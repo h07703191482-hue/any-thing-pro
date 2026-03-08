@@ -4,9 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>توصيل أي شيء - أم قصر</title>
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="أي شيء">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2972/2972185.png">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
     <style>
       :root { 
           --primary: #3949ab; 
@@ -41,7 +49,22 @@
           margin: 0; padding: 0; color: var(--text-color); min-height: 100vh; line-height: 1.6; overflow-x: hidden; 
       }
 
-      /* زر تبديل الوضع الليلي */
+      /* زر تحميل التطبيق الجديد */
+      .download-app-banner {
+          background: var(--gold);
+          color: #000;
+          padding: 10px;
+          text-align: center;
+          font-weight: bold;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          cursor: pointer;
+          border-bottom: 2px solid #e6ae00;
+      }
+
       .theme-toggle {
           position: fixed; top: 15px; left: 15px; z-index: 10001;
           background: var(--primary); color: white; border: none;
@@ -190,7 +213,6 @@
       }
       body.dark-mode #order-status-box { background: #1b2e1b; color: #2ecc71; }
 
-      /* تنسيق عداد الوفاء الجديد */
       .loyalty-card {
           background: var(--stat-box-bg); border-radius: 15px; padding: 15px; margin-bottom: 15px;
           box-shadow: var(--shadow); border: 1.5px solid var(--gold); text-align: center; color: var(--text-color);
@@ -206,6 +228,11 @@
     </style>
 </head>
 <body onload="checkStatus()">
+
+    <div id="download-banner" class="download-app-banner" onclick="handleDownload()">
+        <i class="fas fa-mobile-alt"></i>
+        <span>ثبّت تطبيق "أي شيء" الرسمي الآن مجاناً 📲</span>
+    </div>
 
     <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">
         <i class="fas fa-moon"></i>
@@ -415,6 +442,19 @@
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
+      
+      // رابط MediaFire المباشر الخاص بك
+      const APK_URL = "https://www.mediafire.com/file/k6nk0k3dnmb0od1/_اي_شي_19594874+(1).apk/file";
+
+      // وظيفة التحميل الذكي
+      function handleDownload() {
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+          if (isIOS) {
+              alert("لتثبيت التطبيق على الأيفون:\n1. اضغط على زر المشاركة أسفل المتصفح.\n2. اختر 'إضافة إلى الشاشة الرئيسية' (Add to Home Screen).");
+          } else {
+              window.open(APK_URL, '_blank');
+          }
+      }
 
       function toggleTheme() {
           document.body.classList.toggle('dark-mode');
@@ -539,7 +579,6 @@
           }
       }
 
-      // وظيفة تحديث العداد الأصفر بناءً على رقم الهاتف
       async function updateLoyaltyUI() {
           const phone = document.getElementById('custPhone').value.trim();
           const iqRegex = /^(077|078|075)\d{8}$/;
@@ -647,7 +686,6 @@
           
           document.getElementById('sendBtn').innerText = "جاري الإرسال...";
 
-          // --- تعديل: تحديث العداد بصرياً فوراً للزبون ---
           const bar = document.getElementById('loyalty-bar');
           const countText = document.getElementById('current-order-count');
           let currentVal = parseInt(countText.innerText) || 0;
@@ -655,7 +693,6 @@
               countText.innerText = currentVal + 1;
               bar.style.width = ((currentVal + 1) / 6 * 100) + "%";
           }
-          // -------------------------------------------
 
           const vc = generateSecureVC();
           await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
@@ -715,4 +752,4 @@
       }
     </script>
 </body>
-</html>
+    </html>
