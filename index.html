@@ -22,7 +22,6 @@
           --stat-box-bg: white;
       }
       
-      /* إعدادات الوضع الليلي */
       body.dark-mode {
           --bg-gradient: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460);
           --text-color: #f1f2f6;
@@ -41,7 +40,6 @@
           margin: 0; padding: 0; color: var(--text-color); min-height: 100vh; line-height: 1.6; overflow-x: hidden; 
       }
 
-      /* زر تبديل الوضع الليلي */
       .theme-toggle {
           position: fixed; top: 15px; left: 15px; z-index: 10001;
           background: var(--primary); color: white; border: none;
@@ -164,7 +162,7 @@
       .stat-box p { margin: 5px 0 0; font-size: 18px; font-weight: 700; color: var(--primary); }
       body.dark-mode .stat-box p { color: var(--gold); }
       
-      .form-group { margin-bottom: 15px; }
+      .form-group { margin-bottom: 15px; position: relative; }
       input, textarea, select { 
           width: 100%; padding: 15px; border: 1.5px solid #e0e0e0; border-radius: 12px; 
           box-sizing: border-box; font-family: 'Cairo'; outline: none; font-size: 15px; 
@@ -172,6 +170,16 @@
       }
       body.dark-mode input, body.dark-mode textarea, body.dark-mode select { border-color: #444; }
       input:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(57, 73, 171, 0.1); }
+
+      /* تنسيق زر الموقع الجديد */
+      .location-btn {
+          background: #f1f3f9; color: var(--primary); border: 1.5px dashed var(--primary);
+          padding: 10px; border-radius: 10px; width: 100%; font-family: 'Cairo';
+          font-weight: 600; cursor: pointer; margin-bottom: 10px; transition: 0.3s;
+          display: flex; align-items: center; justify-content: center; gap: 8px;
+      }
+      .location-btn.success { background: var(--success); color: white; border-style: solid; }
+      body.dark-mode .location-btn { background: #2f3542; color: #8fa1ff; border-color: #8fa1ff; }
 
       .phone-note { color: var(--danger); font-size: 12px; font-weight: 700; margin-top: 5px; display: block; text-align: center; }
 
@@ -190,7 +198,6 @@
       }
       body.dark-mode #order-status-box { background: #1b2e1b; color: #2ecc71; }
 
-      /* تنسيق عداد الوفاء الجديد */
       .loyalty-card {
           background: var(--stat-box-bg); border-radius: 15px; padding: 15px; margin-bottom: 15px;
           box-shadow: var(--shadow); border: 1.5px solid var(--gold); text-align: center; color: var(--text-color);
@@ -308,25 +315,30 @@
         <div class="form-group"><input type="text" id="tukName" placeholder="الاسم الكامل"></div>
         <div class="form-group">
             <input type="tel" id="tukPhone" placeholder="رقم الهاتف (عراقي)">
-            <span class="phone-note">يجب كتابة رقمك بشكل صحيح حت لا تتعبنه ولا نتعبك ياحبيبي</span>
+            <span class="phone-note">يجب كتابة رقمك بشكل صحيح</span>
         </div>
         <div class="form-group"><select id="tukArea"></select></div>
         <div class="form-group"><input type="text" id="tukLandmark" placeholder="أقرب نقطة دالة"></div>
+        <button class="location-btn" id="loc-btn-tuk" onclick="getLocation('tuk')">
+            <i class="fas fa-map-marker-alt"></i> تحديد موقعي بدقة 📍
+        </button>
         <button class="send-btn" id="tukSendBtn" onclick="sendTukOrder()">إرسال طلب التكتك</button>
     </div>
 
     <div id="mediator-screen" class="screen container">
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 style="text-align: center;">خدمة الوسيط 🤝</h2>
-        <div class="note">هذه الخدمة مخصصة لتوصيل غرض من مكانك إلى شخص آخر داخل أم قصر.</div>
+        <div class="note">توصيل غرض من مكانك إلى شخص آخر داخل أم قصر.</div>
         <div class="form-group"><input type="text" id="medName" placeholder="الاسم الكامل"></div>
         <div class="form-group">
             <input type="tel" id="medPhone" placeholder="رقم الهاتف (عراقي)">
-            <span class="phone-note">يجب كتابة رقمك بشكل صحيح حت لا تتعبنه ولا نتعبك ياحبيبي</span>
         </div>
         <div class="form-group"><select id="medArea"></select></div>
         <div class="form-group"><input type="text" id="medLandmark" placeholder="أقرب نقطة دالة"></div>
-        <div class="form-group"><textarea id="medOrder" rows="4" placeholder="مختصر للشي الي تبي توصله للشخص الثاني..."></textarea></div>
+        <button class="location-btn" id="loc-btn-med" onclick="getLocation('med')">
+            <i class="fas fa-map-marker-alt"></i> تحديد موقعي بدقة 📍
+        </button>
+        <div class="form-group"><textarea id="medOrder" rows="4" placeholder="مختصر للشي الي تبي توصله..."></textarea></div>
         <button class="send-btn" id="medSendBtn" onclick="sendMedFinal()">إرسال طلب الوسيط</button>
     </div>
 
@@ -336,7 +348,6 @@
         <div class="form-group"><input type="text" id="driverJoinName" placeholder="الاسم الكامل"></div>
         <div class="form-group">
             <input type="tel" id="driverJoinPhone" placeholder="رقم الهاتف (عراقي)">
-            <span class="phone-note">يجب كتابة رقمك بشكل صحيح حت لا تتعبنه ولا نتعبك ياحبيبي</span>
         </div>
         <div class="form-group">
             <select id="bikeType">
@@ -351,8 +362,7 @@
 
     <div id="activation-screen" class="screen container">
         <div class="note">
-            ⚠️ ملاحظة هامة:<br>
-            لقد تم إرسال طلبك بنجاح. سيتم مراجعته من قبل المدير، وفي حال الموافقة سيتم تزويدك بكود التفعيل الخاص بك. يرجى إدخاله لتفعيل حسابك.
+            ⚠️ تم إرسال طلبك. سيقوم المدير بمراجعته وتزويدك بكود التفعيل.
         </div>
         <div class="form-group"><input type="number" id="activationCodeInput" placeholder="أدخل كود التفعيل هنا"></div>
         <button class="send-btn" style="background: var(--success);" onclick="verifyActivationCode()">قدم (تفعيل الحساب)</button>
@@ -372,18 +382,17 @@
         </div>
 
         <div id="order-status-box"><i class="fas fa-info-circle"></i> <span id="status-text">جاري معالجة الطلب...</span></div>
-        <div class="note">
-            🛵 خدمة التوصيل الموحدة:<br>
-            • سعر التوصيل لكافة المناطق: 2,500 دينار فقط
-        </div>
+        <div class="note">🛵 سعر التوصيل لكافة المناطق: 2,500 دينار فقط</div>
         <h2 style="text-align: center;">تفاصيل الطلب 📦</h2>
         <div class="form-group"><input type="text" id="custName" placeholder="الاسم الكامل"></div>
         <div class="form-group">
             <input type="tel" id="custPhone" placeholder="رقم الموبايل (11 رقم)" oninput="updateLoyaltyUI()">
-            <span class="phone-note">يجب كتابة رقمك بشكل صحيح حت لا تتعبنه ولا نتعبك ياحبيبي</span>
         </div>
         <div class="form-group"><select id="custArea"></select></div>
         <div class="form-group"><input type="text" id="custLandmark" placeholder="أقرب نقطة دالة"></div>
+        <button class="location-btn" id="loc-btn-cust" onclick="getLocation('cust')">
+            <i class="fas fa-map-marker-alt"></i> تحديد موقعي بدقة 📍
+        </button>
         <div class="form-group"><textarea id="custOrder" rows="5" placeholder="اكتب قائمة طلباتك هنا..."></textarea></div>
         <button class="send-btn" id="sendBtn" onclick="sendFinal()">إرسال الطلب للمناديب</button>
     </div>
@@ -416,6 +425,8 @@
       const ADMIN_CHAT_ID = "7479342799"; 
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
+      let userCoords = ""; // لتخزين الإحداثيات
+
       function toggleTheme() {
           document.body.classList.toggle('dark-mode');
           const btn = document.getElementById('theme-btn');
@@ -426,6 +437,28 @@
 
       function generateSecureVC() {
           return Math.floor(1000 + Math.random() * 9000).toString();
+      }
+
+      // ميزة تحديد الموقع الجديدة
+      function getLocation(type) {
+          const btn = document.getElementById(`loc-btn-${type}`);
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحديد...';
+          
+          if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                      userCoords = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
+                      btn.innerHTML = '<i class="fas fa-check"></i> تم تحديد موقعك ✅';
+                      btn.classList.add('success');
+                  },
+                  (error) => {
+                      alert("فشل تحديد الموقع، يرجى تفعيل الـ GPS في هاتفك");
+                      btn.innerHTML = '<i class="fas fa-map-marker-alt"></i> حاول مرة أخرى';
+                  }
+              );
+          } else {
+              alert("متصفحك لا يدعم تحديد الموقع");
+          }
       }
 
       function checkStatus() {
@@ -444,16 +477,10 @@
               document.getElementById('join-driver-card').style.display = 'none';
               document.getElementById('driver-plaza-card').style.display = 'flex';
               document.getElementById('driver-status-badge').style.display = 'block';
-              checkRemoteReset();
               setInterval(checkRemoteReset, 15000); 
           }
           showScreen('home-screen');
-          
-          setTimeout(() => {
-              const logo = document.getElementById('app-logo-splash');
-              if(logo) logo.classList.add('show-logo');
-          }, 1500);
-
+          setTimeout(() => { document.getElementById('app-logo-splash').classList.add('show-logo'); }, 1500);
           setTimeout(skipSplash, 3500); 
       }
 
@@ -472,12 +499,9 @@
               const response = await fetch(`${GS_URL}?action=checkReset&phone=${myPhone}`);
               const result = await response.text();
               if (result === "reset_now") {
-                  localStorage.setItem('d_count', 0);
-                  localStorage.setItem('d_profit', 0);
-                  localStorage.setItem('a_profit', 0);
-                  localStorage.setItem('used_codes', "[]");
+                  localStorage.setItem('d_count', 0); localStorage.setItem('d_profit', 0);
+                  localStorage.setItem('a_profit', 0); localStorage.setItem('used_codes', "[]");
                   updateStatsUI();
-                  alert("✅ تمت مزامنة الحساب: تم تصفير أرباحك من قبل المدير.");
               }
           } catch(e) {}
       }
@@ -492,40 +516,30 @@
           const phone = document.getElementById('driverJoinPhone').value.trim();
           const bike = document.getElementById('bikeType').value;
           const iqRegex = /^(077|078|075)\d{8}$/;
-          if(!name || !iqRegex.test(phone) || !bike) return alert("يرجى كتابة رقم الهاتف العراقي بشكل صحيح (11 رقم)");
-          localStorage.setItem('temp_name', name);
-          localStorage.setItem('temp_phone', phone);
+          if(!name || !iqRegex.test(phone) || !bike) return alert("بيانات غير مكتملة");
+          localStorage.setItem('temp_name', name); localStorage.setItem('temp_phone', phone);
           const randomCode = Math.floor(100000 + Math.random() * 900000);
           localStorage.setItem('temp_activation', randomCode);
           localStorage.setItem('pending_join', 'true');
           const msg = `📥 طلب انضمام جديد\n👤 الاسم: ${name}\n📞 الهاتف: ${phone}\n🏍️ الدراجة: ${bike}\n🔑 الكود: ${randomCode}`;
-          try {
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                  method: "POST", headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
-              });
-              showScreen('activation-screen');
-          } catch(e) { alert("فشل الإرسال"); }
+          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+          });
+          showScreen('activation-screen');
       }
 
       function verifyActivationCode() {
           if(document.getElementById('activationCodeInput').value.trim() === localStorage.getItem('temp_activation')) {
-              const name = localStorage.getItem('temp_name');
-              document.getElementById('welcome-msg').innerText = "كفو منك يا " + name;
-              document.getElementById('welcome-overlay').style.display = 'flex';
-              confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#3949ab', '#ffc107', '#2ecc71', '#ffffff'] });
-              setTimeout(() => {
-                  localStorage.setItem('isVerifiedDriver', 'true');
-                  localStorage.setItem('driver_name', name);
-                  localStorage.setItem('driver_phone', localStorage.getItem('temp_phone'));
-                  localStorage.removeItem('pending_join');
-                  location.reload();
-              }, 4000);
+              localStorage.setItem('isVerifiedDriver', 'true');
+              localStorage.setItem('driver_name', localStorage.getItem('temp_name'));
+              localStorage.setItem('driver_phone', localStorage.getItem('temp_phone'));
+              location.reload();
           } else { alert("رمز التفعيل غير صحيح"); }
       }
 
-      function cancelJoinRequest() { if(confirm("إلغاء التقديم؟")) { localStorage.clear(); location.reload(); } }
-      function resignDriver() { if (confirm("هل تريد الاستقالة فعلاً؟ سيتم مسح جميع بياناتك.")) { localStorage.clear(); location.reload(); } }
+      function cancelJoinRequest() { if(confirm("إلغاء؟")) { localStorage.clear(); location.reload(); } }
+      function resignDriver() { if (confirm("استقالة؟")) { localStorage.clear(); location.reload(); } }
 
       function showScreen(id) {
           document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
@@ -534,48 +548,20 @@
               updateStatsUI();
               document.getElementById('driver-display-name').innerText = "المندوب: " + localStorage.getItem('driver_name');
           }
-          if(id === 'order-screen') {
-              updateLoyaltyUI();
-          }
+          if(id === 'order-screen') updateLoyaltyUI();
       }
 
-      // وظيفة تحديث العداد الأصفر بناءً على رقم الهاتف
       async function updateLoyaltyUI() {
           const phone = document.getElementById('custPhone').value.trim();
           const iqRegex = /^(077|078|075)\d{8}$/;
-          const bar = document.getElementById('loyalty-bar');
-          const countText = document.getElementById('current-order-count');
-          const msg = document.getElementById('loyalty-msg');
-          
           if (iqRegex.test(phone)) {
               try {
                   const response = await fetch(`${GS_URL}?action=getCustomerOrders&phone=${phone}`);
                   const count = parseInt(await response.text()) || 0;
-                  
                   let progressCount = count % 6;
-                  countText.innerText = progressCount;
-                  
-                  let percentage = (progressCount / 6) * 100;
-                  bar.style.width = percentage + "%";
-                  
-                  if (progressCount === 5) {
-                      msg.innerHTML = "🎊 طلبك الجاي هو السادس.. يعني التوصيل <b>مجاني</b>!";
-                      msg.style.color = "var(--success)";
-                  } else if (progressCount === 0 && count > 0) {
-                      bar.style.width = "100%";
-                      countText.innerText = "6";
-                      msg.innerHTML = "🎉 مبروك! حصلت على التوصيل المجاني لهذا الطلب!";
-                      msg.style.color = "var(--gold)";
-                  } else {
-                      let remain = 6 - progressCount;
-                      msg.innerText = `باقي لك ${remain} طلبات وتحصل على توصيل مجاني!`;
-                      msg.style.color = "var(--primary)";
-                  }
-              } catch (e) { console.log("Loyalty error"); }
-          } else {
-              bar.style.width = "0%";
-              countText.innerText = "0";
-              msg.innerText = "اكتب رقمك لمعرفة تقدمك نحو الهدية 🎁";
+                  document.getElementById('current-order-count').innerText = progressCount;
+                  document.getElementById('loyalty-bar').style.width = (progressCount / 6 * 100) + "%";
+              } catch (e) {}
           }
       }
 
@@ -584,27 +570,20 @@
           const phone = document.getElementById('tukPhone').value.trim();
           const area = document.getElementById('tukArea').value;
           const land = document.getElementById('tukLandmark').value.trim();
-          const iqRegex = /^(077|078|075)\d{8}$/;
+          if(!name || !phone || !area) return alert("أكمل البيانات");
 
-          if(!name || !phone || !area) return alert("يرجى إكمال البيانات واختيار المنطقة");
-          if(!iqRegex.test(phone)) return alert("رقم الهاتف غير صحيح ياحبيبي، تأكد من الـ 11 رقم!");
-
-          document.getElementById('tukSendBtn').innerText = "جاري الإرسال...";
           const vc = generateSecureVC();
           await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true`);
-
-          const msg = `🚖 طلب تكتك بلي جديد\n━━━━━━━━━━━━━━━\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الموقع: ${area} - ${land}\n💰 السعر: 1500 دينار`;
-          try {
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                  method: "POST", headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ 
-                      chat_id: PUBLIC_CHANNEL, text: msg, 
-                      reply_markup: { inline_keyboard: [[{ text: "📝 حجز طلب التكتك", callback_data: `claim|${name}|${vc}` }]] } 
-                  })
-              });
-              alert("سوف يصل تكتك بلي عند حجز الطلب قريبا"); 
-              showScreen('home-screen');
-          } catch(e) { alert("حدث خطأ"); }
+          const msg = `🚖 طلب تكتك جديد\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📌 الدالة: ${land}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
+          
+          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ 
+                  chat_id: PUBLIC_CHANNEL, text: msg, 
+                  reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } 
+              })
+          });
+          alert("تم الإرسال!"); showScreen('home-screen');
       }
 
       async function sendMedFinal() {
@@ -612,27 +591,20 @@
           const phone = document.getElementById('medPhone').value.trim();
           const order = document.getElementById('medOrder').value.trim();
           const area = document.getElementById('medArea').value;
-          const land = document.getElementById('medLandmark').value.trim();
-          const iqRegex = /^(077|078|075)\d{8}$/;
-          if(!name || !phone || !order || !area) return alert("يرجى إكمال البيانات واختيار المنطقة");
-          if(!iqRegex.test(phone)) return alert("رقم الهاتف غير صحيح ياحبيبي، تأكد من الـ 11 رقم!");
-          
-          document.getElementById('medSendBtn').innerText = "جاري الإرسال...";
+          if(!name || !phone || !area) return alert("أكمل البيانات");
+
           const vc = generateSecureVC();
           await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
-
-          const msg = `🔵 طلب مسواك جديد (وسيط) \n━━━━━━━━━━━━━━━\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الموقع: ${area} - ${land}\n📝 الطلب المختصر: ${order}`;
-          try {
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                  method: "POST", headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ 
-                      chat_id: PUBLIC_CHANNEL, text: msg, 
-                      reply_markup: { inline_keyboard: [[{ text: "📝 حجز طلب الوسيط", callback_data: `claimMed|${name}|${vc}` }]] } 
-                  })
-              });
-              alert("تم إرسال طلب الوسيط بنجاح!"); 
-              showScreen('home-screen');
-          } catch(e) { alert("حدث خطأ"); }
+          const msg = `🔵 طلب وسيط\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📝 الغرض: ${order}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
+          
+          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ 
+                  chat_id: PUBLIC_CHANNEL, text: msg, 
+                  reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } 
+              })
+          });
+          alert("تم الإرسال!"); showScreen('home-screen');
       }
 
       async function sendFinal() {
@@ -641,71 +613,39 @@
           const order = document.getElementById('custOrder').value.trim();
           const area = document.getElementById('custArea').value;
           const land = document.getElementById('custLandmark').value.trim();
-          const iqRegex = /^(077|078|075)\d{8}$/;
-          if(!name || !phone || !order || !area) return alert("يرجى إكمال البيانات واختيار المنطقة");
-          if(!iqRegex.test(phone)) return alert("رقم الهاتف غير صحيح ياحبيبي، تأكد من الـ 11 رقم!");
-          
-          document.getElementById('sendBtn').innerText = "جاري الإرسال...";
-
-          // --- تعديل: تحديث العداد بصرياً فوراً للزبون ---
-          const bar = document.getElementById('loyalty-bar');
-          const countText = document.getElementById('current-order-count');
-          let currentVal = parseInt(countText.innerText) || 0;
-          if (currentVal < 6) {
-              countText.innerText = currentVal + 1;
-              bar.style.width = ((currentVal + 1) / 6 * 100) + "%";
-          }
-          // -------------------------------------------
+          if(!name || !phone || !order || !area) return alert("أكمل البيانات");
 
           const vc = generateSecureVC();
           await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
+          const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📌 الدالة: ${land}\n📝 الطلب: ${order}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
           
-          const msg = `🔵 طلب مسواك جديد (موحد)\n━━━━━━━━━━━━━━━\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الموقع: ${area} - ${land}\n📝 الطلب: ${order}`;
-          try {
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                  method: "POST", headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ 
-                      chat_id: PUBLIC_CHANNEL, text: msg, 
-                      reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } 
-                  })
-              });
-              alert("تم إرسال الطلب بنجاح!"); 
-              document.getElementById('custOrder').value = "";
-              document.getElementById('sendBtn').innerText = "إرسال الطلب للمناديب";
-              updateLoyaltyUI(); 
-          } catch(e) { alert("فشل الإرسال"); }
+          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ 
+                  chat_id: PUBLIC_CHANNEL, text: msg, 
+                  reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } 
+              })
+          });
+          alert("تم الإرسال!"); showScreen('home-screen');
       }
 
       async function processVerifyCode() {
           const code = document.getElementById('driverVerifyInput').value.trim();
           const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
-          let usedCodes = JSON.parse(localStorage.getItem('used_codes') || "[]");
-          if (usedCodes.includes(code)) return alert("هذا الكود مستخدم مسبقاً");
-
           const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
           const checkResult = await checkResp.text();
 
           if (checkResult.startsWith("valid")) {
               let dG = checkResult.includes("tuk") ? 1000 : 2000;
-              let aG = 500;
-
-              usedCodes.push(code);
-              localStorage.setItem('used_codes', JSON.stringify(usedCodes));
               localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
               localStorage.setItem('d_profit', parseInt(localStorage.getItem('d_profit') || 0) + dG);
-              localStorage.setItem('a_profit', parseInt(localStorage.getItem('a_profit') || 0) + aG);
+              localStorage.setItem('a_profit', parseInt(localStorage.getItem('a_profit') || 0) + 500);
               updateStatsUI();
-              
               const dName = localStorage.getItem('driver_name');
               const dPhone = localStorage.getItem('driver_phone');
-              fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(dName)}&phone=${dPhone}&inCount=${localStorage.getItem('d_count')}&inDriver=${localStorage.getItem('d_profit')}&inAdmin=${localStorage.getItem('a_profit')}&outCount=0&outDriver=0&outAdmin=0`);
-              
-              alert(`✅ كفو! تم التأكيد تلقائياً.\n💰 أرباحك: ${dG} د.ع`);
-              document.getElementById('driverVerifyInput').value = "";
-              document.getElementById('driverVerifyPhoneInput').value = "";
-          } else {
-              alert("عذراً، الكود غير صحيح لهذا الهاتف!");
-          }
+              fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(dName)}&phone=${dPhone}&inCount=${localStorage.getItem('d_count')}&inDriver=${localStorage.getItem('d_profit')}&inAdmin=${localStorage.getItem('a_profit')}`);
+              alert(`تم التأكيد! أرباحك: ${dG}`);
+          } else alert("الكود خطأ");
       }
 
       function updateStatsUI() {
