@@ -315,7 +315,7 @@
         <div class="form-group"><input type="text" id="tukName" placeholder="الاسم الكامل"></div>
         <div class="form-group">
             <input type="tel" id="tukPhone" placeholder="رقم الهاتف (عراقي)">
-            <span class="phone-note">يرجى كتابه الرقم الصحيح حت لا تتعبنه ولا نتعبك</span>
+            <span class="phone-note">يجب كتابة رقمك بشكل صحيح</span>
         </div>
         <div class="form-group"><select id="tukArea"></select></div>
         <div class="form-group"><input type="text" id="tukLandmark" placeholder="أقرب نقطة دالة"></div>
@@ -332,7 +332,6 @@
         <div class="form-group"><input type="text" id="medName" placeholder="الاسم الكامل"></div>
         <div class="form-group">
             <input type="tel" id="medPhone" placeholder="رقم الهاتف (عراقي)">
-            <span class="phone-note">يرجى كتابه الرقم الصحيح حت لا تتعبنه ولا نتعبك</span>
         </div>
         <div class="form-group"><select id="medArea"></select></div>
         <div class="form-group"><input type="text" id="medLandmark" placeholder="أقرب نقطة دالة"></div>
@@ -388,7 +387,6 @@
         <div class="form-group"><input type="text" id="custName" placeholder="الاسم الكامل"></div>
         <div class="form-group">
             <input type="tel" id="custPhone" placeholder="رقم الموبايل (11 رقم)" oninput="updateLoyaltyUI()">
-            <span class="phone-note">يرجى كتابه الرقم الصحيح حت لا تتعبنه ولا نتعبك</span>
         </div>
         <div class="form-group"><select id="custArea"></select></div>
         <div class="form-group"><input type="text" id="custLandmark" placeholder="أقرب نقطة دالة"></div>
@@ -537,7 +535,7 @@
               localStorage.setItem('driver_name', localStorage.getItem('temp_name'));
               localStorage.setItem('driver_phone', localStorage.getItem('temp_phone'));
               location.reload();
-          } else { alert("رمز التفعيل غير صحيح"); } verification code is 2006.
+          } else { alert("رمز التفعيل غير صحيح"); }
       }
 
       function cancelJoinRequest() { if(confirm("إلغاء؟")) { localStorage.clear(); location.reload(); } }
