@@ -171,14 +171,13 @@
       body.dark-mode input, body.dark-mode textarea, body.dark-mode select { border-color: #444; }
       input:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(57, 73, 171, 0.1); }
 
-      /* تنسيق زر الموقع الجديد */
       .location-btn {
           background: #f1f3f9; color: var(--primary); border: 1.5px dashed var(--primary);
           padding: 10px; border-radius: 10px; width: 100%; font-family: 'Cairo';
           font-weight: 600; cursor: pointer; margin-bottom: 10px; transition: 0.3s;
           display: flex; align-items: center; justify-content: center; gap: 8px;
       }
-      .location-btn.success { background: var(--success); color: white; border-style: solid; }
+      .location-btn.success { background: var(--success) !important; color: white !important; border-style: solid; }
       body.dark-mode .location-btn { background: #2f3542; color: #8fa1ff; border-color: #8fa1ff; }
 
       .phone-note { color: var(--danger); font-size: 12px; font-weight: 700; margin-top: 5px; display: block; text-align: center; }
@@ -425,10 +424,7 @@
       const ADMIN_CHAT_ID = "7479342799"; 
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
-      let userCoords = ""; // لتخزين الإحداثيات
-      
-      // تعبير نمطي للتحقق من الرقم العراقي
-      const IRAQ_PHONE_REGEX = /^(077|078|075)\d{8}$/;
+      let userCoords = ""; 
 
       function toggleTheme() {
           document.body.classList.toggle('dark-mode');
@@ -442,7 +438,6 @@
           return Math.floor(1000 + Math.random() * 9000).toString();
       }
 
-      // ميزة تحديد الموقع الجديدة
       function getLocation(type) {
           const btn = document.getElementById(`loc-btn-${type}`);
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحديد...';
@@ -480,33 +475,22 @@
               document.getElementById('join-driver-card').style.display = 'none';
               document.getElementById('driver-plaza-card').style.display = 'flex';
               document.getElementById('driver-status-badge').style.display = 'block';
-              setInterval(checkRemoteReset, 15000); 
           }
-          showScreen('home-screen');
-          setTimeout(() => { document.getElementById('app-logo-splash').classList.add('show-logo'); }, 1500);
-          setTimeout(skipSplash, 3500); 
+          
+          setTimeout(() => { document.getElementById('app-logo-splash').classList.add('show-logo'); }, 800);
+          // حل مشكلة تعليق الدراجة: إخفاء تلقائي بعد 3 ثوانٍ
+          setTimeout(skipSplash, 3000); 
       }
 
       function skipSplash() {
           const splash = document.getElementById('splash-screen');
           if (splash && splash.style.display !== 'none') {
               splash.classList.add('splash-exit');
-              setTimeout(() => { splash.style.display = 'none'; }, 500);
+              setTimeout(() => { 
+                splash.style.display = 'none'; 
+                showScreen('home-screen');
+              }, 500);
           }
-      }
-
-      async function checkRemoteReset() {
-          try {
-              const myPhone = localStorage.getItem('driver_phone');
-              if(!myPhone) return;
-              const response = await fetch(`${GS_URL}?action=checkReset&phone=${myPhone}`);
-              const result = await response.text();
-              if (result === "reset_now") {
-                  localStorage.setItem('d_count', 0); localStorage.setItem('d_profit', 0);
-                  localStorage.setItem('a_profit', 0); localStorage.setItem('used_codes', "[]");
-                  updateStatsUI();
-              }
-          } catch(e) {}
       }
 
       function openJoinScreen() {
@@ -518,9 +502,8 @@
           const name = document.getElementById('driverJoinName').value.trim();
           const phone = document.getElementById('driverJoinPhone').value.trim();
           const bike = document.getElementById('bikeType').value;
-          
-          if(!name || !IRAQ_PHONE_REGEX.test(phone) || !bike) return alert("يرجى إدخال اسمك ونوع الدراجة ورقم هاتف عراقي صحيح (077/078/075)");
-          
+          const iqRegex = /^(077|078|075)\d{8}$/;
+          if(!name || !iqRegex.test(phone) || !bike) return alert("بيانات غير مكتملة");
           localStorage.setItem('temp_name', name); localStorage.setItem('temp_phone', phone);
           const randomCode = Math.floor(100000 + Math.random() * 900000);
           localStorage.setItem('temp_activation', randomCode);
@@ -547,7 +530,9 @@
 
       function showScreen(id) {
           document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
-          document.getElementById(id).classList.add('active-screen');
+          const target = document.getElementById(id);
+          if(target) target.classList.add('active-screen');
+          
           if(id === 'plaza-screen') {
               updateStatsUI();
               document.getElementById('driver-display-name').innerText = "المندوب: " + localStorage.getItem('driver_name');
@@ -557,14 +542,14 @@
 
       async function updateLoyaltyUI() {
           const phone = document.getElementById('custPhone').value.trim();
-          if (IRAQ_PHONE_REGEX.test(phone)) {
+          const iqRegex = /^(077|078|075)\d{8}$/;
+          if (iqRegex.test(phone)) {
               try {
                   const response = await fetch(`${GS_URL}?action=getCustomerOrders&phone=${phone}`);
                   const count = parseInt(await response.text()) || 0;
                   let progressCount = count % 6;
                   document.getElementById('current-order-count').innerText = progressCount;
                   document.getElementById('loyalty-bar').style.width = (progressCount / 6 * 100) + "%";
-                  document.getElementById('loyalty-msg').innerText = progressCount === 5 ? "هذا طلبك الخامس! الطلب القادم مجاني 🎁" : "استمر بالطلب للحصول على توصيل مجاني";
               } catch (e) {}
           }
       }
@@ -574,12 +559,10 @@
           const phone = document.getElementById('tukPhone').value.trim();
           const area = document.getElementById('tukArea').value;
           const land = document.getElementById('tukLandmark').value.trim();
-          
-          if(!name || !IRAQ_PHONE_REGEX.test(phone) || !area) return alert("أكمل البيانات وتأكد من كتابة رقم عراقي صحيح");
+          if(!name || !phone || !area) return alert("أكمل البيانات");
 
           const vc = generateSecureVC();
-          await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true`);
-          const msg = `🚖 طلب تكتك جديد\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📌 الدالة: ${land}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
+          const msg = `🚖 طلب تكتك جديد\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📌 الدالة: ${land}\n🗺️ الموقع: ${userCoords || 'لم يحدد'}`;
           
           await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
               method: "POST", headers: { "Content-Type": "application/json" },
@@ -596,12 +579,10 @@
           const phone = document.getElementById('medPhone').value.trim();
           const order = document.getElementById('medOrder').value.trim();
           const area = document.getElementById('medArea').value;
-          
-          if(!name || !IRAQ_PHONE_REGEX.test(phone) || !area) return alert("أكمل البيانات وتأكد من كتابة رقم عراقي صحيح");
+          if(!name || !phone || !area) return alert("أكمل البيانات");
 
           const vc = generateSecureVC();
-          await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
-          const msg = `🔵 طلب وسيط\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📝 الغرض: ${order}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
+          const msg = `🔵 طلب وسيط\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📝 الغرض: ${order}\n🗺️ الموقع: ${userCoords || 'لم يحدد'}`;
           
           await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
               method: "POST", headers: { "Content-Type": "application/json" },
@@ -619,12 +600,10 @@
           const order = document.getElementById('custOrder').value.trim();
           const area = document.getElementById('custArea').value;
           const land = document.getElementById('custLandmark').value.trim();
-          
-          if(!name || !IRAQ_PHONE_REGEX.test(phone) || !order || !area) return alert("أكمل البيانات وتأكد من كتابة رقم عراقي صحيح");
+          if(!name || !phone || !order || !area) return alert("أكمل البيانات");
 
           const vc = generateSecureVC();
-          await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
-          const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📌 الدالة: ${land}\n📝 الطلب: ${order}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
+          const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📌 الدالة: ${land}\n📝 الطلب: ${order}\n🗺️ الموقع: ${userCoords || 'لم يحدد'}`;
           
           await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
               method: "POST", headers: { "Content-Type": "application/json" },
@@ -639,9 +618,6 @@
       async function processVerifyCode() {
           const code = document.getElementById('driverVerifyInput').value.trim();
           const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
-          
-          if(!IRAQ_PHONE_REGEX.test(custPhone)) return alert("رقم هاتف الزبون غير صحيح");
-          
           const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
           const checkResult = await checkResp.text();
 
@@ -651,9 +627,6 @@
               localStorage.setItem('d_profit', parseInt(localStorage.getItem('d_profit') || 0) + dG);
               localStorage.setItem('a_profit', parseInt(localStorage.getItem('a_profit') || 0) + 500);
               updateStatsUI();
-              const dName = localStorage.getItem('driver_name');
-              const dPhone = localStorage.getItem('driver_phone');
-              fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(dName)}&phone=${dPhone}&inCount=${localStorage.getItem('d_count')}&inDriver=${localStorage.getItem('d_profit')}&inAdmin=${localStorage.getItem('a_profit')}`);
               alert(`تم التأكيد! أرباحك: ${dG}`);
           } else alert("الكود خطأ");
       }
