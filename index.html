@@ -49,6 +49,23 @@
       }
       .theme-toggle:active { transform: scale(0.9); }
 
+      .whatsapp-float {
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          background-color: #25d366;
+          color: #FFF;
+          border-radius: 50px;
+          text-align: center;
+          font-size: 30px;
+          box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+          z-index: 10000;
+          width: 60px;
+          height: 60px;
+          display: flex; align-items: center; justify-content: center; text-decoration: none; transition: transform 0.3s ease;
+      }
+      .whatsapp-float:active { transform: scale(0.9); }
+
       @keyframes gradientBG {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
@@ -171,7 +188,6 @@
       body.dark-mode input, body.dark-mode textarea, body.dark-mode select { border-color: #444; }
       input:focus { border-color: var(--primary); box-shadow: 0 0 8px rgba(57, 73, 171, 0.1); }
 
-      /* تنسيق زر الموقع الجديد */
       .location-btn {
           background: #f1f3f9; color: var(--primary); border: 1.5px dashed var(--primary);
           padding: 10px; border-radius: 10px; width: 100%; font-family: 'Cairo';
@@ -189,7 +205,13 @@
       .note { font-size: 14px; color: #2d3436; background: #fff9c4; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-right: 5px solid var(--gold); font-weight: 600; line-height: 1.5; }
       body.dark-mode .note { background: #3d3d29; color: #fff9c4; }
 
-      #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(57, 73, 171, 0.95); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; box-sizing: border-box; }
+      #welcome-overlay { 
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+          background: rgba(57, 73, 171, 0.98); z-index: 10000; 
+          display: none; flex-direction: column; align-items: center; justify-content: center; 
+          color: white; text-align: center; padding: 20px; box-sizing: border-box; 
+          cursor: pointer;
+      }
 
       #order-status-box {
           display: none; background: #e8f5e9; border: 2px solid var(--success);
@@ -203,26 +225,59 @@
           box-shadow: var(--shadow); border: 1.5px solid var(--gold); text-align: center; color: var(--text-color);
       }
       .loyalty-progress {
-          background: #f0f0f0; border-radius: 20px; height: 20px; margin: 10px 0; overflow: hidden; position: relative; border: 1px solid #ddd;
+          background: #f0f0f0; border-radius: 20px; height: 12px; margin: 15px 0; overflow: hidden; position: relative; border: 1px solid #ddd;
       }
       body.dark-mode .loyalty-progress { background: #1a1a1a; border-color: #333; }
       .loyalty-bar {
           background: linear-gradient(90deg, #ffd700, #ffc107); height: 100%; width: 0%; transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       }
-      .loyalty-text { font-size: 14px; font-weight: 700; color: var(--text-color); }
+      .loyalty-text { font-size: 15px; font-weight: 700; color: var(--text-color); }
+      .gift-note { font-size: 13px; color: var(--primary); font-weight: 600; display: block; margin-top: 5px; }
+      
+      .telegram-card {
+          background: #0088cc; color: white !important; border: none !important; margin-top: 15px;
+      }
+      .telegram-card i { background: rgba(255,255,255,0.2) !important; color: white !important; }
+      .telegram-card small { color: rgba(255,255,255,0.8); }
+
+      /* تنسيق زر الصوت الجديد */
+      .voice-btn {
+          position: absolute; left: 10px; top: 12px;
+          background: #ff5252; color: white; border: none;
+          width: 35px; height: 35px; border-radius: 10px;
+          cursor: pointer; display: flex; align-items: center; justify-content: center;
+          transition: 0.3s; z-index: 5;
+      }
+      .voice-btn.recording {
+          animation: pulse-red 1s infinite;
+          background: #2ecc71;
+      }
+      @keyframes pulse-red {
+          0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7); }
+          70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(255, 82, 82, 0); }
+          100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 82, 82, 0); }
+      }
     </style>
 </head>
 <body onload="checkStatus()">
+
+    <a href="https://wa.me/9647739470354" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
     <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">
         <i class="fas fa-moon"></i>
     </button>
 
-    <div id="welcome-overlay">
-        <i class="fas fa-check-circle" style="font-size: 80px; color: var(--success); margin-bottom: 20px;"></i>
-        <h1>أهلاً بك في الفريق! 🥳</h1>
-        <p id="welcome-msg" style="font-size: 18px;"></p>
-        <p>تم تفعيل حسابك كمندوب رسمي في تطبيق "أي شيء"</p>
+    <div id="welcome-overlay" onclick="skipWelcome()">
+        <i class="fas fa-star" style="font-size: 80px; color: var(--gold); margin-bottom: 20px; animation: bounce 1s infinite;"></i>
+        <h1 id="welcome-title">أهلاً بك في الفريق! 🥳</h1>
+        <p id="welcome-msg" style="font-size: 20px; margin-bottom: 20px;"></p>
+        <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; margin-bottom: 20px;">
+            <p>تم تفعيل حسابك كمندوب رسمي بنجاح</p>
+            <p style="font-size: 14px;">جاري الانتقال للوحة التحكم...</p>
+        </div>
+        <i class="fas fa-spinner fa-spin" style="font-size: 30px;"></i>
     </div>
 
     <div id="splash-screen" onclick="skipSplash()">
@@ -230,11 +285,9 @@
           <h2>مرحباً بكم في تطبيق أي شيء ✨</h2>
           <p>أهل أم قصر.. نصلكم أينما كنتم</p>
       </div>
-
       <div id="app-logo-splash">
           <i class="fas fa-shopping-bag"></i>
       </div>
-
       <div class="road-realistic">
           <div class="road-lines"></div>
       </div>
@@ -254,22 +307,18 @@
         <h1>أبشر.. أي شيء! ✨</h1>
         <p>خدمتكم وسعادتنا في سرعة وصولنا</p>
       </div>
-      
       <div class="select-card" onclick="showScreen('order-screen')">
         <i class="fas fa-shopping-cart"></i>
         <div><h3>تسوق مسواكك</h3><small>اطلب مسواكك أو غداك الآن</small></div>
       </div>
-
       <div class="select-card" onclick="showScreen('mediator-screen')">
         <i class="fas fa-handshake" style="color: #ff5722; background: #fbe9e7;"></i>
         <div><h3>الوسيط</h3><small>توصيل غرض من شخص لآخر</small></div>
       </div>
-
       <div class="select-card" onclick="showScreen('tuk-screen')">
         <i class="fas fa-taxi" style="color: #ffc107; background: #fff8e1;"></i>
         <div><h3>تكتك بلي</h3><small>احجز تكتك لرحلتك الآن</small></div>
       </div>
-
       <div id="join-driver-card" class="select-card" onclick="openJoinScreen()">
         <i class="fas fa-user-plus" style="color: var(--success); background: #e8f5e9;"></i>
         <div><h3>التقديم على وظيفة</h3><small>كن جزءاً من فريقنا</small></div>
@@ -315,7 +364,7 @@
         <div class="form-group"><input type="text" id="tukName" placeholder="الاسم الكامل"></div>
         <div class="form-group">
             <input type="tel" id="tukPhone" placeholder="رقم الهاتف (عراقي)">
-            <span class="phone-note">يجب كتابة رقمك بشكل صحيح</span>
+            <span class="phone-note" style="color: red;">تاكد من رقمك عدل قبل لا تسوي اي شي يروحي</span>
         </div>
         <div class="form-group"><select id="tukArea"></select></div>
         <div class="form-group"><input type="text" id="tukLandmark" placeholder="أقرب نقطة دالة"></div>
@@ -332,13 +381,17 @@
         <div class="form-group"><input type="text" id="medName" placeholder="الاسم الكامل"></div>
         <div class="form-group">
             <input type="tel" id="medPhone" placeholder="رقم الهاتف (عراقي)">
+            <span class="phone-note" style="color: red;">تاكد من رقمك عدل قبل لا تسوي اي شي يروحي</span>
         </div>
         <div class="form-group"><select id="medArea"></select></div>
         <div class="form-group"><input type="text" id="medLandmark" placeholder="أقرب نقطة دالة"></div>
         <button class="location-btn" id="loc-btn-med" onclick="getLocation('med')">
             <i class="fas fa-map-marker-alt"></i> تحديد موقعي بدقة 📍
         </button>
-        <div class="form-group"><textarea id="medOrder" rows="4" placeholder="مختصر للشي الي تبي توصله..."></textarea></div>
+        <div class="form-group" style="position: relative;">
+            <button class="voice-btn" onclick="startVoice('medOrder')"><i class="fas fa-microphone"></i></button>
+            <textarea id="medOrder" rows="4" placeholder="مختصر للشي الي تبي توصله..."></textarea>
+        </div>
         <button class="send-btn" id="medSendBtn" onclick="sendMedFinal()">إرسال طلب الوسيط</button>
     </div>
 
@@ -348,6 +401,7 @@
         <div class="form-group"><input type="text" id="driverJoinName" placeholder="الاسم الكامل"></div>
         <div class="form-group">
             <input type="tel" id="driverJoinPhone" placeholder="رقم الهاتف (عراقي)">
+            <span class="phone-note" style="color: red;">تاكد من رقمك عدل قبل لا تسوي اي شي يروحي</span>
         </div>
         <div class="form-group">
             <select id="bikeType">
@@ -374,11 +428,11 @@
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         
         <div id="loyalty-info" class="loyalty-card">
-            <div class="loyalty-text">هذا طلبك رقم: <span id="current-order-count">0</span> من أصل 6</div>
+            <div class="loyalty-text">هذا طلبك رقم <span id="current-order-count">0</span> من أصل 6</div>
             <div class="loyalty-progress">
                 <div id="loyalty-bar" class="loyalty-bar"></div>
             </div>
-            <div id="loyalty-msg" class="loyalty-text" style="color: var(--primary);">اكتب رقمك لمعرفة تقدمك نحو الهدية 🎁</div>
+            <span class="gift-note">أوصل للطلب 6 وكروتك علينه 🎁</span>
         </div>
 
         <div id="order-status-box"><i class="fas fa-info-circle"></i> <span id="status-text">جاري معالجة الطلب...</span></div>
@@ -387,13 +441,17 @@
         <div class="form-group"><input type="text" id="custName" placeholder="الاسم الكامل"></div>
         <div class="form-group">
             <input type="tel" id="custPhone" placeholder="رقم الموبايل (11 رقم)" oninput="updateLoyaltyUI()">
+            <span class="phone-note" style="color: red;">تاكد من رقمك عدل قبل لا تسوي اي شي يروحي</span>
         </div>
         <div class="form-group"><select id="custArea"></select></div>
         <div class="form-group"><input type="text" id="custLandmark" placeholder="أقرب نقطة دالة"></div>
         <button class="location-btn" id="loc-btn-cust" onclick="getLocation('cust')">
             <i class="fas fa-map-marker-alt"></i> تحديد موقعي بدقة 📍
         </button>
-        <div class="form-group"><textarea id="custOrder" rows="5" placeholder="اكتب قائمة طلباتك هنا..."></textarea></div>
+        <div class="form-group" style="position: relative;">
+            <button class="voice-btn" onclick="startVoice('custOrder')"><i class="fas fa-microphone"></i></button>
+            <textarea id="custOrder" rows="5" placeholder="اكتب قائمة طلباتك هنا..."></textarea>
+        </div>
         <button class="send-btn" id="sendBtn" onclick="sendFinal()">إرسال الطلب للمناديب</button>
     </div>
 
@@ -405,6 +463,15 @@
             <div class="stat-box"><h4>ربحك (د.ع)</h4><p id="stat-driver">0</p></div>
             <div class="stat-box" style="grid-column: span 2;"><h4>حساب المدير (د.ع)</h4><p id="stat-admin" style="color: var(--danger);">0</p></div>
         </div>
+        <a href="https://t.me/uumqaser" target="_blank" style="text-decoration: none;">
+            <div class="select-card telegram-card">
+                <i class="fab fa-telegram-plane"></i>
+                <div>
+                    <h3 style="margin:0">قناة المندوبين الرسمية</h3>
+                    <small>انضم لتلقي الإشعارات والطلبات</small>
+                </div>
+            </div>
+        </a>
         <div class="select-card" style="flex-direction: column; cursor: default;">
             <h4 style="margin: 0 0 10px 0;">تسليم طلب جديد</h4>
             <div class="form-group" style="width: 100%;">
@@ -425,7 +492,44 @@
       const ADMIN_CHAT_ID = "7479342799"; 
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
-      let userCoords = ""; // لتخزين الإحداثيات
+      let userCoords = ""; 
+
+      // ميزة تحويل الصوت إلى نص
+      function startVoice(targetId) {
+          const btn = event.currentTarget;
+          if (!('webkitSpeechRecognition' in window) && !('speechRecognition' in window)) {
+              alert("عذراً، متصفحك لا يدعم ميزة التعرف على الصوت. يرجى استخدام متصفح Chrome.");
+              return;
+          }
+
+          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+          const recognition = new SpeechRecognition();
+
+          recognition.lang = 'ar-SA';
+          recognition.interimResults = false;
+          recognition.maxAlternatives = 1;
+
+          recognition.onstart = () => {
+              btn.classList.add('recording');
+              btn.innerHTML = '<i class="fas fa-stop"></i>';
+          };
+
+          recognition.onresult = (event) => {
+              const text = event.results[0][0].transcript;
+              document.getElementById(targetId).value += (document.getElementById(targetId).value ? ' ' : '') + text;
+          };
+
+          recognition.onerror = (event) => {
+              alert("حدث خطأ في التسجيل: " + event.error);
+          };
+
+          recognition.onend = () => {
+              btn.classList.remove('recording');
+              btn.innerHTML = '<i class="fas fa-microphone"></i>';
+          };
+
+          recognition.start();
+      }
 
       function toggleTheme() {
           document.body.classList.toggle('dark-mode');
@@ -439,11 +543,14 @@
           return Math.floor(1000 + Math.random() * 9000).toString();
       }
 
-      // ميزة تحديد الموقع الجديدة
+      function validateIraqiPhone(phone) {
+          const iqRegex = /^(077|078|075)\d{8}$/;
+          return iqRegex.test(phone);
+      }
+
       function getLocation(type) {
           const btn = document.getElementById(`loc-btn-${type}`);
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحديد...';
-          
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
                   (position) => {
@@ -466,12 +573,14 @@
               document.body.classList.add('dark-mode');
               document.getElementById('theme-btn').innerHTML = '<i class="fas fa-sun"></i>';
           }
-
           const areas = document.getElementById('areas-list').innerHTML;
           ['custArea', 'medArea', 'tukArea'].forEach(id => {
               const el = document.getElementById(id);
               if(el) el.innerHTML = areas;
           });
+          
+          // استعادة بيانات الزبون المحفوظة إن وجدت
+          loadSavedCustomerData();
 
           if (localStorage.getItem('isVerifiedDriver') === 'true') {
               document.getElementById('join-driver-card').style.display = 'none';
@@ -484,11 +593,37 @@
           setTimeout(skipSplash, 3500); 
       }
 
+      // وظيفة حفظ بيانات الزبون
+      function saveCustomerData(name, phone) {
+          localStorage.setItem('saved_customer_name', name);
+          localStorage.setItem('saved_customer_phone', phone);
+      }
+
+      // وظيفة تحميل البيانات المحفوظة للحقول
+      function loadSavedCustomerData() {
+          const name = localStorage.getItem('saved_customer_name');
+          const phone = localStorage.getItem('saved_customer_phone');
+          if (name && phone) {
+              const nameFields = ['custName', 'medName', 'tukName'];
+              const phoneFields = ['custPhone', 'medPhone', 'tukPhone'];
+              nameFields.forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = name; });
+              phoneFields.forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = phone; });
+          }
+      }
+
       function skipSplash() {
           const splash = document.getElementById('splash-screen');
           if (splash && splash.style.display !== 'none') {
               splash.classList.add('splash-exit');
               setTimeout(() => { splash.style.display = 'none'; }, 500);
+          }
+      }
+
+      function skipWelcome() {
+          const welcome = document.getElementById('welcome-overlay');
+          if (welcome && welcome.style.display !== 'none') {
+              welcome.style.display = 'none';
+              location.reload(); 
           }
       }
 
@@ -515,8 +650,9 @@
           const name = document.getElementById('driverJoinName').value.trim();
           const phone = document.getElementById('driverJoinPhone').value.trim();
           const bike = document.getElementById('bikeType').value;
-          const iqRegex = /^(077|078|075)\d{8}$/;
-          if(!name || !iqRegex.test(phone) || !bike) return alert("بيانات غير مكتملة");
+          if(!name || !validateIraqiPhone(phone) || !bike) {
+              return alert("يرجى إدخال اسمك ونوع الدراجة ورقم هاتف عراقي صحيح (077, 078, 075)");
+          }
           localStorage.setItem('temp_name', name); localStorage.setItem('temp_phone', phone);
           const randomCode = Math.floor(100000 + Math.random() * 900000);
           localStorage.setItem('temp_activation', randomCode);
@@ -530,11 +666,24 @@
       }
 
       function verifyActivationCode() {
-          if(document.getElementById('activationCodeInput').value.trim() === localStorage.getItem('temp_activation')) {
+          const input = document.getElementById('activationCodeInput').value.trim();
+          const correct = localStorage.getItem('temp_activation');
+          if(input === correct) {
               localStorage.setItem('isVerifiedDriver', 'true');
               localStorage.setItem('driver_name', localStorage.getItem('temp_name'));
               localStorage.setItem('driver_phone', localStorage.getItem('temp_phone'));
-              location.reload();
+              localStorage.removeItem('pending_join');
+              
+              document.getElementById('welcome-overlay').style.display = 'flex';
+              document.getElementById('welcome-msg').innerText = `يا مية هلا بيك يا ${localStorage.getItem('driver_name')}!`;
+              confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+              
+              setTimeout(() => { 
+                  if (document.getElementById('welcome-overlay').style.display !== 'none') {
+                    document.getElementById('welcome-overlay').style.display = 'none';
+                    location.reload(); 
+                  }
+              }, 4000);
           } else { alert("رمز التفعيل غير صحيح"); }
       }
 
@@ -553,15 +702,24 @@
 
       async function updateLoyaltyUI() {
           const phone = document.getElementById('custPhone').value.trim();
-          const iqRegex = /^(077|078|075)\d{8}$/;
-          if (iqRegex.test(phone)) {
+          const displayCount = document.getElementById('current-order-count');
+          const progressBar = document.getElementById('loyalty-bar');
+          
+          if (validateIraqiPhone(phone)) {
               try {
                   const response = await fetch(`${GS_URL}?action=getCustomerOrders&phone=${phone}`);
                   const count = parseInt(await response.text()) || 0;
-                  let progressCount = count % 6;
-                  document.getElementById('current-order-count').innerText = progressCount;
-                  document.getElementById('loyalty-bar').style.width = (progressCount / 6 * 100) + "%";
-              } catch (e) {}
+                  let currentProgress = (count % 6) + 1; 
+                  
+                  displayCount.innerText = currentProgress;
+                  progressBar.style.width = (currentProgress / 6 * 100) + "%";
+              } catch (e) {
+                  displayCount.innerText = "1";
+                  progressBar.style.width = "16%";
+              }
+          } else {
+              displayCount.innerText = "0";
+              progressBar.style.width = "0%";
           }
       }
 
@@ -570,12 +728,14 @@
           const phone = document.getElementById('tukPhone').value.trim();
           const area = document.getElementById('tukArea').value;
           const land = document.getElementById('tukLandmark').value.trim();
-          if(!name || !phone || !area) return alert("أكمل البيانات");
+          if(!name || !validateIraqiPhone(phone) || !area) return alert("يرجى إكمال البيانات والتأكد من الرقم العراقي");
+          
+          // حفظ البيانات لأول مرة
+          saveCustomerData(name, phone);
 
           const vc = generateSecureVC();
           await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true`);
           const msg = `🚖 طلب تكتك جديد\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📌 الدالة: ${land}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
-          
           await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
               method: "POST", headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ 
@@ -583,7 +743,8 @@
                   reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } 
               })
           });
-          alert("تم الإرسال!"); showScreen('home-screen');
+          alert("تم الإرسال!"); 
+          showScreen('home-screen');
       }
 
       async function sendMedFinal() {
@@ -591,12 +752,14 @@
           const phone = document.getElementById('medPhone').value.trim();
           const order = document.getElementById('medOrder').value.trim();
           const area = document.getElementById('medArea').value;
-          if(!name || !phone || !area) return alert("أكمل البيانات");
+          if(!name || !validateIraqiPhone(phone) || !area) return alert("يرجى إكمال البيانات والتأكد من الرقم العراقي");
+          
+          // حفظ البيانات لأول مرة
+          saveCustomerData(name, phone);
 
           const vc = generateSecureVC();
           await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
           const msg = `🔵 طلب وسيط\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📝 الغرض: ${order}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
-          
           await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
               method: "POST", headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ 
@@ -604,7 +767,9 @@
                   reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } 
               })
           });
-          alert("تم الإرسال!"); showScreen('home-screen');
+          alert("تم الإرسال!"); 
+          document.getElementById('medOrder').value = "";
+          showScreen('home-screen');
       }
 
       async function sendFinal() {
@@ -613,12 +778,14 @@
           const order = document.getElementById('custOrder').value.trim();
           const area = document.getElementById('custArea').value;
           const land = document.getElementById('custLandmark').value.trim();
-          if(!name || !phone || !order || !area) return alert("أكمل البيانات");
+          if(!name || !validateIraqiPhone(phone) || !order || !area) return alert("يرجى إكمال البيانات والتأكد من الرقم العراقي");
+          
+          // حفظ البيانات لأول مرة
+          saveCustomerData(name, phone);
 
           const vc = generateSecureVC();
           await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
           const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📌 الدالة: ${land}\n📝 الطلب: ${order}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
-          
           await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
               method: "POST", headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ 
@@ -626,15 +793,17 @@
                   reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } 
               })
           });
-          alert("تم الإرسال!"); showScreen('home-screen');
+          alert("تم الإرسال!"); 
+          document.getElementById('custOrder').value = "";
+          showScreen('home-screen');
       }
 
       async function processVerifyCode() {
           const code = document.getElementById('driverVerifyInput').value.trim();
           const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
+          if(!validateIraqiPhone(custPhone)) return alert("يرجى التأكد من رقم هاتف الزبون");
           const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
           const checkResult = await checkResp.text();
-
           if (checkResult.startsWith("valid")) {
               let dG = checkResult.includes("tuk") ? 1000 : 2000;
               localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
@@ -655,4 +824,4 @@
       }
     </script>
 </body>
-</html>
+            </html>
