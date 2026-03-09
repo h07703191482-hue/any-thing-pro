@@ -6,283 +6,157 @@
     <title>توصيل أي شيء - أم قصر</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
       :root { 
           --primary: #3949ab; 
           --gold: #ffc107; 
-          --shadow: 0 8px 25px rgba(0, 0, 0, 0.1); 
-          --success: #2ecc71; 
-          --danger: #e74c3c; 
-          --glass: rgba(255, 255, 255, 0.85);
           --bg-gradient: linear-gradient(-45deg, #f4f7f6, #e8eaf6, #ffffff);
           --text-color: #2d3436;
-          --card-bg: var(--glass);
-          --input-bg: white;
-          --stat-box-bg: white;
       }
       
-      body.dark-mode {
-          --bg-gradient: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460);
-          --text-color: #f1f2f6;
-          --glass: rgba(30, 39, 46, 0.85);
-          --card-bg: rgba(47, 53, 66, 0.9);
-          --input-bg: #2f3542;
-          --stat-box-bg: #2f3542;
-          --shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-      }
-
       body { 
           font-family: 'Cairo', sans-serif; 
           background: var(--bg-gradient);
-          background-size: 400% 400%;
-          animation: gradientBG 15s ease infinite;
-          margin: 0; padding: 0; color: var(--text-color); min-height: 100vh; line-height: 1.6; overflow-x: hidden; 
+          margin: 0; padding: 0; color: var(--text-color); min-height: 100vh; overflow-x: hidden; 
       }
 
-      .theme-toggle {
-          position: fixed; top: 15px; left: 15px; z-index: 10001;
-          background: var(--primary); color: white; border: none;
-          width: 45px; height: 45px; border-radius: 50%; cursor: pointer;
-          box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center;
-          font-size: 20px; transition: 0.3s;
-      }
-
-      @keyframes gradientBG {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-      }
-
-      .screen { display: none; width: 100%; min-height: 100vh; box-sizing: border-box; }
-      .active-screen { display: block !important; }
-      .container { max-width: 450px; margin: auto; padding: 20px; }
-      
+      /* شاشة الدراجة - تظهر أولاً */
       #splash-screen { 
           position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-          background: #2c3e50; z-index: 9999; 
+          background: #2c3e50; z-index: 99999; 
           display: flex; flex-direction: column; align-items: center; justify-content: center; 
-          cursor: pointer; transition: transform 0.5s ease-in; overflow: hidden;
+          transition: 0.5s ease-out;
       }
 
       #app-logo-splash {
-          position: absolute;
-          width: 120px; height: 120px;
-          background: white;
-          border-radius: 30px;
+          width: 100px; height: 100px; background: white; border-radius: 25px;
           display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-          opacity: 0; transform: scale(0.5);
-          transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          z-index: 20;
+          font-size: 50px; color: var(--primary);
+          box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+          transform: scale(0); transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       }
-      #app-logo-splash i { font-size: 60px; color: var(--primary); }
-      .show-logo { opacity: 1 !important; transform: scale(1) !important; }
+      .show-logo { transform: scale(1) !important; }
 
-      .splash-welcome-text {
-          position: absolute; top: 15%; text-align: center; width: 100%;
-          color: white; animation: fadeInDown 1s ease-out;
-      }
-      .splash-welcome-text h2 { margin: 0; font-size: 24px; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-      .splash-welcome-text p { margin: 5px 0 0; opacity: 0.8; font-size: 14px; }
-
-      @keyframes fadeInDown {
-          from { opacity: 0; transform: translateY(-20px); }
-          to { opacity: 1; transform: translateY(0); }
+      .road {
+          position: absolute; bottom: 30%; width: 100%; height: 40px; background: #34495e;
+          border-top: 3px solid #7f8c8d; border-bottom: 3px solid #7f8c8d;
       }
 
-      .road-realistic {
-          position: absolute; bottom: 30%; width: 100%; height: 60px;
-          background: #34495e; border-top: 4px solid #7f8c8d; border-bottom: 4px solid #7f8c8d;
-          display: flex; align-items: center;
-      }
-      .road-lines {
-          width: 100%; height: 4px; background: repeating-linear-gradient(90deg, #f1c40f 0, #f1c40f 40px, transparent 40px, transparent 80px);
-          animation: road-scroll 0.6s linear infinite;
-      }
-      @keyframes road-scroll { from { transform: translateX(0); } to { transform: translateX(80px); } }
-
-      .bike-box {
-          position: absolute; bottom: calc(30% + 10px); left: 110%;
-          font-size: 70px; color: white; transform: scaleX(-1);
-          animation: drive-left 2.5s linear forwards; z-index: 10;
+      .bike {
+          position: absolute; bottom: calc(30% + 5px); right: -100px;
+          font-size: 50px; color: white; transform: scaleX(1);
+          animation: drive 3s linear forwards;
       }
 
-      .exhaust { position: absolute; right: -10px; bottom: 10px; display: flex; flex-direction: column; }
-      .smoke {
-          width: 10px; height: 10px; background: rgba(236, 240, 241, 0.6); border-radius: 50%;
-          margin-top: -5px; opacity: 0; animation: smoke-bloom 0.8s infinite;
+      @keyframes drive {
+          0% { right: -100px; }
+          100% { right: 110%; }
       }
 
-      @keyframes smoke-bloom {
-          0% { transform: translate(0, 0) scale(1); opacity: 0; }
-          20% { opacity: 0.7; }
-          100% { transform: translate(40px, -40px) scale(4); opacity: 0; filter: blur(5px); }
-      }
+      /* الشاشات - مخفية افتراضياً */
+      .screen { display: none; width: 100%; min-height: 100vh; opacity: 0; transition: 0.4s; }
+      
+      /* الكلاس الذي يظهر الشاشة */
+      .active-screen { display: block !important; opacity: 1 !important; }
 
-      @keyframes drive-left {
-          0% { left: 110%; }
-          100% { left: -30%; }
-      }
-
-      .splash-exit { transform: translateX(-100%) !important; }
-
+      .container { max-width: 450px; margin: auto; padding: 20px; box-sizing: border-box; }
+      
       .header-main { 
-          background: linear-gradient(135deg, var(--primary), #5c6bc0); 
-          color: white; padding: 45px 20px; text-align: center; border-radius: 0 0 35px 35px; 
-          margin: -20px -20px 20px -20px; box-shadow: var(--shadow); 
-          position: relative;
+          background: var(--primary); color: white; padding: 40px 20px; 
+          text-align: center; border-radius: 0 0 30px 30px; margin: -20px -20px 20px -20px;
       }
 
       .select-card { 
-          background: var(--card-bg); backdrop-filter: blur(10px);
-          padding: 20px; border-radius: 20px; margin-bottom: 15px; 
-          display: flex; align-items: center; gap: 15px; box-shadow: var(--shadow); 
-          cursor: pointer; transition: 0.3s; border: 1px solid rgba(255,255,255,0.1);
-          color: var(--text-color);
+          background: white; padding: 20px; border-radius: 20px; margin-bottom: 15px; 
+          display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+          cursor: pointer;
       }
-      .select-card:active { transform: scale(0.96); }
+      .select-card i { font-size: 25px; color: var(--primary); background: #f0f2ff; padding: 15px; border-radius: 12px; }
 
-      .select-card i { font-size: 28px; color: var(--primary); background: #e8eaf6; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 15px; }
-      
-      .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-      .stat-box { background: var(--stat-box-bg); padding: 15px; border-radius: 15px; text-align: center; box-shadow: var(--shadow); color: var(--text-color); }
-      .stat-box p { margin: 5px 0 0; font-size: 18px; font-weight: 700; color: var(--primary); }
-      
-      .form-group { margin-bottom: 15px; }
-      input, textarea, select { 
-          width: 100%; padding: 15px; border: 1.5px solid #e0e0e0; border-radius: 12px; 
-          box-sizing: border-box; font-family: 'Cairo'; outline: none; font-size: 15px; 
-          background: var(--input-bg); transition: 0.3s; color: var(--text-color);
-      }
-
-      .send-btn { background: linear-gradient(45deg, var(--primary), #5c6bc0); color: white; width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 17px; cursor: pointer; box-shadow: 0 4px 15px rgba(57, 73, 171, 0.3); margin-bottom: 10px; }
-      .back-btn { background: var(--stat-box-bg); border: none; font-size: 18px; color: var(--primary); width: 40px; height: 40px; border-radius: 10px; margin-bottom: 20px; box-shadow: var(--shadow); cursor: pointer; }
-
-      .loyalty-card {
-          background: var(--stat-box-bg); border-radius: 15px; padding: 15px; margin-bottom: 15px;
-          box-shadow: var(--shadow); border: 1.5px solid var(--gold); text-align: center; color: var(--text-color);
-      }
-      .loyalty-progress {
-          background: #f0f0f0; border-radius: 20px; height: 20px; margin: 10px 0; overflow: hidden; position: relative; border: 1px solid #ddd;
-      }
-      .loyalty-bar {
-          background: linear-gradient(90deg, #ffd700, #ffc107); height: 100%; width: 0%; transition: 0.8s;
-      }
+      .back-btn { background: white; border: none; font-size: 20px; padding: 10px; border-radius: 10px; margin-bottom: 15px; cursor: pointer; }
     </style>
 </head>
-<body onload="checkStatus()">
-
-    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">
-        <i class="fas fa-moon"></i>
-    </button>
+<body onload="startApp()">
 
     <div id="splash-screen" onclick="skipSplash()">
-      <div class="splash-welcome-text">
-          <h2>مرحباً بكم في تطبيق أي شيء ✨</h2>
-          <p>أهل أم قصر.. نصلكم أينما كنتم</p>
-      </div>
       <div id="app-logo-splash"><i class="fas fa-shopping-bag"></i></div>
-      <div class="road-realistic"><div class="road-lines"></div></div>
-      <div class="bike-box"><i class="fas fa-motorcycle"></i></div>
+      <h2 style="color: white; margin-top: 20px;">أي شيء - أم قصر</h2>
+      <div class="road"></div>
+      <div class="bike"><i class="fas fa-motorcycle"></i></div>
     </div>
 
-    <div id="home-screen" class="screen active-screen container">
+    <div id="home-screen" class="screen container">
       <div class="header-main">
-        <h1>أبشر.. أي شيء! ✨</h1>
-        <p>خدمتكم وسعادتنا في سرعة وصولنا</p>
+        <h1>أهلاً بك ✨</h1>
+        <p>اطلب أي شيء من داخل أم قصر</p>
       </div>
       
       <div class="select-card" onclick="showScreen('order-screen')">
         <i class="fas fa-shopping-cart"></i>
-        <div><h3>تسوق مسواكك</h3><small>اطلب مسواكك أو غداك الآن</small></div>
-      </div>
-
-      <div class="select-card" onclick="showScreen('mediator-screen')">
-        <i class="fas fa-handshake" style="color: #ff5722; background: #fbe9e7;"></i>
-        <div><h3>الوسيط</h3><small>توصيل غرض من شخص لآخر</small></div>
+        <div><h3>طلب مسواك</h3><p>اطلب غداك أو مسواكك</p></div>
       </div>
 
       <div class="select-card" onclick="showScreen('tuk-screen')">
-        <i class="fas fa-taxi" style="color: #ffc107; background: #fff8e1;"></i>
-        <div><h3>تكتك بلي</h3><small>احجز تكتك لرحلتك الآن</small></div>
+        <i class="fas fa-taxi"></i>
+        <div><h3>تكتك بلي</h3><p>احجز تكتك الآن</p></div>
       </div>
     </div>
 
     <div id="order-screen" class="screen container">
-        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <div id="loyalty-info" class="loyalty-card">
-            <div class="loyalty-text">طلبك رقم: <span id="current-order-count">0</span> من 6</div>
-            <div class="loyalty-progress"><div id="loyalty-bar" class="loyalty-bar"></div></div>
-            <div id="loyalty-msg" class="loyalty-text">أدخل رقمك لمعرفة الهدية 🎁</div>
-        </div>
-        <div class="form-group"><input type="text" id="custName" placeholder="الاسم الكامل"></div>
-        <div class="form-group"><input type="tel" id="custPhone" placeholder="رقم الموبايل" oninput="updateLoyaltyUI()"></div>
-        <div class="form-group"><textarea id="custOrder" rows="5" placeholder="اكتب طلباتك هنا..."></textarea></div>
-        <button class="send-btn" onclick="sendFinal()">إرسال الطلب</button>
+        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i> رجوع</button>
+        <h2>تفاصيل الطلب 📦</h2>
+        <input type="text" placeholder="الاسم" style="width:100%; padding:15px; margin-bottom:10px; border-radius:10px; border:1px solid #ddd;">
+        <textarea placeholder="اكتب طلباتك هنا..." style="width:100%; padding:15px; border-radius:10px; border:1px solid #ddd;" rows="5"></textarea>
+        <button style="width:100%; background:var(--primary); color:white; padding:15px; border:none; border-radius:10px; margin-top:10px; font-weight:bold;">إرسال الطلب</button>
     </div>
 
     <div id="tuk-screen" class="screen container">
-        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 style="text-align: center;">حجز تكتك 🚕</h2>
-        <div class="form-group"><input type="text" id="tukName" placeholder="الاسم"></div>
-        <div class="form-group"><input type="tel" id="tukPhone" placeholder="رقم الهاتف"></div>
-        <button class="send-btn" onclick="alert('سيتم إرسال التكتك فوراً!')">إرسال الطلب</button>
-    </div>
-
-    <div id="mediator-screen" class="screen container">
-        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 style="text-align: center;">خدمة الوسيط 🤝</h2>
-        <div class="form-group"><textarea id="medOrder" rows="4" placeholder="شنو تبي توصل؟"></textarea></div>
-        <button class="send-btn" onclick="alert('تم إرسال طلب الوسيط')">إرسال</button>
+        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i> رجوع</button>
+        <h2>حجز تكتك 🚕</h2>
+        <p>سيتم تحديد موقعك وإرسال أقرب تكتك.</p>
+        <button style="width:100%; background:var(--gold); color:black; padding:15px; border:none; border-radius:10px; font-weight:bold;">احجز الآن</button>
     </div>
 
     <script>
-      function checkStatus() {
-          // إظهار اللوجو أولاً
+      function startApp() {
+          // إظهار اللوجو بحركة
           setTimeout(() => {
               document.getElementById('app-logo-splash').classList.add('show-logo');
           }, 500);
 
-          // إخفاء شاشة الدراجة بعد 3.5 ثانية
+          // إخفاء الشاشة بعد انتهاء الدراجة (3 ثواني)
           setTimeout(skipSplash, 3500);
       }
 
       function skipSplash() {
           const splash = document.getElementById('splash-screen');
-          if (splash) {
-              splash.classList.add('splash-exit');
-              setTimeout(() => { 
-                  splash.style.display = 'none'; 
-                  showScreen('home-screen'); // التأكيد على إظهار الرئيسية
+          if (splash && splash.style.display !== 'none') {
+              splash.style.opacity = '0';
+              setTimeout(() => {
+                  splash.style.display = 'none';
+                  showScreen('home-screen'); // إظهار الرئيسية بعد الاختفاء
               }, 500);
           }
       }
 
       function showScreen(id) {
-          // إخفاء كل الشاشات
-          document.querySelectorAll('.screen').forEach(s => {
+          // 1. إخفاء كافة الشاشات تماماً
+          const screens = document.querySelectorAll('.screen');
+          screens.forEach(s => {
               s.classList.remove('active-screen');
               s.style.display = 'none';
           });
-          // إظهار الشاشة المطلوبة
+
+          // 2. إظهار الشاشة المطلوبة فقط
           const target = document.getElementById(id);
-          target.classList.add('active-screen');
-          target.style.display = 'block';
-      }
-
-      function toggleTheme() {
-          document.body.classList.toggle('dark-mode');
-      }
-
-      function updateLoyaltyUI() {
-          // سيتم تفعيلها بربطها مع GS_URL الخاص بك
-          console.log("تحديث عداد الوفاء...");
-      }
-
-      function sendFinal() {
-          alert("تم إرسال الطلب بنجاح!");
-          showScreen('home-screen');
+          if (target) {
+              target.style.display = 'block';
+              // تأخير بسيط لتفعيل الـ opacity (الأنيميشن)
+              setTimeout(() => {
+                  target.classList.add('active-screen');
+              }, 10);
+          }
+          window.scrollTo(0,0);
       }
     </script>
 </body>
