@@ -426,6 +426,9 @@
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
       let userCoords = ""; // لتخزين الإحداثيات
+      
+      // تعبير نمطي للتحقق من الرقم العراقي
+      const IRAQ_PHONE_REGEX = /^(077|078|075)\d{8}$/;
 
       function toggleTheme() {
           document.body.classList.toggle('dark-mode');
@@ -515,8 +518,9 @@
           const name = document.getElementById('driverJoinName').value.trim();
           const phone = document.getElementById('driverJoinPhone').value.trim();
           const bike = document.getElementById('bikeType').value;
-          const iqRegex = /^(077|078|075)\d{8}$/;
-          if(!name || !iqRegex.test(phone) || !bike) return alert("بيانات غير مكتملة");
+          
+          if(!name || !IRAQ_PHONE_REGEX.test(phone) || !bike) return alert("يرجى إدخال اسمك ونوع الدراجة ورقم هاتف عراقي صحيح (077/078/075)");
+          
           localStorage.setItem('temp_name', name); localStorage.setItem('temp_phone', phone);
           const randomCode = Math.floor(100000 + Math.random() * 900000);
           localStorage.setItem('temp_activation', randomCode);
@@ -553,14 +557,14 @@
 
       async function updateLoyaltyUI() {
           const phone = document.getElementById('custPhone').value.trim();
-          const iqRegex = /^(077|078|075)\d{8}$/;
-          if (iqRegex.test(phone)) {
+          if (IRAQ_PHONE_REGEX.test(phone)) {
               try {
                   const response = await fetch(`${GS_URL}?action=getCustomerOrders&phone=${phone}`);
                   const count = parseInt(await response.text()) || 0;
                   let progressCount = count % 6;
                   document.getElementById('current-order-count').innerText = progressCount;
                   document.getElementById('loyalty-bar').style.width = (progressCount / 6 * 100) + "%";
+                  document.getElementById('loyalty-msg').innerText = progressCount === 5 ? "هذا طلبك الخامس! الطلب القادم مجاني 🎁" : "استمر بالطلب للحصول على توصيل مجاني";
               } catch (e) {}
           }
       }
@@ -570,7 +574,8 @@
           const phone = document.getElementById('tukPhone').value.trim();
           const area = document.getElementById('tukArea').value;
           const land = document.getElementById('tukLandmark').value.trim();
-          if(!name || !phone || !area) return alert("أكمل البيانات");
+          
+          if(!name || !IRAQ_PHONE_REGEX.test(phone) || !area) return alert("أكمل البيانات وتأكد من كتابة رقم عراقي صحيح");
 
           const vc = generateSecureVC();
           await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true`);
@@ -591,7 +596,8 @@
           const phone = document.getElementById('medPhone').value.trim();
           const order = document.getElementById('medOrder').value.trim();
           const area = document.getElementById('medArea').value;
-          if(!name || !phone || !area) return alert("أكمل البيانات");
+          
+          if(!name || !IRAQ_PHONE_REGEX.test(phone) || !area) return alert("أكمل البيانات وتأكد من كتابة رقم عراقي صحيح");
 
           const vc = generateSecureVC();
           await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
@@ -613,7 +619,8 @@
           const order = document.getElementById('custOrder').value.trim();
           const area = document.getElementById('custArea').value;
           const land = document.getElementById('custLandmark').value.trim();
-          if(!name || !phone || !order || !area) return alert("أكمل البيانات");
+          
+          if(!name || !IRAQ_PHONE_REGEX.test(phone) || !order || !area) return alert("أكمل البيانات وتأكد من كتابة رقم عراقي صحيح");
 
           const vc = generateSecureVC();
           await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
@@ -632,6 +639,9 @@
       async function processVerifyCode() {
           const code = document.getElementById('driverVerifyInput').value.trim();
           const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
+          
+          if(!IRAQ_PHONE_REGEX.test(custPhone)) return alert("رقم هاتف الزبون غير صحيح");
+          
           const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
           const checkResult = await checkResp.text();
 
