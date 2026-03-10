@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
     <title>توصيل أي شيء - أم قصر</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
@@ -199,7 +204,8 @@
 
       .phone-note { color: var(--danger); font-size: 12px; font-weight: 700; margin-top: 5px; display: block; text-align: center; }
 
-      .send-btn { background: linear-gradient(45deg, var(--primary), #5c6bc0); color: white; width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 17px; cursor: pointer; box-shadow: 0 4px 15px rgba(57, 73, 171, 0.3); margin-bottom: 10px; }
+      .send-btn { background: linear-gradient(45deg, var(--primary), #5c6bc0); color: white; width: 100%; padding: 16px; border-radius: 12px; border: none; font-weight: 700; font-size: 17px; cursor: pointer; box-shadow: 0 4px 15px rgba(57, 73, 171, 0.3); margin-bottom: 10px; transition: 0.3s; }
+      .send-btn:disabled { background: #9fa8da; cursor: not-allowed; box-shadow: none; }
       .back-btn { background: var(--stat-box-bg); border: none; font-size: 18px; color: var(--primary); width: 40px; height: 40px; border-radius: 10px; margin-bottom: 20px; box-shadow: var(--shadow); cursor: pointer; }
       .resign-btn { margin-top: 30px; background: transparent; color: var(--danger); border: 1px solid var(--danger); width: 100%; padding: 12px; border-radius: 12px; font-family: 'Cairo'; font-weight: 600; cursor: pointer; }
       .note { font-size: 14px; color: #2d3436; background: #fff9c4; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-right: 5px solid var(--gold); font-weight: 600; line-height: 1.5; }
@@ -240,23 +246,14 @@
       .telegram-card i { background: rgba(255,255,255,0.2) !important; color: white !important; }
       .telegram-card small { color: rgba(255,255,255,0.8); }
 
-      /* تنسيق زر الصوت الجديد */
-      .voice-btn {
-          position: absolute; left: 10px; top: 12px;
-          background: #ff5252; color: white; border: none;
-          width: 35px; height: 35px; border-radius: 10px;
-          cursor: pointer; display: flex; align-items: center; justify-content: center;
-          transition: 0.3s; z-index: 5;
+      /* تنسيق بوكس السعر الجديد */
+      .price-indicator {
+          background: var(--stat-box-bg); border: 2px solid var(--gold); padding: 15px; 
+          border-radius: 12px; margin-bottom: 15px; text-align: center; display: none;
       }
-      .voice-btn.recording {
-          animation: pulse-red 1s infinite;
-          background: #2ecc71;
-      }
-      @keyframes pulse-red {
-          0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7); }
-          70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(255, 82, 82, 0); }
-          100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 82, 82, 0); }
-      }
+      .price-indicator span { font-size: 14px; opacity: 0.8; }
+      .price-indicator .amount { font-size: 24px; font-weight: bold; color: var(--primary); display: block; }
+      body.dark-mode .price-indicator .amount { color: var(--gold); }
     </style>
 </head>
 <body onload="checkStatus()">
@@ -329,48 +326,40 @@
       </div>
     </div>
 
-    <template id="areas-list">
-        <option value="">اختر المنطقة (الحي) 🏠</option>
-        <option value="حي الموانئ">حي الموانئ</option>
-        <option value="حي المعلمين">حي المعلمين</option>
-        <option value="حي الجاهزة (دور الخمسين)">حي الجاهزة (دور الخمسين)</option>
-        <option value="حي دور الهندية">حي دور الهندية</option>
-        <option value="حي القاعدة">حي القاعدة</option>
-        <option value="مجمع أم قصر السكني">مجمع أم قصر السكني</option>
-        <option value="منطقة الهدامة">منطقة الهدامة</option>
-        <option value="حي التنف">حي التنف</option>
-        <option value="المنطقة الشمالية">المنطقة الشمالية</option>
-        <option value="حي الضباط">حي الضباط</option>
-        <option value="منطقة السوق">منطقة السوق</option>
-        <option value="حي الشهداء">حي الشهداء</option>
-        <option value="حي الخليج">حي الخليج</option>
-        <option value="منطقة المشروع">منطقة المشروع</option>
-        <option value="حي الأندلس">حي الأندلس</option>
-        <option value="حي البصرة">حي البصرة</option>
-        <option value="حي العمال">حي العمال</option>
-        <option value="حي الموظفين">حي الموظفين</option>
-        <option value="العماير">العماير</option>
-        <option value="كريع الذيب">كريع الذيب</option>
-        <option value="شعوان">شعوان</option>
-        <option value="الكشعانية">الكشعانية</option>
-        <option value="هيلة">هيلة</option>
-        <option value="أخرى - سأكتبها بالتفصيل">أخرى - سأكتبها بالتفصيل</option>
-    </template>
-
     <div id="tuk-screen" class="screen container">
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 style="text-align: center;">خدمة تكتك بلي 🚕</h2>
-        <div class="note">احجز تكتك وسنصل إليك في أسرع وقت ممكن.</div>
+        
+        <div id="tuk-price-display" class="price-indicator" style="display: block;">
+            <span>سعر التوصيل المثبت لكافة أم قصر:</span>
+            <span class="amount">2,000 د.ع</span>
+            <small style="color: var(--success); font-weight: bold;">✅ سعر رسمي غير قابل للتلاعب</small>
+        </div>
+
         <div class="form-group"><input type="text" id="tukName" placeholder="الاسم الكامل"></div>
         <div class="form-group">
             <input type="tel" id="tukPhone" placeholder="رقم الهاتف (عراقي)">
             <span class="phone-note" style="color: red;">تاكد من رقمك عدل قبل لا تسوي اي شي يروحي</span>
         </div>
-        <div class="form-group"><select id="tukArea"></select></div>
-        <div class="form-group"><input type="text" id="tukLandmark" placeholder="أقرب نقطة دالة"></div>
-        <button class="location-btn" id="loc-btn-tuk" onclick="getLocation('tuk')">
-            <i class="fas fa-map-marker-alt"></i> تحديد موقعي بدقة 📍
+        
+        <button class="location-btn" id="loc-btn-tuk" onclick="getLocation('tuk')" style="margin-bottom: 20px;">
+            <i class="fas fa-map-marker-alt"></i> تحديد نقطة الصعود تلقائياً 📍
         </button>
+
+        <div class="form-group" style="background: var(--stat-box-bg); padding: 15px; border-radius: 12px; border: 1px solid #e0e0e0;">
+            <label style="font-size: 14px; color: var(--primary); font-weight: bold; display: block; margin-bottom: 10px; text-align: center;">نقطة النزول (وين تبي تروح؟)</label>
+            <span class="phone-note" style="color: #e67e22; text-align: center; margin-bottom: 15px; font-size: 12px; display: block; line-height: 1.6;">
+                💡 شلون تنسخ الرابط؟ افتح الخريطة من الزر الجوه، حدد المكان بضغطة مطولة، دوس مشاركة واختار (نسخ 📄).<br>
+                <strong>اذا ما طلعت نسخ 📄 روح سوي مشاركه لنفسك على التلكرام او الواتساب وانسخ الرابط ورجع خلي بالخانه الرابط ودوس ارسال.</strong>
+            </span>
+            <button type="button" class="location-btn" onclick="window.open('https://www.google.com/maps', '_blank')" style="margin-bottom: 10px;">
+                <i class="fas fa-map"></i> افتح الخريطة لنسخ الرابط
+            </button>
+            <input type="url" id="tukDropoffLink" placeholder="الصق رابط موقع النزول هنا...">
+        </div>
+
+        <div class="form-group"><input type="text" id="tukLandmark" placeholder="أقرب نقطة دالة (اختياري)"></div>
+        
         <button class="send-btn" id="tukSendBtn" onclick="sendTukOrder()">إرسال طلب التكتك</button>
     </div>
 
@@ -383,15 +372,11 @@
             <input type="tel" id="medPhone" placeholder="رقم الهاتف (عراقي)">
             <span class="phone-note" style="color: red;">تاكد من رقمك عدل قبل لا تسوي اي شي يروحي</span>
         </div>
-        <div class="form-group"><select id="medArea"></select></div>
         <div class="form-group"><input type="text" id="medLandmark" placeholder="أقرب نقطة دالة"></div>
         <button class="location-btn" id="loc-btn-med" onclick="getLocation('med')">
             <i class="fas fa-map-marker-alt"></i> تحديد موقعي بدقة 📍
         </button>
-        <div class="form-group" style="position: relative;">
-            <button class="voice-btn" onclick="startVoice('medOrder')"><i class="fas fa-microphone"></i></button>
-            <textarea id="medOrder" rows="4" placeholder="مختصر للشي الي تبي توصله..."></textarea>
-        </div>
+        <div class="form-group"><textarea id="medOrder" rows="4" placeholder="مختصر للشي الي تبي توصله..."></textarea></div>
         <button class="send-btn" id="medSendBtn" onclick="sendMedFinal()">إرسال طلب الوسيط</button>
     </div>
 
@@ -411,7 +396,7 @@
                 <option value="تكتك">تكتك</option>
             </select>
         </div>
-        <button class="send-btn" onclick="submitJoinRequest()">إرسال طلب الانضمام</button>
+        <button class="send-btn" id="joinSendBtn" onclick="submitJoinRequest()">إرسال طلب الانضمام</button>
     </div>
 
     <div id="activation-screen" class="screen container">
@@ -432,7 +417,7 @@
             <div class="loyalty-progress">
                 <div id="loyalty-bar" class="loyalty-bar"></div>
             </div>
-            <span class="gift-note">أوصل للطلب 6 وكروتك علينه 🎁</span>
+            <span class="gift-note" id="loyalty-gift-msg">أوصل للطلب 6 وكروتك علينه 🎁</span>
         </div>
 
         <div id="order-status-box"><i class="fas fa-info-circle"></i> <span id="status-text">جاري معالجة الطلب...</span></div>
@@ -443,15 +428,11 @@
             <input type="tel" id="custPhone" placeholder="رقم الموبايل (11 رقم)" oninput="updateLoyaltyUI()">
             <span class="phone-note" style="color: red;">تاكد من رقمك عدل قبل لا تسوي اي شي يروحي</span>
         </div>
-        <div class="form-group"><select id="custArea"></select></div>
         <div class="form-group"><input type="text" id="custLandmark" placeholder="أقرب نقطة دالة"></div>
         <button class="location-btn" id="loc-btn-cust" onclick="getLocation('cust')">
             <i class="fas fa-map-marker-alt"></i> تحديد موقعي بدقة 📍
         </button>
-        <div class="form-group" style="position: relative;">
-            <button class="voice-btn" onclick="startVoice('custOrder')"><i class="fas fa-microphone"></i></button>
-            <textarea id="custOrder" rows="5" placeholder="اكتب قائمة طلباتك هنا..."></textarea>
-        </div>
+        <div class="form-group"><textarea id="custOrder" rows="5" placeholder="اكتب قائمة طلباتك هنا..."></textarea></div>
         <button class="send-btn" id="sendBtn" onclick="sendFinal()">إرسال الطلب للمناديب</button>
     </div>
 
@@ -494,43 +475,6 @@
 
       let userCoords = ""; 
 
-      // ميزة تحويل الصوت إلى نص
-      function startVoice(targetId) {
-          const btn = event.currentTarget;
-          if (!('webkitSpeechRecognition' in window) && !('speechRecognition' in window)) {
-              alert("عذراً، متصفحك لا يدعم ميزة التعرف على الصوت. يرجى استخدام متصفح Chrome.");
-              return;
-          }
-
-          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-          const recognition = new SpeechRecognition();
-
-          recognition.lang = 'ar-SA';
-          recognition.interimResults = false;
-          recognition.maxAlternatives = 1;
-
-          recognition.onstart = () => {
-              btn.classList.add('recording');
-              btn.innerHTML = '<i class="fas fa-stop"></i>';
-          };
-
-          recognition.onresult = (event) => {
-              const text = event.results[0][0].transcript;
-              document.getElementById(targetId).value += (document.getElementById(targetId).value ? ' ' : '') + text;
-          };
-
-          recognition.onerror = (event) => {
-              alert("حدث خطأ في التسجيل: " + event.error);
-          };
-
-          recognition.onend = () => {
-              btn.classList.remove('recording');
-              btn.innerHTML = '<i class="fas fa-microphone"></i>';
-          };
-
-          recognition.start();
-      }
-
       function toggleTheme() {
           document.body.classList.toggle('dark-mode');
           const btn = document.getElementById('theme-btn');
@@ -554,8 +498,8 @@
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
                   (position) => {
-                      userCoords = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
-                      btn.innerHTML = '<i class="fas fa-check"></i> تم تحديد موقعك ✅';
+                      userCoords = `https://www.google.com/maps?q=$${position.coords.latitude},${position.coords.longitude}`;
+                      btn.innerHTML = '<i class="fas fa-check"></i> تم التحديد ✅';
                       btn.classList.add('success');
                   },
                   (error) => {
@@ -573,13 +517,7 @@
               document.body.classList.add('dark-mode');
               document.getElementById('theme-btn').innerHTML = '<i class="fas fa-sun"></i>';
           }
-          const areas = document.getElementById('areas-list').innerHTML;
-          ['custArea', 'medArea', 'tukArea'].forEach(id => {
-              const el = document.getElementById(id);
-              if(el) el.innerHTML = areas;
-          });
           
-          // استعادة بيانات الزبون المحفوظة إن وجدت
           loadSavedCustomerData();
 
           if (localStorage.getItem('isVerifiedDriver') === 'true') {
@@ -593,13 +531,11 @@
           setTimeout(skipSplash, 3500); 
       }
 
-      // وظيفة حفظ بيانات الزبون
       function saveCustomerData(name, phone) {
           localStorage.setItem('saved_customer_name', name);
           localStorage.setItem('saved_customer_phone', phone);
       }
 
-      // وظيفة تحميل البيانات المحفوظة للحقول
       function loadSavedCustomerData() {
           const name = localStorage.getItem('saved_customer_name');
           const phone = localStorage.getItem('saved_customer_phone');
@@ -653,16 +589,29 @@
           if(!name || !validateIraqiPhone(phone) || !bike) {
               return alert("يرجى إدخال اسمك ونوع الدراجة ورقم هاتف عراقي صحيح (077, 078, 075)");
           }
-          localStorage.setItem('temp_name', name); localStorage.setItem('temp_phone', phone);
-          const randomCode = Math.floor(100000 + Math.random() * 900000);
-          localStorage.setItem('temp_activation', randomCode);
-          localStorage.setItem('pending_join', 'true');
-          const msg = `📥 طلب انضمام جديد\n👤 الاسم: ${name}\n📞 الهاتف: ${phone}\n🏍️ الدراجة: ${bike}\n🔑 الكود: ${randomCode}`;
-          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-              method: "POST", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
-          });
-          showScreen('activation-screen');
+
+          const btn = document.getElementById('joinSendBtn');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+          btn.disabled = true;
+
+          try {
+              localStorage.setItem('temp_name', name); localStorage.setItem('temp_phone', phone);
+              const randomCode = Math.floor(100000 + Math.random() * 900000);
+              localStorage.setItem('temp_activation', randomCode);
+              localStorage.setItem('pending_join', 'true');
+              const msg = `📥 طلب انضمام جديد\n👤 الاسم: ${name}\n📞 الهاتف: ${phone}\n🏍️ الدراجة: ${bike}\n🔑 الكود: ${randomCode}`;
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                  method: "POST", headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+              });
+              showScreen('activation-screen');
+          } catch (e) {
+              alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
+          } finally {
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+          }
       }
 
       function verifyActivationCode() {
@@ -704,15 +653,22 @@
           const phone = document.getElementById('custPhone').value.trim();
           const displayCount = document.getElementById('current-order-count');
           const progressBar = document.getElementById('loyalty-bar');
+          const giftMsg = document.getElementById('loyalty-gift-msg');
           
           if (validateIraqiPhone(phone)) {
               try {
                   const response = await fetch(`${GS_URL}?action=getCustomerOrders&phone=${phone}`);
-                  const count = parseInt(await response.text()) || 0;
-                  let currentProgress = (count % 6) + 1; 
-                  
-                  displayCount.innerText = currentProgress;
-                  progressBar.style.width = (currentProgress / 6 * 100) + "%";
+                  let count = parseInt(await response.text()) || 0;
+                  let nextCount = (count % 6) + 1; 
+                  displayCount.innerText = nextCount;
+                  progressBar.style.width = (nextCount / 6 * 100) + "%";
+                  if(nextCount === 6) {
+                      giftMsg.innerText = "مبروك! هذا طلبك المجاني (الهدية) 🎁";
+                      giftMsg.style.color = "var(--success)";
+                  } else {
+                      giftMsg.innerText = "أوصل للطلب 6 وكروتك علينه 🎁";
+                      giftMsg.style.color = "var(--primary)";
+                  }
               } catch (e) {
                   displayCount.innerText = "1";
                   progressBar.style.width = "16%";
@@ -726,76 +682,111 @@
       async function sendTukOrder() {
           const name = document.getElementById('tukName').value.trim();
           const phone = document.getElementById('tukPhone').value.trim();
-          const area = document.getElementById('tukArea').value;
           const land = document.getElementById('tukLandmark').value.trim();
-          if(!name || !validateIraqiPhone(phone) || !area) return alert("يرجى إكمال البيانات والتأكد من الرقم العراقي");
           
-          // حفظ البيانات لأول مرة
-          saveCustomerData(name, phone);
+          const dropoffLinkEl = document.getElementById('tukDropoffLink');
+          const dropoffLink = dropoffLinkEl && dropoffLinkEl.value.trim() ? dropoffLinkEl.value.trim() : 'غير محدد';
+          
+          if(!name || !validateIraqiPhone(phone) || !userCoords) return alert("يرجى إكمال البيانات والتأكد من الرقم وتحديد نقطة الصعود تلقائياً");
+          
+          const btn = document.getElementById('tukSendBtn');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+          btn.disabled = true;
 
-          const vc = generateSecureVC();
-          await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true`);
-          const msg = `🚖 طلب تكتك جديد\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📌 الدالة: ${land}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
-          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-              method: "POST", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ 
-                  chat_id: PUBLIC_CHANNEL, text: msg, 
-                  reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } 
-              })
-          });
-          alert("تم الإرسال!"); 
-          showScreen('home-screen');
+          try {
+              saveCustomerData(name, phone);
+              const vc = generateSecureVC();
+              
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true`);
+              
+              const msg = `🚖 طلب تكتك (سعر مثبت)\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n💰 السعر المطلوب: 2,000 د.ع\n📌 الدالة: ${land || 'لا توجد'}\n\n📍 مسار الرحلة:\nصعود من: ${userCoords}\nنزول في: ${dropoffLink}`;
+              
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                  method: "POST", headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ 
+                      chat_id: PUBLIC_CHANNEL, text: msg, 
+                      reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } 
+                  })
+              });
+              alert("تم إرسال طلب التكتك بالسعر المثبت: 2,000 د.ع"); 
+              showScreen('home-screen');
+          } catch (e) {
+              alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
+          } finally {
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+          }
       }
 
       async function sendMedFinal() {
           const name = document.getElementById('medName').value.trim();
           const phone = document.getElementById('medPhone').value.trim();
           const order = document.getElementById('medOrder').value.trim();
-          const area = document.getElementById('medArea').value;
-          if(!name || !validateIraqiPhone(phone) || !area) return alert("يرجى إكمال البيانات والتأكد من الرقم العراقي");
+          if(!name || !validateIraqiPhone(phone)) return alert("يرجى إكمال البيانات والتأكد من الرقم العراقي");
           
-          // حفظ البيانات لأول مرة
-          saveCustomerData(name, phone);
+          const btn = document.getElementById('medSendBtn');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+          btn.disabled = true;
 
-          const vc = generateSecureVC();
-          await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
-          const msg = `🔵 طلب وسيط\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📝 الغرض: ${order}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
-          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-              method: "POST", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ 
-                  chat_id: PUBLIC_CHANNEL, text: msg, 
-                  reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } 
-              })
-          });
-          alert("تم الإرسال!"); 
-          document.getElementById('medOrder').value = "";
-          showScreen('home-screen');
+          try {
+              saveCustomerData(name, phone);
+              const vc = generateSecureVC();
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
+              const msg = `🔵 طلب وسيط\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📝 الغرض: ${order}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                  method: "POST", headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ 
+                      chat_id: PUBLIC_CHANNEL, text: msg, 
+                      reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } 
+                  })
+              });
+              alert("تم الإرسال!"); 
+              document.getElementById('medOrder').value = "";
+              showScreen('home-screen');
+          } catch (e) {
+              alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
+          } finally {
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+          }
       }
 
       async function sendFinal() {
           const name = document.getElementById('custName').value.trim();
           const phone = document.getElementById('custPhone').value.trim();
           const order = document.getElementById('custOrder').value.trim();
-          const area = document.getElementById('custArea').value;
           const land = document.getElementById('custLandmark').value.trim();
-          if(!name || !validateIraqiPhone(phone) || !order || !area) return alert("يرجى إكمال البيانات والتأكد من الرقم العراقي");
+          if(!name || !validateIraqiPhone(phone) || !order) return alert("يرجى إكمال البيانات والتأكد من الرقم العراقي");
           
-          // حفظ البيانات لأول مرة
-          saveCustomerData(name, phone);
+          const btn = document.getElementById('sendBtn');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+          btn.disabled = true;
 
-          const vc = generateSecureVC();
-          await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
-          const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 الحي: ${area}\n📌 الدالة: ${land}\n📝 الطلب: ${order}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
-          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-              method: "POST", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ 
-                  chat_id: PUBLIC_CHANNEL, text: msg, 
-                  reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } 
-              })
-          });
-          alert("تم الإرسال!"); 
-          document.getElementById('custOrder').value = "";
-          showScreen('home-screen');
+          try {
+              saveCustomerData(name, phone);
+              const vc = generateSecureVC();
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
+              const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${order}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                  method: "POST", headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ 
+                      chat_id: PUBLIC_CHANNEL, text: msg, 
+                      reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } 
+                  })
+              });
+              updateLoyaltyUI();
+              alert("تم الإرسال!"); 
+              document.getElementById('custOrder').value = "";
+              showScreen('home-screen');
+          } catch (e) {
+              alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
+          } finally {
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+          }
       }
 
       async function processVerifyCode() {
@@ -805,7 +796,7 @@
           const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
           const checkResult = await checkResp.text();
           if (checkResult.startsWith("valid")) {
-              let dG = checkResult.includes("tuk") ? 1000 : 2000;
+              let dG = checkResult.includes("tuk") ? 1500 : 2000;
               localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
               localStorage.setItem('d_profit', parseInt(localStorage.getItem('d_profit') || 0) + dG);
               localStorage.setItem('a_profit', parseInt(localStorage.getItem('a_profit') || 0) + 500);
