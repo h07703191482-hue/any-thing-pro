@@ -237,7 +237,6 @@
       .price-indicator .amount { font-size: 24px; font-weight: bold; color: var(--primary); display: block; }
       body.dark-mode .price-indicator .amount { color: var(--gold); }
 
-      /* === إضافات الإشعارات (Toast) وشريط التنقل === */
       #toast-container {
           position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
           z-index: 100000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px;
@@ -284,7 +283,6 @@
           position: absolute; top: -5px; right: -5px; font-weight: bold; border: 2px solid white;
       }
 
-      /* تنسيقات القائمة الجانبية (Sidebar) */
       .sidebar {
           position: fixed; top: 0; right: -280px; width: 260px; height: 100%;
           background: var(--card-bg); backdrop-filter: blur(15px);
@@ -308,7 +306,6 @@
       }
       .sidebar-item:active { transform: scale(0.95); }
       
-      /* تعديل زر الإغلاق ليكون زر "رجوع" أنيق */
       .sidebar-close {
           align-self: flex-start; 
           font-size: 16px; 
@@ -327,7 +324,6 @@
       .sidebar-close:active { transform: scale(0.9); background: rgba(57, 73, 171, 0.2); }
       body.dark-mode .sidebar-close { background: rgba(143, 161, 255, 0.1); color: #8fa1ff; }
 
-      /* === تنسيقات دوري المندوبين الجديدة === */
       .leaderboard-card {
           background: var(--stat-box-bg);
           border-radius: 15px;
@@ -351,11 +347,12 @@
           justify-content: space-between;
           padding: 10px;
           border-bottom: 1px solid #eee;
+          transition: 0.5s ease;
       }
       .driver-rank:last-child { border-bottom: none; }
       body.dark-mode .driver-rank { border-bottom-color: #333; }
       .rank-info { display: flex; align-items: center; gap: 10px; font-weight: bold;}
-      .rank-medal { font-size: 20px; }
+      .rank-medal { font-size: 20px; min-width: 25px; text-align: center; }
       .rank-score { color: var(--success); font-weight: bold; }
     </style>
 </head>
@@ -583,20 +580,12 @@
 
         <div class="leaderboard-card">
             <h3 class="leaderboard-title"><i class="fas fa-trophy" style="color: var(--gold);"></i> أبطال أم قصر للتوصيل</h3>
-            <div class="driver-rank">
-                <div class="rank-info"><span class="rank-medal">🥇</span> <span>علي (أبو التكتك)</span></div>
-                <span class="rank-score" id="rank1-score">145 طلب</span>
-            </div>
-            <div class="driver-rank">
-                <div class="rank-info"><span class="rank-medal">🥈</span> <span>محمد (ايراني)</span></div>
-                <span class="rank-score" id="rank2-score">120 طلب</span>
-            </div>
-            <div class="driver-rank">
-                <div class="rank-info"><span class="rank-medal">🥉</span> <span id="my-rank-name">أنت</span></div>
-                <span class="rank-score" id="my-rank-score">0 طلب</span>
+            <div id="leaderboard-list">
+                <p style="text-align: center; color: #888;">جاري تحميل لوحة الصدارة...</p>
             </div>
             <small style="display: block; text-align: center; margin-top: 10px; color: #888;">المنافسة مستمرة حتى إعلان بطل الموسم من الإدارة 🏆</small>
         </div>
+
         <a href="https://t.me/uumqaser" target="_blank" style="text-decoration: none;">
             <div class="select-card telegram-card">
                 <i class="fab fa-telegram-plane"></i>
@@ -687,6 +676,7 @@
               document.getElementById('driver-plaza-card').style.display = 'flex';
               document.getElementById('driver-status-badge').style.display = 'block';
               setInterval(checkRemoteReset, 15000); 
+              setInterval(refreshLeaderboard, 30000); // تحديث لوحة الصدارة كل 30 ثانية
           }
           showScreen('home-screen');
           setTimeout(() => { document.getElementById('app-logo-splash').classList.add('show-logo'); }, 1500);
@@ -725,7 +715,6 @@
           }
       }
 
-      /* تم تحديث هذه الدالة لتستقبل إشارة تصفير الدوري وتصوير الأرباح كل على حدة */
       async function checkRemoteReset() {
           try {
               const myPhone = localStorage.getItem('driver_phone');
@@ -734,15 +723,12 @@
               const result = await response.text();
               
               if (result === "reset_now") {
-                  // تصفير كل شيء (حسب النظام القديم)
                   localStorage.setItem('d_count', 0); localStorage.setItem('d_profit', 0);
-                  localStorage.setItem('a_profit', 0); localStorage.setItem('used_codes', "[]");
+                  localStorage.setItem('a_profit', 0); localStorage.setItem('league_count', 0);
+                  localStorage.setItem('used_codes', "[]");
                   updateStatsUI();
               } else if (result.includes("reset_league")) {
-                  // تصفير الدوري فقط بدون المساس بالأرباح والطلبات الكلية
                   localStorage.setItem('league_count', 0);
-                  localStorage.setItem('mock_rank1', 0);
-                  localStorage.setItem('mock_rank2', 0);
                   updateStatsUI();
               }
           } catch(e) {}
@@ -815,6 +801,7 @@
           document.getElementById(id).classList.add('active-screen');
           if(id === 'plaza-screen') {
               updateStatsUI();
+              refreshLeaderboard();
               document.getElementById('driver-display-name').innerText = "المندوب: " + localStorage.getItem('driver_name');
           }
           if(id === 'order-screen') updateLoyaltyUI();
@@ -824,25 +811,18 @@
           const name = document.getElementById('tukName').value.trim();
           const phone = document.getElementById('tukPhone').value.trim();
           const land = document.getElementById('tukLandmark').value.trim();
-          
           const dropoffLinkEl = document.getElementById('tukDropoffLink');
           const dropoffLink = dropoffLinkEl && dropoffLinkEl.value.trim() ? dropoffLinkEl.value.trim() : 'غير محدد';
-          
           if(!name || !validateIraqiPhone(phone) || !userCoords) return alert("يرجى إكمال البيانات والتأكد من الرقم وتحديد نقطة الصعود تلقائياً");
-          
           const btn = document.getElementById('tukSendBtn');
           const originalText = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
           btn.disabled = true;
-
           try {
               saveCustomerData(name, phone);
               const vc = generateSecureVC();
-              
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true`);
-              
               const msg = `🚖 طلب تكتك (سعر مثبت)\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n💰 السعر المطلوب: 2,000 د.ع\n📌 الدالة: ${land || 'لا توجد'}\n\n📍 مسار الرحلة:\nصعود من: ${userCoords}\nنزول في: ${dropoffLink}`;
-              
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ 
@@ -852,25 +832,18 @@
               });
               alert("تم إرسال طلب التكتك بالسعر المثبت: 2,000 د.ع"); 
               showScreen('home-screen');
-          } catch (e) {
-              alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
-          } finally {
-              btn.innerHTML = originalText;
-              btn.disabled = false;
-          }
+          } catch (e) { alert("حدث خطأ أثناء الإرسال"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       async function sendMedFinal() {
           const name = document.getElementById('medName').value.trim();
           const phone = document.getElementById('medPhone').value.trim();
           const order = document.getElementById('medOrder').value.trim();
-          if(!name || !validateIraqiPhone(phone) || !userCoords) return alert("يرجى إكمال البيانات والتأكد من الرقم وتحديد موقعك بدقة 📍");
-          
+          if(!name || !validateIraqiPhone(phone) || !userCoords) return alert("يرجى إكمال البيانات وتحديد موقعك بدقة 📍");
           const btn = document.getElementById('medSendBtn');
           const originalText = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
           btn.disabled = true;
-
           try {
               saveCustomerData(name, phone);
               const vc = generateSecureVC();
@@ -883,15 +856,8 @@
                       reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } 
                   })
               });
-              alert("تم الإرسال!"); 
-              document.getElementById('medOrder').value = "";
-              showScreen('home-screen');
-          } catch (e) {
-              alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
-          } finally {
-              btn.innerHTML = originalText;
-              btn.disabled = false;
-          }
+              alert("تم الإرسال!"); showScreen('home-screen');
+          } catch (e) { alert("خطأ في الإرسال"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       async function sendFinal() {
@@ -899,24 +865,19 @@
           const phone = document.getElementById('custPhone').value.trim();
           const order = document.getElementById('custOrder').value.trim();
           const land = document.getElementById('custLandmark').value.trim();
-          if(!name || !validateIraqiPhone(phone) || !order || !userCoords) return alert("يرجى إكمال البيانات والتأكد من الرقم وتحديد موقعك بدقة 📍");
-          
+          if(!name || !validateIraqiPhone(phone) || !order || !userCoords) return alert("يرجى إكمال البيانات وتحديد موقعك بدقة 📍");
           const btn = document.getElementById('sendBtn');
           const originalText = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
           btn.disabled = true;
-
           try {
               saveCustomerData(name, phone);
               const vc = generateSecureVC();
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
-              
               let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
               let orderNum = (tempLoyalty % 6) + 1;
               let loyaltyMsg = orderNum === 6 ? "🎁 هذا الطلب مجاني (الطلب السادس)" : `الطلب رقم ${orderNum} من أصل 6`;
-
               const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${order}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
-              
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ 
@@ -924,15 +885,8 @@
                       reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } 
                   })
               });
-              alert("تم الإرسال بنجاح!"); 
-              document.getElementById('custOrder').value = "";
-              showScreen('home-screen');
-          } catch (e) {
-              alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
-          } finally {
-              btn.innerHTML = originalText;
-              btn.disabled = false;
-          }
+              alert("تم الإرسال بنجاح!"); showScreen('home-screen');
+          } catch (e) { alert("خطأ في الإرسال"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       async function processVerifyCode() {
@@ -943,52 +897,60 @@
           const checkResult = await checkResp.text();
           if (checkResult.startsWith("valid")) {
               let dG = checkResult.includes("tuk") ? 1500 : 2000;
-              
-              /* زيادة العداد الكلي والعداد الخاص بالدوري كل على حدة */
               localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
               localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
-              
               localStorage.setItem('d_profit', parseInt(localStorage.getItem('d_profit') || 0) + dG);
               localStorage.setItem('a_profit', parseInt(localStorage.getItem('a_profit') || 0) + 500);
-              
               updateStatsUI();
               const dName = localStorage.getItem('driver_name');
               const dPhone = localStorage.getItem('driver_phone');
-              fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(dName)}&phone=${dPhone}&inCount=${localStorage.getItem('d_count')}&inDriver=${localStorage.getItem('d_profit')}&inAdmin=${localStorage.getItem('a_profit')}`);
+              fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(dName)}&phone=${dPhone}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=${localStorage.getItem('d_profit')}&inAdmin=${localStorage.getItem('a_profit')}`);
               alert(`تم التأكيد! أرباحك: ${dG}`);
+              refreshLeaderboard();
           } else alert("الكود خطأ");
       }
 
       function updateStatsUI() {
-          // العدادات الكلية الثابتة
           document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0;
           document.getElementById('stat-driver').innerText = (localStorage.getItem('d_profit') || 0).toLocaleString();
           document.getElementById('stat-admin').innerText = (localStorage.getItem('a_profit') || 0).toLocaleString();
-          
-          /* تحديث أرقام لوحة دوري المندوبين بالعداد المنفصل (league_count) */
-          const myName = localStorage.getItem('driver_name') || 'أنت';
-          const myLeagueCount = localStorage.getItem('league_count') || 0;
-          document.getElementById('my-rank-name').innerText = myName + " (أنت)";
-          document.getElementById('my-rank-score').innerText = myLeagueCount + " طلب";
-
-          /* تحديث الأرقام الوهمية (إذا تم تصفيرها) */
-          let r1 = localStorage.getItem('mock_rank1');
-          let r2 = localStorage.getItem('mock_rank2');
-          
-          if(r1 !== null) {
-              document.getElementById('rank1-score').innerText = r1 + " طلب";
-          } else {
-              document.getElementById('rank1-score').innerText = "145 طلب";
-          }
-          
-          if(r2 !== null) {
-              document.getElementById('rank2-score').innerText = r2 + " طلب";
-          } else {
-              document.getElementById('rank2-score').innerText = "120 طلب";
-          }
       }
 
-      // === إضافات الإشعارات (Toast) ===
+      // جلب وترتيب لوحة الصدارة الحقيقية
+      async function refreshLeaderboard() {
+          const listDiv = document.getElementById('leaderboard-list');
+          try {
+              const response = await fetch(`${GS_URL}?action=getAllDriverStats`);
+              const drivers = await response.json();
+              
+              // الترتيب تنازلياً حسب leagueCount
+              drivers.sort((a, b) => (parseInt(b.leagueCount) || 0) - (parseInt(a.leagueCount) || 0));
+
+              listDiv.innerHTML = "";
+              if(drivers.length === 0) {
+                  listDiv.innerHTML = '<p style="text-align: center; color: #888;">لا يوجد مناديب حالياً</p>';
+                  return;
+              }
+
+              drivers.forEach((d, index) => {
+                  let medal = "";
+                  if(index === 0) medal = "🥇";
+                  else if(index === 1) medal = "🥈";
+                  else if(index === 2) medal = "🥉";
+                  else medal = `<span style="font-size:14px; color:#888;">${index + 1}</span>`;
+
+                  const div = document.createElement('div');
+                  div.className = "driver-rank";
+                  div.innerHTML = `
+                    <div class="rank-info"><span class="rank-medal">${medal}</span> <span>${d.name}</span></div>
+                    <span class="rank-score">${d.leagueCount || 0} طلب</span>
+                  `;
+                  listDiv.appendChild(div);
+              });
+          } catch (e) {
+              listDiv.innerHTML = '<p style="text-align: center; color: var(--danger);">فشل تحميل البيانات</p>';
+          }
+      }
 
       window.originalAlert = window.alert;
       window.alert = function(message) { showToast(message); };
@@ -999,7 +961,6 @@
           toast.className = 'toast';
           toast.innerHTML = `<i class="fas fa-check-circle" style="color: var(--success);"></i> <span>${msg}</span>`;
           container.appendChild(toast);
-          
           setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 2800);
       }
 
@@ -1026,10 +987,7 @@
 
       function updateLocalBadge() {
           const badge = document.getElementById('local-cart-badge');
-          if (localOrderCount > 0) {
-              badge.style.display = 'flex';
-              badge.innerText = localOrderCount;
-          }
+          if (localOrderCount > 0) { badge.style.display = 'flex'; badge.innerText = localOrderCount; }
       }
       updateLocalBadge();
 
@@ -1037,70 +995,39 @@
           const displayCount = document.getElementById('current-order-count');
           const progressBar = document.getElementById('loyalty-bar');
           const giftMsg = document.getElementById('loyalty-gift-msg');
-          
           let nextCount = (loyaltyCount % 6) + 1; 
-          
           if(displayCount) displayCount.innerText = nextCount;
           if(progressBar) progressBar.style.width = (nextCount / 6 * 100) + "%";
-          
           if(nextCount === 6) {
-              if(giftMsg) {
-                  giftMsg.innerText = "مبروك! هذا طلبك المجاني (الهدية) 🎁";
-                  giftMsg.style.color = "var(--success)";
-              }
+              if(giftMsg) { giftMsg.innerText = "مبروك! هذا طلبك المجاني 🎁"; giftMsg.style.color = "var(--success)"; }
               if(progressBar) progressBar.style.background = "var(--success)";
           } else {
-              if(giftMsg) {
-                  giftMsg.innerText = "أوصل للطلب 6 وكروتك علينه 🎁";
-                  giftMsg.style.color = "var(--text-color)";
-              }
+              if(giftMsg) { giftMsg.innerText = "أوصل للطلب 6 وكروتك علينه 🎁"; giftMsg.style.color = "var(--text-color)"; }
               if(progressBar) progressBar.style.background = "var(--gold)";
           }
       }
-
       updateLoyaltyUI = async function() { updateLocalLoyaltyUI(); };
       updateLocalLoyaltyUI();
 
       const originalSendFinal = sendFinal;
       sendFinal = async function() {
-          await originalSendFinal();
-          
-          localOrderCount++;
-          localStorage.setItem('my_local_orders', localOrderCount);
-          updateLocalBadge();
-          
-          loyaltyCount++;
-          if (loyaltyCount >= 6) { loyaltyCount = 0; } 
-          localStorage.setItem('my_loyalty_orders', loyaltyCount);
-          updateLocalLoyaltyUI();
+          await originalSendFinal(); localOrderCount++; localStorage.setItem('my_local_orders', localOrderCount);
+          updateLocalBadge(); loyaltyCount++; if (loyaltyCount >= 6) { loyaltyCount = 0; } 
+          localStorage.setItem('my_loyalty_orders', loyaltyCount); updateLocalLoyaltyUI();
       };
       
       const originalSendMedFinal = sendMedFinal;
       sendMedFinal = async function() {
-          await originalSendMedFinal();
-          
-          localOrderCount++;
-          localStorage.setItem('my_local_orders', localOrderCount);
-          updateLocalBadge();
-
-          loyaltyCount++;
-          if (loyaltyCount >= 6) { loyaltyCount = 0; }
-          localStorage.setItem('my_loyalty_orders', loyaltyCount);
-          updateLocalLoyaltyUI();
+          await originalSendMedFinal(); localOrderCount++; localStorage.setItem('my_local_orders', localOrderCount);
+          updateLocalBadge(); loyaltyCount++; if (loyaltyCount >= 6) { loyaltyCount = 0; }
+          localStorage.setItem('my_loyalty_orders', loyaltyCount); updateLocalLoyaltyUI();
       };
 
       const originalSendTukOrder = sendTukOrder;
       sendTukOrder = async function() {
-          await originalSendTukOrder();
-          
-          localOrderCount++;
-          localStorage.setItem('my_local_orders', localOrderCount);
-          updateLocalBadge();
-
-          loyaltyCount++;
-          if (loyaltyCount >= 6) { loyaltyCount = 0; }
-          localStorage.setItem('my_loyalty_orders', loyaltyCount);
-          updateLocalLoyaltyUI();
+          await originalSendTukOrder(); localOrderCount++; localStorage.setItem('my_local_orders', localOrderCount);
+          updateLocalBadge(); loyaltyCount++; if (loyaltyCount >= 6) { loyaltyCount = 0; }
+          localStorage.setItem('my_loyalty_orders', loyaltyCount); updateLocalLoyaltyUI();
       };
     </script>
 </body>
