@@ -246,7 +246,6 @@
       .telegram-card i { background: rgba(255,255,255,0.2) !important; color: white !important; }
       .telegram-card small { color: rgba(255,255,255,0.8); }
 
-      /* تنسيق بوكس السعر الجديد */
       .price-indicator {
           background: var(--stat-box-bg); border: 2px solid var(--gold); padding: 15px; 
           border-radius: 12px; margin-bottom: 15px; text-align: center; display: none;
@@ -475,6 +474,13 @@
 
       let userCoords = ""; 
 
+      // نظام التحديث التلقائي الذكي
+      const CURRENT_VERSION = "1.0.5"; 
+      if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
+          localStorage.setItem('app_version', CURRENT_VERSION);
+          window.location.reload(true); 
+      }
+
       function toggleTheme() {
           document.body.classList.toggle('dark-mode');
           const btn = document.getElementById('theme-btn');
@@ -498,7 +504,8 @@
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
                   (position) => {
-                      userCoords = `https://www.google.com/maps?q=$${position.coords.latitude},${position.coords.longitude}`;
+                      // الرابط الرسمي من جوجل لضمان دقة الموقع في كل أم قصر
+                      userCoords = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
                       btn.innerHTML = '<i class="fas fa-check"></i> تم التحديد ✅';
                       btn.classList.add('success');
                   },
