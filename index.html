@@ -854,6 +854,7 @@
               const vc = generateSecureVC();
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
               
+              // التعديل الجديد: قراءة رقم الطلب وإضافته للرسالة فقط في هذا القسم
               let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
               let orderNum = (tempLoyalty % 6) + 1;
               let loyaltyMsg = orderNum === 6 ? "🎁 هذا الطلب مجاني (الطلب السادس)" : `الطلب رقم ${orderNum} من أصل 6`;
@@ -903,6 +904,8 @@
           document.getElementById('stat-admin').innerText = (localStorage.getItem('a_profit') || 0).toLocaleString();
       }
 
+      // === إضافات جديدة (New Features JS) ===
+
       window.originalAlert = window.alert;
       window.alert = function(message) { showToast(message); };
 
@@ -939,18 +942,14 @@
 
       function updateLocalBadge() {
           const badge = document.getElementById('local-cart-badge');
-          if (badge) {
-              if (localOrderCount > 0) {
-                  badge.style.display = 'flex';
-                  badge.innerText = localOrderCount;
-              } else {
-                  badge.style.display = 'none';
-              }
+          if (localOrderCount > 0) {
+              badge.style.display = 'flex';
+              badge.innerText = localOrderCount;
           }
       }
       updateLocalBadge();
 
-      function updateLoyaltyUI() {
+      function updateLocalLoyaltyUI() {
           const displayCount = document.getElementById('current-order-count');
           const progressBar = document.getElementById('loyalty-bar');
           const giftMsg = document.getElementById('loyalty-gift-msg');
@@ -968,4 +967,57 @@
               if(progressBar) progressBar.style.background = "var(--success)";
           } else {
               if(giftMsg) {
-                  giftMsg.innerText = "أوصل للطلب 6 وكروتك علينه 🎁"
+                  giftMsg.innerText = "أوصل للطلب 6 وكروتك علينه 🎁";
+                  giftMsg.style.color = "var(--text-color)";
+              }
+              if(progressBar) progressBar.style.background = "var(--gold)";
+          }
+      }
+
+      updateLoyaltyUI = async function() { updateLocalLoyaltyUI(); };
+      updateLocalLoyaltyUI();
+
+      const originalSendFinal = sendFinal;
+      sendFinal = async function() {
+          await originalSendFinal();
+          
+          localOrderCount++;
+          localStorage.setItem('my_local_orders', localOrderCount);
+          updateLocalBadge();
+          
+          loyaltyCount++;
+          if (loyaltyCount >= 6) { loyaltyCount = 0; } 
+          localStorage.setItem('my_loyalty_orders', loyaltyCount);
+          updateLocalLoyaltyUI();
+      };
+      
+      const originalSendMedFinal = sendMedFinal;
+      sendMedFinal = async function() {
+          await originalSendMedFinal();
+          
+          localOrderCount++;
+          localStorage.setItem('my_local_orders', localOrderCount);
+          updateLocalBadge();
+
+          loyaltyCount++;
+          if (loyaltyCount >= 6) { loyaltyCount = 0; }
+          localStorage.setItem('my_loyalty_orders', loyaltyCount);
+          updateLocalLoyaltyUI();
+      };
+
+      const originalSendTukOrder = sendTukOrder;
+      sendTukOrder = async function() {
+          await originalSendTukOrder();
+          
+          localOrderCount++;
+          localStorage.setItem('my_local_orders', localOrderCount);
+          updateLocalBadge();
+
+          loyaltyCount++;
+          if (loyaltyCount >= 6) { loyaltyCount = 0; }
+          localStorage.setItem('my_loyalty_orders', loyaltyCount);
+          updateLocalLoyaltyUI();
+      };
+    </script>
+</body>
+</html>
