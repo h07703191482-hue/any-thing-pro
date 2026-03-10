@@ -727,15 +727,24 @@
           }
       }
 
+      /* تم تحديث هذه الدالة لتستقبل إشارة تصفير الدوري وتصوير الأرباح كل على حدة */
       async function checkRemoteReset() {
           try {
               const myPhone = localStorage.getItem('driver_phone');
               if(!myPhone) return;
               const response = await fetch(`${GS_URL}?action=checkReset&phone=${myPhone}`);
               const result = await response.text();
+              
               if (result === "reset_now") {
+                  // تصفير كل شيء (حسب النظام القديم)
                   localStorage.setItem('d_count', 0); localStorage.setItem('d_profit', 0);
                   localStorage.setItem('a_profit', 0); localStorage.setItem('used_codes', "[]");
+                  updateStatsUI();
+              } else if (result.includes("reset_league")) {
+                  // تصفير الدوري فقط بدون المساس بالأرباح والطلبات الكلية
+                  localStorage.setItem('league_count', 0);
+                  localStorage.setItem('mock_rank1', 0);
+                  localStorage.setItem('mock_rank2', 0);
                   updateStatsUI();
               }
           } catch(e) {}
@@ -936,9 +945,14 @@
           const checkResult = await checkResp.text();
           if (checkResult.startsWith("valid")) {
               let dG = checkResult.includes("tuk") ? 1500 : 2000;
+              
+              /* تم التعديل هنا: زيادة العداد الكلي والعداد الخاص بالدوري كل على حدة */
               localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
+              localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
+              
               localStorage.setItem('d_profit', parseInt(localStorage.getItem('d_profit') || 0) + dG);
               localStorage.setItem('a_profit', parseInt(localStorage.getItem('a_profit') || 0) + 500);
+              
               updateStatsUI();
               const dName = localStorage.getItem('driver_name');
               const dPhone = localStorage.getItem('driver_phone');
@@ -948,15 +962,16 @@
       }
 
       function updateStatsUI() {
+          // العدادات الكلية الثابتة
           document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0;
           document.getElementById('stat-driver').innerText = (localStorage.getItem('d_profit') || 0).toLocaleString();
           document.getElementById('stat-admin').innerText = (localStorage.getItem('a_profit') || 0).toLocaleString();
           
-          /* تحديث أرقام لوحة دوري المندوبين */
+          /* تحديث أرقام لوحة دوري المندوبين بالعداد المنفصل (league_count) */
           const myName = localStorage.getItem('driver_name') || 'أنت';
-          const myCount = localStorage.getItem('d_count') || 0;
+          const myLeagueCount = localStorage.getItem('league_count') || 0;
           document.getElementById('my-rank-name').innerText = myName + " (أنت)";
-          document.getElementById('my-rank-score').innerText = myCount + " طلب";
+          document.getElementById('my-rank-score').innerText = myLeagueCount + " طلب";
 
           /* تحديث الأرقام الوهمية (إذا تم تصفيرها) */
           let r1 = localStorage.getItem('mock_rank1');
@@ -986,18 +1001,17 @@
           if (adminTapCount >= 5) {
               adminTapCount = 0;
               let pass = prompt("أدخل رمز المدير لتصفير العدادات وبدء دوري جديد:");
-              if (pass === "0000") { // تقدر تغير هذا الرمز من هنا لأي رقم تريده
-                  localStorage.setItem('d_count', 0);
-                  localStorage.setItem('d_profit', 0);
-                  localStorage.setItem('a_profit', 0);
-                  localStorage.setItem('used_codes', "[]");
-                  
-                  // تصفير أرقام المندوبين الآخرين
+              if (pass === "0000") { 
+                  // تصفير عداد دوري الأبطال فقط (لك وللآخرين)
+                  localStorage.setItem('league_count', 0);
                   localStorage.setItem('mock_rank1', 0);
                   localStorage.setItem('mock_rank2', 0);
-
                   updateStatsUI();
-                  alert("تم تصفير العدادات بنجاح يا مدير! بدأت منافسة جديدة 🏆");
+                  
+                  // إرسال إشارة للسيرفر حتى يصفر الدوري عند باقي المندوبين
+                  fetch(`${GS_URL}?action=resetLeagueCommand`);
+                  
+                  alert("تم تصفير عداد دوري الأبطال بنجاح وإرسال الإشارة لجميع المندوبين! 🏆\n(ملاحظة: الأرباح والطلبات الكلية لم تتأثر)");
               } else if (pass !== null) {
                   alert("الرمز غير صحيح ❌");
               }
