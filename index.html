@@ -807,7 +807,7 @@
           const name = document.getElementById('medName').value.trim();
           const phone = document.getElementById('medPhone').value.trim();
           const order = document.getElementById('medOrder').value.trim();
-          if(!name || !validateIraqiPhone(phone)) return alert("يرجى إكمال البيانات والتأكد من الرقم العراقي");
+          if(!name || !validateIraqiPhone(phone) || !userCoords) return alert("يرجى إكمال البيانات والتأكد من الرقم وتحديد موقعك بدقة 📍");
           
           const btn = document.getElementById('medSendBtn');
           const originalText = btn.innerHTML;
@@ -842,7 +842,7 @@
           const phone = document.getElementById('custPhone').value.trim();
           const order = document.getElementById('custOrder').value.trim();
           const land = document.getElementById('custLandmark').value.trim();
-          if(!name || !validateIraqiPhone(phone) || !order) return alert("يرجى إكمال البيانات والتأكد من الرقم العراقي");
+          if(!name || !validateIraqiPhone(phone) || !order || !userCoords) return alert("يرجى إكمال البيانات والتأكد من الرقم وتحديد موقعك بدقة 📍");
           
           const btn = document.getElementById('sendBtn');
           const originalText = btn.innerHTML;
@@ -854,7 +854,6 @@
               const vc = generateSecureVC();
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
               
-              // التعديل الجديد: قراءة رقم الطلب وإضافته للرسالة فقط في هذا القسم
               let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
               let orderNum = (tempLoyalty % 6) + 1;
               let loyaltyMsg = orderNum === 6 ? "🎁 هذا الطلب مجاني (الطلب السادس)" : `الطلب رقم ${orderNum} من أصل 6`;
