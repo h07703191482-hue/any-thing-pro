@@ -854,7 +854,6 @@
               const vc = generateSecureVC();
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
               
-              // التعديل الجديد: قراءة رقم الطلب وإضافته للرسالة فقط في هذا القسم
               let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
               let orderNum = (tempLoyalty % 6) + 1;
               let loyaltyMsg = orderNum === 6 ? "🎁 هذا الطلب مجاني (الطلب السادس)" : `الطلب رقم ${orderNum} من أصل 6`;
@@ -904,8 +903,6 @@
           document.getElementById('stat-admin').innerText = (localStorage.getItem('a_profit') || 0).toLocaleString();
       }
 
-      // === إضافات جديدة (New Features JS) ===
-
       window.originalAlert = window.alert;
       window.alert = function(message) { showToast(message); };
 
@@ -942,14 +939,18 @@
 
       function updateLocalBadge() {
           const badge = document.getElementById('local-cart-badge');
-          if (localOrderCount > 0) {
-              badge.style.display = 'flex';
-              badge.innerText = localOrderCount;
+          if (badge) {
+              if (localOrderCount > 0) {
+                  badge.style.display = 'flex';
+                  badge.innerText = localOrderCount;
+              } else {
+                  badge.style.display = 'none';
+              }
           }
       }
       updateLocalBadge();
 
-      function updateLocalLoyaltyUI() {
+      function updateLoyaltyUI() {
           const displayCount = document.getElementById('current-order-count');
           const progressBar = document.getElementById('loyalty-bar');
           const giftMsg = document.getElementById('loyalty-gift-msg');
@@ -967,4 +968,4 @@
               if(progressBar) progressBar.style.background = "var(--success)";
           } else {
               if(giftMsg) {
-                  giftMsg.innerText = "أوصل للطلب 6 وك
+                  giftMsg.innerText = "أوصل للطلب 6 وكروتك علينه 🎁"
