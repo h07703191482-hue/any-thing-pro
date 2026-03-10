@@ -326,6 +326,39 @@
       }
       .sidebar-close:active { transform: scale(0.9); background: rgba(57, 73, 171, 0.2); }
       body.dark-mode .sidebar-close { background: rgba(143, 161, 255, 0.1); color: #8fa1ff; }
+
+      /* === تنسيقات دوري المندوبين الجديدة === */
+      .leaderboard-card {
+          background: var(--stat-box-bg);
+          border-radius: 15px;
+          padding: 15px;
+          margin-bottom: 20px;
+          box-shadow: var(--shadow);
+          border: 1px solid rgba(0,0,0,0.05);
+      }
+      body.dark-mode .leaderboard-card { border-color: rgba(255,255,255,0.05); }
+      .leaderboard-title {
+          text-align: center;
+          color: var(--primary);
+          margin: 0 0 15px 0;
+          font-size: 18px;
+          font-weight: 700;
+          cursor: pointer; /* إضافة مؤشر للضغط */
+          user-select: none;
+      }
+      body.dark-mode .leaderboard-title { color: var(--gold); }
+      .driver-rank {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px;
+          border-bottom: 1px solid #eee;
+      }
+      .driver-rank:last-child { border-bottom: none; }
+      body.dark-mode .driver-rank { border-bottom-color: #333; }
+      .rank-info { display: flex; align-items: center; gap: 10px; font-weight: bold;}
+      .rank-medal { font-size: 20px; }
+      .rank-score { color: var(--success); font-weight: bold; }
     </style>
 </head>
 <body onload="checkStatus()">
@@ -548,6 +581,23 @@
             <div class="stat-box"><h4>الطلبات</h4><p id="stat-count">0</p></div>
             <div class="stat-box"><h4>ربحك (د.ع)</h4><p id="stat-driver">0</p></div>
             <div class="stat-box" style="grid-column: span 2;"><h4>حساب المدير (د.ع)</h4><p id="stat-admin" style="color: var(--danger);">0</p></div>
+        </div>
+
+        <div class="leaderboard-card">
+            <h3 class="leaderboard-title" onclick="handleAdminResetTap()"><i class="fas fa-trophy" style="color: var(--gold);"></i> أبطال أم قصر للتوصيل</h3>
+            <div class="driver-rank">
+                <div class="rank-info"><span class="rank-medal">🥇</span> <span>علي (أبو التكتك)</span></div>
+                <span class="rank-score" id="rank1-score">145 طلب</span>
+            </div>
+            <div class="driver-rank">
+                <div class="rank-info"><span class="rank-medal">🥈</span> <span>محمد (ايراني)</span></div>
+                <span class="rank-score" id="rank2-score">120 طلب</span>
+            </div>
+            <div class="driver-rank">
+                <div class="rank-info"><span class="rank-medal">🥉</span> <span id="my-rank-name">أنت</span></div>
+                <span class="rank-score" id="my-rank-score">0 طلب</span>
+            </div>
+            <small style="display: block; text-align: center; margin-top: 10px; color: #888;">المنافسة مستمرة حتى إعلان بطل الموسم من الإدارة 🏆</small>
         </div>
         <a href="https://t.me/uumqaser" target="_blank" style="text-decoration: none;">
             <div class="select-card telegram-card">
@@ -901,9 +951,60 @@
           document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0;
           document.getElementById('stat-driver').innerText = (localStorage.getItem('d_profit') || 0).toLocaleString();
           document.getElementById('stat-admin').innerText = (localStorage.getItem('a_profit') || 0).toLocaleString();
+          
+          /* تحديث أرقام لوحة دوري المندوبين */
+          const myName = localStorage.getItem('driver_name') || 'أنت';
+          const myCount = localStorage.getItem('d_count') || 0;
+          document.getElementById('my-rank-name').innerText = myName + " (أنت)";
+          document.getElementById('my-rank-score').innerText = myCount + " طلب";
+
+          /* تحديث الأرقام الوهمية (إذا تم تصفيرها) */
+          let r1 = localStorage.getItem('mock_rank1');
+          let r2 = localStorage.getItem('mock_rank2');
+          
+          if(r1 !== null) {
+              document.getElementById('rank1-score').innerText = r1 + " طلب";
+          } else {
+              document.getElementById('rank1-score').innerText = "145 طلب";
+          }
+          
+          if(r2 !== null) {
+              document.getElementById('rank2-score').innerText = r2 + " طلب";
+          } else {
+              document.getElementById('rank2-score').innerText = "120 طلب";
+          }
       }
 
-      // === إضافات جديدة (New Features JS) ===
+      // === إضافات المدير السرية (تصفير العداد) ===
+      let adminTapCount = 0;
+      let adminTapTimer;
+      function handleAdminResetTap() {
+          adminTapCount++;
+          clearTimeout(adminTapTimer);
+          adminTapTimer = setTimeout(() => { adminTapCount = 0; }, 2000); // تصفير الضغطات إذا تأخرت
+          
+          if (adminTapCount >= 5) {
+              adminTapCount = 0;
+              let pass = prompt("أدخل رمز المدير لتصفير العدادات وبدء دوري جديد:");
+              if (pass === "0000") { // تقدر تغير هذا الرمز من هنا لأي رقم تريده
+                  localStorage.setItem('d_count', 0);
+                  localStorage.setItem('d_profit', 0);
+                  localStorage.setItem('a_profit', 0);
+                  localStorage.setItem('used_codes', "[]");
+                  
+                  // تصفير أرقام المندوبين الآخرين
+                  localStorage.setItem('mock_rank1', 0);
+                  localStorage.setItem('mock_rank2', 0);
+
+                  updateStatsUI();
+                  alert("تم تصفير العدادات بنجاح يا مدير! بدأت منافسة جديدة 🏆");
+              } else if (pass !== null) {
+                  alert("الرمز غير صحيح ❌");
+              }
+          }
+      }
+
+      // === إضافات الإشعارات (Toast) ===
 
       window.originalAlert = window.alert;
       window.alert = function(message) { showToast(message); };
