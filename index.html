@@ -45,27 +45,6 @@
           margin: 0; padding: 0; color: var(--text-color); min-height: 100vh; line-height: 1.6; overflow-x: hidden; 
       }
 
-      /* --- إضافة: نظام التنبيهات الشكاك --- */
-      .toast-container {
-          position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-          z-index: 20000; pointer-events: none; width: 90%; max-width: 400px;
-      }
-      .custom-toast {
-          background: var(--primary); color: white; padding: 12px 20px;
-          border-radius: 12px; margin-top: 10px; box-shadow: var(--shadow);
-          display: flex; align-items: center; gap: 10px; animation: slideUp 0.4s ease-out;
-      }
-      @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-      /* --- إضافة: عداد الطلبات النشطة --- */
-      .live-counter {
-          background: rgba(46, 204, 113, 0.1); color: var(--success);
-          padding: 5px 15px; border-radius: 20px; font-size: 13px; font-weight: bold;
-          display: inline-flex; align-items: center; gap: 6px; margin-bottom: 15px;
-      }
-      .pulse-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: pulse 1.5s infinite; }
-      @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
-
       .theme-toggle {
           position: fixed; top: 15px; left: 15px; z-index: 10001;
           background: var(--primary); color: white; border: none;
@@ -192,8 +171,6 @@
           cursor: pointer; transition: 0.3s; border: 1px solid rgba(255,255,255,0.1);
           color: var(--text-color);
       }
-      /* تحسين الحركية عند اللمس */
-      .select-card:hover { transform: translateY(-3px); border-color: var(--primary); }
       .select-card:active { transform: scale(0.96); }
 
       .select-card i { font-size: 28px; color: var(--primary); background: #e8eaf6; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; border-radius: 15px; }
@@ -280,8 +257,6 @@
 </head>
 <body onload="checkStatus()">
 
-    <div class="toast-container" id="toast-container"></div>
-
     <a href="https://wa.me/9647739470354" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
@@ -305,7 +280,6 @@
       <div class="splash-welcome-text">
           <h2>مرحباً بكم في تطبيق أي شيء ✨</h2>
           <p>أهل أم قصر.. نصلكم أينما كنتم</p>
-          <div id="load-percent" style="font-weight:bold; margin-top:10px; opacity:0.6">0%</div>
       </div>
       <div id="app-logo-splash">
           <i class="fas fa-shopping-bag"></i>
@@ -329,14 +303,6 @@
         <h1>أبشر.. أي شيء! ✨</h1>
         <p>خدمتكم وسعادتنا في سرعة وصولنا</p>
       </div>
-
-      <div style="text-align: center; margin-top: 15px;">
-          <div class="live-counter">
-              <span class="pulse-dot"></span>
-              هناك <span id="active-orders-mock">12</span> طلب نشط في منطقتك الآن
-          </div>
-      </div>
-
       <div class="select-card" onclick="showScreen('order-screen')">
         <i class="fas fa-shopping-cart"></i>
         <div><h3>تسوق مسواكك</h3><small>اطلب مسواكك أو غداك الآن</small></div>
@@ -515,23 +481,12 @@
           window.location.reload(true); 
       }
 
-      // وظيفة لإظهار التنبيهات الشكاكة
-      function showToast(text, icon = 'info-circle') {
-          const container = document.getElementById('toast-container');
-          const toast = document.createElement('div');
-          toast.className = 'custom-toast';
-          toast.innerHTML = `<i class="fas fa-${icon}"></i> <span>${text}</span>`;
-          container.appendChild(toast);
-          setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 400); }, 3000);
-      }
-
       function toggleTheme() {
           document.body.classList.toggle('dark-mode');
           const btn = document.getElementById('theme-btn');
           const isDark = document.body.classList.contains('dark-mode');
           btn.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
           localStorage.setItem('theme', isDark ? 'dark' : 'light');
-          showToast(isDark ? "تم تفعيل الوضع الليلي" : "تم تفعيل الوضع النهاري", isDark ? 'moon' : 'sun');
       }
 
       function generateSecureVC() {
@@ -549,13 +504,13 @@
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
                   (position) => {
-                      userCoords = `http://googleusercontent.com/maps.google.com/${position.coords.latitude},${position.coords.longitude}`;
+                      // الرابط الرسمي والصحيح من خرائط جوجل
+                      userCoords = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
                       btn.innerHTML = '<i class="fas fa-check"></i> تم التحديد ✅';
                       btn.classList.add('success');
-                      showToast("تم تحديد موقعك بنجاح", "map-marker-alt");
                   },
                   (error) => {
-                      showToast("فشل تحديد الموقع، فعل الـ GPS", "exclamation-triangle");
+                      alert("فشل تحديد الموقع، يرجى تفعيل الـ GPS في هاتفك");
                       btn.innerHTML = '<i class="fas fa-map-marker-alt"></i> حاول مرة أخرى';
                   }
               );
@@ -565,20 +520,13 @@
       }
 
       function checkStatus() {
-          // عداد وهمي للتحميل
-          let p = 0;
-          const interval = setInterval(() => {
-              p += Math.floor(Math.random() * 15);
-              if(p > 100) p = 100;
-              document.getElementById('load-percent').innerText = p + "%";
-              if(p === 100) clearInterval(interval);
-          }, 100);
-
           if (localStorage.getItem('theme') === 'dark') {
               document.body.classList.add('dark-mode');
               document.getElementById('theme-btn').innerHTML = '<i class="fas fa-sun"></i>';
           }
+          
           loadSavedCustomerData();
+
           if (localStorage.getItem('isVerifiedDriver') === 'true') {
               document.getElementById('join-driver-card').style.display = 'none';
               document.getElementById('driver-plaza-card').style.display = 'flex';
@@ -588,12 +536,6 @@
           showScreen('home-screen');
           setTimeout(() => { document.getElementById('app-logo-splash').classList.add('show-logo'); }, 1500);
           setTimeout(skipSplash, 3500); 
-
-          // تغيير رقم الطلبات النشطة بشكل عشوائي للواقعية
-          setInterval(() => {
-              const el = document.getElementById('active-orders-mock');
-              if(el) el.innerText = Math.floor(8 + Math.random() * 10);
-          }, 10000);
       }
 
       function saveCustomerData(name, phone) {
@@ -652,11 +594,14 @@
           const phone = document.getElementById('driverJoinPhone').value.trim();
           const bike = document.getElementById('bikeType').value;
           if(!name || !validateIraqiPhone(phone) || !bike) {
-              return showToast("أدخل بياناتك كاملة يروحي", "exclamation-circle");
+              return alert("يرجى إدخال اسمك ونوع الدراجة ورقم هاتف عراقي صحيح (077, 078, 075)");
           }
+
           const btn = document.getElementById('joinSendBtn');
+          const originalText = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
           btn.disabled = true;
+
           try {
               localStorage.setItem('temp_name', name); localStorage.setItem('temp_phone', phone);
               const randomCode = Math.floor(100000 + Math.random() * 900000);
@@ -669,9 +614,9 @@
               });
               showScreen('activation-screen');
           } catch (e) {
-              showToast("خطأ في الاتصال", "wifi");
+              alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
           } finally {
-              btn.innerHTML = 'إرسال طلب الانضمام';
+              btn.innerHTML = originalText;
               btn.disabled = false;
           }
       }
@@ -684,16 +629,18 @@
               localStorage.setItem('driver_name', localStorage.getItem('temp_name'));
               localStorage.setItem('driver_phone', localStorage.getItem('temp_phone'));
               localStorage.removeItem('pending_join');
+              
               document.getElementById('welcome-overlay').style.display = 'flex';
               document.getElementById('welcome-msg').innerText = `يا مية هلا بيك يا ${localStorage.getItem('driver_name')}!`;
               confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+              
               setTimeout(() => { 
                   if (document.getElementById('welcome-overlay').style.display !== 'none') {
                     document.getElementById('welcome-overlay').style.display = 'none';
                     location.reload(); 
                   }
               }, 4000);
-          } else { showToast("كود التفعيل خطأ", "lock"); }
+          } else { alert("رمز التفعيل غير صحيح"); }
       }
 
       function cancelJoinRequest() { if(confirm("إلغاء؟")) { localStorage.clear(); location.reload(); } }
@@ -702,7 +649,6 @@
       function showScreen(id) {
           document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
           document.getElementById(id).classList.add('active-screen');
-          window.scrollTo(0,0); // الرجوع للأعلى عند تغيير الشاشة
           if(id === 'plaza-screen') {
               updateStatsUI();
               document.getElementById('driver-display-name').innerText = "المندوب: " + localStorage.getItem('driver_name');
@@ -746,33 +692,53 @@
           const name = document.getElementById('tukName').value.trim();
           const phone = document.getElementById('tukPhone').value.trim();
           const land = document.getElementById('tukLandmark').value.trim();
-          const dropoffLink = document.getElementById('tukDropoffLink').value.trim() || 'غير محدد';
-          if(!name || !validateIraqiPhone(phone) || !userCoords) return showToast("كمل بياناتك وحدد موقعك", "map-pin");
+          
+          const dropoffLinkEl = document.getElementById('tukDropoffLink');
+          const dropoffLink = dropoffLinkEl && dropoffLinkEl.value.trim() ? dropoffLinkEl.value.trim() : 'غير محدد';
+          
+          if(!name || !validateIraqiPhone(phone) || !userCoords) return alert("يرجى إكمال البيانات والتأكد من الرقم وتحديد نقطة الصعود تلقائياً");
+          
           const btn = document.getElementById('tukSendBtn');
+          const originalText = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
           btn.disabled = true;
+
           try {
               saveCustomerData(name, phone);
               const vc = generateSecureVC();
+              
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true`);
+              
               const msg = `🚖 طلب تكتك (سعر مثبت)\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n💰 السعر المطلوب: 2,000 د.ع\n📌 الدالة: ${land || 'لا توجد'}\n\n📍 مسار الرحلة:\nصعود من: ${userCoords}\nنزول في: ${dropoffLink}`;
+              
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
+                  body: JSON.stringify({ 
+                      chat_id: PUBLIC_CHANNEL, text: msg, 
+                      reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } 
+                  })
               });
-              showToast("تم إرسال طلب التكتك بنجاح", "check-circle");
+              alert("تم إرسال طلب التكتك بالسعر المثبت: 2,000 د.ع"); 
               showScreen('home-screen');
-          } catch (e) { showToast("فشل الإرسال", "times"); } finally { btn.innerHTML = 'إرسال طلب التكتك'; btn.disabled = false; }
+          } catch (e) {
+              alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
+          } finally {
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+          }
       }
 
       async function sendMedFinal() {
           const name = document.getElementById('medName').value.trim();
           const phone = document.getElementById('medPhone').value.trim();
           const order = document.getElementById('medOrder').value.trim();
-          if(!name || !validateIraqiPhone(phone)) return showToast("يرجى إكمال البيانات", "info");
+          if(!name || !validateIraqiPhone(phone)) return alert("يرجى إكمال البيانات والتأكد من الرقم العراقي");
+          
           const btn = document.getElementById('medSendBtn');
+          const originalText = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
           btn.disabled = true;
+
           try {
               saveCustomerData(name, phone);
               const vc = generateSecureVC();
@@ -780,12 +746,20 @@
               const msg = `🔵 طلب وسيط\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📝 الغرض: ${order}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
+                  body: JSON.stringify({ 
+                      chat_id: PUBLIC_CHANNEL, text: msg, 
+                      reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } 
+                  })
               });
-              showToast("تم إرسال طلب الوسيط", "handshake");
+              alert("تم الإرسال!"); 
               document.getElementById('medOrder').value = "";
               showScreen('home-screen');
-          } catch (e) { showToast("فشل الإرسال", "times"); } finally { btn.innerHTML = 'إرسال طلب الوسيط'; btn.disabled = false; }
+          } catch (e) {
+              alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
+          } finally {
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+          }
       }
 
       async function sendFinal() {
@@ -793,10 +767,13 @@
           const phone = document.getElementById('custPhone').value.trim();
           const order = document.getElementById('custOrder').value.trim();
           const land = document.getElementById('custLandmark').value.trim();
-          if(!name || !validateIraqiPhone(phone) || !order) return showToast("يرجى إكمال البيانات", "shopping-cart");
+          if(!name || !validateIraqiPhone(phone) || !order) return alert("يرجى إكمال البيانات والتأكد من الرقم العراقي");
+          
           const btn = document.getElementById('sendBtn');
+          const originalText = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
           btn.disabled = true;
+
           try {
               saveCustomerData(name, phone);
               const vc = generateSecureVC();
@@ -804,19 +781,27 @@
               const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${order}\n🗺️ الموقع: ${userCoords || 'غير محدد'}`;
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
+                  body: JSON.stringify({ 
+                      chat_id: PUBLIC_CHANNEL, text: msg, 
+                      reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } 
+                  })
               });
               await updateLoyaltyUI();
-              showToast("تم إرسال طلبك للمناديب", "truck");
+              alert("تم الإرسال!"); 
               document.getElementById('custOrder').value = "";
               showScreen('home-screen');
-          } catch (e) { showToast("فشل الإرسال", "times"); } finally { btn.innerHTML = 'إرسال الطلب للمناديب'; btn.disabled = false; }
+          } catch (e) {
+              alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
+          } finally {
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+          }
       }
 
       async function processVerifyCode() {
           const code = document.getElementById('driverVerifyInput').value.trim();
           const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
-          if(!validateIraqiPhone(custPhone)) return showToast("رقم الزبون خطأ", "phone-slash");
+          if(!validateIraqiPhone(custPhone)) return alert("يرجى التأكد من رقم هاتف الزبون");
           const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
           const checkResult = await checkResp.text();
           if (checkResult.startsWith("valid")) {
@@ -828,8 +813,8 @@
               const dName = localStorage.getItem('driver_name');
               const dPhone = localStorage.getItem('driver_phone');
               fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(dName)}&phone=${dPhone}&inCount=${localStorage.getItem('d_count')}&inDriver=${localStorage.getItem('d_profit')}&inAdmin=${localStorage.getItem('a_profit')}`);
-              showToast(`تم التأكيد! أرباحك: ${dG}`, "award");
-          } else showToast("الكود خطأ وغير صحيح", "times-circle");
+              alert(`تم التأكيد! أرباحك: ${dG}`);
+          } else alert("الكود خطأ");
       }
 
       function updateStatsUI() {
