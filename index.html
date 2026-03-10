@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ط<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -343,8 +343,6 @@
           margin: 0 0 15px 0;
           font-size: 18px;
           font-weight: 700;
-          cursor: pointer; /* إضافة مؤشر للضغط */
-          user-select: none;
       }
       body.dark-mode .leaderboard-title { color: var(--gold); }
       .driver-rank {
@@ -584,7 +582,7 @@
         </div>
 
         <div class="leaderboard-card">
-            <h3 class="leaderboard-title" onclick="handleAdminResetTap()"><i class="fas fa-trophy" style="color: var(--gold);"></i> أبطال أم قصر للتوصيل</h3>
+            <h3 class="leaderboard-title"><i class="fas fa-trophy" style="color: var(--gold);"></i> أبطال أم قصر للتوصيل</h3>
             <div class="driver-rank">
                 <div class="rank-info"><span class="rank-medal">🥇</span> <span>علي (أبو التكتك)</span></div>
                 <span class="rank-score" id="rank1-score">145 طلب</span>
@@ -946,7 +944,7 @@
           if (checkResult.startsWith("valid")) {
               let dG = checkResult.includes("tuk") ? 1500 : 2000;
               
-              /* تم التعديل هنا: زيادة العداد الكلي والعداد الخاص بالدوري كل على حدة */
+              /* زيادة العداد الكلي والعداد الخاص بالدوري كل على حدة */
               localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
               localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
               
@@ -987,34 +985,6 @@
               document.getElementById('rank2-score').innerText = r2 + " طلب";
           } else {
               document.getElementById('rank2-score').innerText = "120 طلب";
-          }
-      }
-
-      // === إضافات المدير السرية (تصفير العداد) ===
-      let adminTapCount = 0;
-      let adminTapTimer;
-      function handleAdminResetTap() {
-          adminTapCount++;
-          clearTimeout(adminTapTimer);
-          adminTapTimer = setTimeout(() => { adminTapCount = 0; }, 2000); // تصفير الضغطات إذا تأخرت
-          
-          if (adminTapCount >= 5) {
-              adminTapCount = 0;
-              let pass = prompt("أدخل رمز المدير لتصفير العدادات وبدء دوري جديد:");
-              if (pass === "0000") { 
-                  // تصفير عداد دوري الأبطال فقط (لك وللآخرين)
-                  localStorage.setItem('league_count', 0);
-                  localStorage.setItem('mock_rank1', 0);
-                  localStorage.setItem('mock_rank2', 0);
-                  updateStatsUI();
-                  
-                  // إرسال إشارة للسيرفر حتى يصفر الدوري عند باقي المندوبين
-                  fetch(`${GS_URL}?action=resetLeagueCommand`);
-                  
-                  alert("تم تصفير عداد دوري الأبطال بنجاح وإرسال الإشارة لجميع المندوبين! 🏆\n(ملاحظة: الأرباح والطلبات الكلية لم تتأثر)");
-              } else if (pass !== null) {
-                  alert("الرمز غير صحيح ❌");
-              }
           }
       }
 
