@@ -271,6 +271,17 @@
       body.dark-mode .note { background: rgba(245, 158, 11, 0.1); color: var(--gold); }
 
       /* =========================================
+         بطاقات عرض السعر (Price Indicator)
+         ========================================= */
+      .price-indicator {
+          background: var(--surface); border: 2px solid var(--border-color); padding: 20px; 
+          border-radius: var(--radius-lg); margin-bottom: 20px; text-align: center; box-shadow: var(--shadow-sm);
+      }
+      body.dark-mode .price-indicator { border-color: rgba(255,255,255,0.05); }
+      .price-indicator span { font-size: 14px; color: var(--text-muted); font-weight: 600; display: block; }
+      .price-indicator .amount { font-size: 32px; font-weight: 800; color: var(--primary); display: block; margin: 5px 0; }
+
+      /* =========================================
          شريط التنقل والإشعارات (Nav & Toast)
          ========================================= */
       .bottom-nav {
@@ -381,7 +392,7 @@
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
             </div>
             <h3 style="margin: 0; font-weight: 800; color: var(--text-main);">تطبيق أي شيء</h3>
-            <p style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.4</p>
+            <p style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.5</p>
         </div>
         
         <div class="sidebar-item" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
@@ -532,7 +543,12 @@
     <div id="mediator-screen" class="screen container">
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> خدمة الوسيط</h2>
-        <div class="note"><i class="fas fa-bolt"></i> نوصل أغراضك بسرعة وأمان من وإلى أي مكان داخل أم قصر.</div>
+        
+        <div class="price-indicator" style="display: block;">
+            <span>سعر خدمة الوسيط لكافة مناطق أم قصر:</span>
+            <span class="amount">2,500 د.ع</span>
+            <small style="color: var(--secondary); font-weight: bold;"><i class="fas fa-bolt"></i> نوصل أغراضك بسرعة وأمان</small>
+        </div>
         
         <div class="form-card">
             <div class="form-card-title"><i class="fas fa-user-circle"></i> بيانات المرسل</div>
@@ -572,6 +588,12 @@
             <div class="loyalty-text">طلبك رقم <span id="current-order-count" style="color:var(--primary); font-size:22px;">0</span> / 6</div>
             <div class="loyalty-progress"><div id="loyalty-bar" class="loyalty-bar"></div></div>
             <span class="gift-note" id="loyalty-gift-msg"><i class="fas fa-gift"></i> أوصل للطلب 6 وكروتك مجانية</span>
+        </div>
+
+        <div class="price-indicator" style="display: block;">
+            <span>سعر التوصيل لكافة مناطق أم قصر:</span>
+            <span class="amount">2,500 د.ع</span>
+            <small style="color: var(--secondary); font-weight: bold;"><i class="fas fa-motorcycle"></i> خدمة توصيل سريعة ومضمونة</small>
         </div>
 
         <div class="form-card">
@@ -689,11 +711,10 @@
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
       
-      // ⚠️ تأكد من وضع رابط الـ Google Script الجديد هنا بدل القديم
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.4"; 
+      const CURRENT_VERSION = "2.0.5"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
