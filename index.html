@@ -160,11 +160,10 @@
       
       body.dark-mode .select-card i { background: #3d3d5c; color: #8fa1ff; }
 
-      .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
       .stat-box { background: var(--stat-box-bg); padding: 15px; border-radius: 15px; text-align: center; box-shadow: var(--shadow); color: var(--text-color); }
-      .stat-box h4 { margin: 0; font-size: 14px; color: #666; }
+      .stat-box h4 { margin: 0; font-size: 16px; color: #666; font-weight: bold; }
       body.dark-mode .stat-box h4 { color: #bbb; }
-      .stat-box p { margin: 5px 0 0; font-size: 18px; font-weight: 700; color: var(--primary); }
+      .stat-box p { margin: 5px 0 0; font-size: 26px; font-weight: 700; color: var(--primary); }
       body.dark-mode .stat-box p { color: var(--gold); }
       
       .form-group { margin-bottom: 15px; position: relative; }
@@ -237,7 +236,7 @@
       .price-indicator .amount { font-size: 24px; font-weight: bold; color: var(--primary); display: block; }
       body.dark-mode .price-indicator .amount { color: var(--gold); }
 
-      /* === Toast Styling (الإشعارات المنبثقة) === */
+      /* === Toast Styling === */
       #toast-container {
           position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
           z-index: 100000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px;
@@ -461,9 +460,9 @@
         <h2 style="text-align: center;">خدمة تكتك بلي 🚕</h2>
         
         <div id="tuk-price-display" class="price-indicator" style="display: block;">
-            <span>سعر التوصيل المثبت لكافة أم قصر:</span>
-            <span class="amount">2,000 د.ع</span>
-            <small style="color: var(--success); font-weight: bold;">✅ سعر رسمي غير قابل للتلاعب</small>
+            <span>سعر التوصيل المتوقع:</span>
+            <span class="amount" id="tukPriceAmount">1,500 د.ع</span>
+            <small style="color: var(--success); font-weight: bold;">✅ يتم تحديد السعر حسب المسافة</small>
         </div>
 
         <div class="form-group"><input type="text" id="tukName" placeholder="الاسم الكامل"></div>
@@ -472,6 +471,14 @@
             <span class="phone-note" style="color: red;">تاكد من رقمك عدل قبل لا تسوي اي شي يروحي</span>
         </div>
         
+        <div class="form-group">
+            <label style="font-size: 14px; color: var(--primary); font-weight: bold; display: block; margin-bottom: 5px;">نوع الرحلة (المسافة)</label>
+            <select id="tukDistance" onchange="updateTukPrice()">
+                <option value="1500">أماكن قريبة داخل المنطقة (1,500 د.ع)</option>
+                <option value="2500">أماكن متوسطة وبعيدة (2,500 د.ع)</option>
+            </select>
+        </div>
+
         <button class="location-btn" id="loc-btn-tuk" onclick="getLocation('tuk')" style="margin-bottom: 20px;">
             <i class="fas fa-map-marker-alt"></i> تحديد نقطة الصعود تلقائياً 📍
         </button>
@@ -568,11 +575,12 @@
 
     <div id="plaza-screen" class="screen container">
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 style="text-align: center;">إحصائياتك اليوم 🏆</h2>
-        <div class="stats-grid">
-            <div class="stat-box"><h4>الطلبات</h4><p id="stat-count">0</p></div>
-            <div class="stat-box"><h4>ربحك (د.ع)</h4><p id="stat-driver">0</p></div>
-            <div class="stat-box" style="grid-column: span 2;"><h4>حساب المدير (د.ع)</h4><p id="stat-admin" style="color: var(--danger);">0</p></div>
+        
+        <div class="stats-grid" style="display: block;">
+            <div class="stat-box" style="margin-bottom: 15px;">
+                <h4>إجمالي الطلبات المنجزة 📦</h4>
+                <p id="stat-count" style="font-size: 32px;">0</p>
+            </div>
         </div>
 
         <div class="leaderboard-card">
@@ -620,7 +628,6 @@
           window.location.reload(true); 
       }
 
-      // === Toast System (نظام الإشعارات المنبثقة) ===
       window.originalAlert = window.alert;
       window.alert = function(message) { showToast(message); };
 
@@ -643,17 +650,20 @@
           localStorage.setItem('theme', isDark ? 'dark' : 'light');
       }
 
-      // === Automatic Dark Mode (الوضع الليلي التلقائي) ===
       function applyAutoTheme() {
           const hour = new Date().getHours();
-          const isNight = hour >= 18 || hour < 6; // من 6 العصر لـ 6 الصبح
+          const isNight = hour >= 18 || hour < 6; 
           const savedTheme = localStorage.getItem('theme');
-          
           if (!savedTheme) {
               if (isNight) document.body.classList.add('dark-mode');
           } else if (savedTheme === 'dark') {
               document.body.classList.add('dark-mode');
           }
+      }
+
+      function updateTukPrice() {
+          const price = document.getElementById('tukDistance').value;
+          document.getElementById('tukPriceAmount').innerText = parseInt(price).toLocaleString() + " د.ع";
       }
 
       function generateSecureVC() {
@@ -686,7 +696,7 @@
       }
 
       function checkStatus() {
-          applyAutoTheme(); // استدعاء ميزة الوقت التلقائي
+          applyAutoTheme(); 
           loadSavedCustomerData();
 
           if (localStorage.getItem('isVerifiedDriver') === 'true') {
@@ -740,8 +750,8 @@
               const response = await fetch(`${GS_URL}?action=checkReset&phone=${myPhone}`);
               const result = await response.text();
               if (result === "reset_now") {
-                  localStorage.setItem('d_count', 0); localStorage.setItem('d_profit', 0);
-                  localStorage.setItem('a_profit', 0); localStorage.setItem('league_count', 0);
+                  localStorage.setItem('d_count', 0); 
+                  localStorage.setItem('league_count', 0);
                   localStorage.setItem('used_codes', "[]");
                   updateStatsUI();
               } else if (result.includes("reset_league")) {
@@ -806,12 +816,13 @@
           if(id === 'order-screen') updateLoyaltyUI();
       }
 
-      // === التعديل المطلوب: مسح الحقول والبقاء بنفس الصفحة بعد الطلب ===
       async function sendTukOrder() {
           const name = document.getElementById('tukName').value.trim();
           const phone = document.getElementById('tukPhone').value.trim();
           const land = document.getElementById('tukLandmark').value.trim();
+          const price = document.getElementById('tukDistance').value; 
           const dropLink = document.getElementById('tukDropoffLink').value.trim() || 'غير محدد';
+          
           if(!name || !validateIraqiPhone(phone) || !userCoords) return showToast("أكمل البيانات وحدد موقعك 📍");
           const btn = document.getElementById('tukSendBtn');
           btn.disabled = true;
@@ -819,14 +830,15 @@
               saveCustomerData(name, phone);
               const vc = generateSecureVC();
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true`);
-              const msg = `🚖 طلب تكتك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 صعود من: ${userCoords}\nنزول في: ${dropLink}`;
+              
+              const msg = `🚖 طلب تكتك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n💰 السعر المطلوب: ${parseInt(price).toLocaleString()} د.ع\n📍 صعود من: ${userCoords}\nنزول في: ${dropLink}`;
+              
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
               
               showToast("تم إرسال طلب التكتك بنجاح ✅");
-              // مسح الحقول بدون الرجوع للرئيسية
               document.getElementById('tukDropoffLink').value = ""; 
               document.getElementById('tukLandmark').value = "";
               
@@ -852,7 +864,6 @@
               });
               
               showToast("تم إرسال طلب الوسيط بنجاح ✅");
-              // مسح الحقول بدون الرجوع للرئيسية
               document.getElementById('medOrder').value = ""; 
               document.getElementById('medLandmark').value = "";
               
@@ -882,7 +893,6 @@
               });
               
               showToast("تم إرسال طلبك للمناديب ✅");
-              // مسح الحقول بدون الرجوع للرئيسية
               document.getElementById('custOrder').value = ""; 
               document.getElementById('custLandmark').value = "";
               
@@ -890,6 +900,7 @@
           } catch (e) { showToast("خطأ في الإرسال"); } finally { btn.disabled = false; }
       }
 
+      // === التعديل المطلوب: الاعتماد على عدد الطلبات فقط للمندوب وإرسال الحصة الخفية للمدير ===
       async function processVerifyCode() {
           const code = document.getElementById('driverVerifyInput').value.trim();
           const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
@@ -897,22 +908,29 @@
           const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
           const checkResult = await checkResp.text();
           if (checkResult.startsWith("valid")) {
-              let dG = checkResult.includes("tuk") ? 1500 : 2000;
+              
               localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
               localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
-              localStorage.setItem('d_profit', parseInt(localStorage.getItem('d_profit') || 0) + dG);
-              localStorage.setItem('a_profit', parseInt(localStorage.getItem('a_profit') || 0) + 500);
+              
               updateStatsUI();
-              fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=${localStorage.getItem('d_profit')}&inAdmin=${localStorage.getItem('a_profit')}`);
-              showToast(`تم التأكيد! أرباحك: ${dG} ✅`);
+              
+              // حساب حصة المدير برمجياً بالخلفية ليتم عرضها في جدول التليجرام الخاص بك فقط
+              let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
+              
+              fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
+              
+              showToast(`تم تأكيد تسليم الطلب بنجاح! عاشت ايدك ✅`);
               refreshLeaderboard();
+              
+              document.getElementById('driverVerifyInput').value = "";
+              document.getElementById('driverVerifyPhoneInput').value = "";
           } else showToast("الكود غير صحيح ❌");
       }
 
       function updateStatsUI() {
-          document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0;
-          document.getElementById('stat-driver').innerText = (localStorage.getItem('d_profit') || 0).toLocaleString();
-          document.getElementById('stat-admin').innerText = (localStorage.getItem('a_profit') || 0).toLocaleString();
+          if(document.getElementById('stat-count')) {
+              document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0;
+          }
       }
 
       async function refreshLeaderboard() {
