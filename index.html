@@ -160,10 +160,11 @@
       
       body.dark-mode .select-card i { background: #3d3d5c; color: #8fa1ff; }
 
+      .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
       .stat-box { background: var(--stat-box-bg); padding: 15px; border-radius: 15px; text-align: center; box-shadow: var(--shadow); color: var(--text-color); }
-      .stat-box h4 { margin: 0; font-size: 16px; color: #666; font-weight: bold; }
+      .stat-box h4 { margin: 0; font-size: 14px; color: #666; font-weight: bold; }
       body.dark-mode .stat-box h4 { color: #bbb; }
-      .stat-box p { margin: 5px 0 0; font-size: 26px; font-weight: 700; color: var(--primary); }
+      .stat-box p { margin: 5px 0 0; font-size: 20px; font-weight: 700; color: var(--primary); }
       body.dark-mode .stat-box p { color: var(--gold); }
       
       .form-group { margin-bottom: 15px; position: relative; }
@@ -575,12 +576,12 @@
 
     <div id="plaza-screen" class="screen container">
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 style="text-align: center;">إحصائياتك اليوم 🏆</h2>
         
-        <div class="stats-grid" style="display: block;">
-            <div class="stat-box" style="margin-bottom: 15px;">
-                <h4>إجمالي الطلبات المنجزة 📦</h4>
-                <p id="stat-count" style="font-size: 32px;">0</p>
-            </div>
+        <div class="stats-grid" id="main-stats-grid">
+            <div class="stat-box"><h4>الطلبات</h4><p id="stat-count">0</p></div>
+            <div class="stat-box"><h4>ربحك (د.ع)</h4><p id="stat-driver">0</p></div>
+            <div class="stat-box" style="grid-column: span 2;"><h4>حساب المدير (د.ع)</h4><p id="stat-admin" style="color: var(--danger);">0</p></div>
         </div>
 
         <div class="leaderboard-card">
@@ -751,6 +752,8 @@
               const result = await response.text();
               if (result === "reset_now") {
                   localStorage.setItem('d_count', 0); 
+                  localStorage.setItem('d_profit', 0);
+                  localStorage.setItem('a_profit', 0);
                   localStorage.setItem('league_count', 0);
                   localStorage.setItem('used_codes', "[]");
                   updateStatsUI();
@@ -900,37 +903,58 @@
           } catch (e) { showToast("خطأ في الإرسال"); } finally { btn.disabled = false; }
       }
 
-      // === التعديل المطلوب: الاعتماد على عدد الطلبات فقط للمندوب وإرسال الحصة الخفية للمدير ===
+      // === التعديل المطلوب: حساب الأرباح بناءً على نوع الطلب (مسواكك/تكتك) ===
       async function processVerifyCode() {
           const code = document.getElementById('driverVerifyInput').value.trim();
           const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
           if(!validateIraqiPhone(custPhone)) return showToast("رقم هاتف الزبون خطأ");
+          
           const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
           const checkResult = await checkResp.text();
+          
           if (checkResult.startsWith("valid")) {
-              
+              let dG = 0; // ربح المندوب
+              let aG = 0; // حساب المدير
+              let alertMsg = "";
+
+              if (checkResult.includes("tuk")) {
+                  // إذا كان الطلب تكتك، الأرباح صفر، فقط زيادة عدد الطلبات
+                  dG = 0;
+                  aG = 0;
+                  alertMsg = "تم تأكيد رحلة التكتك! (تم احتساب الطلب فقط) 🚖";
+              } else {
+                  // مسواكك والوسيط يحسب أرباح بشكل طبيعي
+                  dG = 2000;
+                  aG = 500;
+                  alertMsg = `تم التأكيد! أرباحك: ${dG} د.ع ✅`;
+              }
+
+              // زيادة عدد الطلبات دائماً
               localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
               localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
               
+              // إضافة الأرباح بناءً على الترتيب أعلاه
+              localStorage.setItem('d_profit', parseInt(localStorage.getItem('d_profit') || 0) + dG);
+              localStorage.setItem('a_profit', parseInt(localStorage.getItem('a_profit') || 0) + aG);
+              
               updateStatsUI();
               
-              // حساب حصة المدير برمجياً بالخلفية ليتم عرضها في جدول التليجرام الخاص بك فقط
-              let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
+              fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=${localStorage.getItem('d_profit')}&inAdmin=${localStorage.getItem('a_profit')}`);
               
-              fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
-              
-              showToast(`تم تأكيد تسليم الطلب بنجاح! عاشت ايدك ✅`);
+              showToast(alertMsg);
               refreshLeaderboard();
               
               document.getElementById('driverVerifyInput').value = "";
               document.getElementById('driverVerifyPhoneInput').value = "";
-          } else showToast("الكود غير صحيح ❌");
+          } else {
+              showToast("الكود غير صحيح ❌");
+          }
       }
 
       function updateStatsUI() {
-          if(document.getElementById('stat-count')) {
-              document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0;
-          }
+          document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0;
+          document.getElementById('stat-driver').innerText = (parseInt(localStorage.getItem('d_profit')) || 0).toLocaleString();
+          document.getElementById('stat-admin').innerText = (parseInt(localStorage.getItem('a_profit')) || 0).toLocaleString();
       }
 
       async function refreshLeaderboard() {
