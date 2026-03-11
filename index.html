@@ -397,7 +397,7 @@
             <i class="fas fa-compass"></i>
             <span>الرئيسية</span>
         </div>
-        <div class="nav-item" onclick="showScreen('order-screen'); updateNav(this)">
+        <div class="nav-item" onclick="showScreen('order-screen'); updateNav(this)" style="position: relative;">
             <i class="fas fa-shopping-basket"></i>
             <span>مسواكك</span>
             <div id="local-cart-badge" class="local-order-counter" style="display:none;">0</div>
@@ -517,7 +517,7 @@
                 <button type="button" class="location-btn" style="border:1px solid var(--border-color); background:var(--surface); color:var(--text-main);" onclick="window.open('https://www.google.com/maps', '_blank')">
                     <i class="fas fa-map"></i> افتح الخريطة لنسخ الرابط
                 </button>
-                <input type="url" id="tukDropoffLink" placeholder="لصق رابط موقع النزول هنا...">
+                <input type="url" id="tukDropoffLink" placeholder="لصق الرابط هنا...">
             </div>
 
             <div class="form-group">
@@ -658,7 +658,7 @@
             <div class="form-card-title"><i class="fas fa-qrcode"></i> تأكيد تسليم طلب جديد</div>
             <div class="form-group">
                 <label>رقم هاتف الزبون</label>
-                <input type="tel" id="driverVerifyPhoneInput" placeholder="ادخل رقم الزبون">
+                <input type="tel" id="driverVerifyPhoneInput" placeholder="ادخل رقم الزبون" style="text-align:center;">
             </div>
             <div class="form-group">
                 <label>كود التأكيد (الذي وصل للزبون)</label>
@@ -675,12 +675,10 @@
             <small style="display: block; text-align: center; margin-top: 15px; color: var(--text-muted); font-weight:600;">المنافسة مستمرة حتى إعلان النتائج 🏆</small>
         </div>
 
-        <a href="https://t.me/uumqaser" target="_blank" style="text-decoration: none;">
-            <div class="select-card" style="background: #0088cc; color: white; border:none; padding:15px;">
-                <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color:white; width:50px; height:50px;"><i class="fab fa-telegram-plane" style="font-size:22px;"></i></div>
-                <div class="card-text"><h3 style="margin:0; font-size:16px;">قناة المناديب الرسمية</h3><small style="color:rgba(255,255,255,0.8);">لاستلام الطلبات الحصرية</small></div>
-            </div>
-        </a>
+        <div class="select-card" style="background: #0088cc; color: white; border:none; padding:15px; cursor:pointer;" onclick="window.location.href='https://t.me/uumqaser';">
+            <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color:white; width:50px; height:50px;"><i class="fab fa-telegram-plane" style="font-size:22px;"></i></div>
+            <div class="card-text"><h3 style="margin:0; font-size:16px;">قناة المناديب الرسمية</h3><small style="color:rgba(255,255,255,0.8);">انضم لتلقي الإشعارات والطلبات</small></div>
+        </div>
 
         <p id="driver-display-name" style="text-align: center; font-weight: 700; color: var(--text-muted); margin-top:30px;"></p>
         <button class="resign-btn" onclick="resignDriver()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج / استقالة</button>
@@ -690,10 +688,12 @@
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
+      
+      // ⚠️ تأكد من وضع رابط الـ Google Script الجديد هنا حتى تختفي رسالة الخطأ
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.2"; 
+      const CURRENT_VERSION = "2.0.3"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -878,7 +878,7 @@
           const name = document.getElementById('tukName').value.trim();
           const phone = document.getElementById('tukPhone').value.trim();
           const land = document.getElementById('tukLandmark').value.trim();
-          const dropLink = document.getElementById('tukDropoffLink').value.trim(); // صار إجباري برمجياً
+          const dropLink = document.getElementById('tukDropoffLink').value.trim(); 
           
           if(!name || !validateIraqiPhone(phone) || !userCoords || !dropLink) return showToast("أكمل البيانات وحدد نقطة الصعود والنزول 📍");
           const btn = document.getElementById('tukSendBtn');
