@@ -237,7 +237,7 @@
       .price-indicator .amount { font-size: 24px; font-weight: bold; color: var(--primary); display: block; }
       body.dark-mode .price-indicator .amount { color: var(--gold); }
 
-      /* === Toast Styling === */
+      /* === Toast Styling (الإشعارات المنبثقة) === */
       #toast-container {
           position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
           z-index: 100000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 400px;
@@ -620,7 +620,7 @@
           window.location.reload(true); 
       }
 
-      // === Toast System ===
+      // === Toast System (نظام الإشعارات المنبثقة) ===
       window.originalAlert = window.alert;
       window.alert = function(message) { showToast(message); };
 
@@ -643,10 +643,10 @@
           localStorage.setItem('theme', isDark ? 'dark' : 'light');
       }
 
-      // === Automatic Dark Mode (New Feature) ===
+      // === Automatic Dark Mode (الوضع الليلي التلقائي) ===
       function applyAutoTheme() {
           const hour = new Date().getHours();
-          const isNight = hour >= 18 || hour < 6;
+          const isNight = hour >= 18 || hour < 6; // من 6 العصر لـ 6 الصبح
           const savedTheme = localStorage.getItem('theme');
           
           if (!savedTheme) {
@@ -686,7 +686,7 @@
       }
 
       function checkStatus() {
-          applyAutoTheme();
+          applyAutoTheme(); // استدعاء ميزة الوقت التلقائي
           loadSavedCustomerData();
 
           if (localStorage.getItem('isVerifiedDriver') === 'true') {
@@ -806,7 +806,7 @@
           if(id === 'order-screen') updateLoyaltyUI();
       }
 
-      // === Modified Order Functions (Stay on page & Clear inputs) ===
+      // === التعديل المطلوب: مسح الحقول والبقاء بنفس الصفحة بعد الطلب ===
       async function sendTukOrder() {
           const name = document.getElementById('tukName').value.trim();
           const phone = document.getElementById('tukPhone').value.trim();
@@ -824,8 +824,12 @@
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
+              
               showToast("تم إرسال طلب التكتك بنجاح ✅");
-              document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = "";
+              // مسح الحقول بدون الرجوع للرئيسية
+              document.getElementById('tukDropoffLink').value = ""; 
+              document.getElementById('tukLandmark').value = "";
+              
               loyaltyCount++; localStorage.setItem('my_loyalty_orders', loyaltyCount); updateLocalLoyaltyUI();
           } catch (e) { showToast("خطأ في الإرسال"); } finally { btn.disabled = false; }
       }
@@ -846,8 +850,12 @@
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
               });
+              
               showToast("تم إرسال طلب الوسيط بنجاح ✅");
-              document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = "";
+              // مسح الحقول بدون الرجوع للرئيسية
+              document.getElementById('medOrder').value = ""; 
+              document.getElementById('medLandmark').value = "";
+              
               loyaltyCount++; localStorage.setItem('my_loyalty_orders', loyaltyCount); updateLocalLoyaltyUI();
           } catch (e) { showToast("خطأ في الإرسال"); } finally { btn.disabled = false; }
       }
@@ -872,8 +880,12 @@
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
+              
               showToast("تم إرسال طلبك للمناديب ✅");
-              document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = "";
+              // مسح الحقول بدون الرجوع للرئيسية
+              document.getElementById('custOrder').value = ""; 
+              document.getElementById('custLandmark').value = "";
+              
               loyaltyCount++; localStorage.setItem('my_loyalty_orders', loyaltyCount); updateLocalLoyaltyUI();
           } catch (e) { showToast("خطأ في الإرسال"); } finally { btn.disabled = false; }
       }
