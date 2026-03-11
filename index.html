@@ -164,7 +164,7 @@
       }
 
       /* =========================================
-         ترتيب البطاقات (Grid Layout)
+         ترتيب البطاقات (Grid Layout) للرئيسية
          ========================================= */
       .services-grid {
           display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
@@ -394,13 +394,13 @@
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
             </div>
             <h3 style="margin: 0; font-weight: 800; color: var(--text-main);">تطبيق أي شيء</h3>
-            <p style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.6</p>
+            <p style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.7</p>
         </div>
         
         <div class="sidebar-item" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
             <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> تفعيل الوضع الليلي
         </div>
-        <a href="tg://resolve?domain=uumqaser" class="sidebar-item">
+        <a href="https://wa.me/9647739470354" target="_blank" class="sidebar-item">
             <i class="fab fa-whatsapp" style="color: #25d366; font-size: 22px; width: 25px;"></i> مراسلة الدعم الفني
         </a>
     </div>
@@ -713,11 +713,11 @@
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
       
-      // ⚠️ تنبيه للمدير: انسخ الرابط الجديد من Google Script والصقه هنا بدلاً من الرابط القديم ⚠️
+      // ⚠️ تأكد من إضافة رابط السيرفر الجديد مالتك هنا حتى تشتغل الأسماء ⚠️
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.6"; 
+      const CURRENT_VERSION = "2.0.7"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
