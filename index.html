@@ -229,14 +229,6 @@
       .telegram-card i { background: rgba(255,255,255,0.2) !important; color: white !important; }
       .telegram-card small { color: rgba(255,255,255,0.8); }
 
-      .price-indicator {
-          background: var(--stat-box-bg); border: 2px solid var(--gold); padding: 15px; 
-          border-radius: 12px; margin-bottom: 15px; text-align: center; display: none;
-      }
-      .price-indicator span { font-size: 14px; opacity: 0.8; }
-      .price-indicator .amount { font-size: 24px; font-weight: bold; color: var(--primary); display: block; }
-      body.dark-mode .price-indicator .amount { color: var(--gold); }
-
       /* === Toast Styling === */
       #toast-container {
           position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
@@ -460,26 +452,12 @@
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 style="text-align: center;">خدمة تكتك بلي 🚕</h2>
         
-        <div id="tuk-price-display" class="price-indicator" style="display: block;">
-            <span>سعر التوصيل المتوقع:</span>
-            <span class="amount" id="tukPriceAmount">1,500 د.ع</span>
-            <small style="color: var(--success); font-weight: bold;">✅ يتم تحديد السعر حسب المسافة</small>
-        </div>
-
         <div class="form-group"><input type="text" id="tukName" placeholder="الاسم الكامل"></div>
         <div class="form-group">
             <input type="tel" id="tukPhone" placeholder="رقم الهاتف (عراقي)">
             <span class="phone-note" style="color: red;">تاكد من رقمك عدل قبل لا تسوي اي شي يروحي</span>
         </div>
         
-        <div class="form-group">
-            <label style="font-size: 14px; color: var(--primary); font-weight: bold; display: block; margin-bottom: 5px;">نوع الرحلة (المسافة)</label>
-            <select id="tukDistance" onchange="updateTukPrice()">
-                <option value="1500">أماكن قريبة داخل المنطقة (1,500 د.ع)</option>
-                <option value="2500">أماكن متوسطة وبعيدة (2,500 د.ع)</option>
-            </select>
-        </div>
-
         <button class="location-btn" id="loc-btn-tuk" onclick="getLocation('tuk')" style="margin-bottom: 20px;">
             <i class="fas fa-map-marker-alt"></i> تحديد نقطة الصعود تلقائياً 📍
         </button>
@@ -629,6 +607,7 @@
           window.location.reload(true); 
       }
 
+      // === Toast System (نظام الإشعارات المنبثقة) ===
       window.originalAlert = window.alert;
       window.alert = function(message) { showToast(message); };
 
@@ -660,11 +639,6 @@
           } else if (savedTheme === 'dark') {
               document.body.classList.add('dark-mode');
           }
-      }
-
-      function updateTukPrice() {
-          const price = document.getElementById('tukDistance').value;
-          document.getElementById('tukPriceAmount').innerText = parseInt(price).toLocaleString() + " د.ع";
       }
 
       function generateSecureVC() {
@@ -823,7 +797,6 @@
           const name = document.getElementById('tukName').value.trim();
           const phone = document.getElementById('tukPhone').value.trim();
           const land = document.getElementById('tukLandmark').value.trim();
-          const price = document.getElementById('tukDistance').value; 
           const dropLink = document.getElementById('tukDropoffLink').value.trim() || 'غير محدد';
           
           if(!name || !validateIraqiPhone(phone) || !userCoords) return showToast("أكمل البيانات وحدد موقعك 📍");
@@ -834,7 +807,7 @@
               const vc = generateSecureVC();
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true`);
               
-              const msg = `🚖 طلب تكتك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n💰 السعر المطلوب: ${parseInt(price).toLocaleString()} د.ع\n📍 صعود من: ${userCoords}\nنزول في: ${dropLink}`;
+              const msg = `🚖 طلب تكتك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 صعود من: ${userCoords}\nنزول في: ${dropLink}`;
               
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
@@ -903,7 +876,6 @@
           } catch (e) { showToast("خطأ في الإرسال"); } finally { btn.disabled = false; }
       }
 
-      // === التعديل المطلوب: حساب الأرباح بناءً على نوع الطلب (مسواكك/تكتك) ===
       async function processVerifyCode() {
           const code = document.getElementById('driverVerifyInput').value.trim();
           const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
@@ -913,27 +885,23 @@
           const checkResult = await checkResp.text();
           
           if (checkResult.startsWith("valid")) {
-              let dG = 0; // ربح المندوب
-              let aG = 0; // حساب المدير
+              let dG = 0; 
+              let aG = 0; 
               let alertMsg = "";
 
               if (checkResult.includes("tuk")) {
-                  // إذا كان الطلب تكتك، الأرباح صفر، فقط زيادة عدد الطلبات
                   dG = 0;
                   aG = 0;
                   alertMsg = "تم تأكيد رحلة التكتك! (تم احتساب الطلب فقط) 🚖";
               } else {
-                  // مسواكك والوسيط يحسب أرباح بشكل طبيعي
                   dG = 2000;
                   aG = 500;
                   alertMsg = `تم التأكيد! أرباحك: ${dG} د.ع ✅`;
               }
 
-              // زيادة عدد الطلبات دائماً
               localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
               localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
               
-              // إضافة الأرباح بناءً على الترتيب أعلاه
               localStorage.setItem('d_profit', parseInt(localStorage.getItem('d_profit') || 0) + dG);
               localStorage.setItem('a_profit', parseInt(localStorage.getItem('a_profit') || 0) + aG);
               
