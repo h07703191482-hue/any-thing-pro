@@ -83,7 +83,6 @@
       }
       .theme-toggle:active { transform: scale(0.9); }
 
-      /* --- إضافات الميزات الجديدة (النبض، زر اللغة، شاشة القفل) --- */
       .lang-toggle {
           position: fixed; top: 20px; left: 80px; z-index: 10001;
           background: var(--surface); color: var(--primary); border: 1px solid var(--border-color);
@@ -91,22 +90,6 @@
           box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center;
           font-weight: 800; font-size: 14px; transition: 0.3s;
       }
-      .lang-toggle:active { transform: scale(0.9); }
-
-      @keyframes iconPulse {
-          0% { transform: scale(1); filter: brightness(1); }
-          50% { transform: scale(1.08); filter: brightness(1.2); }
-          100% { transform: scale(1); filter: brightness(1); }
-      }
-      .icon-pulse { animation: iconPulse 2s infinite ease-in-out; }
-
-      #global-lock-screen {
-          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-          background: var(--surface); z-index: 9999999; display: none; 
-          flex-direction: column; align-items: center; justify-content: center;
-          text-align: center; padding: 30px; box-sizing: border-box;
-      }
-      /* ------------------------------------------------------------- */
 
       .screen { display: none; width: 100%; min-height: 100vh; animation: fadeSlideUp 0.4s ease-out forwards; }
       .active-screen { display: block !important; }
@@ -117,8 +100,28 @@
           to { opacity: 1; transform: translateY(0); }
       }
 
+      @keyframes iconPulse {
+          0% { transform: scale(1); filter: brightness(1); }
+          50% { transform: scale(1.08); filter: brightness(1.2); }
+          100% { transform: scale(1); filter: brightness(1); }
+      }
+      .icon-pulse { animation: iconPulse 2s infinite ease-in-out; }
+
       /* =========================================
-         شاشة عدم الاتصال بالانترنت (Offline Screen)
+         شاشة القفل الشاملة
+         ========================================= */
+      #global-lock-screen {
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: var(--surface); z-index: 9999999; display: none; 
+          flex-direction: column; align-items: center; justify-content: center;
+          text-align: center; padding: 30px; box-sizing: border-box;
+      }
+      .lock-icon { font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: scaleIn 0.5s ease; cursor: pointer; }
+      .lock-title { font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
+      .lock-text { font-size: 16px; font-weight: 600; color: var(--text-muted); line-height: 1.6; }
+
+      /* =========================================
+         شاشة عدم الاتصال بالانترنت
          ========================================= */
       #offline-screen {
           position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -128,18 +131,9 @@
       }
       .offline-title { font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 20px; }
       .offline-text { font-size: 15px; font-weight: 600; color: var(--text-muted); margin-bottom: 40px; line-height: 1.6; }
-      .offline-btn-primary {
-          background: var(--primary); color: white; width: 100%; padding: 18px;
-          border-radius: 12px; border: none; font-family: 'Cairo'; font-size: 16px;
-          font-weight: 700; cursor: pointer; margin-bottom: 15px; transition: 0.3s;
-      }
+      .offline-btn-primary { background: var(--primary); color: white; width: 100%; padding: 18px; border-radius: 12px; border: none; font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
       .offline-btn-primary:active { transform: scale(0.96); background: var(--primary-hover); }
-      .offline-btn-outline {
-          background: transparent; color: var(--primary); width: 100%; padding: 18px;
-          border-radius: 12px; border: 2px solid var(--primary); font-family: 'Cairo';
-          font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s;
-      }
-      .offline-btn-outline:active { transform: scale(0.96); background: rgba(0, 0, 255, 0.05); }
+      .offline-btn-outline { background: transparent; color: var(--primary); width: 100%; padding: 18px; border-radius: 12px; border: 2px solid var(--primary); font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
 
       /* =========================================
          شاشة البداية 
@@ -181,17 +175,10 @@
           animation: drive-left 2s linear forwards; z-index: 10; animation-delay: 0.5s;
       }
       .exhaust { position: absolute; right: -10px; bottom: 10px; display: flex; flex-direction: column; }
-      .smoke {
-          width: 12px; height: 12px; background: rgba(255, 255, 255, 0.6); border-radius: 50%;
-          margin-top: -5px; opacity: 0; animation: smoke-bloom 0.8s infinite;
-      }
+      .smoke { width: 12px; height: 12px; background: rgba(255, 255, 255, 0.6); border-radius: 50%; margin-top: -5px; opacity: 0; animation: smoke-bloom 0.8s infinite; }
       .smoke:nth-child(2) { animation-delay: 0.2s; }
       .smoke:nth-child(3) { animation-delay: 0.4s; }
-      @keyframes smoke-bloom {
-          0% { transform: translate(0, 0) scale(1); opacity: 0; }
-          20% { opacity: 0.7; }
-          100% { transform: translate(40px, -40px) scale(3); opacity: 0; filter: blur(5px); }
-      }
+      @keyframes smoke-bloom { 0% { transform: translate(0, 0) scale(1); opacity: 0; } 20% { opacity: 0.7; } 100% { transform: translate(40px, -40px) scale(3); opacity: 0; filter: blur(5px); } }
       @keyframes drive-left { 0% { left: 110%; } 100% { left: -30%; } }
 
       /* =========================================
@@ -207,28 +194,14 @@
       .header-main h1 { margin: 0; font-size: 32px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.2); cursor: pointer; }
       .header-main p { margin: 10px 0 0; font-size: 15px; opacity: 0.9; font-weight: 500; }
 
-      .driver-status-bar {
-          display: none; background: var(--gold); color: #000; font-weight: 800; letter-spacing: 0.5px;
-          font-size: 12px; padding: 6px 0; position: absolute; top: 0; left: 0; width: 100%; z-index: 10;
-          transition: background 0.3s ease, color 0.3s ease;
-      }
+      .driver-status-bar { display: none; background: var(--gold); color: #000; font-weight: 800; letter-spacing: 0.5px; font-size: 12px; padding: 6px 0; position: absolute; top: 0; left: 0; width: 100%; z-index: 10; transition: background 0.3s ease, color 0.3s ease; }
 
       /* =========================================
          ترتيب البطاقات (Grid Layout)
          ========================================= */
-      .services-grid {
-          display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;
-          position: relative; z-index: 5; margin-top: -40px;
-      }
-      .select-card { 
-          background: var(--surface); border-radius: var(--radius-lg); 
-          display: flex; box-shadow: var(--shadow-md); cursor: pointer; 
-          border: 1px solid var(--border-color); color: var(--text-main); 
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden;
-      }
-      .select-card:hover, .select-card:active { 
-          transform: translateY(-3px) scale(0.98); box-shadow: var(--shadow-floating); border-color: var(--primary);
-      }
+      .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; position: relative; z-index: 5; margin-top: -40px; }
+      .select-card { background: var(--surface); border-radius: var(--radius-lg); display: flex; box-shadow: var(--shadow-md); cursor: pointer; border: 1px solid var(--border-color); color: var(--text-main); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+      .select-card:hover, .select-card:active { transform: translateY(-3px) scale(0.98); box-shadow: var(--shadow-floating); border-color: var(--primary); }
       .card-full { grid-column: span 2; flex-direction: row; align-items: center; padding: 20px; gap: 18px; }
       .card-full .icon-wrapper { width: 65px; height: 65px; font-size: 28px; border-radius: 20px; display: flex; align-items: center; justify-content: center; }
       .card-full .card-text { flex: 1; text-align: right; }
@@ -252,72 +225,33 @@
       /* =========================================
          بطاقات الفورمات الداخلية 
          ========================================= */
-      .form-card {
-          background: var(--surface); border-radius: var(--radius-lg); padding: 20px;
-          margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
-          animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
-      }
-      .form-card-title {
-          font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 18px;
-          display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color);
-          padding-bottom: 12px;
-      }
+      .form-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards; }
+      .form-card-title { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
       .form-card-title i { font-size: 18px; color: var(--gold); }
-
       .screen-header-title { margin: 0 0 20px; font-weight: 800; font-size: 24px; display: flex; align-items: center; gap: 10px; }
 
       .form-group { margin-bottom: 16px; position: relative; }
       .form-group label { display: block; font-size: 13px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; }
-      input, textarea, select { 
-          width: 100%; padding: 16px 20px; border: 1.5px solid var(--border-color); border-radius: var(--radius-md); 
-          font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-main); 
-          background: var(--bg-color); transition: all 0.3s ease; appearance: none;
-      }
+      input, textarea, select { width: 100%; padding: 16px 20px; border: 1.5px solid var(--border-color); border-radius: var(--radius-md); font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-main); background: var(--bg-color); transition: all 0.3s ease; appearance: none; }
       input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 0.7; font-weight: 500;}
-      input:focus, textarea:focus, select:focus { 
-          border-color: var(--primary); background: var(--surface); 
-          box-shadow: 0 0 0 4px rgba(0, 0, 255, 0.1); outline: none; 
-      }
+      input:focus, textarea:focus, select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 4px rgba(0, 0, 255, 0.1); outline: none; }
 
-      .location-btn {
-          background: var(--bg-color); color: var(--primary); border: 2px dashed var(--primary);
-          padding: 14px; border-radius: var(--radius-md); width: 100%; font-family: 'Cairo'; font-size: 15px;
-          font-weight: 700; cursor: pointer; margin-bottom: 12px; transition: all 0.3s ease;
-          display: flex; align-items: center; justify-content: center; gap: 10px;
-      }
+      .location-btn { background: var(--bg-color); color: var(--primary); border: 2px dashed var(--primary); padding: 14px; border-radius: var(--radius-md); width: 100%; font-family: 'Cairo'; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 12px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
       .location-btn:active { transform: scale(0.96); }
       .location-btn.success { background: rgba(16, 185, 129, 0.1); color: var(--secondary); border-color: var(--secondary); border-style: solid; }
-      
       .phone-note { color: var(--danger); font-size: 12px; font-weight: 600; margin-top: 6px; display: block; text-align: right; padding-right: 5px; }
 
-      .send-btn { 
-          background: linear-gradient(135deg, var(--primary) 0%, #3730A3 100%); 
-          color: white; width: 100%; padding: 18px; border-radius: var(--radius-md); border: none; 
-          font-weight: 800; font-size: 18px; letter-spacing: 0.5px; cursor: pointer; 
-          box-shadow: 0 8px 20px rgba(0, 0, 255, 0.3); margin-top: 10px; transition: all 0.3s ease; 
-      }
+      .send-btn { background: linear-gradient(135deg, var(--primary) 0%, #3730A3 100%); color: white; width: 100%; padding: 18px; border-radius: var(--radius-md); border: none; font-weight: 800; font-size: 18px; letter-spacing: 0.5px; cursor: pointer; box-shadow: 0 8px 20px rgba(0, 0, 255, 0.3); margin-top: 10px; transition: all 0.3s ease; }
       .send-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(0, 0, 255, 0.2); }
       .send-btn:disabled { background: var(--border-color) !important; color: var(--text-muted) !important; cursor: not-allowed; box-shadow: none !important; transform: none !important; }
       
-      .back-btn { 
-          background: var(--surface); border: 1px solid var(--border-color); font-size: 18px; color: var(--text-main); 
-          width: 45px; height: 45px; border-radius: 14px; margin-bottom: 25px; box-shadow: var(--shadow-sm); 
-          cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; 
-      }
+      .back-btn { background: var(--surface); border: 1px solid var(--border-color); font-size: 18px; color: var(--text-main); width: 45px; height: 45px; border-radius: 14px; margin-bottom: 25px; box-shadow: var(--shadow-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
       .back-btn:active { transform: translateX(5px); }
       
-      .resign-btn { 
-          background: transparent; color: var(--danger); border: 2px solid rgba(239, 68, 68, 0.2); 
-          width: 100%; padding: 14px; border-radius: var(--radius-md); font-family: 'Cairo'; font-weight: 700; 
-          cursor: pointer; transition: 0.3s; margin-top: 30px; 
-      }
+      .resign-btn { background: transparent; color: var(--danger); border: 2px solid rgba(239, 68, 68, 0.2); width: 100%; padding: 14px; border-radius: var(--radius-md); font-family: 'Cairo'; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 30px; }
       .resign-btn:active { background: rgba(239, 68, 68, 0.1); }
 
-      .note { 
-          font-size: 13px; color: #854D0E; background: #FEF3C7; padding: 16px; 
-          border-radius: var(--radius-md); margin-bottom: 20px; border-right: 4px solid var(--gold); 
-          font-weight: 600; display: flex; gap: 10px; align-items: flex-start; line-height: 1.6;
-      }
+      .note { font-size: 13px; color: #854D0E; background: #FEF3C7; padding: 16px; border-radius: var(--radius-md); margin-bottom: 20px; border-right: 4px solid var(--gold); font-weight: 600; display: flex; gap: 10px; align-items: flex-start; line-height: 1.6; }
       body.dark-mode .note { background: rgba(245, 158, 11, 0.1); color: var(--gold); }
 
       /* =========================================
@@ -332,46 +266,25 @@
       .price-indicator .amount { font-size: 32px; font-weight: 800; color: var(--primary); display: block; margin: 5px 0; }
 
       /* =========================================
-         شريط التنقل والإشعارات (Nav & Toast)
+         شريط التنقل والإشعارات
          ========================================= */
-      .bottom-nav {
-          position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 400px;
-          background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-          display: flex; justify-content: space-around; align-items: center; padding: 8px 12px;
-          border-radius: var(--radius-pill); box-shadow: var(--shadow-floating); z-index: 9998;
-          border: 1px solid rgba(255,255,255,0.4);
-      }
+      .bottom-nav { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 400px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); display: flex; justify-content: space-around; align-items: center; padding: 8px 12px; border-radius: var(--radius-pill); box-shadow: var(--shadow-floating); z-index: 9998; border: 1px solid rgba(255,255,255,0.4); }
       body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.85); border-color: rgba(255,255,255,0.05); }
-      
-      .nav-item {
-          display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 20px;
-          color: var(--text-muted); text-decoration: none; font-size: 12px; font-weight: 600; 
-          cursor: pointer; transition: all 0.3s ease; border-radius: var(--radius-pill); position: relative;
-      }
+      .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 20px; color: var(--text-muted); text-decoration: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; border-radius: var(--radius-pill); position: relative; }
       .nav-item i { font-size: 20px; transition: transform 0.3s; }
       .nav-item.active { color: var(--primary); background: rgba(0, 0, 255, 0.1); }
       .nav-item.active i { transform: translateY(-2px); }
-      .nav-item:active { transform: scale(0.9); }
 
       #toast-container { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 100000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 350px; }
-      .toast {
-          background: rgba(17, 24, 39, 0.95); color: white; padding: 16px 20px; border-radius: var(--radius-lg); 
-          box-shadow: var(--shadow-floating); font-family: 'Cairo', sans-serif; font-size: 14px; font-weight: 700;
-          animation: slideDownToast 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards, fadeOutToast 0.4s ease forwards 3s;
-          display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px);
-      }
+      .toast { background: rgba(17, 24, 39, 0.95); color: white; padding: 16px 20px; border-radius: var(--radius-lg); box-shadow: var(--shadow-floating); font-family: 'Cairo', sans-serif; font-size: 14px; font-weight: 700; animation: slideDownToast 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards, fadeOutToast 0.4s ease forwards 3s; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px); }
       body.dark-mode .toast { background: rgba(255, 255, 255, 0.95); color: #111827; }
-      
       @keyframes slideDownToast { from { opacity: 0; transform: translateY(-30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
       @keyframes fadeOutToast { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-20px) scale(0.9); visibility: hidden; } }
 
       /* =========================================
          بطاقات الولاء ولوحة الصدارة
          ========================================= */
-      .loyalty-card {
-          background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px;
-          box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); text-align: center;
-      }
+      .loyalty-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); text-align: center; }
       .loyalty-progress { background: var(--bg-color); border-radius: var(--radius-pill); height: 10px; margin: 15px 0; overflow: hidden; }
       .loyalty-bar { background: var(--gold); height: 100%; width: 0%; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); border-radius: var(--radius-pill); }
       .loyalty-text { font-size: 16px; font-weight: 800; color: var(--text-main); }
@@ -391,54 +304,30 @@
       .rank-score { color: var(--secondary); font-weight: 800; background: rgba(16, 185, 129, 0.1); padding: 4px 12px; border-radius: var(--radius-pill); font-size: 13px; }
 
       /* =========================================
-         القائمة الجانبية (Sidebar)
+         القائمة الجانبية
          ========================================= */
-      .sidebar {
-          position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
-          background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-          box-shadow: -10px 0 30px rgba(0,0,0,0.1); z-index: 100002;
-          transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px; box-sizing: border-box;
-          display: flex; flex-direction: column; gap: 15px;
-      }
+      .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); box-shadow: -10px 0 30px rgba(0,0,0,0.1); z-index: 100002; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
       body.dark-mode .sidebar { background: rgba(15, 23, 42, 0.95); border-left: 1px solid rgba(255,255,255,0.05); }
       .sidebar.open { right: 0; }
-      .sidebar-overlay {
-          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-          background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-          z-index: 100001; display: none; opacity: 0; transition: opacity 0.4s ease;
-      }
+      .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 100001; display: none; opacity: 0; transition: opacity 0.4s ease; }
       .sidebar-overlay.show { display: block; opacity: 1; }
-      .sidebar-item {
-          padding: 16px; border-radius: var(--radius-md); background: var(--bg-color);
-          color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 14px; 
-          font-weight: 700; cursor: pointer; transition: 0.3s; border: 1px solid transparent;
-      }
+      .sidebar-item { padding: 16px; border-radius: var(--radius-md); background: var(--bg-color); color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; border: 1px solid transparent; }
       .sidebar-item:hover, .sidebar-item:active { transform: translateX(-5px); border-color: var(--primary); background: var(--surface); box-shadow: var(--shadow-sm); }
-      .sidebar-close {
-          align-self: flex-start; font-size: 15px; color: var(--text-muted); cursor: pointer;
-          background: var(--bg-color); padding: 10px 20px; border-radius: var(--radius-pill);
-          display: flex; align-items: center; gap: 8px; transition: 0.3s; font-weight: 700; margin-bottom: 20px;
-      }
-      .sidebar-close:active { transform: scale(0.9); }
+      .sidebar-close { align-self: flex-start; font-size: 15px; color: var(--text-muted); cursor: pointer; background: var(--bg-color); padding: 10px 20px; border-radius: var(--radius-pill); display: flex; align-items: center; gap: 8px; transition: 0.3s; font-weight: 700; margin-bottom: 20px; }
 
-      #welcome-overlay { 
-          position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-          background: var(--surface); z-index: 10000; display: none; flex-direction: column; 
-          align-items: center; justify-content: center; color: var(--text-main); text-align: center; padding: 20px; 
-      }
+      #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--text-main); text-align: center; padding: 20px; }
     </style>
 </head>
 <body onload="checkStatus()">
 
     <div id="global-lock-screen">
-        <i class="fas fa-tools lock-icon"></i>
+        <i class="fas fa-tools lock-icon" onclick="handleLockScreenSecret()"></i>
         <h2 id="lock-h2" class="lock-title">تم إيقاف التطبيق مؤقتاً</h2>
         <p id="lock-p" class="lock-text">نحن نقوم ببعض التحديثات أو الصيانة، يرجى المحاولة في وقت لاحق.</p>
     </div>
 
     <div id="offline-screen">
         <h2 id="off-title" class="offline-title">لا يوجد إتصال بالانترنت</h2>
-        
         <svg style="margin-bottom: 20px; width: 250px; height: 250px;" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
             <path d="M40 160 L100 60 L160 160 Z" fill="#9CA3AF" opacity="0.8"/>
             <path d="M100 60 L160 160 L100 160 Z" fill="#6B7280" opacity="0.9"/>
@@ -453,21 +342,15 @@
             <path d="M100 15 A25 25 0 0 1 120 5" stroke="#D1D5DB" stroke-width="3" fill="none" stroke-linecap="round"/>
             <path d="M90 20 L130 -5" stroke="#EF4444" stroke-width="3" fill="none" stroke-linecap="round"/>
         </svg>
-
         <p id="off-text" class="offline-text">للمتابعة، يرجى الاتصال بالإنترنت أو المحاولة مرة أخرى.</p>
-        
         <button id="off-btn-wifi" class="offline-btn-primary" onclick="openWiFiSettings()">الاتصال عبر ال WiFi</button>
         <button id="off-btn-data" class="offline-btn-outline" onclick="openDataSettings()">الاتصال عبر انترنت الهاتف</button>
     </div>
 
     <div id="toast-container"></div>
-
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
     <div class="sidebar" id="appSidebar">
-        <div class="sidebar-close" id="side-close-text" onclick="closeSidebar()">
-            <i class="fas fa-arrow-right"></i> إغلاق
-        </div>
-        
+        <div class="sidebar-close" id="side-close-text" onclick="closeSidebar()"><i class="fas fa-arrow-right"></i> إغلاق</div>
         <div style="text-align: center; margin-bottom: 30px;">
             <div style="width:80px; height:80px; background:rgba(0, 0, 255, 0.1); border-radius:24px; display:flex; align-items:center; justify-content:center; margin: 0 auto 15px;">
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
@@ -475,7 +358,6 @@
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">تطبيق أي شيء</h3>
             <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.8</p>
         </div>
-        
         <div class="sidebar-item" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
             <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
         </div>
@@ -486,23 +368,18 @@
 
     <div class="bottom-nav" id="bottomNavigation">
         <div class="nav-item active" onclick="showScreen('home-screen'); updateNav(this)">
-            <i class="fas fa-compass"></i>
-            <span id="nav-home-text">الرئيسية</span>
+            <i class="fas fa-compass"></i><span id="nav-home-text">الرئيسية</span>
         </div>
         <div class="nav-item" onclick="showScreen('order-screen'); updateNav(this)" style="position: relative;">
-            <i class="fas fa-shopping-basket"></i>
-            <span id="nav-shop-text">مسواكك</span>
+            <i class="fas fa-shopping-basket"></i><span id="nav-shop-text">مسواكك</span>
             <div id="local-cart-badge" class="local-order-counter" style="display:none;">0</div>
         </div>
         <div class="nav-item" onclick="openJoinScreen(); updateNav(this)">
-            <i class="fas fa-user-circle"></i>
-            <span id="nav-acc-text">حسابي</span>
+            <i class="fas fa-user-circle"></i><span id="nav-acc-text">حسابي</span>
         </div>
     </div>
 
-    <button class="theme-toggle" onclick="openSidebar()" id="menu-btn">
-        <i class="fas fa-bars"></i>
-    </button>
+    <button class="theme-toggle" onclick="openSidebar()" id="menu-btn"><i class="fas fa-bars"></i></button>
     <button class="lang-toggle" onclick="toggleLanguage()" id="langBtn">English</button>
 
     <div id="welcome-overlay" onclick="skipWelcome()">
@@ -516,30 +393,37 @@
     </div>
 
     <div id="splash-screen" onclick="skipSplash()">
-      <div id="app-logo-splash">
-          <i class="fas fa-box-open" style="font-size: 55px;"></i>
-      </div>
+      <div id="app-logo-splash"><i class="fas fa-box-open" style="font-size: 55px;"></i></div>
       <div class="splash-welcome-text">
           <h2 id="splash-title">أي شيء</h2>
           <p id="splash-subtitle">نصلك أينما كنت في أم قصر</p>
       </div>
-      
-      <div class="road-realistic">
-          <div class="road-lines"></div>
-      </div>
-      <div class="bike-box">
-          <i class="fas fa-motorcycle"></i>
-          <div class="exhaust">
-              <div class="smoke"></div>
-              <div class="smoke"></div>
-              <div class="smoke"></div>
-          </div>
-      </div>
+      <div class="road-realistic"><div class="road-lines"></div></div>
+      <div class="bike-box"><i class="fas fa-motorcycle"></i><div class="exhaust"><div class="smoke"></div><div class="smoke"></div><div class="smoke"></div></div></div>
+    </div>
+
+    <div id="admin-panel" class="screen container">
+        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> <span id="adm-title">لوحة التحكم السرية</span></h2>
+        <div class="form-card" style="text-align: center;">
+            <p id="adm-status-desc" style="font-weight: 700; margin-bottom: 20px;">حالة استقبال الطلبات للزبائن</p>
+            
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button id="btn-open-app" class="send-btn" style="margin-top: 0; background: var(--secondary);" onclick="setGlobalAppStatus('online')">
+                    <i class="fas fa-unlock"></i> فتح التطبيق
+                </button>
+                <button id="btn-close-app" class="send-btn" style="margin-top: 0; background: var(--danger);" onclick="setGlobalAppStatus('offline')">
+                    <i class="fas fa-lock"></i> إغلاق التطبيق
+                </button>
+            </div>
+            
+            <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
+        </div>
     </div>
 
     <div id="home-screen" class="screen container">
       <div class="header-main">
-        <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً 🔴</div>
+        <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً - Service Offline 🔴</div>
         <div id="driver-status-badge" class="driver-status-bar">أنت الآن في وضع المندوب النشط 🟢</div>
         <h1 id="main-title" onclick="handleSecretClick()">ماذا تحتاج اليوم؟</h1>
         <p id="main-sub">اختر الخدمة ودع الباقي علينا</p>
@@ -586,25 +470,6 @@
       </div>
     </div>
 
-    <div id="admin-panel" class="screen container">
-        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> <span id="adm-title">لوحة التحكم السرية</span></h2>
-        <div class="form-card" style="text-align: center;">
-            <p id="adm-status-desc" style="font-weight: 700; margin-bottom: 20px;">حالة استقبال الطلبات للزبائن</p>
-            
-            <div style="display: flex; gap: 15px; justify-content: center;">
-                <button id="btn-open-app" class="send-btn" style="margin-top: 0; background: var(--secondary);" onclick="setGlobalAppStatus('online')">
-                    <i class="fas fa-unlock"></i> فتح التطبيق
-                </button>
-                <button id="btn-close-app" class="send-btn" style="margin-top: 0; background: var(--danger);" onclick="setGlobalAppStatus('offline')">
-                    <i class="fas fa-lock"></i> إغلاق التطبيق
-                </button>
-            </div>
-            
-            <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
-        </div>
-    </div>
-
     <div id="tuk-screen" class="screen container">
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-taxi" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
@@ -647,7 +512,7 @@
             </div>
         </div>
         
-        <button class="send-btn" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">اطلب التكتك الآن</span></button>
+        <button class="send-btn order-btn-logic" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">اطلب التكتك الآن</span></button>
     </div>
 
     <div id="mediator-screen" class="screen container">
@@ -687,7 +552,7 @@
             </div>
         </div>
 
-        <button class="send-btn" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
+        <button class="send-btn order-btn-logic" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
     </div>
 
     <div id="order-screen" class="screen container">
@@ -741,7 +606,7 @@
             </div>
         </div>
 
-        <button class="send-btn" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
+        <button class="send-btn order-btn-logic" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
 
     <div id="join-screen" class="screen container">
@@ -860,6 +725,207 @@
           window.location.reload(true); 
       }
 
+      // =========================================
+      // إضافات النظام الجديد (اللغة + لوحة التحكم الشاملة) (2006)
+      // =========================================
+      let secretCounter = 0;
+      let lockSecretCounter = 0;
+      let currentLang = 'ar';
+      let appIsActive = true;
+
+      // 1. الدخول للوحة من الشاشة الرئيسية
+      function handleSecretClick() {
+          secretCounter++;
+          if (secretCounter === 5) {
+              secretCounter = 0;
+              let pass = prompt(currentLang === 'ar' ? "أدخل الرمز السري:" : "Admin Code:");
+              if (pass === "2006") {
+                  localStorage.setItem('isAdmin', 'true'); // يحفظك كأدمن
+                  showScreen('admin-panel');
+                  checkGlobalStatusFromServer(); 
+              } else if (pass !== null) {
+                  showToast(currentLang === 'ar' ? "الرمز خطأ ❌" : "Wrong Code ❌");
+              }
+          }
+      }
+
+      // 2. الدخول للوحة من شاشة القفل (إذا كان مقفول وأنت بموبايل جديد)
+      function handleLockScreenSecret() {
+          lockSecretCounter++;
+          if (lockSecretCounter === 5) {
+              lockSecretCounter = 0;
+              let pass = prompt(currentLang === 'ar' ? "أدخل الرمز السري:" : "Admin Code:");
+              if (pass === "2006") {
+                  localStorage.setItem('isAdmin', 'true'); // يحفظك كأدمن ويوخر القفل
+                  document.getElementById('global-lock-screen').style.display = 'none';
+                  showScreen('admin-panel');
+              } else if (pass !== null) {
+                  showToast(currentLang === 'ar' ? "الرمز خطأ ❌" : "Wrong Code ❌");
+              }
+          }
+      }
+
+      async function setGlobalAppStatus(newStatus) {
+          const btnOpen = document.getElementById('btn-open-app');
+          const btnClose = document.getElementById('btn-close-app');
+          
+          if(newStatus === 'online') {
+              btnOpen.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+          } else {
+              btnClose.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+          }
+          btnOpen.disabled = true;
+          btnClose.disabled = true;
+          
+          try {
+              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}`);
+              showToast(newStatus === "online" ? (currentLang === 'ar' ? "تم فتح التطبيق للجميع ✅" : "App Opened ✅") : (currentLang === 'ar' ? "تم إغلاق التطبيق 🔴" : "App Closed 🔴"));
+              checkGlobalStatusFromServer();
+          } catch(e) {
+              showToast(currentLang === 'ar' ? "حدث خطأ بالاتصال بالسيرفر ⚠️" : "Server Error ⚠️");
+          } finally { 
+              btnOpen.innerHTML = currentLang === 'ar' ? '<i class="fas fa-unlock"></i> فتح التطبيق' : '<i class="fas fa-unlock"></i> Open App';
+              btnClose.innerHTML = currentLang === 'ar' ? '<i class="fas fa-lock"></i> إغلاق التطبيق' : '<i class="fas fa-lock"></i> Close App';
+              btnOpen.disabled = false; 
+              btnClose.disabled = false;
+          }
+      }
+
+      async function checkGlobalStatusFromServer() {
+          try {
+              const resp = await fetch(`${GS_URL}?action=getAppStatus`);
+              const status = await resp.text();
+              const lockScreen = document.getElementById('global-lock-screen');
+              const isAdmin = localStorage.getItem('isAdmin') === 'true'; // يفحصك إذا أدمن
+              
+              if (status === "offline") {
+                  appIsActive = false;
+                  // يقفل بس للناس العادية، الأدمن مالتك يظل مفتوح
+                  if(lockScreen && !isAdmin) lockScreen.style.display = 'flex'; 
+                  else if(lockScreen && isAdmin) lockScreen.style.display = 'none';
+              } else {
+                  appIsActive = true;
+                  if(lockScreen) lockScreen.style.display = 'none'; 
+              }
+              applyGlobalStatus();
+          } catch(e) { console.log("Failed to fetch global status"); }
+      }
+
+      function applyGlobalStatus() {
+          const badge = document.getElementById('admin-status-badge');
+          const orderButtons = document.querySelectorAll('.order-btn-logic');
+          const isAdmin = localStorage.getItem('isAdmin') === 'true';
+          
+          if (!appIsActive) {
+              badge.style.display = 'block'; // يطلعلك شريط أحمر حتى تعرف إن التطبيق مقفول ع الناس
+              if (!isAdmin) {
+                  orderButtons.forEach(btn => {
+                      btn.disabled = true;
+                      btn.innerHTML = '<i class="fas fa-lock"></i> ' + (currentLang === 'ar' ? 'مغلق حالياً' : 'Closed Now');
+                  });
+              } else {
+                  // أزرارك كأدمن تظل شغالة حتى تجرب
+                  orderButtons.forEach(btn => btn.disabled = false);
+              }
+          } else {
+              badge.style.display = 'none';
+              document.getElementById('tukSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> ' + (currentLang === 'ar' ? 'اطلب التكتك الآن' : 'Order TukTuk');
+              document.getElementById('medSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> ' + (currentLang === 'ar' ? 'تأكيد طلب الوسيط' : 'Confirm Order');
+              document.getElementById('sendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> ' + (currentLang === 'ar' ? 'أرسل الطلب الآن' : 'Send Order Now');
+              orderButtons.forEach(btn => btn.disabled = false);
+          }
+      }
+
+      function toggleLanguage() {
+          currentLang = currentLang === 'ar' ? 'en' : 'ar';
+          document.getElementById('langBtn').innerText = currentLang === 'ar' ? 'English' : 'عربي';
+          document.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+          
+          const t = {
+              ar: { 
+                  title: "ماذا تحتاج اليوم؟", sub: "اختر الخدمة ودع الباقي علينا", shop: "تسوق مسواكك", shop_s: "مطاعم، سوبر ماركت والمزيد",
+                  tuk: "تكتك توصيلة", tuk_s: "مشوارك سريع ومضمون", med: "الوسيط", med_s: "نقل الأغراض بين شخصين",
+                  share: "شارك واربح", share_s: "انسخ رابطك ودزه لأصدقائك 🎁", join: "انضم ككابتن", join_s: "سجل معنا وابدأ بالعمل",
+                  plaza: "لوحة الكابتن", plaza_s: "إحصائيات المندوب", h: "الرئيسية", o: "مسواكك", p: "حسابي",
+                  off_t: "لا يوجد اتصال", off_m: "يرجى الاتصال بالإنترنت", btn_w: "واي فاي", btn_d: "بيانات الهاتف",
+                  side_close: "إغلاق", side_v: "الإصدار 2.0.8", side_wa: "الدعم الفني", side_dark: "تفعيل الوضع الليلي",
+                  shop_h: "تسوق مسواكك", shop_info: "بيانات التوصيل", shop_gps: "تحديد الموقع بدقة", shop_btn: "أرسل الطلب الآن", shop_img: "إضافة صور", shop_o: "ماذا تريد أن نشتري لك؟",
+                  tuk_h: "تكتك توصيلة", tuk_info: "بيانات الراكب", tuk_gps: "تحديد مكان الصعود 📍", tuk_btn: "اطلب التكتك الآن", tuk_trip: "تفاصيل الرحلة",
+                  med_h: "خدمة الوسيط", med_info: "بيانات المرسل", med_gps: "تحديد موقعي", med_btn: "تأكيد طلب الوسيط",
+                  loy_t: "طلبك رقم", wait_h: "طلبك قيد المراجعة", splash_t: "أي شيء", splash_s: "نصلك أينما كنت في أم قصر",
+                  lock_h: "تم إيقاف التطبيق مؤقتاً", lock_p: "نحن نقوم ببعض التحديثات أو الصيانة، يرجى المحاولة في وقت لاحق.",
+                  btn_open: '<i class="fas fa-unlock"></i> فتح التطبيق', btn_close: '<i class="fas fa-lock"></i> إغلاق التطبيق'
+              },
+              en: { 
+                  title: "What do you need?", sub: "Pick a service and let us handle it", shop: "Shopping", shop_s: "Restaurants, Market and more",
+                  tuk: "TukTuk Ride", tuk_s: "Fast and reliable ride", med: "Mediator", med_s: "Transfer items between people",
+                  share: "Share & Win", share_s: "Copy link to your friends 🎁", join: "Join as Captain", join_s: "Register and start working",
+                  plaza: "Captain Panel", plaza_s: "Delegate Statistics", h: "Home", o: "Shopping", p: "Profile",
+                  off_t: "No Connection", off_m: "Please connect to internet", btn_w: "Wi-Fi", btn_d: "Mobile Data",
+                  side_close: "Close", side_v: "Version 2.0.8", side_wa: "Support", side_dark: "Night Mode",
+                  shop_h: "Shopping", shop_info: "Delivery Details", shop_gps: "Detect My Location", shop_btn: "Send Order Now", shop_img: "Add Photos", shop_o: "What do you want us to buy?",
+                  tuk_h: "TukTuk Ride", tuk_info: "Passenger Details", tuk_gps: "Detect Pickup Point 📍", tuk_btn: "Order TukTuk Now", tuk_trip: "Trip Details",
+                  med_h: "Mediator", med_info: "Sender Details", med_gps: "Detect My Location", med_btn: "Confirm Request",
+                  loy_t: "Order No.", wait_h: "Application Under Review", splash_t: "Any Thing", splash_s: "Delivering everywhere in Um Qasr",
+                  lock_h: "App Temporarily Offline", lock_p: "We are doing some maintenance, please try again later.",
+                  btn_open: '<i class="fas fa-unlock"></i> Open App', btn_close: '<i class="fas fa-lock"></i> Close App'
+              }
+          };
+
+          if(document.getElementById('main-title')) document.getElementById('main-title').innerText = t[currentLang].title;
+          if(document.getElementById('main-sub')) document.getElementById('main-sub').innerText = t[currentLang].sub;
+          if(document.getElementById('srv-shop-title')) document.getElementById('srv-shop-title').innerText = t[currentLang].shop;
+          if(document.getElementById('srv-shop-sub')) document.getElementById('srv-shop-sub').innerText = t[currentLang].shop_s;
+          if(document.getElementById('srv-tuk-title')) document.getElementById('srv-tuk-title').innerText = t[currentLang].tuk;
+          if(document.getElementById('srv-tuk-sub')) document.getElementById('srv-tuk-sub').innerText = t[currentLang].tuk_s;
+          if(document.getElementById('srv-med-title')) document.getElementById('srv-med-title').innerText = t[currentLang].med;
+          if(document.getElementById('srv-med-sub')) document.getElementById('srv-med-sub').innerText = t[currentLang].med_s;
+          if(document.getElementById('srv-share-title')) document.getElementById('srv-share-title').innerText = t[currentLang].share;
+          if(document.getElementById('srv-share-sub')) document.getElementById('srv-share-sub').innerText = t[currentLang].share_s;
+          if(document.getElementById('srv-join-title')) document.getElementById('srv-join-title').innerText = t[currentLang].join;
+          if(document.getElementById('srv-join-sub')) document.getElementById('srv-join-sub').innerText = t[currentLang].join_s;
+          if(document.getElementById('srv-plaza-title')) document.getElementById('srv-plaza-title').innerText = t[currentLang].plaza;
+          if(document.getElementById('srv-plaza-sub')) document.getElementById('srv-plaza-sub').innerText = t[currentLang].plaza_s;
+
+          if(document.getElementById('nav-home-text')) document.getElementById('nav-home-text').innerText = t[currentLang].h;
+          if(document.getElementById('nav-shop-text')) document.getElementById('nav-shop-text').innerText = t[currentLang].o;
+          if(document.getElementById('nav-acc-text')) document.getElementById('nav-acc-text').innerText = t[currentLang].p;
+          if(document.getElementById('side-close-text')) document.getElementById('side-close-text').innerHTML = `<i class="fas fa-arrow-right"></i> ${t[currentLang].side_close}`;
+          if(document.getElementById('side-dark-text')) document.getElementById('side-dark-text').innerText = t[currentLang].side_dark;
+          if(document.getElementById('side-support-text')) document.getElementById('side-support-text').innerText = t[currentLang].side_wa;
+
+          if(document.getElementById('shop-head')) document.getElementById('shop-head').innerText = t[currentLang].shop_h;
+          if(document.getElementById('shop-p-info')) document.getElementById('shop-p-info').innerText = t[currentLang].shop_info;
+          if(document.getElementById('shop-o-info')) document.getElementById('shop-o-info').innerText = t[currentLang].shop_o;
+          if(document.getElementById('shop-gps-btn')) document.getElementById('shop-gps-btn').innerText = t[currentLang].shop_gps;
+          if(document.getElementById('shop-img-btn')) document.getElementById('shop-img-btn').innerText = t[currentLang].shop_img;
+          if(document.getElementById('shop-final-btn')) document.getElementById('shop-final-btn').innerText = t[currentLang].shop_btn;
+          if(document.getElementById('loy-txt')) document.getElementById('loy-txt').innerText = t[currentLang].loy_t;
+
+          if(document.getElementById('tuk-head')) document.getElementById('tuk-head').innerText = t[currentLang].tuk_h;
+          if(document.getElementById('tuk-p-info')) document.getElementById('tuk-p-info').innerText = t[currentLang].tuk_info;
+          if(document.getElementById('tuk-r-info')) document.getElementById('tuk-r-info').innerText = t[currentLang].tuk_trip;
+          if(document.getElementById('tuk-gps-btn')) document.getElementById('tuk-gps-btn').innerText = t[currentLang].tuk_gps;
+          if(document.getElementById('tuk-final-btn')) document.getElementById('tuk-final-btn').innerText = t[currentLang].tuk_btn;
+
+          if(document.getElementById('med-head')) document.getElementById('med-head').innerText = t[currentLang].med_h;
+          if(document.getElementById('med-p-info')) document.getElementById('med-p-info').innerText = t[currentLang].med_info;
+          if(document.getElementById('med-o-info')) document.getElementById('med-o-info').innerText = t[currentLang].med_h;
+          if(document.getElementById('med-gps-btn')) document.getElementById('med-gps-btn').innerText = t[currentLang].med_gps;
+          if(document.getElementById('med-final-btn')) document.getElementById('med-final-btn').innerText = t[currentLang].med_btn;
+
+          if(document.getElementById('off-title')) document.getElementById('off-title').innerText = t[currentLang].off_t;
+          if(document.getElementById('off-text')) document.getElementById('off-text').innerText = t[currentLang].off_m;
+          if(document.getElementById('off-btn-wifi')) document.getElementById('off-btn-wifi').innerText = t[currentLang].btn_w;
+          if(document.getElementById('off-btn-data')) document.getElementById('off-btn-data').innerText = t[currentLang].btn_d;
+          
+          if(document.getElementById('lock-h2')) document.getElementById('lock-h2').innerText = t[currentLang].lock_h;
+          if(document.getElementById('lock-p')) document.getElementById('lock-p').innerText = t[currentLang].lock_p;
+          
+          if(document.getElementById('btn-open-app')) document.getElementById('btn-open-app').innerHTML = t[currentLang].btn_open;
+          if(document.getElementById('btn-close-app')) document.getElementById('btn-close-app').innerHTML = t[currentLang].btn_close;
+      }
+
       // --- دالة المزامنة مع السيرفر للحصول على النقاط الحقيقية ---
       async function syncLoyaltyWithServer() {
           const phoneInput = document.getElementById('custPhone');
@@ -933,7 +999,7 @@
       }
 
       function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
-      function validateIraqiPhone(phone) { return /^(077|078|075)\d{8}$/.test(phone); }
+      function validateIraqiPhone(phone) { return /^\+?\d{8,15}$/.test(phone); }
 
       function getLocation(type) {
           const btn = document.getElementById(`loc-btn-${type}`);
@@ -961,11 +1027,10 @@
           checkConnection(); 
           applyAutoTheme(); 
           loadSavedCustomerData();
-          syncLoyaltyWithServer(); // مزامنة النقاط عند فتح التطبيق
+          syncLoyaltyWithServer(); 
+          
+          checkGlobalStatusFromServer(); // يفحص التطبيق مقفول لو مفتوح من السيرفر
 
-          checkGlobalStatusFromServer(); // فحص الإغلاق الشامل من السيرفر
-
-          // التحقق من كود الإحالة (شارك واربح)
           const urlParams = new URLSearchParams(window.location.search);
           const ref = urlParams.get('ref');
           const myPhone = localStorage.getItem('saved_customer_phone');
@@ -1405,160 +1470,6 @@
           const phone = document.getElementById('arrivePhoneInput').value.trim();
           if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️");
           window.location.href = `tel:${phone}`;
-      }
-
-      // =========================================
-      // إضافات النظام الجديد (اللغة + لوحة التحكم الشاملة)
-      // =========================================
-      let secretCounter = 0;
-      let currentLang = 'ar';
-      let appIsActive = true;
-
-      function handleSecretClick() {
-          secretCounter++;
-          if (secretCounter === 5) {
-              secretCounter = 0;
-              let pass = prompt(currentLang === 'ar' ? "أدخل الرمز السري:" : "Admin Code:");
-              if (pass === "2006") {
-                  showScreen('admin-panel');
-                  checkGlobalStatusFromServer(); 
-              } else if (pass !== null) {
-                  showToast(currentLang === 'ar' ? "الرمز خطأ ❌" : "Wrong Code ❌");
-              }
-          }
-      }
-
-      async function setGlobalAppStatus(newStatus) {
-          const btnOpen = document.getElementById('btn-open-app');
-          const btnClose = document.getElementById('btn-close-app');
-          
-          if(newStatus === 'online') {
-              btnOpen.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
-          } else {
-              btnClose.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
-          }
-          btnOpen.disabled = true;
-          btnClose.disabled = true;
-          
-          try {
-              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}`);
-              showToast(newStatus === "online" ? (currentLang === 'ar' ? "تم فتح التطبيق للجميع ✅" : "App Opened ✅") : (currentLang === 'ar' ? "تم إغلاق التطبيق 🔴" : "App Closed 🔴"));
-              checkGlobalStatusFromServer();
-          } catch(e) {
-              showToast(currentLang === 'ar' ? "حدث خطأ بالاتصال بالسيرفر ⚠️" : "Server Error ⚠️");
-          } finally { 
-              btnOpen.innerHTML = currentLang === 'ar' ? '<i class="fas fa-unlock"></i> فتح التطبيق' : '<i class="fas fa-unlock"></i> Open App';
-              btnClose.innerHTML = currentLang === 'ar' ? '<i class="fas fa-lock"></i> إغلاق التطبيق' : '<i class="fas fa-lock"></i> Close App';
-              btnOpen.disabled = false; 
-              btnClose.disabled = false;
-          }
-      }
-
-      async function checkGlobalStatusFromServer() {
-          try {
-              const resp = await fetch(`${GS_URL}?action=getAppStatus`);
-              const status = await resp.text();
-              const lockScreen = document.getElementById('global-lock-screen');
-              
-              if (status === "offline") {
-                  appIsActive = false;
-                  if(lockScreen) lockScreen.style.display = 'flex'; 
-              } else {
-                  appIsActive = true;
-                  if(lockScreen) lockScreen.style.display = 'none'; 
-              }
-          } catch(e) { console.log("Failed to fetch global status"); }
-      }
-
-      function toggleLanguage() {
-          currentLang = currentLang === 'ar' ? 'en' : 'ar';
-          document.getElementById('langBtn').innerText = currentLang === 'ar' ? 'English' : 'عربي';
-          document.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-          
-          const t = {
-              ar: { 
-                  title: "ماذا تحتاج اليوم؟", sub: "اختر الخدمة ودع الباقي علينا", shop: "تسوق مسواكك", shop_s: "مطاعم، سوبر ماركت والمزيد",
-                  tuk: "تكتك توصيلة", tuk_s: "مشوارك سريع ومضمون", med: "الوسيط", med_s: "نقل الأغراض بين شخصين",
-                  share: "شارك واربح", share_s: "انسخ رابطك ودزه لأصدقائك 🎁", join: "انضم ككابتن", join_s: "سجل معنا وابدأ بالعمل",
-                  plaza: "لوحة الكابتن", plaza_s: "إحصائيات المندوب", h: "الرئيسية", o: "مسواكك", p: "حسابي",
-                  off_t: "لا يوجد اتصال", off_m: "يرجى الاتصال بالإنترنت", btn_w: "واي فاي", btn_d: "بيانات الهاتف",
-                  side_close: "إغلاق", side_v: "الإصدار 2.0.8", side_wa: "الدعم الفني", side_dark: "تفعيل الوضع الليلي",
-                  shop_h: "تسوق مسواكك", shop_info: "بيانات التوصيل", shop_gps: "تحديد الموقع بدقة", shop_btn: "أرسل الطلب الآن", shop_img: "إضافة صور", shop_o: "ماذا تريد أن نشتري لك؟",
-                  tuk_h: "تكتك توصيلة", tuk_info: "بيانات الراكب", tuk_gps: "تحديد مكان الصعود 📍", tuk_btn: "اطلب التكتك الآن", tuk_trip: "تفاصيل الرحلة",
-                  med_h: "خدمة الوسيط", med_info: "بيانات المرسل", med_gps: "تحديد موقعي", med_btn: "تأكيد طلب الوسيط",
-                  loy_t: "طلبك رقم", wait_h: "طلبك قيد المراجعة", splash_t: "أي شيء", splash_s: "نصلك أينما كنت في أم قصر",
-                  lock_h: "تم إيقاف التطبيق مؤقتاً", lock_p: "نحن نقوم ببعض التحديثات أو الصيانة، يرجى المحاولة في وقت لاحق.",
-                  btn_open: '<i class="fas fa-unlock"></i> فتح التطبيق', btn_close: '<i class="fas fa-lock"></i> إغلاق التطبيق'
-              },
-              en: { 
-                  title: "What do you need?", sub: "Pick a service and let us handle it", shop: "Shopping", shop_s: "Restaurants, Market and more",
-                  tuk: "TukTuk Ride", tuk_s: "Fast and reliable ride", med: "Mediator", med_s: "Transfer items between people",
-                  share: "Share & Win", share_s: "Copy link to your friends 🎁", join: "Join as Captain", join_s: "Register and start working",
-                  plaza: "Captain Panel", plaza_s: "Delegate Statistics", h: "Home", o: "Shopping", p: "Profile",
-                  off_t: "No Connection", off_m: "Please connect to internet", btn_w: "Wi-Fi", btn_d: "Mobile Data",
-                  side_close: "Close", side_v: "Version 2.0.8", side_wa: "Support", side_dark: "Night Mode",
-                  shop_h: "Shopping", shop_info: "Delivery Details", shop_gps: "Detect My Location", shop_btn: "Send Order Now", shop_img: "Add Photos", shop_o: "What do you want us to buy?",
-                  tuk_h: "TukTuk Ride", tuk_info: "Passenger Details", tuk_gps: "Detect Pickup Point 📍", tuk_btn: "Order TukTuk Now", tuk_trip: "Trip Details",
-                  med_h: "Mediator", med_info: "Sender Details", med_gps: "Detect My Location", med_btn: "Confirm Request",
-                  loy_t: "Order No.", wait_h: "Application Under Review", splash_t: "Any Thing", splash_s: "Delivering everywhere in Um Qasr",
-                  lock_h: "App Temporarily Offline", lock_p: "We are doing some maintenance, please try again later.",
-                  btn_open: '<i class="fas fa-unlock"></i> Open App', btn_close: '<i class="fas fa-lock"></i> Close App'
-              }
-          };
-
-          // تطبيق النصوص للغة الإنجليزية
-          if(document.getElementById('main-title')) document.getElementById('main-title').innerText = t[currentLang].title;
-          if(document.getElementById('main-sub')) document.getElementById('main-sub').innerText = t[currentLang].sub;
-          if(document.getElementById('srv-shop-title')) document.getElementById('srv-shop-title').innerText = t[currentLang].shop;
-          if(document.getElementById('srv-shop-sub')) document.getElementById('srv-shop-sub').innerText = t[currentLang].shop_s;
-          if(document.getElementById('srv-tuk-title')) document.getElementById('srv-tuk-title').innerText = t[currentLang].tuk;
-          if(document.getElementById('srv-tuk-sub')) document.getElementById('srv-tuk-sub').innerText = t[currentLang].tuk_s;
-          if(document.getElementById('srv-med-title')) document.getElementById('srv-med-title').innerText = t[currentLang].med;
-          if(document.getElementById('srv-med-sub')) document.getElementById('srv-med-sub').innerText = t[currentLang].med_s;
-          if(document.getElementById('srv-share-title')) document.getElementById('srv-share-title').innerText = t[currentLang].share;
-          if(document.getElementById('srv-share-sub')) document.getElementById('srv-share-sub').innerText = t[currentLang].share_s;
-          if(document.getElementById('srv-join-title')) document.getElementById('srv-join-title').innerText = t[currentLang].join;
-          if(document.getElementById('srv-join-sub')) document.getElementById('srv-join-sub').innerText = t[currentLang].join_s;
-          if(document.getElementById('srv-plaza-title')) document.getElementById('srv-plaza-title').innerText = t[currentLang].plaza;
-          if(document.getElementById('srv-plaza-sub')) document.getElementById('srv-plaza-sub').innerText = t[currentLang].plaza_s;
-
-          if(document.getElementById('nav-home-text')) document.getElementById('nav-home-text').innerText = t[currentLang].h;
-          if(document.getElementById('nav-shop-text')) document.getElementById('nav-shop-text').innerText = t[currentLang].o;
-          if(document.getElementById('nav-acc-text')) document.getElementById('nav-acc-text').innerText = t[currentLang].p;
-          if(document.getElementById('side-close-text')) document.getElementById('side-close-text').innerHTML = `<i class="fas fa-arrow-right"></i> ${t[currentLang].side_close}`;
-          if(document.getElementById('side-dark-text')) document.getElementById('side-dark-text').innerText = t[currentLang].side_dark;
-          if(document.getElementById('side-support-text')) document.getElementById('side-support-text').innerText = t[currentLang].side_wa;
-
-          if(document.getElementById('shop-head')) document.getElementById('shop-head').innerText = t[currentLang].shop_h;
-          if(document.getElementById('shop-p-info')) document.getElementById('shop-p-info').innerText = t[currentLang].shop_info;
-          if(document.getElementById('shop-o-info')) document.getElementById('shop-o-info').innerText = t[currentLang].shop_o;
-          if(document.getElementById('shop-gps-btn')) document.getElementById('shop-gps-btn').innerText = t[currentLang].shop_gps;
-          if(document.getElementById('shop-img-btn')) document.getElementById('shop-img-btn').innerText = t[currentLang].shop_img;
-          if(document.getElementById('shop-final-btn')) document.getElementById('shop-final-btn').innerText = t[currentLang].shop_btn;
-          if(document.getElementById('loy-txt')) document.getElementById('loy-txt').innerText = t[currentLang].loy_t;
-
-          if(document.getElementById('tuk-head')) document.getElementById('tuk-head').innerText = t[currentLang].tuk_h;
-          if(document.getElementById('tuk-p-info')) document.getElementById('tuk-p-info').innerText = t[currentLang].tuk_info;
-          if(document.getElementById('tuk-r-info')) document.getElementById('tuk-r-info').innerText = t[currentLang].tuk_trip;
-          if(document.getElementById('tuk-gps-btn')) document.getElementById('tuk-gps-btn').innerText = t[currentLang].tuk_gps;
-          if(document.getElementById('tuk-final-btn')) document.getElementById('tuk-final-btn').innerText = t[currentLang].tuk_btn;
-
-          if(document.getElementById('med-head')) document.getElementById('med-head').innerText = t[currentLang].med_h;
-          if(document.getElementById('med-p-info')) document.getElementById('med-p-info').innerText = t[currentLang].med_info;
-          if(document.getElementById('med-o-info')) document.getElementById('med-o-info').innerText = t[currentLang].med_h;
-          if(document.getElementById('med-gps-btn')) document.getElementById('med-gps-btn').innerText = t[currentLang].med_gps;
-          if(document.getElementById('med-final-btn')) document.getElementById('med-final-btn').innerText = t[currentLang].med_btn;
-
-          if(document.getElementById('off-title')) document.getElementById('off-title').innerText = t[currentLang].off_t;
-          if(document.getElementById('off-text')) document.getElementById('off-text').innerText = t[currentLang].off_m;
-          if(document.getElementById('off-btn-wifi')) document.getElementById('off-btn-wifi').innerText = t[currentLang].btn_w;
-          if(document.getElementById('off-btn-data')) document.getElementById('off-btn-data').innerText = t[currentLang].btn_d;
-          
-          if(document.getElementById('lock-h2')) document.getElementById('lock-h2').innerText = t[currentLang].lock_h;
-          if(document.getElementById('lock-p')) document.getElementById('lock-p').innerText = t[currentLang].lock_p;
-          
-          if(document.getElementById('btn-open-app')) document.getElementById('btn-open-app').innerHTML = t[currentLang].btn_open;
-          if(document.getElementById('btn-close-app')) document.getElementById('btn-close-app').innerHTML = t[currentLang].btn_close;
       }
     </script>
 </body>
