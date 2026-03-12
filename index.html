@@ -92,6 +92,14 @@
           to { opacity: 1; transform: translateY(0); }
       }
 
+      /* تحريك النبض للأيقونات */
+      @keyframes iconPulse {
+          0% { transform: scale(1); filter: brightness(1); }
+          50% { transform: scale(1.08); filter: brightness(1.2); }
+          100% { transform: scale(1); filter: brightness(1); }
+      }
+      .icon-pulse { animation: iconPulse 2s infinite ease-in-out; }
+
       /* =========================================
          شاشة عدم الاتصال بالانترنت (Offline Screen)
          ========================================= */
@@ -179,7 +187,7 @@
           border-radius: 0 0 40px 40px; margin: -20px -20px 20px -20px; 
           box-shadow: var(--shadow-md); position: relative; overflow: hidden;
       }
-      .header-main h1 { margin: 0; font-size: 32px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+      .header-main h1 { margin: 0; font-size: 32px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.2); cursor: pointer; }
       .header-main p { margin: 10px 0 0; font-size: 15px; opacity: 0.9; font-weight: 500; }
 
       .driver-status-bar {
@@ -272,7 +280,7 @@
           box-shadow: 0 8px 20px rgba(0, 0, 255, 0.3); margin-top: 10px; transition: all 0.3s ease; 
       }
       .send-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(0, 0, 255, 0.2); }
-      .send-btn:disabled { background: var(--border-color); color: var(--text-muted); cursor: not-allowed; box-shadow: none; transform: none; }
+      .send-btn:disabled { background: var(--border-color) !important; color: var(--text-muted) !important; cursor: not-allowed; box-shadow: none !important; transform: none !important; }
       
       .back-btn { 
           background: var(--surface); border: 1px solid var(--border-color); font-size: 18px; color: var(--text-main); 
@@ -507,26 +515,27 @@
 
     <div id="home-screen" class="screen container">
       <div class="header-main">
+        <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً 🔴</div>
         <div id="driver-status-badge" class="driver-status-bar">أنت الآن في وضع المندوب النشط 🟢</div>
-        <h1>ماذا تحتاج اليوم؟</h1>
+        <h1 id="main-title" onclick="handleSecretClick()">ماذا تحتاج اليوم؟</h1>
         <p>اختر الخدمة ودع الباقي علينا</p>
       </div>
       
       <div class="services-grid">
           <div class="select-card card-full card-cart" onclick="showScreen('order-screen')">
-            <div class="icon-wrapper"><i class="fas fa-shopping-cart"></i></div>
+            <div class="icon-wrapper icon-pulse"><i class="fas fa-shopping-cart"></i></div>
             <div class="card-text"><h3>تسوق مسواكك</h3><small>مطاعم، سوبر ماركت، صيدليات والمزيد</small></div>
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
           
           <div class="select-card card-half card-tuk" onclick="showScreen('tuk-screen')">
-            <div class="icon-wrapper"><i class="fas fa-taxi"></i></div>
+            <div class="icon-wrapper icon-pulse"><i class="fas fa-taxi"></i></div>
             <h3>تكتك توصيلة</h3>
             <small>مشوارك سريع<br>ومضمون</small>
           </div>
           
           <div class="select-card card-half card-med" onclick="showScreen('mediator-screen')">
-            <div class="icon-wrapper"><i class="fas fa-handshake"></i></div>
+            <div class="icon-wrapper icon-pulse"><i class="fas fa-handshake"></i></div>
             <h3>الوسيط</h3>
             <small>نقل الأغراض<br>بين شخصين</small>
           </div>
@@ -551,6 +560,18 @@
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
       </div>
+    </div>
+
+    <div id="admin-panel" class="screen container">
+        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> لوحة التحكم السرية</h2>
+        <div class="form-card" style="text-align: center;">
+            <p style="font-weight: 700;">حالة استقبال الطلبات للزبائن</p>
+            <button id="appStatusBtn" class="send-btn" onclick="toggleAppActiveStatus()">
+                جاري التحميل...
+            </button>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 15px;">من تعطل الحالة، راح تطلع رسالة لكل الزبائن وتتعطل أزرار الطلبات.</p>
+        </div>
     </div>
 
     <div id="tuk-screen" class="screen container">
@@ -595,7 +616,7 @@
             </div>
         </div>
         
-        <button class="send-btn" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> اطلب التكتك الآن</button>
+        <button class="send-btn order-btn-logic" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> اطلب التكتك الآن</button>
     </div>
 
     <div id="mediator-screen" class="screen container">
@@ -635,7 +656,7 @@
             </div>
         </div>
 
-        <button class="send-btn" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط</button>
+        <button class="send-btn order-btn-logic" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط</button>
     </div>
 
     <div id="order-screen" class="screen container">
@@ -689,7 +710,7 @@
             </div>
         </div>
 
-        <button class="send-btn" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> أرسل الطلب الآن</button>
+        <button class="send-btn order-btn-logic" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> أرسل الطلب الآن</button>
     </div>
 
     <div id="join-screen" class="screen container">
@@ -808,6 +829,63 @@
           window.location.reload(true); 
       }
 
+      // متغيرات الأدمن السرية
+      let secretCounter = 0;
+      let appIsActive = localStorage.getItem('app_active_status') !== 'false';
+
+      function handleSecretClick() {
+          secretCounter++;
+          if (secretCounter === 5) {
+              secretCounter = 0;
+              let pass = prompt("أدخل الرمز السري للوصول للوحة التحكم:");
+              if (pass === "2006") {
+                  showScreen('admin-panel');
+                  updateAdminPanelUI();
+              } else if (pass !== null) {
+                  showToast("الرمز غير صحيح ❌");
+              }
+          }
+      }
+
+      function updateAdminPanelUI() {
+          const btn = document.getElementById('appStatusBtn');
+          if (appIsActive) {
+              btn.innerText = "إيقاف استقبال الطلبات (تعطيل)";
+              btn.style.background = "var(--danger)";
+          } else {
+              btn.innerText = "تنشيط التطبيق الآن (تفعيل)";
+              btn.style.background = "var(--secondary)";
+          }
+      }
+
+      function toggleAppActiveStatus() {
+          appIsActive = !appIsActive;
+          localStorage.setItem('app_active_status', appIsActive);
+          updateAdminPanelUI();
+          applyGlobalStatus();
+          showToast(appIsActive ? "تم تفعيل التطبيق بنجاح ✅" : "تم تعطيل التطبيق بنجاح 🔴");
+      }
+
+      function applyGlobalStatus() {
+          const badge = document.getElementById('admin-status-badge');
+          const orderButtons = document.querySelectorAll('.order-btn-logic');
+          
+          if (!appIsActive) {
+              badge.style.display = 'block';
+              orderButtons.forEach(btn => {
+                  btn.disabled = true;
+                  btn.innerHTML = '<i class="fas fa-lock"></i> الخدمة متوقفة حالياً';
+              });
+          } else {
+              badge.style.display = 'none';
+              // إعادة الأزرار لوضعها الطبيعي حسب الشاشة
+              document.getElementById('tukSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> اطلب التكتك الآن';
+              document.getElementById('medSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
+              document.getElementById('sendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
+              orderButtons.forEach(btn => btn.disabled = false);
+          }
+      }
+
       // --- دالة المزامنة مع السيرفر للحصول على النقاط الحقيقية ---
       async function syncLoyaltyWithServer() {
           const phoneInput = document.getElementById('custPhone');
@@ -909,6 +987,7 @@
           checkConnection(); 
           applyAutoTheme(); 
           loadSavedCustomerData();
+          applyGlobalStatus(); // تطبيق حالة التطبيق (نشط/غير نشط)
           syncLoyaltyWithServer(); // مزامنة النقاط عند فتح التطبيق
 
           // التحقق من كود الإحالة (شارك واربح)
@@ -1354,4 +1433,4 @@
       }
     </script>
 </body>
-                </html>
+</html>
