@@ -185,6 +185,7 @@
       .driver-status-bar {
           display: none; background: var(--gold); color: #000; font-weight: 800; letter-spacing: 0.5px;
           font-size: 12px; padding: 6px 0; position: absolute; top: 0; left: 0; width: 100%; z-index: 10;
+          transition: background 0.3s ease, color 0.3s ease;
       }
 
       /* =========================================
@@ -334,7 +335,6 @@
           animation: slideDownToast 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards, fadeOutToast 0.4s ease forwards 3s;
           display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px);
       }
-      /* ✅ تم حل مشكلة لون الخط بالوضع الليلي */
       body.dark-mode .toast { background: rgba(255, 255, 255, 0.95); color: #111827; }
       
       @keyframes slideDownToast { from { opacity: 0; transform: translateY(-30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
@@ -719,11 +719,33 @@
     <div id="plaza-screen" class="screen container">
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-chart-pie" style="color:#8B5CF6;"></i> لوحة الكابتن</h2>
+
+        <div class="form-card" style="text-align: center; padding: 15px;">
+            <button id="statusToggleBtn" class="send-btn" style="background: var(--secondary); margin-top: 0; box-shadow: none;" onclick="toggleDriverStatus()">
+                <i class="fas fa-check-circle"></i> أنا متاح للعمل
+            </button>
+        </div>
         
         <div class="form-card" style="background: linear-gradient(135deg, var(--primary) 0%, #818CF8 100%); color:white; border:none;">
             <h4 style="color:rgba(255,255,255,0.8); margin:0; font-size:15px;">إجمالي الطلبات المنجزة 📦</h4>
             <p id="stat-count" style="font-size: 45px; font-weight:800; color:white; margin:10px 0 0;">0</p>
             <div style="display:none;"><span id="stat-driver">0</span><span id="stat-admin">0</span></div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-map-marker-alt"></i> إشعار وصول للزبون</div>
+            <div class="form-group">
+                <label>رقم هاتف الزبون</label>
+                <input type="tel" id="arrivePhoneInput" placeholder="ادخل رقم الزبون هنا" style="text-align:center;">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="location-btn success" style="flex: 1; margin: 0; background: #25D366; color: white; border: none;" onclick="notifyArriveWhatsApp()">
+                    <i class="fab fa-whatsapp"></i> رسالة واتساب
+                </button>
+                <button class="location-btn" style="flex: 1; margin: 0; background: var(--primary); color: white; border: none;" onclick="notifyArriveCall()">
+                    <i class="fas fa-phone-alt"></i> اتصال سريع
+                </button>
+            </div>
         </div>
 
         <div class="form-card">
@@ -761,7 +783,6 @@
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
       
-      // ⚠️ تأكد من إضافة رابط السيرفر الجديد مالتك هنا ⚠️
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
       let userCoords = ""; 
@@ -771,9 +792,6 @@
           window.location.reload(true); 
       }
 
-      // ==========================================
-      // نظام فحص الإنترنت الذكي (Offline Checker)
-      // ==========================================
       function checkConnection() {
           if (!navigator.onLine) {
               document.getElementById('offline-screen').style.display = 'flex';
@@ -785,7 +803,6 @@
       window.addEventListener('offline', checkConnection);
       window.addEventListener('online', checkConnection);
       
-      // دوال فتح الإعدادات (Intent for Android)
       function openWiFiSettings() {
           window.location.href = "intent:#Intent;action=android.settings.WIFI_SETTINGS;end";
           setTimeout(() => { if(!navigator.onLine) showToast("يرجى فتح إعدادات الـ WiFi من هاتفك"); }, 1500);
@@ -796,7 +813,6 @@
           setTimeout(() => { if(!navigator.onLine) showToast("يرجى فتح إعدادات بيانات الهاتف من جهازك"); }, 1500);
       }
 
-      // Toast System
       window.originalAlert = window.alert;
       window.alert = function(message) { showToast(message); };
 
@@ -856,7 +872,7 @@
       }
 
       function checkStatus() {
-          checkConnection(); // فحص النت عند فتح التطبيق
+          checkConnection(); 
           applyAutoTheme(); 
           loadSavedCustomerData();
 
@@ -864,6 +880,7 @@
               document.getElementById('join-driver-card').style.display = 'none';
               document.getElementById('driver-plaza-card').style.display = 'flex';
               document.getElementById('driver-status-badge').style.display = 'block';
+              initDriverStatus();
               setInterval(checkRemoteReset, 15000); 
               setInterval(refreshLeaderboard, 30000);
           }
@@ -1066,6 +1083,13 @@
               const checkResult = await checkResp.text();
               
               if (checkResult.startsWith("valid")) {
+                  // ميزة 4: صوت الكاشير والاحتفال
+                  try {
+                      const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+                      cashAudio.play();
+                      confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } });
+                  } catch(e) {}
+
                   localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
                   localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
                   updateStatsUI();
@@ -1147,6 +1171,59 @@
       }
       updateLoyaltyUI = async function() { updateLocalLoyaltyUI(); };
       updateLocalLoyaltyUI();
+
+      // دوال الكابتن الجديدة
+      function toggleDriverStatus() {
+          const btn = document.getElementById('statusToggleBtn');
+          const badge = document.getElementById('driver-status-badge');
+          let current = localStorage.getItem('driver_status') || 'available';
+          if(current === 'available') {
+              localStorage.setItem('driver_status', 'busy');
+              btn.style.background = 'var(--danger)';
+              btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً';
+              if(badge) {
+                  badge.innerText = 'أنت الآن مشغول 🔴';
+                  badge.style.background = 'var(--danger)';
+                  badge.style.color = 'white';
+              }
+          } else {
+              localStorage.setItem('driver_status', 'available');
+              btn.style.background = 'var(--secondary)';
+              btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل';
+              if(badge) {
+                  badge.innerText = 'أنت الآن في وضع المندوب النشط 🟢';
+                  badge.style.background = 'var(--gold)';
+                  badge.style.color = '#000';
+              }
+          }
+      }
+
+      function initDriverStatus() {
+          let current = localStorage.getItem('driver_status') || 'available';
+          const btn = document.getElementById('statusToggleBtn');
+          const badge = document.getElementById('driver-status-badge');
+          if(current === 'busy') {
+              if(btn) { btn.style.background = 'var(--danger)'; btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً'; }
+              if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; }
+          } else {
+              if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; }
+              if(badge) { badge.innerText = 'أنت الآن في وضع المندوب النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; }
+          }
+      }
+
+      function notifyArriveWhatsApp() {
+          const phone = document.getElementById('arrivePhoneInput').value.trim();
+          if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️");
+          let formattedPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone;
+          let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (أي شيء) بالباب، يرجى استلام الطلب 🛵");
+          window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank');
+      }
+
+      function notifyArriveCall() {
+          const phone = document.getElementById('arrivePhoneInput').value.trim();
+          if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️");
+          window.location.href = `tel:${phone}`;
+      }
     </script>
 </body>
-                </html>
+</html>
