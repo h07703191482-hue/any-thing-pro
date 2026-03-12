@@ -531,6 +531,14 @@
             <small>نقل الأغراض<br>بين شخصين</small>
           </div>
           
+          <div class="select-card card-full" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; margin-bottom: 5px;" onclick="shareApp()">
+            <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-gift"></i></div>
+            <div class="card-text">
+                <h3 style="color: white;">شارك واربح توصيل مجاني</h3>
+                <small style="color: rgba(255,255,255,0.9);">انسخ رابطك ودزه لأصدقائك 🎁</small>
+            </div>
+          </div>
+
           <div id="join-driver-card" class="select-card card-full card-join" onclick="openJoinScreen()">
             <div class="icon-wrapper"><i class="fas fa-id-card"></i></div>
             <div class="card-text"><h3>انضم ككابتن</h3><small>سجل معنا وابدأ بتحقيق الدخل</small></div>
@@ -884,6 +892,15 @@
           applyAutoTheme(); 
           loadSavedCustomerData();
 
+          // التحقق من كود الإحالة (شارك واربح)
+          const urlParams = new URLSearchParams(window.location.search);
+          const ref = urlParams.get('ref');
+          const myPhone = localStorage.getItem('saved_customer_phone');
+          if (ref && ref !== myPhone) {
+              localStorage.setItem('referred_by', ref);
+              setTimeout(() => showToast("تم تفعيل كود الدعوة! أول طلب إلك راح يفيد صديقك 🎁"), 2000);
+          }
+
           if (localStorage.getItem('isVerifiedDriver') === 'true') {
               document.getElementById('join-driver-card').style.display = 'none';
               document.getElementById('driver-plaza-card').style.display = 'flex';
@@ -895,6 +912,30 @@
           showScreen('home-screen');
           setTimeout(() => { document.getElementById('app-logo-splash').classList.add('show-logo'); }, 500);
           setTimeout(skipSplash, 2500); 
+      }
+
+      // دالة شارك واربح
+      function shareApp() {
+          let myPhone = localStorage.getItem('saved_customer_phone');
+          if (!myPhone) return showToast("لازم تسجل رقمك بطلب مسواك أولاً حتى يتفعل رابطك! ⚠️");
+          
+          let link = window.location.href.split('?')[0] + "?ref=" + myPhone;
+          
+          if (navigator.share) {
+              navigator.share({
+                  title: 'تطبيق أي شيء - أم قصر',
+                  text: 'نزل التطبيق واطلب مسواكك، وهذا كود الدعوة مالتي حتى نحصل توصيل مجاني! 🎁',
+                  url: link
+              }).catch(console.error);
+          } else {
+              let temp = document.createElement("input");
+              temp.value = link;
+              document.body.appendChild(temp);
+              temp.select();
+              document.execCommand("copy");
+              document.body.removeChild(temp);
+              showToast("تم نسخ الرابط! دزه لأصدقائك 🔗");
+          }
       }
 
       function saveCustomerData(name, phone) {
@@ -1012,7 +1053,11 @@
           try {
               saveCustomerData(name, phone);
               const vc = generateSecureVC();
-              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true`);
+              let referrer = localStorage.getItem('referred_by') || "";
+              
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`);
+              localStorage.removeItem('referred_by'); // مسح الكود بعد الاستخدام
+              
               const msg = `🚖 طلب تكتك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 صعود من: ${userCoords}\nنزول في: ${dropLink}`;
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
@@ -1036,7 +1081,11 @@
           try {
               saveCustomerData(name, phone);
               const vc = generateSecureVC();
-              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
+              let referrer = localStorage.getItem('referred_by') || "";
+              
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`);
+              localStorage.removeItem('referred_by');
+              
               const msg = `🔵 طلب وسيط\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📝 الغرض: ${order}\n📍 الموقع: ${userCoords}`;
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
@@ -1048,7 +1097,6 @@
           } catch (e) { showToast("حدث خطأ في الإرسال"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
-      // دوال الصور السريّة للمسواك
       function previewImages() {
           const input = document.getElementById('custImages');
           const container = document.getElementById('image-preview-container');
@@ -1086,12 +1134,11 @@
               const vc = generateSecureVC();
               let photoMsgs = [];
 
-              // الرفع السري للصور للقناة الخاصة أولاً
               if (files.length > 0) {
                   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري رفع الصور بسرية...';
                   for (let i = 0; i < files.length; i++) {
                       let fd = new FormData();
-                      fd.append('chat_id', "-1003786625443"); // القناة الخاصة
+                      fd.append('chat_id', "-1003786625443"); 
                       fd.append('photo', files[i]);
                       fd.append('caption', `📦 صور طلب رقم: ${vc}\n👤 الزبون: ${name}`);
                       try {
@@ -1107,9 +1154,12 @@
 
               btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
               
-              // حفظ أرقام الصور في السيرفر
               let photoIdsStr = photoMsgs.join(',');
-              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&photoMsgs=${photoIdsStr}`);
+              let referrer = localStorage.getItem('referred_by') || "";
+
+              // إرسال كود الدعوة للسيرفر
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&photoMsgs=${photoIdsStr}&referrer=${referrer}`);
+              localStorage.removeItem('referred_by');
               
               let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
               let orderNum = (tempLoyalty % 6) + 1;
@@ -1119,7 +1169,6 @@
               let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص عند الحجز)**" : "";
               const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍 الموقع: ${userCoords}`;
               
-              // إرسال الطلب للقناة العامة
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
