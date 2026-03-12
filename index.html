@@ -101,6 +101,19 @@
       .icon-pulse { animation: iconPulse 2s infinite ease-in-out; }
 
       /* =========================================
+         شاشة الإيقاف الشاملة (للكل)
+         ========================================= */
+      #global-lock-screen {
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: var(--surface); z-index: 9999999; display: none; 
+          flex-direction: column; align-items: center; justify-content: center;
+          text-align: center; padding: 30px; box-sizing: border-box;
+      }
+      .lock-icon { font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: scaleIn 0.5s ease; }
+      .lock-title { font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
+      .lock-text { font-size: 16px; font-weight: 600; color: var(--text-muted); line-height: 1.6; }
+
+      /* =========================================
          شاشة عدم الاتصال بالانترنت (Offline Screen)
          ========================================= */
       #offline-screen {
@@ -413,6 +426,12 @@
 </head>
 <body onload="checkStatus()">
 
+    <div id="global-lock-screen">
+        <i class="fas fa-tools lock-icon"></i>
+        <h2 class="lock-title">تم إيقاف التطبيق مؤقتاً</h2>
+        <p class="lock-text">نحن نقوم ببعض التحديثات أو الصيانة، يرجى المحاولة في وقت لاحق.</p>
+    </div>
+
     <div id="offline-screen">
         <h2 class="offline-title">لا يوجد إتصال بالانترنت</h2>
         
@@ -570,7 +589,7 @@
             <button id="appStatusBtn" class="send-btn" onclick="toggleAppActiveStatus()">
                 جاري التحميل...
             </button>
-            <p style="font-size: 12px; color: var(--text-muted); margin-top: 15px;">من تعطل الحالة، راح تطلع رسالة لكل الزبائن وتتعطل أزرار الطلبات.</p>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 15px;">من تعطل الحالة، راح تطلع رسالة لكل الزبائن ويقفل التطبيق.</p>
         </div>
     </div>
 
@@ -831,7 +850,7 @@
 
       // متغيرات الأدمن السرية
       let secretCounter = 0;
-      let appIsActive = localStorage.getItem('app_active_status') !== 'false';
+      let appIsActive = true; 
 
       function handleSecretClick() {
           secretCounter++;
@@ -840,30 +859,50 @@
               let pass = prompt("أدخل الرمز السري للوصول للوحة التحكم:");
               if (pass === "2006") {
                   showScreen('admin-panel');
-                  updateAdminPanelUI();
+                  checkGlobalStatusFromServer(); 
               } else if (pass !== null) {
                   showToast("الرمز غير صحيح ❌");
               }
           }
       }
 
-      function updateAdminPanelUI() {
+      async function toggleAppActiveStatus() {
           const btn = document.getElementById('appStatusBtn');
-          if (appIsActive) {
-              btn.innerText = "إيقاف استقبال الطلبات (تعطيل)";
-              btn.style.background = "var(--danger)";
-          } else {
-              btn.innerText = "تنشيط التطبيق الآن (تفعيل)";
-              btn.style.background = "var(--secondary)";
+          const isCurrentlyOffline = btn.innerText.includes("تنشيط") || btn.innerText.includes("Activate");
+          const newStatus = isCurrentlyOffline ? "online" : "offline";
+          
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التغيير...';
+          btn.disabled = true;
+          
+          try {
+              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}`);
+              showToast(newStatus === "online" ? "تم تنشيط التطبيق للجميع ✅" : "تم إيقاف التطبيق للجميع 🔴");
+              checkGlobalStatusFromServer();
+          } catch(e) {
+              showToast("حدث خطأ بالاتصال بالسيرفر ⚠️");
+          } finally { 
+              btn.disabled = false; 
           }
       }
 
-      function toggleAppActiveStatus() {
-          appIsActive = !appIsActive;
-          localStorage.setItem('app_active_status', appIsActive);
-          updateAdminPanelUI();
-          applyGlobalStatus();
-          showToast(appIsActive ? "تم تفعيل التطبيق بنجاح ✅" : "تم تعطيل التطبيق بنجاح 🔴");
+      async function checkGlobalStatusFromServer() {
+          try {
+              const resp = await fetch(`${GS_URL}?action=getAppStatus`);
+              const status = await resp.text();
+              const lockScreen = document.getElementById('global-lock-screen');
+              const btn = document.getElementById('appStatusBtn');
+              
+              if (status === "offline") {
+                  appIsActive = false;
+                  lockScreen.style.display = 'flex'; 
+                  if(btn) { btn.innerText = "تنشيط التطبيق الآن (تفعيل)"; btn.style.background = "var(--secondary)"; }
+              } else {
+                  appIsActive = true;
+                  lockScreen.style.display = 'none'; 
+                  if(btn) { btn.innerText = "إيقاف استقبال الطلبات (تعطيل)"; btn.style.background = "var(--danger)"; }
+              }
+              applyGlobalStatus();
+          } catch(e) { console.log("Failed to fetch global status"); }
       }
 
       function applyGlobalStatus() {
@@ -878,7 +917,6 @@
               });
           } else {
               badge.style.display = 'none';
-              // إعادة الأزرار لوضعها الطبيعي حسب الشاشة
               document.getElementById('tukSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> اطلب التكتك الآن';
               document.getElementById('medSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
               document.getElementById('sendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
@@ -987,10 +1025,9 @@
           checkConnection(); 
           applyAutoTheme(); 
           loadSavedCustomerData();
-          applyGlobalStatus(); // تطبيق حالة التطبيق (نشط/غير نشط)
-          syncLoyaltyWithServer(); // مزامنة النقاط عند فتح التطبيق
+          checkGlobalStatusFromServer(); 
+          syncLoyaltyWithServer(); 
 
-          // التحقق من كود الإحالة (شارك واربح)
           const urlParams = new URLSearchParams(window.location.search);
           const ref = urlParams.get('ref');
           const myPhone = localStorage.getItem('saved_customer_phone');
@@ -1012,7 +1049,6 @@
           setTimeout(skipSplash, 2500); 
       }
 
-      // دالة شارك واربح
       function shareApp() {
           let myPhone = localStorage.getItem('saved_customer_phone');
           if (!myPhone) return showToast("لازم تسجل رقمك بطلب مسواك أولاً حتى يتفعل رابطك! ⚠️");
@@ -1154,7 +1190,7 @@
               let referrer = localStorage.getItem('referred_by') || "";
               
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`);
-              localStorage.removeItem('referred_by'); // مسح الكود بعد الاستخدام
+              localStorage.removeItem('referred_by'); 
               
               const msg = `🚖 طلب تكتك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 صعود من: ${userCoords}\nنزول في: ${dropLink}`;
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -1163,7 +1199,7 @@
               });
               showToast("تم طلب التكتك بنجاح ✅");
               document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = "";
-              syncLoyaltyWithServer(); // تحديث النقاط
+              syncLoyaltyWithServer(); 
           } catch (e) { showToast("حدث خطأ أثناء الإرسال"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1191,7 +1227,7 @@
               });
               showToast("تم إرسال الطلب بنجاح ✅");
               document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = "";
-              syncLoyaltyWithServer(); // تحديث النقاط
+              syncLoyaltyWithServer(); 
           } catch (e) { showToast("حدث خطأ في الإرسال"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1273,7 +1309,7 @@
               
               showToast("تم إرسال طلبك بنجاح ✅");
               document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = "";
-              syncLoyaltyWithServer(); // تحديث فوري للنقاط من السيرفر
+              syncLoyaltyWithServer(); 
           } catch (e) { showToast("خطأ في الشبكة"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
