@@ -671,6 +671,14 @@
             <div class="form-group">
                 <textarea id="custOrder" rows="5" placeholder="اكتب طلباتك هنا بالتفصيل (أكل، مسواك، صيدلية)..."></textarea>
             </div>
+            
+            <div class="form-group" style="margin-top: 10px;">
+                <input type="file" id="custImages" accept="image/*" multiple style="display:none;" onchange="previewImages()">
+                <button type="button" class="location-btn" style="border: 2px dashed var(--primary); background: var(--bg-color); color: var(--text-main); margin-bottom: 0;" onclick="document.getElementById('custImages').click()">
+                    <i class="fas fa-camera" style="color: var(--primary);"></i> إضافة صور للطلبات (اختياري)
+                </button>
+                <div id="image-preview-container" style="display:flex; gap:10px; overflow-x:auto; margin-top:10px; padding-bottom:5px; flex-wrap: wrap;"></div>
+            </div>
         </div>
 
         <button class="send-btn" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> أرسل الطلب الآن</button>
@@ -1040,13 +1048,36 @@
           } catch (e) { showToast("حدث خطأ في الإرسال"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
+      // دوال الصور
+      function previewImages() {
+          const input = document.getElementById('custImages');
+          const container = document.getElementById('image-preview-container');
+          container.innerHTML = '';
+          for (let i = 0; i < input.files.length; i++) {
+              const url = URL.createObjectURL(input.files[i]);
+              container.innerHTML += `<img src="${url}" style="width:70px; height:70px; border-radius:10px; object-fit:cover; border:1px solid var(--border-color);">`;
+          }
+          if(input.files.length > 0) {
+              container.innerHTML += `<div style="display:flex; align-items:center; color:var(--danger); font-size:13px; font-weight:bold; cursor:pointer; padding:5px; width: 100%;" onclick="clearImages()"><i class="fas fa-trash-alt" style="margin-left:5px;"></i> مسح الصور</div>`;
+          }
+      }
+
+      function clearImages() {
+          document.getElementById('custImages').value = '';
+          document.getElementById('image-preview-container').innerHTML = '';
+      }
+
       async function sendFinal() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت للطلب ❌");
           const name = document.getElementById('custName').value.trim();
           const phone = document.getElementById('custPhone').value.trim();
           const order = document.getElementById('custOrder').value.trim();
           const land = document.getElementById('custLandmark').value.trim();
-          if(!name || !validateIraqiPhone(phone) || !order || !userCoords) return showToast("أكمل البيانات وحدد موقعك 📍");
+          
+          const files = document.getElementById('custImages').files;
+
+          if(!name || !validateIraqiPhone(phone) || (!order && files.length === 0) || !userCoords) return showToast("أكمل البيانات وحدد موقعك، واكتب الطلب أو أضف صورة 📍📸");
+          
           const btn = document.getElementById('sendBtn');
           const originalText = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...'; btn.disabled = true;
@@ -1057,11 +1088,30 @@
               let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
               let orderNum = (tempLoyalty % 6) + 1;
               let loyaltyMsg = orderNum === 6 ? "🎁 هذا الطلب مجاني" : `الطلب رقم ${orderNum} من أصل 6`;
-              const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${order}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍 الموقع: ${userCoords}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+              
+              let msgContent = order || "الطلب موضح في الصور المرفقة 📸";
+              const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${msgContent}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍 الموقع: ${userCoords}`;
+              
+              const tgResp = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
+              
+              const tgData = await tgResp.json();
+              
+              if (files.length > 0 && tgData.ok) {
+                  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري رفع الصور...';
+                  const msgId = tgData.result.message_id;
+                  for (let i = 0; i < files.length; i++) {
+                      let fd = new FormData();
+                      fd.append('chat_id', PUBLIC_CHANNEL);
+                      fd.append('photo', files[i]);
+                      fd.append('reply_to_message_id', msgId);
+                      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
+                  }
+                  clearImages();
+              }
+
               showToast("تم إرسال طلبك بنجاح ✅");
               document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = "";
               loyaltyCount++; localStorage.setItem('my_loyalty_orders', loyaltyCount); updateLocalLoyaltyUI();
