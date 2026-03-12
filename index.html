@@ -83,6 +83,31 @@
       }
       .theme-toggle:active { transform: scale(0.9); }
 
+      /* --- إضافات الميزات الجديدة (النبض، زر اللغة، شاشة القفل) --- */
+      .lang-toggle {
+          position: fixed; top: 20px; left: 80px; z-index: 10001;
+          background: var(--surface); color: var(--primary); border: 1px solid var(--border-color);
+          padding: 0 15px; height: 48px; border-radius: var(--radius-pill); cursor: pointer;
+          box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center;
+          font-weight: 800; font-size: 14px; transition: 0.3s;
+      }
+      .lang-toggle:active { transform: scale(0.9); }
+
+      @keyframes iconPulse {
+          0% { transform: scale(1); filter: brightness(1); }
+          50% { transform: scale(1.08); filter: brightness(1.2); }
+          100% { transform: scale(1); filter: brightness(1); }
+      }
+      .icon-pulse { animation: iconPulse 2s infinite ease-in-out; }
+
+      #global-lock-screen {
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: var(--surface); z-index: 9999999; display: none; 
+          flex-direction: column; align-items: center; justify-content: center;
+          text-align: center; padding: 30px; box-sizing: border-box;
+      }
+      /* ------------------------------------------------------------- */
+
       .screen { display: none; width: 100%; min-height: 100vh; animation: fadeSlideUp 0.4s ease-out forwards; }
       .active-screen { display: block !important; }
       .container { max-width: 480px; margin: auto; padding: 20px; padding-bottom: 120px; }
@@ -91,27 +116,6 @@
           from { opacity: 0; transform: translateY(15px); }
           to { opacity: 1; transform: translateY(0); }
       }
-
-      /* تحريك النبض للأيقونات */
-      @keyframes iconPulse {
-          0% { transform: scale(1); filter: brightness(1); }
-          50% { transform: scale(1.08); filter: brightness(1.2); }
-          100% { transform: scale(1); filter: brightness(1); }
-      }
-      .icon-pulse { animation: iconPulse 2s infinite ease-in-out; }
-
-      /* =========================================
-         شاشة الإيقاف الشاملة (للكل)
-         ========================================= */
-      #global-lock-screen {
-          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-          background: var(--surface); z-index: 9999999; display: none; 
-          flex-direction: column; align-items: center; justify-content: center;
-          text-align: center; padding: 30px; box-sizing: border-box;
-      }
-      .lock-icon { font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: scaleIn 0.5s ease; }
-      .lock-title { font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
-      .lock-text { font-size: 16px; font-weight: 600; color: var(--text-muted); line-height: 1.6; }
 
       /* =========================================
          شاشة عدم الاتصال بالانترنت (Offline Screen)
@@ -428,12 +432,12 @@
 
     <div id="global-lock-screen">
         <i class="fas fa-tools lock-icon"></i>
-        <h2 class="lock-title">تم إيقاف التطبيق مؤقتاً</h2>
-        <p class="lock-text">نحن نقوم ببعض التحديثات أو الصيانة، يرجى المحاولة في وقت لاحق.</p>
+        <h2 id="lock-h2" class="lock-title">تم إيقاف التطبيق مؤقتاً</h2>
+        <p id="lock-p" class="lock-text">نحن نقوم ببعض التحديثات أو الصيانة، يرجى المحاولة في وقت لاحق.</p>
     </div>
 
     <div id="offline-screen">
-        <h2 class="offline-title">لا يوجد إتصال بالانترنت</h2>
+        <h2 id="off-title" class="offline-title">لا يوجد إتصال بالانترنت</h2>
         
         <svg style="margin-bottom: 20px; width: 250px; height: 250px;" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
             <path d="M40 160 L100 60 L160 160 Z" fill="#9CA3AF" opacity="0.8"/>
@@ -450,17 +454,17 @@
             <path d="M90 20 L130 -5" stroke="#EF4444" stroke-width="3" fill="none" stroke-linecap="round"/>
         </svg>
 
-        <p class="offline-text">للمتابعة، يرجى الاتصال بالإنترنت أو المحاولة مرة أخرى.</p>
+        <p id="off-text" class="offline-text">للمتابعة، يرجى الاتصال بالإنترنت أو المحاولة مرة أخرى.</p>
         
-        <button class="offline-btn-primary" onclick="openWiFiSettings()">الاتصال عبر ال WiFi</button>
-        <button class="offline-btn-outline" onclick="openDataSettings()">الاتصال عبر انترنت الهاتف</button>
+        <button id="off-btn-wifi" class="offline-btn-primary" onclick="openWiFiSettings()">الاتصال عبر ال WiFi</button>
+        <button id="off-btn-data" class="offline-btn-outline" onclick="openDataSettings()">الاتصال عبر انترنت الهاتف</button>
     </div>
 
     <div id="toast-container"></div>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
     <div class="sidebar" id="appSidebar">
-        <div class="sidebar-close" onclick="closeSidebar()">
+        <div class="sidebar-close" id="side-close-text" onclick="closeSidebar()">
             <i class="fas fa-arrow-right"></i> إغلاق
         </div>
         
@@ -468,45 +472,46 @@
             <div style="width:80px; height:80px; background:rgba(0, 0, 255, 0.1); border-radius:24px; display:flex; align-items:center; justify-content:center; margin: 0 auto 15px;">
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
             </div>
-            <h3 style="margin: 0; font-weight: 800; color: var(--text-main);">تطبيق أي شيء</h3>
-            <p style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.8</p>
+            <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">تطبيق أي شيء</h3>
+            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.8</p>
         </div>
         
         <div class="sidebar-item" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
-            <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> تفعيل الوضع الليلي
+            <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
         </div>
-        <a href="https://wa.me/9647739470354" target="_blank" class="sidebar-item">
-            <i class="fab fa-whatsapp" style="color: #25d366; font-size: 22px; width: 25px;"></i> مراسلة الدعم الفني
+        <a id="side-support-link" href="https://wa.me/9647739470354" target="_blank" class="sidebar-item">
+            <i class="fab fa-whatsapp" style="color: #25d366; font-size: 22px; width: 25px;"></i> <span id="side-support-text">مراسلة الدعم الفني</span>
         </a>
     </div>
 
     <div class="bottom-nav" id="bottomNavigation">
         <div class="nav-item active" onclick="showScreen('home-screen'); updateNav(this)">
             <i class="fas fa-compass"></i>
-            <span>الرئيسية</span>
+            <span id="nav-home-text">الرئيسية</span>
         </div>
         <div class="nav-item" onclick="showScreen('order-screen'); updateNav(this)" style="position: relative;">
             <i class="fas fa-shopping-basket"></i>
-            <span>مسواكك</span>
+            <span id="nav-shop-text">مسواكك</span>
             <div id="local-cart-badge" class="local-order-counter" style="display:none;">0</div>
         </div>
         <div class="nav-item" onclick="openJoinScreen(); updateNav(this)">
             <i class="fas fa-user-circle"></i>
-            <span>حسابي</span>
+            <span id="nav-acc-text">حسابي</span>
         </div>
     </div>
 
     <button class="theme-toggle" onclick="openSidebar()" id="menu-btn">
         <i class="fas fa-bars"></i>
     </button>
+    <button class="lang-toggle" onclick="toggleLanguage()" id="langBtn">English</button>
 
     <div id="welcome-overlay" onclick="skipWelcome()">
         <i class="fas fa-check-circle" style="font-size: 80px; color: var(--secondary); margin-bottom: 20px; animation: scaleIn 0.5s ease;"></i>
         <h1 id="welcome-title" style="margin:0 0 10px; font-weight:800;">تم التفعيل! 🥳</h1>
         <p id="welcome-msg" style="font-size: 18px; color: var(--text-muted); margin-bottom: 30px;"></p>
         <div style="background: var(--bg-color); padding: 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
-            <p style="margin:0; font-weight:700;">أنت الآن مندوب رسمي</p>
-            <p style="margin:5px 0 0; font-size: 14px; color:var(--text-muted);">جاري تجهيز لوحة التحكم...</p>
+            <p id="wel-p1" style="margin:0; font-weight:700;">أنت الآن مندوب رسمي</p>
+            <p id="wel-p2" style="margin:5px 0 0; font-size: 14px; color:var(--text-muted);">جاري تجهيز لوحة التحكم...</p>
         </div>
     </div>
 
@@ -515,8 +520,8 @@
           <i class="fas fa-box-open" style="font-size: 55px;"></i>
       </div>
       <div class="splash-welcome-text">
-          <h2>أي شيء</h2>
-          <p>نصلك أينما كنت في أم قصر</p>
+          <h2 id="splash-title">أي شيء</h2>
+          <p id="splash-subtitle">نصلك أينما كنت في أم قصر</p>
       </div>
       
       <div class="road-realistic">
@@ -537,45 +542,45 @@
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً 🔴</div>
         <div id="driver-status-badge" class="driver-status-bar">أنت الآن في وضع المندوب النشط 🟢</div>
         <h1 id="main-title" onclick="handleSecretClick()">ماذا تحتاج اليوم؟</h1>
-        <p>اختر الخدمة ودع الباقي علينا</p>
+        <p id="main-sub">اختر الخدمة ودع الباقي علينا</p>
       </div>
       
       <div class="services-grid">
           <div class="select-card card-full card-cart" onclick="showScreen('order-screen')">
             <div class="icon-wrapper icon-pulse"><i class="fas fa-shopping-cart"></i></div>
-            <div class="card-text"><h3>تسوق مسواكك</h3><small>مطاعم، سوبر ماركت، صيدليات والمزيد</small></div>
+            <div class="card-text"><h3 id="srv-shop-title">تسوق مسواكك</h3><small id="srv-shop-sub">مطاعم، سوبر ماركت، صيدليات والمزيد</small></div>
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
           
           <div class="select-card card-half card-tuk" onclick="showScreen('tuk-screen')">
             <div class="icon-wrapper icon-pulse"><i class="fas fa-taxi"></i></div>
-            <h3>تكتك توصيلة</h3>
-            <small>مشوارك سريع<br>ومضمون</small>
+            <h3 id="srv-tuk-title">تكتك توصيلة</h3>
+            <small id="srv-tuk-sub">مشوارك سريع<br>ومضمون</small>
           </div>
           
           <div class="select-card card-half card-med" onclick="showScreen('mediator-screen')">
             <div class="icon-wrapper icon-pulse"><i class="fas fa-handshake"></i></div>
-            <h3>الوسيط</h3>
-            <small>نقل الأغراض<br>بين شخصين</small>
+            <h3 id="srv-med-title">الوسيط</h3>
+            <small id="srv-med-sub">نقل الأغراض<br>بين شخصين</small>
           </div>
 
           <div class="select-card card-full" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; margin-bottom: 5px;" onclick="shareApp()">
             <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-gift"></i></div>
             <div class="card-text">
-                <h3 style="color: white;">شارك واربح توصيل مجاني</h3>
-                <small style="color: rgba(255,255,255,0.9);">انسخ رابطك ودزه لأصدقائك 🎁</small>
+                <h3 id="srv-share-title">شارك واربح توصيل مجاني</h3>
+                <small id="srv-share-sub">انسخ رابطك ودزه لأصدقائك 🎁</small>
             </div>
           </div>
           
           <div id="join-driver-card" class="select-card card-full card-join" onclick="openJoinScreen()">
             <div class="icon-wrapper"><i class="fas fa-id-card"></i></div>
-            <div class="card-text"><h3>انضم ككابتن</h3><small>سجل معنا وابدأ بتحقيق الدخل</small></div>
+            <div class="card-text"><h3 id="srv-join-title">انضم ككابتن</h3><small id="srv-join-sub">سجل معنا وابدأ بتحقيق الدخل</small></div>
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
           
           <div id="driver-plaza-card" class="select-card card-full card-plaza" style="display: none;" onclick="showScreen('plaza-screen')">
             <div class="icon-wrapper"><i class="fas fa-chart-pie"></i></div>
-            <div class="card-text"><h3>لوحة الكابتن</h3><small>تسليم الطلبات والإحصائيات</small></div>
+            <div class="card-text"><h3 id="srv-plaza-title">لوحة الكابتن</h3><small id="srv-plaza-sub">تسليم الطلبات والإحصائيات</small></div>
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
       </div>
@@ -583,42 +588,49 @@
 
     <div id="admin-panel" class="screen container">
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> لوحة التحكم السرية</h2>
+        <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> <span id="adm-title">لوحة التحكم السرية</span></h2>
         <div class="form-card" style="text-align: center;">
-            <p style="font-weight: 700;">حالة استقبال الطلبات للزبائن</p>
-            <button id="appStatusBtn" class="send-btn" onclick="toggleAppActiveStatus()">
-                جاري التحميل...
-            </button>
-            <p style="font-size: 12px; color: var(--text-muted); margin-top: 15px;">من تعطل الحالة، راح تطلع رسالة لكل الزبائن ويقفل التطبيق.</p>
+            <p id="adm-status-desc" style="font-weight: 700; margin-bottom: 20px;">حالة استقبال الطلبات للزبائن</p>
+            
+            <div style="display: flex; gap: 15px; justify-content: center;">
+                <button id="btn-open-app" class="send-btn" style="margin-top: 0; background: var(--secondary);" onclick="setGlobalAppStatus('online')">
+                    <i class="fas fa-unlock"></i> فتح التطبيق
+                </button>
+                <button id="btn-close-app" class="send-btn" style="margin-top: 0; background: var(--danger);" onclick="setGlobalAppStatus('offline')">
+                    <i class="fas fa-lock"></i> إغلاق التطبيق
+                </button>
+            </div>
+            
+            <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
 
     <div id="tuk-screen" class="screen container">
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-taxi" style="color:var(--gold);"></i> تكتك توصيلة</h2>
+        <h2 class="screen-header-title"><i class="fas fa-taxi" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
         
         <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-user-circle"></i> بيانات الراكب</div>
+            <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="tuk-p-info">بيانات الراكب</span></div>
             <div class="form-group">
-                <label>الاسم الكامل</label>
+                <label id="lbl-tuk-name">الاسم الكامل</label>
                 <input type="text" id="tukName" placeholder="اكتب اسمك هنا">
             </div>
             <div class="form-group">
-                <label>رقم الموبايل</label>
+                <label id="lbl-tuk-phone">رقم الموبايل</label>
                 <input type="tel" id="tukPhone" placeholder="مثال: 07700000000">
-                <span class="phone-note">تأكد من الرقم لتسهيل التواصل</span>
+                <span id="tuk-phone-n" class="phone-note">تأكد من الرقم لتسهيل التواصل</span>
             </div>
         </div>
 
         <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-route"></i> تفاصيل الرحلة</div>
+            <div class="form-card-title"><i class="fas fa-route"></i> <span id="tuk-r-info">تفاصيل الرحلة</span></div>
             
             <button class="location-btn" id="loc-btn-tuk" onclick="getLocation('tuk')" style="margin-top:5px;">
-                <i class="fas fa-location-crosshairs"></i> تحديد نقطة الصعود الحالية 📍
+                <i class="fas fa-location-crosshairs"></i> <span id="tuk-gps-btn">تحديد نقطة الصعود الحالية 📍</span>
             </button>
 
             <div class="form-group" style="margin-top: 20px;">
-                <label style="color:var(--danger);">نقطة النزول (إجباري)</label>
+                <label style="color:var(--danger);" id="lbl-tuk-drop">نقطة النزول (إجباري)</label>
                 <div class="note" style="padding:12px; font-size:12px; margin-bottom:10px; background:var(--bg-color); border-right-color:var(--primary); color:var(--text-main);">
                     💡 <strong>شلون تنسخ الرابط؟</strong> افتح الخريطة من الزر الجوه، حدد المكان بضغطة مطولة، دوس مشاركة واختار (نسخ 📄).<br>
                     <span style="color:var(--danger); font-weight:800;">اذا ما طلعت نسخ 📄 روح سوي مشاركه لنفسك على التلكرام او الواتساب وانسخ الرابط ورجع خلي بالخانه.</span>
@@ -635,12 +647,12 @@
             </div>
         </div>
         
-        <button class="send-btn order-btn-logic" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> اطلب التكتك الآن</button>
+        <button class="send-btn" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">اطلب التكتك الآن</span></button>
     </div>
 
     <div id="mediator-screen" class="screen container">
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> خدمة الوسيط</h2>
+        <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> <span id="med-head">خدمة الوسيط</span></h2>
         
         <div class="price-indicator" style="display: block;">
             <span>سعر خدمة الوسيط لكافة مناطق أم قصر:</span>
@@ -649,7 +661,7 @@
         </div>
         
         <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-user-circle"></i> بيانات المرسل</div>
+            <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="med-p-info">بيانات المرسل</span></div>
             <div class="form-group">
                 <label>الاسم الكامل</label>
                 <input type="text" id="medName" placeholder="اكتب اسمك">
@@ -663,27 +675,27 @@
                 <input type="text" id="medLandmark" placeholder="لتسهيل وصول المندوب">
             </div>
             <button class="location-btn" id="loc-btn-med" onclick="getLocation('med')" style="margin-top:5px;">
-                <i class="fas fa-location-crosshairs"></i> تحديد موقعي الحالي بدقة
+                <i class="fas fa-location-crosshairs"></i> <span id="med-gps-btn">تحديد موقعي الحالي بدقة</span>
             </button>
         </div>
 
         <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-box-open"></i> تفاصيل الطلب</div>
+            <div class="form-card-title"><i class="fas fa-box-open"></i> <span id="med-o-info">تفاصيل الطلب</span></div>
             <div class="form-group">
                 <label>ما هو الغرض؟ وإلى أين؟</label>
                 <textarea id="medOrder" rows="4" placeholder="مثال: أريد توصيل مفاتيح من تقاطع الميناء إلى حي المهندسين..."></textarea>
             </div>
         </div>
 
-        <button class="send-btn order-btn-logic" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط</button>
+        <button class="send-btn" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
     </div>
 
     <div id="order-screen" class="screen container">
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-shopping-cart" style="color:var(--primary);"></i> تسوق مسواكك</h2>
+        <h2 class="screen-header-title"><i class="fas fa-shopping-cart" style="color:var(--primary);"></i> <span id="shop-head">تسوق مسواكك</span></h2>
         
         <div id="loyalty-info" class="loyalty-card">
-            <div class="loyalty-text">طلبك رقم <span id="current-order-count" style="color:var(--primary); font-size:22px;">0</span> / 6</div>
+            <div class="loyalty-text"><span id="loy-txt">طلبك رقم</span> <span id="current-order-count" style="color:var(--primary); font-size:22px;">0</span> / 6</div>
             <div class="loyalty-progress"><div id="loyalty-bar" class="loyalty-bar"></div></div>
             <span class="gift-note" id="loyalty-gift-msg"><i class="fas fa-gift"></i> أوصل للطلب 6 وكروتك مجانية</span>
         </div>
@@ -695,7 +707,7 @@
         </div>
 
         <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-address-card"></i> بيانات التوصيل</div>
+            <div class="form-card-title"><i class="fas fa-address-card"></i> <span id="shop-p-info">بيانات التوصيل</span></div>
             <div class="form-group">
                 <label>الاسم</label>
                 <input type="text" id="custName" placeholder="اسمك">
@@ -710,12 +722,12 @@
                 <input type="text" id="custLandmark" placeholder="وصف سريع لمكانك">
             </div>
             <button class="location-btn" id="loc-btn-cust" onclick="getLocation('cust')" style="margin-top:5px;">
-                <i class="fas fa-location-crosshairs"></i> تحديد موقعي بدقة
+                <i class="fas fa-location-crosshairs"></i> <span id="shop-gps-btn">تحديد موقعي بدقة</span>
             </button>
         </div>
 
         <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-list-ul"></i> ماذا تريد أن نشتري لك؟</div>
+            <div class="form-card-title"><i class="fas fa-list-ul"></i> <span id="shop-o-info">ماذا تريد أن نشتري لك؟</span></div>
             <div class="form-group">
                 <textarea id="custOrder" rows="5" placeholder="اكتب طلباتك هنا بالتفصيل (أكل، مسواك، صيدلية)..."></textarea>
             </div>
@@ -723,13 +735,13 @@
             <div class="form-group" style="margin-top: 10px;">
                 <input type="file" id="custImages" accept="image/*" multiple style="display:none;" onchange="previewImages()">
                 <button type="button" class="location-btn" style="border: 2px dashed var(--primary); background: var(--bg-color); color: var(--text-main); margin-bottom: 0;" onclick="document.getElementById('custImages').click()">
-                    <i class="fas fa-camera" style="color: var(--primary);"></i> إضافة صور للطلبات (اختياري)
+                    <i class="fas fa-camera" style="color: var(--primary);"></i> <span id="shop-img-btn">إضافة صور للطلبات (اختياري)</span>
                 </button>
                 <div id="image-preview-container" style="display:flex; gap:10px; overflow-x:auto; margin-top:10px; padding-bottom:5px; flex-wrap: wrap;"></div>
             </div>
         </div>
 
-        <button class="send-btn order-btn-logic" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> أرسل الطلب الآن</button>
+        <button class="send-btn" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
 
     <div id="join-screen" class="screen container">
@@ -762,7 +774,7 @@
     <div id="activation-screen" class="screen container">
         <div class="form-card" style="text-align:center; padding: 40px 20px;">
             <i class="fas fa-clock" style="font-size:50px; margin-bottom:20px; color:var(--gold);"></i>
-            <h3 style="margin:0 0 10px;">طلبك قيد المراجعة</h3>
+            <h3 id="wait-title" style="margin:0 0 10px;">طلبك قيد المراجعة</h3>
             <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">تواصل مع الإدارة للحصول على كود التفعيل المكون من 6 أرقام.</p>
             <div class="form-group">
                 <input type="number" id="activationCodeInput" placeholder="أدخل الكود هنا..." style="text-align:center; font-size:20px; letter-spacing:4px; font-weight:bold;">
@@ -848,82 +860,6 @@
           window.location.reload(true); 
       }
 
-      // متغيرات الأدمن السرية
-      let secretCounter = 0;
-      let appIsActive = true; 
-
-      function handleSecretClick() {
-          secretCounter++;
-          if (secretCounter === 5) {
-              secretCounter = 0;
-              let pass = prompt("أدخل الرمز السري للوصول للوحة التحكم:");
-              if (pass === "2006") {
-                  showScreen('admin-panel');
-                  checkGlobalStatusFromServer(); 
-              } else if (pass !== null) {
-                  showToast("الرمز غير صحيح ❌");
-              }
-          }
-      }
-
-      async function toggleAppActiveStatus() {
-          const btn = document.getElementById('appStatusBtn');
-          const isCurrentlyOffline = btn.innerText.includes("تنشيط") || btn.innerText.includes("Activate");
-          const newStatus = isCurrentlyOffline ? "online" : "offline";
-          
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التغيير...';
-          btn.disabled = true;
-          
-          try {
-              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}`);
-              showToast(newStatus === "online" ? "تم تنشيط التطبيق للجميع ✅" : "تم إيقاف التطبيق للجميع 🔴");
-              checkGlobalStatusFromServer();
-          } catch(e) {
-              showToast("حدث خطأ بالاتصال بالسيرفر ⚠️");
-          } finally { 
-              btn.disabled = false; 
-          }
-      }
-
-      async function checkGlobalStatusFromServer() {
-          try {
-              const resp = await fetch(`${GS_URL}?action=getAppStatus`);
-              const status = await resp.text();
-              const lockScreen = document.getElementById('global-lock-screen');
-              const btn = document.getElementById('appStatusBtn');
-              
-              if (status === "offline") {
-                  appIsActive = false;
-                  lockScreen.style.display = 'flex'; 
-                  if(btn) { btn.innerText = "تنشيط التطبيق الآن (تفعيل)"; btn.style.background = "var(--secondary)"; }
-              } else {
-                  appIsActive = true;
-                  lockScreen.style.display = 'none'; 
-                  if(btn) { btn.innerText = "إيقاف استقبال الطلبات (تعطيل)"; btn.style.background = "var(--danger)"; }
-              }
-              applyGlobalStatus();
-          } catch(e) { console.log("Failed to fetch global status"); }
-      }
-
-      function applyGlobalStatus() {
-          const badge = document.getElementById('admin-status-badge');
-          const orderButtons = document.querySelectorAll('.order-btn-logic');
-          
-          if (!appIsActive) {
-              badge.style.display = 'block';
-              orderButtons.forEach(btn => {
-                  btn.disabled = true;
-                  btn.innerHTML = '<i class="fas fa-lock"></i> الخدمة متوقفة حالياً';
-              });
-          } else {
-              badge.style.display = 'none';
-              document.getElementById('tukSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> اطلب التكتك الآن';
-              document.getElementById('medSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
-              document.getElementById('sendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
-              orderButtons.forEach(btn => btn.disabled = false);
-          }
-      }
-
       // --- دالة المزامنة مع السيرفر للحصول على النقاط الحقيقية ---
       async function syncLoyaltyWithServer() {
           const phoneInput = document.getElementById('custPhone');
@@ -980,7 +916,7 @@
           const isDark = document.body.classList.contains('dark-mode');
           const btn = document.getElementById('sidebar-theme-btn');
           if(btn) {
-              btn.innerHTML = isDark ? '<i class="fas fa-sun" style="color: var(--gold); font-size: 20px; width:25px;"></i> تفعيل الوضع النهاري' : '<i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width:25px;"></i> تفعيل الوضع الليلي';
+              btn.innerHTML = isDark ? '<i class="fas fa-sun" style="color: var(--gold); font-size: 20px; width:25px;"></i> <span id="side-dark-text">تفعيل الوضع النهاري</span>' : '<i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width:25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>';
           }
           localStorage.setItem('theme', isDark ? 'dark' : 'light');
       }
@@ -1025,9 +961,11 @@
           checkConnection(); 
           applyAutoTheme(); 
           loadSavedCustomerData();
-          checkGlobalStatusFromServer(); 
-          syncLoyaltyWithServer(); 
+          syncLoyaltyWithServer(); // مزامنة النقاط عند فتح التطبيق
 
+          checkGlobalStatusFromServer(); // فحص الإغلاق الشامل من السيرفر
+
+          // التحقق من كود الإحالة (شارك واربح)
           const urlParams = new URLSearchParams(window.location.search);
           const ref = urlParams.get('ref');
           const myPhone = localStorage.getItem('saved_customer_phone');
@@ -1049,6 +987,7 @@
           setTimeout(skipSplash, 2500); 
       }
 
+      // دالة شارك واربح
       function shareApp() {
           let myPhone = localStorage.getItem('saved_customer_phone');
           if (!myPhone) return showToast("لازم تسجل رقمك بطلب مسواك أولاً حتى يتفعل رابطك! ⚠️");
@@ -1190,7 +1129,7 @@
               let referrer = localStorage.getItem('referred_by') || "";
               
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`);
-              localStorage.removeItem('referred_by'); 
+              localStorage.removeItem('referred_by'); // مسح الكود بعد الاستخدام
               
               const msg = `🚖 طلب تكتك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 صعود من: ${userCoords}\nنزول في: ${dropLink}`;
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -1199,7 +1138,7 @@
               });
               showToast("تم طلب التكتك بنجاح ✅");
               document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = "";
-              syncLoyaltyWithServer(); 
+              syncLoyaltyWithServer(); // تحديث النقاط
           } catch (e) { showToast("حدث خطأ أثناء الإرسال"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1227,7 +1166,7 @@
               });
               showToast("تم إرسال الطلب بنجاح ✅");
               document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = "";
-              syncLoyaltyWithServer(); 
+              syncLoyaltyWithServer(); // تحديث النقاط
           } catch (e) { showToast("حدث خطأ في الإرسال"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1309,7 +1248,7 @@
               
               showToast("تم إرسال طلبك بنجاح ✅");
               document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = "";
-              syncLoyaltyWithServer(); 
+              syncLoyaltyWithServer(); // تحديث فوري للنقاط من السيرفر
           } catch (e) { showToast("خطأ في الشبكة"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1466,6 +1405,160 @@
           const phone = document.getElementById('arrivePhoneInput').value.trim();
           if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️");
           window.location.href = `tel:${phone}`;
+      }
+
+      // =========================================
+      // إضافات النظام الجديد (اللغة + لوحة التحكم الشاملة)
+      // =========================================
+      let secretCounter = 0;
+      let currentLang = 'ar';
+      let appIsActive = true;
+
+      function handleSecretClick() {
+          secretCounter++;
+          if (secretCounter === 5) {
+              secretCounter = 0;
+              let pass = prompt(currentLang === 'ar' ? "أدخل الرمز السري:" : "Admin Code:");
+              if (pass === "2006") {
+                  showScreen('admin-panel');
+                  checkGlobalStatusFromServer(); 
+              } else if (pass !== null) {
+                  showToast(currentLang === 'ar' ? "الرمز خطأ ❌" : "Wrong Code ❌");
+              }
+          }
+      }
+
+      async function setGlobalAppStatus(newStatus) {
+          const btnOpen = document.getElementById('btn-open-app');
+          const btnClose = document.getElementById('btn-close-app');
+          
+          if(newStatus === 'online') {
+              btnOpen.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+          } else {
+              btnClose.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+          }
+          btnOpen.disabled = true;
+          btnClose.disabled = true;
+          
+          try {
+              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}`);
+              showToast(newStatus === "online" ? (currentLang === 'ar' ? "تم فتح التطبيق للجميع ✅" : "App Opened ✅") : (currentLang === 'ar' ? "تم إغلاق التطبيق 🔴" : "App Closed 🔴"));
+              checkGlobalStatusFromServer();
+          } catch(e) {
+              showToast(currentLang === 'ar' ? "حدث خطأ بالاتصال بالسيرفر ⚠️" : "Server Error ⚠️");
+          } finally { 
+              btnOpen.innerHTML = currentLang === 'ar' ? '<i class="fas fa-unlock"></i> فتح التطبيق' : '<i class="fas fa-unlock"></i> Open App';
+              btnClose.innerHTML = currentLang === 'ar' ? '<i class="fas fa-lock"></i> إغلاق التطبيق' : '<i class="fas fa-lock"></i> Close App';
+              btnOpen.disabled = false; 
+              btnClose.disabled = false;
+          }
+      }
+
+      async function checkGlobalStatusFromServer() {
+          try {
+              const resp = await fetch(`${GS_URL}?action=getAppStatus`);
+              const status = await resp.text();
+              const lockScreen = document.getElementById('global-lock-screen');
+              
+              if (status === "offline") {
+                  appIsActive = false;
+                  if(lockScreen) lockScreen.style.display = 'flex'; 
+              } else {
+                  appIsActive = true;
+                  if(lockScreen) lockScreen.style.display = 'none'; 
+              }
+          } catch(e) { console.log("Failed to fetch global status"); }
+      }
+
+      function toggleLanguage() {
+          currentLang = currentLang === 'ar' ? 'en' : 'ar';
+          document.getElementById('langBtn').innerText = currentLang === 'ar' ? 'English' : 'عربي';
+          document.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+          
+          const t = {
+              ar: { 
+                  title: "ماذا تحتاج اليوم؟", sub: "اختر الخدمة ودع الباقي علينا", shop: "تسوق مسواكك", shop_s: "مطاعم، سوبر ماركت والمزيد",
+                  tuk: "تكتك توصيلة", tuk_s: "مشوارك سريع ومضمون", med: "الوسيط", med_s: "نقل الأغراض بين شخصين",
+                  share: "شارك واربح", share_s: "انسخ رابطك ودزه لأصدقائك 🎁", join: "انضم ككابتن", join_s: "سجل معنا وابدأ بالعمل",
+                  plaza: "لوحة الكابتن", plaza_s: "إحصائيات المندوب", h: "الرئيسية", o: "مسواكك", p: "حسابي",
+                  off_t: "لا يوجد اتصال", off_m: "يرجى الاتصال بالإنترنت", btn_w: "واي فاي", btn_d: "بيانات الهاتف",
+                  side_close: "إغلاق", side_v: "الإصدار 2.0.8", side_wa: "الدعم الفني", side_dark: "تفعيل الوضع الليلي",
+                  shop_h: "تسوق مسواكك", shop_info: "بيانات التوصيل", shop_gps: "تحديد الموقع بدقة", shop_btn: "أرسل الطلب الآن", shop_img: "إضافة صور", shop_o: "ماذا تريد أن نشتري لك؟",
+                  tuk_h: "تكتك توصيلة", tuk_info: "بيانات الراكب", tuk_gps: "تحديد مكان الصعود 📍", tuk_btn: "اطلب التكتك الآن", tuk_trip: "تفاصيل الرحلة",
+                  med_h: "خدمة الوسيط", med_info: "بيانات المرسل", med_gps: "تحديد موقعي", med_btn: "تأكيد طلب الوسيط",
+                  loy_t: "طلبك رقم", wait_h: "طلبك قيد المراجعة", splash_t: "أي شيء", splash_s: "نصلك أينما كنت في أم قصر",
+                  lock_h: "تم إيقاف التطبيق مؤقتاً", lock_p: "نحن نقوم ببعض التحديثات أو الصيانة، يرجى المحاولة في وقت لاحق.",
+                  btn_open: '<i class="fas fa-unlock"></i> فتح التطبيق', btn_close: '<i class="fas fa-lock"></i> إغلاق التطبيق'
+              },
+              en: { 
+                  title: "What do you need?", sub: "Pick a service and let us handle it", shop: "Shopping", shop_s: "Restaurants, Market and more",
+                  tuk: "TukTuk Ride", tuk_s: "Fast and reliable ride", med: "Mediator", med_s: "Transfer items between people",
+                  share: "Share & Win", share_s: "Copy link to your friends 🎁", join: "Join as Captain", join_s: "Register and start working",
+                  plaza: "Captain Panel", plaza_s: "Delegate Statistics", h: "Home", o: "Shopping", p: "Profile",
+                  off_t: "No Connection", off_m: "Please connect to internet", btn_w: "Wi-Fi", btn_d: "Mobile Data",
+                  side_close: "Close", side_v: "Version 2.0.8", side_wa: "Support", side_dark: "Night Mode",
+                  shop_h: "Shopping", shop_info: "Delivery Details", shop_gps: "Detect My Location", shop_btn: "Send Order Now", shop_img: "Add Photos", shop_o: "What do you want us to buy?",
+                  tuk_h: "TukTuk Ride", tuk_info: "Passenger Details", tuk_gps: "Detect Pickup Point 📍", tuk_btn: "Order TukTuk Now", tuk_trip: "Trip Details",
+                  med_h: "Mediator", med_info: "Sender Details", med_gps: "Detect My Location", med_btn: "Confirm Request",
+                  loy_t: "Order No.", wait_h: "Application Under Review", splash_t: "Any Thing", splash_s: "Delivering everywhere in Um Qasr",
+                  lock_h: "App Temporarily Offline", lock_p: "We are doing some maintenance, please try again later.",
+                  btn_open: '<i class="fas fa-unlock"></i> Open App', btn_close: '<i class="fas fa-lock"></i> Close App'
+              }
+          };
+
+          // تطبيق النصوص للغة الإنجليزية
+          if(document.getElementById('main-title')) document.getElementById('main-title').innerText = t[currentLang].title;
+          if(document.getElementById('main-sub')) document.getElementById('main-sub').innerText = t[currentLang].sub;
+          if(document.getElementById('srv-shop-title')) document.getElementById('srv-shop-title').innerText = t[currentLang].shop;
+          if(document.getElementById('srv-shop-sub')) document.getElementById('srv-shop-sub').innerText = t[currentLang].shop_s;
+          if(document.getElementById('srv-tuk-title')) document.getElementById('srv-tuk-title').innerText = t[currentLang].tuk;
+          if(document.getElementById('srv-tuk-sub')) document.getElementById('srv-tuk-sub').innerText = t[currentLang].tuk_s;
+          if(document.getElementById('srv-med-title')) document.getElementById('srv-med-title').innerText = t[currentLang].med;
+          if(document.getElementById('srv-med-sub')) document.getElementById('srv-med-sub').innerText = t[currentLang].med_s;
+          if(document.getElementById('srv-share-title')) document.getElementById('srv-share-title').innerText = t[currentLang].share;
+          if(document.getElementById('srv-share-sub')) document.getElementById('srv-share-sub').innerText = t[currentLang].share_s;
+          if(document.getElementById('srv-join-title')) document.getElementById('srv-join-title').innerText = t[currentLang].join;
+          if(document.getElementById('srv-join-sub')) document.getElementById('srv-join-sub').innerText = t[currentLang].join_s;
+          if(document.getElementById('srv-plaza-title')) document.getElementById('srv-plaza-title').innerText = t[currentLang].plaza;
+          if(document.getElementById('srv-plaza-sub')) document.getElementById('srv-plaza-sub').innerText = t[currentLang].plaza_s;
+
+          if(document.getElementById('nav-home-text')) document.getElementById('nav-home-text').innerText = t[currentLang].h;
+          if(document.getElementById('nav-shop-text')) document.getElementById('nav-shop-text').innerText = t[currentLang].o;
+          if(document.getElementById('nav-acc-text')) document.getElementById('nav-acc-text').innerText = t[currentLang].p;
+          if(document.getElementById('side-close-text')) document.getElementById('side-close-text').innerHTML = `<i class="fas fa-arrow-right"></i> ${t[currentLang].side_close}`;
+          if(document.getElementById('side-dark-text')) document.getElementById('side-dark-text').innerText = t[currentLang].side_dark;
+          if(document.getElementById('side-support-text')) document.getElementById('side-support-text').innerText = t[currentLang].side_wa;
+
+          if(document.getElementById('shop-head')) document.getElementById('shop-head').innerText = t[currentLang].shop_h;
+          if(document.getElementById('shop-p-info')) document.getElementById('shop-p-info').innerText = t[currentLang].shop_info;
+          if(document.getElementById('shop-o-info')) document.getElementById('shop-o-info').innerText = t[currentLang].shop_o;
+          if(document.getElementById('shop-gps-btn')) document.getElementById('shop-gps-btn').innerText = t[currentLang].shop_gps;
+          if(document.getElementById('shop-img-btn')) document.getElementById('shop-img-btn').innerText = t[currentLang].shop_img;
+          if(document.getElementById('shop-final-btn')) document.getElementById('shop-final-btn').innerText = t[currentLang].shop_btn;
+          if(document.getElementById('loy-txt')) document.getElementById('loy-txt').innerText = t[currentLang].loy_t;
+
+          if(document.getElementById('tuk-head')) document.getElementById('tuk-head').innerText = t[currentLang].tuk_h;
+          if(document.getElementById('tuk-p-info')) document.getElementById('tuk-p-info').innerText = t[currentLang].tuk_info;
+          if(document.getElementById('tuk-r-info')) document.getElementById('tuk-r-info').innerText = t[currentLang].tuk_trip;
+          if(document.getElementById('tuk-gps-btn')) document.getElementById('tuk-gps-btn').innerText = t[currentLang].tuk_gps;
+          if(document.getElementById('tuk-final-btn')) document.getElementById('tuk-final-btn').innerText = t[currentLang].tuk_btn;
+
+          if(document.getElementById('med-head')) document.getElementById('med-head').innerText = t[currentLang].med_h;
+          if(document.getElementById('med-p-info')) document.getElementById('med-p-info').innerText = t[currentLang].med_info;
+          if(document.getElementById('med-o-info')) document.getElementById('med-o-info').innerText = t[currentLang].med_h;
+          if(document.getElementById('med-gps-btn')) document.getElementById('med-gps-btn').innerText = t[currentLang].med_gps;
+          if(document.getElementById('med-final-btn')) document.getElementById('med-final-btn').innerText = t[currentLang].med_btn;
+
+          if(document.getElementById('off-title')) document.getElementById('off-title').innerText = t[currentLang].off_t;
+          if(document.getElementById('off-text')) document.getElementById('off-text').innerText = t[currentLang].off_m;
+          if(document.getElementById('off-btn-wifi')) document.getElementById('off-btn-wifi').innerText = t[currentLang].btn_w;
+          if(document.getElementById('off-btn-data')) document.getElementById('off-btn-data').innerText = t[currentLang].btn_d;
+          
+          if(document.getElementById('lock-h2')) document.getElementById('lock-h2').innerText = t[currentLang].lock_h;
+          if(document.getElementById('lock-p')) document.getElementById('lock-p').innerText = t[currentLang].lock_p;
+          
+          if(document.getElementById('btn-open-app')) document.getElementById('btn-open-app').innerHTML = t[currentLang].btn_open;
+          if(document.getElementById('btn-close-app')) document.getElementById('btn-close-app').innerHTML = t[currentLang].btn_close;
       }
     </script>
 </body>
