@@ -1048,7 +1048,7 @@
           } catch (e) { showToast("حدث خطأ في الإرسال"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
-      // دوال الصور
+      // دوال الصور السريّة للمسواك
       function previewImages() {
           const input = document.getElementById('custImages');
           const container = document.getElementById('image-preview-container');
@@ -1080,38 +1080,51 @@
           
           const btn = document.getElementById('sendBtn');
           const originalText = btn.innerHTML;
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...'; btn.disabled = true;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التجهيز...'; btn.disabled = true;
           try {
               saveCustomerData(name, phone);
               const vc = generateSecureVC();
-              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}`);
-              let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
-              let orderNum = (tempLoyalty % 6) + 1;
-              let loyaltyMsg = orderNum === 6 ? "🎁 هذا الطلب مجاني" : `الطلب رقم ${orderNum} من أصل 6`;
-              
-              let msgContent = order || "الطلب موضح في الصور المرفقة 📸";
-              const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${msgContent}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍 الموقع: ${userCoords}`;
-              
-              const tgResp = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                  method: "POST", headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
-              });
-              
-              const tgData = await tgResp.json();
-              
-              if (files.length > 0 && tgData.ok) {
-                  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري رفع الصور...';
-                  const msgId = tgData.result.message_id;
+              let photoMsgs = [];
+
+              // الرفع السري للصور للقناة الخاصة أولاً
+              if (files.length > 0) {
+                  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري رفع الصور بسرية...';
                   for (let i = 0; i < files.length; i++) {
                       let fd = new FormData();
-                      fd.append('chat_id', PUBLIC_CHANNEL);
+                      fd.append('chat_id', "-1003786625443"); // القناة الخاصة
                       fd.append('photo', files[i]);
-                      fd.append('reply_to_message_id', msgId);
-                      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
+                      fd.append('caption', `📦 صور طلب رقم: ${vc}\n👤 الزبون: ${name}`);
+                      try {
+                          let tgResp = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
+                          let tgData = await tgResp.json();
+                          if (tgData.ok) {
+                              photoMsgs.push(tgData.result.message_id);
+                          }
+                      } catch(err) {}
                   }
                   clearImages();
               }
 
+              btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+              
+              // حفظ أرقام الصور في السيرفر
+              let photoIdsStr = photoMsgs.join(',');
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&photoMsgs=${photoIdsStr}`);
+              
+              let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
+              let orderNum = (tempLoyalty % 6) + 1;
+              let loyaltyMsg = orderNum === 6 ? "🎁 هذا الطلب مجاني" : `الطلب رقم ${orderNum} من أصل 6`;
+              
+              let msgContent = order ? order : "الطلب موضح في الصور المرفقة 📸";
+              let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص عند الحجز)**" : "";
+              const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍 الموقع: ${userCoords}`;
+              
+              // إرسال الطلب للقناة العامة
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                  method: "POST", headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
+              });
+              
               showToast("تم إرسال طلبك بنجاح ✅");
               document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = "";
               loyaltyCount++; localStorage.setItem('my_loyalty_orders', loyaltyCount); updateLocalLoyaltyUI();
@@ -1133,7 +1146,6 @@
               const checkResult = await checkResp.text();
               
               if (checkResult.startsWith("valid")) {
-                  // ميزة 4: صوت الكاشير والاحتفال
                   try {
                       const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
                       cashAudio.play();
@@ -1222,7 +1234,6 @@
       updateLoyaltyUI = async function() { updateLocalLoyaltyUI(); };
       updateLocalLoyaltyUI();
 
-      // دوال الكابتن الجديدة
       function toggleDriverStatus() {
           const btn = document.getElementById('statusToggleBtn');
           const badge = document.getElementById('driver-status-badge');
