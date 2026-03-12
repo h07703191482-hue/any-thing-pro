@@ -8,7 +8,10 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
 
-    <title>توصيل أي شيء - أم قصر</title>
+    <title>تطبيق أي شيء - خدمات توصيل في أم قصر</title>
+    <meta name="description" content="أسرع تطبيق لتوصيل المسواك، التكتك، والوسيط في أم قصر. اطلب الآن نصلك أينما كنت بأفضل الأسعار.">
+    <meta name="keywords" content="توصيل، أم قصر، تكتك، مسواك، طلبات، البصرة، مندوب">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -806,7 +809,7 @@
       // --- دالة المزامنة مع السيرفر للحصول على النقاط الحقيقية ---
       async function syncLoyaltyWithServer() {
           const phoneInput = document.getElementById('custPhone');
-          const phone = phoneInput ? phoneInput.value.trim() : localStorage.getItem('saved_customer_phone');
+          const phone = (phoneInput && phoneInput.value.trim() !== "") ? phoneInput.value.trim() : localStorage.getItem('saved_customer_phone');
           if (!phone || !validateIraqiPhone(phone)) return;
           
           try {
@@ -906,6 +909,7 @@
           loadSavedCustomerData();
           syncLoyaltyWithServer(); // مزامنة النقاط عند فتح التطبيق
 
+          // التحقق من كود الإحالة (شارك واربح)
           const urlParams = new URLSearchParams(window.location.search);
           const ref = urlParams.get('ref');
           const myPhone = localStorage.getItem('saved_customer_phone');
@@ -927,14 +931,26 @@
           setTimeout(skipSplash, 2500); 
       }
 
+      // دالة شارك واربح
       function shareApp() {
           let myPhone = localStorage.getItem('saved_customer_phone');
           if (!myPhone) return showToast("لازم تسجل رقمك بطلب مسواك أولاً حتى يتفعل رابطك! ⚠️");
+          
           let link = window.location.href.split('?')[0] + "?ref=" + myPhone;
+          
           if (navigator.share) {
-              navigator.share({ title: 'تطبيق أي شيء - أم قصر', text: 'نزل التطبيق واطلب مسواكك، وهذا كود الدعوة مالتي حتى نحصل توصيل مجاني! 🎁', url: link }).catch(console.error);
+              navigator.share({
+                  title: 'تطبيق أي شيء - أم قصر',
+                  text: 'نزل التطبيق واطلب مسواكك، وهذا كود الدعوة مالتي حتى نحصل توصيل مجاني! 🎁',
+                  url: link
+              }).catch(console.error);
           } else {
-              let temp = document.createElement("input"); temp.value = link; document.body.appendChild(temp); temp.select(); document.execCommand("copy"); document.body.removeChild(temp);
+              let temp = document.createElement("input");
+              temp.value = link;
+              document.body.appendChild(temp);
+              temp.select();
+              document.execCommand("copy");
+              document.body.removeChild(temp);
               showToast("تم نسخ الرابط! دزه لأصدقائك 🔗");
           }
       }
@@ -996,17 +1012,23 @@
           const phone = document.getElementById('driverJoinPhone').value.trim();
           const bike = document.getElementById('bikeType').value;
           if(!name || !validateIraqiPhone(phone) || !bike) { return showToast("يرجى إكمال البيانات بشكل صحيح 📝"); }
+          
           const btn = document.getElementById('joinSendBtn');
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...'; btn.disabled = true;
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+          btn.disabled = true;
           try {
               localStorage.setItem('temp_name', name); localStorage.setItem('temp_phone', phone);
               const randomCode = Math.floor(100000 + Math.random() * 900000);
               localStorage.setItem('temp_activation', randomCode);
               localStorage.setItem('pending_join', 'true');
               const msg = `📥 طلب انضمام جديد\n👤 الاسم: ${name}\n📞 الهاتف: ${phone}\n🏍️ المركبة: ${bike}\n🔑 الكود: ${randomCode}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) });
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                  method: "POST", headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+              });
               showScreen('activation-screen');
-          } catch (e) { showToast("حدث خطأ في الشبكة ⚠️"); } finally { btn.innerHTML = 'إرسال طلب الانضمام'; btn.disabled = false; }
+          } catch (e) { showToast("حدث خطأ في الشبكة ⚠️"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       function verifyActivationCode() {
@@ -1038,18 +1060,30 @@
           if (!navigator.onLine) return showToast("لا يوجد إنترنت للطلب ❌");
           const name = document.getElementById('tukName').value.trim();
           const phone = document.getElementById('tukPhone').value.trim();
+          const land = document.getElementById('tukLandmark').value.trim();
           const dropLink = document.getElementById('tukDropoffLink').value.trim(); 
-          if(!name || !validateIraqiPhone(phone) || !userCoords || !dropLink) return showToast("أكمل البيانات 📍");
-          const btn = document.getElementById('tukSendBtn'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الطلب...'; btn.disabled = true;
+          
+          if(!name || !validateIraqiPhone(phone) || !userCoords || !dropLink) return showToast("أكمل البيانات وحدد نقطة الصعود والنزول 📍");
+          const btn = document.getElementById('tukSendBtn');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الطلب...'; btn.disabled = true;
           try {
-              saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
+              saveCustomerData(name, phone);
+              const vc = generateSecureVC();
+              let referrer = localStorage.getItem('referred_by') || "";
+              
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`);
-              localStorage.removeItem('referred_by');
-              const msg = `🚖 طلب تكتك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 صعود: ${userCoords}\nنزول: ${dropLink}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } }) });
+              localStorage.removeItem('referred_by'); // مسح الكود بعد الاستخدام
+              
+              const msg = `🚖 طلب تكتك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 صعود من: ${userCoords}\nنزول في: ${dropLink}`;
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                  method: "POST", headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
+              });
               showToast("تم طلب التكتك بنجاح ✅");
-              syncLoyaltyWithServer();
-          } catch (e) { showToast("حدث خطأ"); } finally { btn.innerHTML = 'اطلب التكتك الآن'; btn.disabled = false; }
+              document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = "";
+              syncLoyaltyWithServer(); // تحديث النقاط
+          } catch (e) { showToast("حدث خطأ أثناء الإرسال"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       async function sendMedFinal() {
@@ -1057,116 +1091,265 @@
           const name = document.getElementById('medName').value.trim();
           const phone = document.getElementById('medPhone').value.trim();
           const order = document.getElementById('medOrder').value.trim();
-          if(!name || !validateIraqiPhone(phone) || !userCoords) return showToast("أكمل البيانات 📍");
-          const btn = document.getElementById('medSendBtn'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...'; btn.disabled = true;
+          if(!name || !validateIraqiPhone(phone) || !userCoords) return showToast("أكمل البيانات وحدد الموقع 📍");
+          const btn = document.getElementById('medSendBtn');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...'; btn.disabled = true;
           try {
-              saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
+              saveCustomerData(name, phone);
+              const vc = generateSecureVC();
+              let referrer = localStorage.getItem('referred_by') || "";
+              
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`);
               localStorage.removeItem('referred_by');
+              
               const msg = `🔵 طلب وسيط\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📝 الغرض: ${order}\n📍 الموقع: ${userCoords}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } }) });
-              showToast("تم إرسال الطلب ✅");
-              syncLoyaltyWithServer();
-          } catch (e) { showToast("حدث خطأ"); } finally { btn.innerHTML = 'تأكيد طلب الوسيط'; btn.disabled = false; }
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                  method: "POST", headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
+              });
+              showToast("تم إرسال الطلب بنجاح ✅");
+              document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = "";
+              syncLoyaltyWithServer(); // تحديث النقاط
+          } catch (e) { showToast("حدث خطأ في الإرسال"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       function previewImages() {
-          const input = document.getElementById('custImages'); const container = document.getElementById('image-preview-container'); container.innerHTML = '';
-          for (let i = 0; i < input.files.length; i++) { container.innerHTML += `<img src="${URL.createObjectURL(input.files[i])}" style="width:70px; height:70px; border-radius:10px; object-fit:cover; border:1px solid var(--border-color);">`; }
-          if(input.files.length > 0) container.innerHTML += `<div style="display:flex; align-items:center; color:var(--danger); font-size:13px; cursor:pointer;" onclick="clearImages()"><i class="fas fa-trash-alt"></i> مسح</div>`;
+          const input = document.getElementById('custImages');
+          const container = document.getElementById('image-preview-container');
+          container.innerHTML = '';
+          for (let i = 0; i < input.files.length; i++) {
+              const url = URL.createObjectURL(input.files[i]);
+              container.innerHTML += `<img src="${url}" style="width:70px; height:70px; border-radius:10px; object-fit:cover; border:1px solid var(--border-color);">`;
+          }
+          if(input.files.length > 0) {
+              container.innerHTML += `<div style="display:flex; align-items:center; color:var(--danger); font-size:13px; font-weight:bold; cursor:pointer; padding:5px; width: 100%;" onclick="clearImages()"><i class="fas fa-trash-alt" style="margin-left:5px;"></i> مسح الصور</div>`;
+          }
       }
 
-      function clearImages() { document.getElementById('custImages').value = ''; document.getElementById('image-preview-container').innerHTML = ''; }
+      function clearImages() {
+          document.getElementById('custImages').value = '';
+          document.getElementById('image-preview-container').innerHTML = '';
+      }
 
       async function sendFinal() {
-          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت للطلب ❌");
           const name = document.getElementById('custName').value.trim();
           const phone = document.getElementById('custPhone').value.trim();
           const order = document.getElementById('custOrder').value.trim();
+          const land = document.getElementById('custLandmark').value.trim();
+          
           const files = document.getElementById('custImages').files;
-          if(!name || !validateIraqiPhone(phone) || (!order && files.length === 0) || !userCoords) return showToast("أكمل البيانات 📍📸");
-          const btn = document.getElementById('sendBtn'); btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التجهيز...'; btn.disabled = true;
+
+          if(!name || !validateIraqiPhone(phone) || (!order && files.length === 0) || !userCoords) return showToast("أكمل البيانات وحدد موقعك، واكتب الطلب أو أضف صورة 📍📸");
+          
+          const btn = document.getElementById('sendBtn');
+          const originalText = btn.innerHTML;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التجهيز...'; btn.disabled = true;
           try {
-              saveCustomerData(name, phone); const vc = generateSecureVC(); let photoMsgs = [];
+              saveCustomerData(name, phone);
+              const vc = generateSecureVC();
+              let photoMsgs = [];
+
               if (files.length > 0) {
+                  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري رفع الصور بسرية...';
                   for (let i = 0; i < files.length; i++) {
-                      let fd = new FormData(); fd.append('chat_id', "-1003786625443"); fd.append('photo', files[i]); fd.append('caption', `📦 طلب: ${vc}`);
-                      let tgResp = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
-                      let tgData = await tgResp.json(); if (tgData.ok) photoMsgs.push(tgData.result.message_id);
+                      let fd = new FormData();
+                      fd.append('chat_id', "-1003786625443"); 
+                      fd.append('photo', files[i]);
+                      fd.append('caption', `📦 صور طلب رقم: ${vc}\n👤 الزبون: ${name}`);
+                      try {
+                          let tgResp = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
+                          let tgData = await tgResp.json();
+                          if (tgData.ok) {
+                              photoMsgs.push(tgData.result.message_id);
+                          }
+                      } catch(err) {}
                   }
                   clearImages();
               }
+
+              btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+              
+              let photoIdsStr = photoMsgs.join(',');
               let referrer = localStorage.getItem('referred_by') || "";
-              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&photoMsgs=${photoMsgs.join(',')}&referrer=${referrer}`);
+
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&photoMsgs=${photoIdsStr}&referrer=${referrer}`);
               localStorage.removeItem('referred_by');
-              const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📝 الطلب: ${order || "بالصور"}\n🔢 تسلسل: ${(loyaltyCount % 6) + 1}\n📍 الموقع: ${userCoords}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } }) });
-              showToast("تم إرسال الطلب ✅"); syncLoyaltyWithServer();
-          } catch (e) { showToast("خطأ شبكة"); } finally { btn.innerHTML = 'أرسل الطلب الآن'; btn.disabled = false; }
+              
+              let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
+              let orderNum = (tempLoyalty % 6) + 1;
+              let loyaltyMsg = orderNum === 6 ? "🎁 هذا الطلب مجاني" : `الطلب رقم ${orderNum} من أصل 6`;
+              
+              let msgContent = order ? order : "الطلب موضح في الصور المرفقة 📸";
+              let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص عند الحجز)**" : "";
+              const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍 الموقع: ${userCoords}`;
+              
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                  method: "POST", headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
+              });
+              
+              showToast("تم إرسال طلبك بنجاح ✅");
+              document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = "";
+              syncLoyaltyWithServer(); // تحديث فوري للنقاط من السيرفر
+          } catch (e) { showToast("خطأ في الشبكة"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       async function processVerifyCode() {
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت للطلب ❌");
           const code = document.getElementById('driverVerifyInput').value.trim();
           const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
-          if(!validateIraqiPhone(custPhone) || !code) return showToast("بيانات ناقصة ⚠️");
-          const btn = document.querySelector('#plaza-screen .send-btn'); btn.disabled = true;
+          if(!validateIraqiPhone(custPhone) || !code) return showToast("أدخل بيانات صحيحة ⚠️");
+          
+          const btn = document.querySelector('#plaza-screen .send-btn');
+          const oldText = btn.innerHTML;
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التأكيد...'; btn.disabled = true;
+          
           try {
               const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
               const checkResult = await checkResp.text();
+              
               if (checkResult.startsWith("valid")) {
-                  try { new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3').play(); confetti({ particleCount: 300, spread: 100 }); } catch(e) {}
+                  try {
+                      const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+                      cashAudio.play();
+                      confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } });
+                  } catch(e) {}
+
                   localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
                   localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
-                  updateStatsUI(); fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${parseInt(localStorage.getItem('d_count')) * 500}`);
-                  showToast(`تم التأكيد! عاشت ايدك 👏`); refreshLeaderboard();
-              } else showToast("الكود خطأ ❌");
-          } catch(e) { showToast("خطأ اتصال"); } finally { btn.disabled = false; }
+                  updateStatsUI();
+                  
+                  let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
+                  fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
+                  
+                  showToast(`تم تأكيد التسليم بنجاح! عاشت ايدك 👏`);
+                  refreshLeaderboard();
+                  document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
+              } else {
+                  showToast("الكود غير صحيح أو مستخدم ❌");
+              }
+          } catch(e) { showToast("خطأ بالاتصال"); } finally { btn.innerHTML = oldText; btn.disabled = false; }
       }
 
-      function updateStatsUI() { if(document.getElementById('stat-count')) document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0; }
+      function updateStatsUI() {
+          if(document.getElementById('stat-count')) {
+              document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0;
+          }
+      }
+
       async function refreshLeaderboard() {
+          if (!navigator.onLine) return;
           const listDiv = document.getElementById('leaderboard-list');
           try {
-              const drivers = await (await fetch(`${GS_URL}?action=getAllDriverStats`)).json();
+              const response = await fetch(`${GS_URL}?action=getAllDriverStats`);
+              const drivers = await response.json();
               drivers.sort((a, b) => (parseInt(b.leagueCount) || 0) - (parseInt(a.leagueCount) || 0));
               listDiv.innerHTML = "";
+              if(drivers.length === 0) { listDiv.innerHTML = '<p style="text-align: center; color: var(--text-muted);">لا يوجد منافسين حالياً</p>'; return; }
               drivers.forEach((d, index) => {
-                  let medal = (index === 0) ? "🥇" : (index === 1) ? "🥈" : (index === 2) ? "🥉" : index + 1;
-                  const div = document.createElement('div'); div.className = "driver-rank";
-                  div.innerHTML = `<div class="rank-info"><span>${medal}</span> <span>${d.name}</span></div><span class="rank-score">${d.leagueCount || 0}</span>`;
+                  let medal = (index === 0) ? "🥇" : (index === 1) ? "🥈" : (index === 2) ? "🥉" : `<span style="font-size:16px; color:var(--text-muted);">${index + 1}</span>`;
+                  let isMe = d.phone === localStorage.getItem('driver_phone') ? " (أنت)" : "";
+                  let bgColor = isMe ? "background: var(--bg-color); border: 1px solid var(--primary);" : "";
+                  const div = document.createElement('div');
+                  div.className = "driver-rank";
+                  div.style = bgColor;
+                  div.innerHTML = `<div class="rank-info"><span class="rank-medal">${medal}</span> <span>${d.name}${isMe}</span></div><span class="rank-score">${d.leagueCount || 0}</span>`;
                   listDiv.appendChild(div);
               });
-          } catch (e) {}
+          } catch (e) { listDiv.innerHTML = '<p style="text-align: center; color: var(--danger);">فشل تحميل البيانات</p>'; }
       }
 
-      function updateNav(element) { document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); element.classList.add('active'); }
-      function openSidebar() { document.getElementById('appSidebar').classList.add('open'); document.getElementById('sidebarOverlay').style.display = 'block'; setTimeout(() => document.getElementById('sidebarOverlay').classList.add('show'), 10); }
-      function closeSidebar() { document.getElementById('appSidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); setTimeout(() => document.getElementById('sidebarOverlay').style.display = 'none', 300); }
+      function updateNav(element) {
+          document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+          element.classList.add('active');
+      }
+
+      function openSidebar() {
+          document.getElementById('appSidebar').classList.add('open');
+          const overlay = document.getElementById('sidebarOverlay');
+          overlay.style.display = 'block';
+          setTimeout(() => overlay.classList.add('show'), 10);
+      }
+      function closeSidebar() {
+          document.getElementById('appSidebar').classList.remove('open');
+          const overlay = document.getElementById('sidebarOverlay');
+          overlay.classList.remove('show');
+          setTimeout(() => overlay.style.display = 'none', 300);
+      }
 
       let loyaltyCount = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
+
       function updateLocalLoyaltyUI() {
-          const displayCount = document.getElementById('current-order-count'); const progressBar = document.getElementById('loyalty-bar'); const giftMsg = document.getElementById('loyalty-gift-msg');
-          let currentCount = (loyaltyCount % 6); if(displayCount) displayCount.innerText = currentCount; if(progressBar) progressBar.style.width = (currentCount / 6 * 100) + "%";
-          if(currentCount === 5) { if(giftMsg) giftMsg.innerHTML = "🎁 طلبك الجاي مجاني!"; if(progressBar) progressBar.style.background = "var(--secondary)"; }
-          else { if(giftMsg) giftMsg.innerHTML = "أوصل للطلب 6 وكروتك مجانية"; if(progressBar) progressBar.style.background = "var(--gold)"; }
+          const displayCount = document.getElementById('current-order-count');
+          const progressBar = document.getElementById('loyalty-bar');
+          const giftMsg = document.getElementById('loyalty-gift-msg');
+          let currentCount = (loyaltyCount % 6); 
+          if(displayCount) displayCount.innerText = currentCount;
+          if(progressBar) progressBar.style.width = (currentCount / 6 * 100) + "%";
+          if(currentCount === 5) {
+              if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i> اطلب الآن! هذا طلبك المجاني 🎁"; giftMsg.style.color = "var(--secondary)"; }
+              if(progressBar) progressBar.style.background = "var(--secondary)";
+          } else {
+              if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i> أوصل للطلب 6 وكروتك مجانية"; giftMsg.style.color = "var(--primary)"; }
+              if(progressBar) progressBar.style.background = "var(--gold)";
+          }
       }
       function updateLoyaltyUI() { updateLocalLoyaltyUI(); }
+      updateLocalLoyaltyUI();
+
       function toggleDriverStatus() {
-          const btn = document.getElementById('statusToggleBtn'); let current = localStorage.getItem('driver_status') || 'available';
-          if(current === 'available') { localStorage.setItem('driver_status', 'busy'); btn.style.background = 'var(--danger)'; btn.innerHTML = '🔴 مشغول'; }
-          else { localStorage.setItem('driver_status', 'available'); btn.style.background = 'var(--secondary)'; btn.innerHTML = '🟢 متاح للعمل'; }
-          initDriverStatus();
+          const btn = document.getElementById('statusToggleBtn');
+          const badge = document.getElementById('driver-status-badge');
+          let current = localStorage.getItem('driver_status') || 'available';
+          if(current === 'available') {
+              localStorage.setItem('driver_status', 'busy');
+              btn.style.background = 'var(--danger)';
+              btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً';
+              if(badge) {
+                  badge.innerText = 'أنت الآن مشغول 🔴';
+                  badge.style.background = 'var(--danger)';
+                  badge.style.color = 'white';
+              }
+          } else {
+              localStorage.setItem('driver_status', 'available');
+              btn.style.background = 'var(--secondary)';
+              btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل';
+              if(badge) {
+                  badge.innerText = 'أنت الآن في وضع المندوب النشط 🟢';
+                  badge.style.background = 'var(--gold)';
+                  badge.style.color = '#000';
+              }
+          }
       }
+
       function initDriverStatus() {
-          let current = localStorage.getItem('driver_status') || 'available'; const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
-          if(current === 'busy') { if(btn) { btn.style.background = 'var(--danger)'; btn.innerHTML = '🔴 مشغول'; } if(badge) { badge.innerText = 'مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; } }
-          else { if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = '🟢 متاح'; } if(badge) { badge.innerText = 'نشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; } }
+          let current = localStorage.getItem('driver_status') || 'available';
+          const btn = document.getElementById('statusToggleBtn');
+          const badge = document.getElementById('driver-status-badge');
+          if(current === 'busy') {
+              if(btn) { btn.style.background = 'var(--danger)'; btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً'; }
+              if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; }
+          } else {
+              if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; }
+              if(badge) { badge.innerText = 'أنت الآن في وضع المندوب النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; }
+          }
       }
+
       function notifyArriveWhatsApp() {
-          const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("رقم خطأ");
-          window.open(`https://wa.me/${phone.startsWith('0') ? '964' + phone.substring(1) : phone}?text=${encodeURIComponent("السلام عليكم، كابتن (أي شيء) بالباب 🛵")}`, '_blank');
+          const phone = document.getElementById('arrivePhoneInput').value.trim();
+          if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️");
+          let formattedPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone;
+          let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (أي شيء) بالباب، يرجى استلام الطلب 🛵");
+          window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank');
       }
-      function notifyArriveCall() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("رقم خطأ"); window.location.href = `tel:${phone}`; }
+
+      function notifyArriveCall() {
+          const phone = document.getElementById('arrivePhoneInput').value.trim();
+          if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️");
+          window.location.href = `tel:${phone}`;
+      }
     </script>
 </body>
-</html>
+    </html>
