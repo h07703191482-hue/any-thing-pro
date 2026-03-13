@@ -324,9 +324,29 @@
       .sidebar-close { align-self: flex-start; font-size: 15px; color: var(--text-muted); cursor: pointer; background: var(--bg-color); padding: 10px 20px; border-radius: var(--radius-pill); display: flex; align-items: center; gap: 8px; transition: 0.3s; font-weight: 700; margin-bottom: 20px; }
 
       #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--text-main); text-align: center; padding: 20px; }
+
+      /* =========================================
+         إضافة خلفية التطبيق الشفافة (اللوكو)
+         ========================================= */
+      .watermark-bg {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 80%; /* حجم اللوكو في الخلفية */
+          max-width: 400px;
+          opacity: 0.05; /* شفافية جداً خفيفة حتى ما تأثر على القراءة */
+          z-index: -1; /* يكون خلف كل العناصر */
+          pointer-events: none; /* حتى ما يعيق الضغط على الأزرار */
+      }
+      body.dark-mode .watermark-bg {
+          opacity: 0.03; /* شفافية أقل بالوضع الليلي */
+      }
     </style>
 </head>
 <body onload="checkStatus()">
+
+    <img src="1000017314.png" class="watermark-bg" alt="خلفية البندر">
 
     <div id="global-lock-screen">
         <i class="fas fa-tools lock-icon" onclick="handleLockScreenSecret()"></i>
@@ -1481,5 +1501,4 @@
       }
     </script>
 </body>
-</html>
-
+                </html>
