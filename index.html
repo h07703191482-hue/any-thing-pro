@@ -12,10 +12,6 @@
 
     <title>تطبيق البندر - خدمات توصيل في أم قصر</title>
     
-    <link rel="manifest" href="manifest.json?v=1">
-    <link rel="icon" type="image/png" href="logo.png?v=1">
-    <link rel="apple-touch-icon" href="logo.png?v=1">
-    
     <meta name="apple-mobile-web-app-title" content="البندر">
     <meta name="application-name" content="البندر">
     
@@ -1471,4 +1467,14 @@
           if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️");
           let formattedPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone;
           let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (البندر) بالباب، يرجى استلام الطلب 🛵");
-          window.open(`https://wa.me/${formattedPhone}?text=${
+          window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank');
+      }
+
+      function notifyArriveCall() {
+          const phone = document.getElementById('arrivePhoneInput').value.trim();
+          if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️");
+          window.location.href = `tel:${phone}`;
+      }
+    </script>
+</body>
+                </html>
