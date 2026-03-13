@@ -342,6 +342,25 @@
       body.dark-mode .watermark-bg {
           opacity: 0.03; /* شفافية أقل بالوضع الليلي */
       }
+
+      /* ========================================= */
+      /* إضافة جديدة (2006): تصميم شريط التتبع */
+      /* ========================================= */
+      #order-tracking-banner {
+          position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+          width: 90%; max-width: 400px; background: var(--surface);
+          border-radius: var(--radius-lg); box-shadow: var(--shadow-floating);
+          border: 2px solid var(--gold); z-index: 9997;
+          padding: 15px; animation: slideDownToast 0.5s ease forwards;
+          overflow: hidden; transition: all 0.3s ease;
+      }
+      body.dark-mode #order-tracking-banner { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(10px); }
+      .tracking-content { display: flex; align-items: center; gap: 15px; }
+      #track-icon { font-size: 30px; color: var(--gold); animation: pulse 1.5s infinite; }
+      .track-text h4 { margin: 0; font-size: 16px; font-weight: 800; color: var(--text-main); }
+      .track-text p { margin: 3px 0 0; font-size: 13px; font-weight: 600; color: var(--text-muted); }
+      .tracking-progress { width: 100%; height: 6px; background: var(--bg-color); border-radius: 10px; margin-top: 15px; overflow: hidden; }
+      #track-bar { width: 30%; height: 100%; background: var(--gold); transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 10px; }
     </style>
 </head>
 <body onload="checkStatus()">
@@ -376,6 +395,18 @@
     </div>
 
     <div id="toast-container"></div>
+    
+    <div id="order-tracking-banner" style="display: none;">
+        <div class="tracking-content">
+            <i id="track-icon" class="fas fa-clock"></i>
+            <div class="track-text">
+                <h4 id="track-title">طلبك قيد الاستلام</h4>
+                <p id="track-desc">جاري تحويل طلبك لأقرب كابتن متاح...</p>
+            </div>
+        </div>
+        <div class="tracking-progress"><div id="track-bar"></div></div>
+    </div>
+
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
     <div class="sidebar" id="appSidebar">
         <div class="sidebar-close" id="side-close-text" onclick="closeSidebar()"><i class="fas fa-arrow-right"></i> إغلاق</div>
@@ -1499,6 +1530,79 @@
           if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️");
           window.location.href = `tel:${phone}`;
       }
+
+      // =========================================
+      // إضافة جديدة (2006): نظام تشغيل وتتبع حالة الطلب
+      // =========================================
+      let trackingInterval;
+
+      function showOrderTracking(state) {
+          const banner = document.getElementById('order-tracking-banner');
+          const icon = document.getElementById('track-icon');
+          const title = document.getElementById('track-title');
+          const desc = document.getElementById('track-desc');
+          const bar = document.getElementById('track-bar');
+          
+          banner.style.display = 'block';
+
+          if (state === 'pending') {
+              banner.style.borderColor = 'var(--gold)';
+              icon.className = 'fas fa-clock'; icon.style.color = 'var(--gold)'; icon.style.animation = 'pulse 1.5s infinite';
+              title.innerText = currentLang === 'ar' ? 'طلبك قيد الاستلام ⏱️' : 'Order Received ⏱️';
+              desc.innerText = currentLang === 'ar' ? 'جاري تحويل طلبك لأقرب كابتن متاح...' : 'Assigning to the nearest captain...';
+              bar.style.width = '30%'; bar.style.background = 'var(--gold)';
+              
+              clearInterval(trackingInterval);
+              trackingInterval = setInterval(checkLiveOrderStatus, 10000);
+          } 
+          else if (state === 'on_way') {
+              banner.style.borderColor = 'var(--primary)';
+              icon.className = 'fas fa-motorcycle'; icon.style.color = 'var(--primary)'; icon.style.animation = 'drive-left 2s infinite';
+              title.innerText = currentLang === 'ar' ? 'طلبك في الطريق 🛵' : 'Order on the way 🛵';
+              desc.innerText = currentLang === 'ar' ? 'الكابتن استلم الطلب وجاييك بالدرب!' : 'Captain is heading to you!';
+              bar.style.width = '70%'; bar.style.background = 'var(--primary)';
+          } 
+          else if (state === 'delivered') {
+              banner.style.borderColor = 'var(--secondary)';
+              icon.className = 'fas fa-check-circle'; icon.style.color = 'var(--secondary)'; icon.style.animation = 'none';
+              title.innerText = currentLang === 'ar' ? 'تم وصول طلبك ✅' : 'Order Delivered ✅';
+              desc.innerText = currentLang === 'ar' ? 'بالعافية! نتمنى لك تجربة سعيدة.' : 'Enjoy! Have a great day.';
+              bar.style.width = '100%'; bar.style.background = 'var(--secondary)';
+              
+              clearInterval(trackingInterval);
+              setTimeout(() => { banner.style.display = 'none'; }, 15000);
+          }
+      }
+
+      async function checkLiveOrderStatus() {
+          const phone = localStorage.getItem('saved_customer_phone');
+          if(!phone) return;
+          try {
+              const resp = await fetch(`${GS_URL}?action=getOrderStatus&phone=${phone}`);
+              const status = await resp.text();
+              
+              if (status === 'on_way') showOrderTracking('on_way');
+              else if (status === 'delivered') showOrderTracking('delivered');
+          } catch(e) { console.log("جاري تحديث التتبع..."); }
+      }
+
+      const autoTrackSendFinal = sendFinal;
+      sendFinal = async function() {
+          await autoTrackSendFinal();
+          if(document.getElementById('custOrder').value === "") showOrderTracking('pending');
+      };
+
+      const autoTrackSendTukOrder = sendTukOrder;
+      sendTukOrder = async function() {
+          await autoTrackSendTukOrder();
+          if(document.getElementById('tukDropoffLink').value === "") showOrderTracking('pending');
+      };
+
+      const autoTrackSendMedFinal = sendMedFinal;
+      sendMedFinal = async function() {
+          await autoTrackSendMedFinal();
+          if(document.getElementById('medOrder').value === "") showOrderTracking('pending');
+      };
     </script>
 </body>
 </html>
