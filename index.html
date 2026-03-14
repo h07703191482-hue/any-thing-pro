@@ -10,13 +10,20 @@
     
     <meta name="google-site-verification" content="62BLEW3ojjyy5ymvZcQuB2D6rVkft8WSTDU6aKj6e20" />
 
-    <title>تطبيق أي شي - خدمات توصيل في أم قصر</title>
+    <title>تطبيق البندر - خدمات توصيل في أم قصر</title>
     
-    <meta name="apple-mobile-web-app-title" content="أي شي">
-    <meta name="application-name" content="أي شي">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="البندر">
+    <meta name="application-name" content="البندر">
     
-    <meta name="description" content="تطبيق أي شي هو أسرع تطبيق لتوصيل المسواك، التكتك، والوسيط في أم قصر. اطلب الآن نصلك أينما كنت بأفضل الأسعار.">
-    <meta name="keywords" content="أي شي, تطبيق أي شي, توصيل أي شي, توصيل، أم قصر، تكتك، مسواك، طلبات، البصرة، مندوب">
+    <meta name="description" content="تطبيق البندر هو أسرع تطبيق لتوصيل المسواك، التكتك، والوسيط في أم قصر. اطلب الآن نصلك أينما كنت بأفضل الأسعار.">
+    <meta name="keywords" content="البندر, تطبيق البندر, توصيل البندر, توصيل، أم قصر، تكتك، مسواك، طلبات، البصرة، مندوب">
+
+    <link rel="icon" type="image/png" sizes="192x192" href="https://i.ibb.co/gZdpNF8D/IMG.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://i.ibb.co/gZdpNF8D/IMG.png">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/gZdpNF8D/IMG.png">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -359,7 +366,7 @@
             <div style="width:80px; height:80px; background:rgba(0, 0, 255, 0.1); border-radius:24px; display:flex; align-items:center; justify-content:center; margin: 0 auto 15px;">
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
             </div>
-            <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">تطبيق أي شي</h3>
+            <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">تطبيق البندر</h3>
             <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.8</p>
         </div>
         <div class="sidebar-item" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
@@ -399,7 +406,7 @@
     <div id="splash-screen" onclick="skipSplash()">
       <div id="app-logo-splash"><i class="fas fa-box-open" style="font-size: 55px;"></i></div>
       <div class="splash-welcome-text">
-          <h2 id="splash-title">أي شي</h2>
+          <h2 id="splash-title">البندر</h2>
           <p id="splash-subtitle">نصلك أينما كنت في أم قصر</p>
       </div>
       <div class="road-realistic"><div class="road-lines"></div></div>
@@ -729,13 +736,6 @@
           window.location.reload(true); 
       }
 
-      // إضافة 2006: دالة إرسال الزيارة للسيرفر للعداد
-      async function trackLiveVisit() {
-          try {
-              fetch(`${GS_URL}?action=trackVisit`);
-          } catch(e) {}
-      }
-
       // =========================================
       // إضافات النظام الجديد (اللغة + لوحة التحكم الشاملة) (2006)
       // =========================================
@@ -858,12 +858,12 @@
                   tuk: "تكتك توصيلة", tuk_s: "مشوارك سريع ومضمون", med: "الوسيط", med_s: "نقل الأغراض بين شخصين",
                   share: "شارك واربح", share_s: "انسخ رابطك ودزه لأصدقائك 🎁", join: "انضم ككابتن", join_s: "سجل معنا وابدأ بالعمل",
                   plaza: "لوحة الكابتن", plaza_s: "إحصائيات المندوب", h: "الرئيسية", o: "مسواكك", p: "حسابي",
-                  off_t: "لا يوجد اتصال", off_m: "يرجى الاتصال بالإنترنت", btn_w: "واي فاي", btn_d: "بيانات الهاتف",
+                  off_t: "لا يوجد اتصال", off_m: "يرجى الاتصال بالإنترنت", btn_w: "واي فاي", btn_d: "Mobile Data",
                   side_close: "إغلاق", side_v: "الإصدار 2.0.8", side_wa: "الدعم الفني", side_dark: "تفعيل الوضع الليلي",
                   shop_h: "تسوق مسواكك", shop_info: "بيانات التوصيل", shop_gps: "تحديد الموقع بدقة", shop_btn: "أرسل الطلب الآن", shop_img: "إضافة صور", shop_o: "ماذا تريد أن نشتري لك؟",
                   tuk_h: "تكتك توصيلة", tuk_info: "بيانات الراكب", tuk_gps: "تحديد مكان الصعود 📍", tuk_btn: "اطلب التكتك الآن", tuk_trip: "تفاصيل الرحلة",
                   med_h: "خدمة الوسيط", med_info: "بيانات المرسل", med_gps: "تحديد موقعي", med_btn: "تأكيد طلب الوسيط",
-                  loy_t: "طلبك رقم", wait_h: "طلبك قيد المراجعة", splash_t: "أي شي", splash_s: "نصلك أينما كنت في أم قصر",
+                  loy_t: "طلبك رقم", wait_h: "طلبك قيد المراجعة", splash_t: "البندر", splash_s: "نصلك أينما كنت في أم قصر",
                   lock_h: "تم إيقاف التطبيق مؤقتاً", lock_p: "نحن نقوم ببعض التحديثات أو الصيانة، يرجى المحاولة في وقت لاحق.",
                   btn_open: '<i class="fas fa-unlock"></i> فتح التطبيق', btn_close: '<i class="fas fa-lock"></i> إغلاق التطبيق'
               },
@@ -877,7 +877,7 @@
                   shop_h: "Shopping", shop_info: "Delivery Details", shop_gps: "Detect My Location", shop_btn: "Send Order Now", shop_img: "Add Photos", shop_o: "What do you want us to buy?",
                   tuk_h: "TukTuk Ride", tuk_info: "Passenger Details", tuk_gps: "Detect Pickup Point 📍", tuk_btn: "Order TukTuk Now", tuk_trip: "Trip Details",
                   med_h: "Mediator", med_info: "Sender Details", med_gps: "Detect My Location", med_btn: "Confirm Request",
-                  loy_t: "Order No.", wait_h: "Application Under Review", splash_t: "Any Thing", splash_s: "Delivering everywhere in Um Qasr",
+                  loy_t: "Order No.", wait_h: "Application Under Review", splash_t: "Al Bandar", splash_s: "Delivering everywhere in Um Qasr",
                   lock_h: "App Temporarily Offline", lock_p: "We are doing some maintenance, please try again later.",
                   btn_open: '<i class="fas fa-unlock"></i> Open App', btn_close: '<i class="fas fa-lock"></i> Close App'
               }
@@ -1035,9 +1035,6 @@
       }
 
       function checkStatus() {
-          // السطر الجديد اللي يفعل العداد
-          trackLiveVisit();
-          
           checkConnection(); 
           applyAutoTheme(); 
           loadSavedCustomerData();
@@ -1075,7 +1072,7 @@
           
           if (navigator.share) {
               navigator.share({
-                  title: 'تطبيق أي شي - أم قصر',
+                  title: 'تطبيق البندر - أم قصر',
                   text: 'نزل التطبيق واطلب مسواكك، وهذا كود الدعوة مالتي حتى نحصل توصيل مجاني! 🎁',
                   url: link
               }).catch(console.error);
@@ -1476,7 +1473,7 @@
           const phone = document.getElementById('arrivePhoneInput').value.trim();
           if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️");
           let formattedPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone;
-          let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (أي شي) بالباب، يرجى استلام الطلب 🛵");
+          let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (البندر) بالباب، يرجى استلام الطلب 🛵");
           window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank');
       }
 
