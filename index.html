@@ -963,6 +963,10 @@
               } else if (result.includes("reset_league")) {
                   localStorage.setItem('league_count', 0);
                   updateStatsUI();
+              } else if (result === "kick_now") {
+                  localStorage.clear();
+                  showToast("تم سحب صلاحيات الكابتن الخاصة بك 🚫");
+                  setTimeout(() => { location.reload(); }, 2500);
               }
           } catch(e) {}
       }
@@ -1305,7 +1309,7 @@
           const phone = document.getElementById('arrivePhoneInput').value.trim();
           if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️");
           let formattedPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone;
-          let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (أي شي) بالباب، يرجى استلام الطلب 🛵");
+          let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق أي شي بالباب، يرجى استلام الطلب 🛵");
           window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank');
       }
 
