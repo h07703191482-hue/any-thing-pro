@@ -1,313 +1,226 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"><meta name="theme-color" content="#4F46E5">
-<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
-<title>تطبيق البندر - أم قصر</title>
-<meta name="apple-mobile-web-app-title" content="البندر"><meta name="application-name" content="البندر">
-<meta name="description" content="تطبيق البندر هو أسرع تطبيق لتوصيل المسواك، التكتك، والوسيط في أم قصر.">
-<link rel="icon" type="image/png" href="IMG_182541_20260312.png">
-<link rel="apple-touch-icon" href="IMG_182541_20260312.png">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-<style>
-:root{--primary:#0000FF;--primary-hover:#0000CC;--secondary:#10B981;--gold:#F59E0B;--danger:#EF4444;--bg-color:#F3F4F6;--surface:#FFFFFF;--text-main:#111827;--text-muted:#6B7280;--border-color:#E5E7EB;--shadow-sm:0 2px 10px rgba(0,0,0,0.03);--shadow-md:0 10px 30px rgba(0,0,255,0.08);--shadow-floating:0 20px 40px rgba(0,0,0,0.1);--radius-md:16px;--radius-lg:24px;--radius-pill:9999px}
-body.dark-mode{--primary:#4D4DFF;--bg-color:#0F172A;--surface:#1E293B;--text-main:#F9FAFB;--text-muted:#9CA3AF;--border-color:#334155;--shadow-sm:0 2px 10px rgba(0,0,0,0.2);--shadow-md:0 10px 30px rgba(0,0,0,0.4);--shadow-floating:0 20px 40px rgba(0,0,0,0.5)}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:'Cairo',sans-serif;background-color:var(--bg-color);margin:0;padding:0;color:var(--text-main);min-height:100vh;line-height:1.6;overflow-x:hidden;transition:.4s}
-body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 50% 50%,rgba(0,0,255,0.03) 0,transparent 50%);z-index:-1}
-body.dark-mode::before{background:radial-gradient(circle at 50% 0,rgba(77,77,255,0.08) 0,transparent 50%)}
-.theme-toggle{position:fixed;top:20px;left:20px;z-index:10001;background:var(--surface);color:var(--primary);border:1px solid var(--border-color);width:48px;height:48px;border-radius:var(--radius-pill);cursor:pointer;box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;font-size:20px;transition:.3s}
-.screen{display:none;width:100%;min-height:100vh;animation:fadeSlideUp .4s ease-out forwards}.active-screen{display:block!important}
-.container{max-width:480px;margin:auto;padding:20px;padding-bottom:120px}
-@keyframes fadeSlideUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
-@keyframes iconPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}.icon-pulse{animation:iconPulse 2s infinite ease-in-out}
-#global-lock-screen,#offline-screen,#welcome-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--surface);z-index:9999999;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px}
-.lock-icon{font-size:80px;color:var(--danger);margin-bottom:20px}.lock-title,.offline-title{font-size:26px;font-weight:800;color:var(--text-main);margin-bottom:10px}
-.offline-btn-primary,.send-btn{background:linear-gradient(135deg,var(--primary) 0,#3730A3 100%);color:#fff;width:100%;padding:18px;border-radius:var(--radius-md);border:none;font-weight:800;font-size:16px;cursor:pointer;transition:.3s;font-family:'Cairo'}
-.send-btn:disabled{background:var(--border-color)!important;color:var(--text-muted)!important}
-#splash-screen{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--primary);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:.5s}
-#app-logo-splash{width:130px;height:130px;background:#fff;border-radius:35px;display:flex;align-items:center;justify-content:center;margin-top:-100px;opacity:0;transform:scale(0.5);transition:.8s;z-index:20}
-.show-logo{opacity:1!important;transform:scale(1)!important}
-.header-main{background:linear-gradient(135deg,var(--primary) 0,#3730A3 100%);color:#fff;padding:50px 20px 60px;text-align:center;border-radius:0 0 40px 40px;margin:-20px -20px 20px;box-shadow:var(--shadow-md);position:relative}
-.header-main h1{margin:0;font-size:32px;font-weight:800}.driver-status-bar{display:none;background:var(--gold);color:#000;font-weight:800;font-size:12px;padding:6px 0;position:absolute;top:0;left:0;width:100%;z-index:10}
-.services-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;position:relative;z-index:5;margin-top:-40px}
-.select-card{background:var(--surface);border-radius:var(--radius-lg);display:flex;box-shadow:var(--shadow-md);cursor:pointer;border:1px solid var(--border-color);transition:.3s}
-.card-full{grid-column:span 2;padding:20px;gap:18px;align-items:center}.card-half{flex-direction:column;padding:25px 10px;text-align:center;gap:12px}
-.icon-wrapper{width:60px;height:60px;font-size:26px;border-radius:20px;display:flex;align-items:center;justify-content:center}
-.card-full h3{margin:0;font-size:18px}.card-half h3{margin:0;font-size:16px}.card-cart .icon-wrapper{background:rgba(0,0,255,0.1);color:var(--primary)}.card-tuk .icon-wrapper{background:rgba(245,158,11,0.1);color:#F59E0B}.card-med .icon-wrapper{background:rgba(249,115,22,0.1);color:#F97316}
-.form-card{background:var(--surface);border-radius:var(--radius-lg);padding:20px;margin-bottom:20px;border:1px solid var(--border-color)}
-.form-card-title{font-size:16px;font-weight:800;color:var(--primary);margin-bottom:18px;border-bottom:1px solid var(--border-color);padding-bottom:12px;display:flex;gap:8px}
-input,textarea,select{width:100%;padding:16px 20px;border:1.5px solid var(--border-color);border-radius:var(--radius-md);font-family:'Cairo';font-size:15px;color:var(--text-main);background:var(--bg-color);margin-bottom:16px;outline:none}
-input:focus,textarea:focus{border-color:var(--primary)}
-.location-btn{background:var(--bg-color);color:var(--primary);border:2px dashed var(--primary);padding:14px;border-radius:var(--radius-md);width:100%;font-family:'Cairo';font-weight:700;cursor:pointer;margin-bottom:12px}
-.back-btn{background:var(--surface);border:1px solid var(--border-color);width:45px;height:45px;border-radius:14px;margin-bottom:25px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-.bottom-nav{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);width:calc(100% - 40px);max-width:400px;background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);display:flex;justify-content:space-around;padding:8px;border-radius:var(--radius-pill);border:1px solid rgba(255,255,255,0.4);z-index:9998}
-body.dark-mode .bottom-nav{background:rgba(30,41,59,0.85);border-color:rgba(255,255,255,0.05)}
-.nav-item{display:flex;flex-direction:column;align-items:center;padding:10px 20px;font-size:12px;font-weight:600;color:var(--text-muted);cursor:pointer}.nav-item.active{color:var(--primary);background:rgba(0,0,255,0.1);border-radius:var(--radius-pill)}
-#toast-container{position:fixed;top:30px;left:50%;transform:translateX(-50%);z-index:100000;display:flex;flex-direction:column;gap:10px;width:90%}
-.toast{background:rgba(17,24,39,0.95);color:#fff;padding:16px 20px;border-radius:var(--radius-lg);font-family:'Cairo';font-weight:700;display:flex;align-items:center;gap:12px}
-body.dark-mode .toast{background:rgba(255,255,255,0.95);color:#111827}
-.sidebar{position:fixed;top:0;right:-300px;width:280px;height:100%;background:var(--surface);z-index:100002;transition:.4s;padding:30px 20px;display:flex;flex-direction:column;gap:15px}.sidebar.open{right:0}
-.sidebar-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:100001;display:none}
-.sidebar-item{padding:16px;border-radius:var(--radius-md);background:var(--bg-color);color:var(--text-main);display:flex;align-items:center;gap:14px;font-weight:700;cursor:pointer;text-decoration:none}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4F46E5">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="google-site-verification" content="62BLEW3ojjyy5ymvZcQuB2D6rVkft8WSTDU6aKj6e20" />
+
+    <title>تطبيق أي شي - خدمات توصيل في أم قصر</title>
+    
+    <link rel="icon" type="image/png" href="IMG_182541_20260312.png">
+    <link rel="apple-touch-icon" href="IMG_182541_20260312.png">
+
+    <meta name="apple-mobile-web-app-title" content="أي شي">
+    <meta name="application-name" content="أي شي">
+    <meta name="description" content="تطبيق أي شي هو أسرع تطبيق لتوصيل المسواك، التكتك، والوسيط في أم قصر. اطلب الآن نصلك أينما كنت بأفضل الأسعار.">
+    <meta name="keywords" content="أي شي, تطبيق أي شي, توصيل أي شي, توصيل، أم قصر، تكتك، مسواك، طلبات، البصرة، مندوب">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+      :root { 
+          --primary: #0000FF; --primary-hover: #0000CC; --secondary: #10B981;       
+          --gold: #F59E0B; --danger: #EF4444; --bg-color: #F3F4F6;        
+          --surface: #FFFFFF; --text-main: #111827; --text-muted: #6B7280;      
+          --border-color: #E5E7EB; --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.03);
+          --shadow-md: 0 10px 30px rgba(0, 0, 255, 0.08); --shadow-floating: 0 20px 40px rgba(0, 0, 0, 0.1);
+          --radius-md: 16px; --radius-lg: 24px; --radius-pill: 9999px;
+      }
+      body.dark-mode {
+          --primary: #4D4DFF; --bg-color: #0F172A; --surface: #1E293B; --text-main: #F9FAFB;
+          --text-muted: #9CA3AF; --border-color: #334155; --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.2);
+          --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.4); --shadow-floating: 0 20px 40px rgba(0, 0, 0, 0.5);
+      }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; color: var(--text-main); min-height: 100vh; line-height: 1.6; overflow-x: hidden; transition: background-color 0.4s ease, color 0.4s ease; }
+            body::before { content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(0, 0, 255, 0.03) 0%, transparent 50%); z-index: -1; pointer-events: none; }
+      body.dark-mode::before { background: radial-gradient(circle at 50% 0%, rgba(77, 77, 255, 0.08) 0%, transparent 50%); }
+      .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 10001; background: var(--surface); color: var(--primary); border: 1px solid var(--border-color); width: 48px; height: 48px; border-radius: var(--radius-pill); cursor: pointer; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+      .theme-toggle:active { transform: scale(0.9); }
+      .lang-toggle { position: fixed; top: 20px; left: 80px; z-index: 10001; background: var(--surface); color: var(--primary); border: 1px solid var(--border-color); padding: 0 15px; height: 48px; border-radius: var(--radius-pill); cursor: pointer; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; transition: 0.3s; }
+      .screen { display: none; width: 100%; min-height: 100vh; animation: fadeSlideUp 0.4s ease-out forwards; }
+      .active-screen { display: block !important; }
+      .container { max-width: 480px; margin: auto; padding: 20px; padding-bottom: 120px; }
+      @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes iconPulse { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.08); filter: brightness(1.2); } 100% { transform: scale(1); filter: brightness(1); } }
+      .icon-pulse { animation: iconPulse 2s infinite ease-in-out; }
+      #global-lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 9999999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; box-sizing: border-box; }
+      .lock-icon { font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: scaleIn 0.5s ease; cursor: pointer; }
+      .lock-title { font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
+      .lock-text { font-size: 16px; font-weight: 600; color: var(--text-muted); line-height: 1.6; }
+      #offline-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 999999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; box-sizing: border-box; }
+      .offline-title { font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 20px; }
+      .offline-text { font-size: 15px; font-weight: 600; color: var(--text-muted); margin-bottom: 40px; line-height: 1.6; }
+      .offline-btn-primary { background: var(--primary); color: white; width: 100%; padding: 18px; border-radius: 12px; border: none; font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
+      .offline-btn-primary:active { transform: scale(0.96); background: var(--primary-hover); }
+      .offline-btn-outline { background: transparent; color: var(--primary); width: 100%; padding: 18px; border-radius: 12px; border: 2px solid var(--primary); font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+      #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease-in, transform 0.5s ease-in; overflow: hidden; }
+      #app-logo-splash { width: 130px; height: 130px; background: white; border-radius: 35px; display: flex; align-items: center; justify-content: center; margin-top: -100px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); opacity: 0; transform: scale(0.5); transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 20; }
+      #app-logo-splash i { font-size: 65px; color: var(--primary); }
+      .show-logo { opacity: 1 !important; transform: scale(1) !important; }
 </style>
 </head>
 <body onload="checkStatus()">
+    <div id="global-lock-screen">
+        <i class="fas fa-tools lock-icon" onclick="handleLockScreenSecret()"></i>
+        <h2 id="lock-h2" class="lock-title">تم إيقاف التطبيق مؤقتاً</h2>
+        <p id="lock-p" class="lock-text">نحن نقوم ببعض التحديثات أو الصيانة، يرجى المحاولة في وقت لاحق.</p>
+    </div>
+      body::before { content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(0, 0, 255, 0.03) 0%, transparent 50%); z-index: -1; pointer-events: none; }
+      body.dark-mode::before { background: radial-gradient(circle at 50% 0%, rgba(77, 77, 255, 0.08) 0%, transparent 50%); }
+      .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 10001; background: var(--surface); color: var(--primary); border: 1px solid var(--border-color); width: 48px; height: 48px; border-radius: var(--radius-pill); cursor: pointer; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+      .theme-toggle:active { transform: scale(0.9); }
+      .lang-toggle { position: fixed; top: 20px; left: 80px; z-index: 10001; background: var(--surface); color: var(--primary); border: 1px solid var(--border-color); padding: 0 15px; height: 48px; border-radius: var(--radius-pill); cursor: pointer; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; transition: 0.3s; }
+      .screen { display: none; width: 100%; min-height: 100vh; animation: fadeSlideUp 0.4s ease-out forwards; }
+      .active-screen { display: block !important; }
+      .container { max-width: 480px; margin: auto; padding: 20px; padding-bottom: 120px; }
+      @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes iconPulse { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.08); filter: brightness(1.2); } 100% { transform: scale(1); filter: brightness(1); } }
+      .icon-pulse { animation: iconPulse 2s infinite ease-in-out; }
+      #global-lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 9999999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; box-sizing: border-box; }
+      .lock-icon { font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: scaleIn 0.5s ease; cursor: pointer; }
+      .lock-title { font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
+      .lock-text { font-size: 16px; font-weight: 600; color: var(--text-muted); line-height: 1.6; }
+      #offline-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 999999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; box-sizing: border-box; }
+      .offline-title { font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 20px; }
+      .offline-text { font-size: 15px; font-weight: 600; color: var(--text-muted); margin-bottom: 40px; line-height: 1.6; }
+      .offline-btn-primary { background: var(--primary); color: white; width: 100%; padding: 18px; border-radius: 12px; border: none; font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
+      .offline-btn-primary:active { transform: scale(0.96); background: var(--primary-hover); }
+      .offline-btn-outline { background: transparent; color: var(--primary); width: 100%; padding: 18px; border-radius: 12px; border: 2px solid var(--primary); font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+      #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease-in, transform 0.5s ease-in; overflow: hidden; }
+      #app-logo-splash { width: 130px; height: 130px; background: white; border-radius: 35px; display: flex; align-items: center; justify-content: center; margin-top: -100px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); opacity: 0; transform: scale(0.5); transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 20; }
+      #app-logo-splash i { font-size: 65px; color: var(--primary); }
+      .show-logo { opacity: 1 !important; transform: scale(1) !important; }
+</style>
+</head>
+<body onload="checkStatus()">
+    <div id="global-lock-screen">
+        <i class="fas fa-tools lock-icon" onclick="handleLockScreenSecret()"></i>
+        <h2 id="lock-h2" class="lock-title">تم إيقاف التطبيق مؤقتاً</h2>
+        <p id="lock-p" class="lock-text">نحن نقوم ببعض التحديثات أو الصيانة، يرجى المحاولة في وقت لاحق.</p>
+    </div>
+    <div id="tuk-screen" class="screen container">
+        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-taxi" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
+        <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-user-circle"></i> <span>بيانات الراكب</span></div>
+            <div class="form-group"><label>الاسم الكامل</label><input type="text" id="tukName" placeholder="اكتب اسمك هنا"></div>
+            <div class="form-group"><label>رقم الموبايل</label><input type="tel" id="tukPhone" placeholder="مثال: 07700000000"></div>
+        </div>
+        <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-route"></i> <span>تفاصيل الرحلة</span></div>
+            <button class="location-btn" id="loc-btn-tuk" onclick="getLocation('tuk')">تحديد نقطة الصعود الحالية 📍</button>
+            <div class="form-group" style="margin-top: 20px;"><label style="color:var(--danger);">نقطة النزول (إجباري)</label><input type="url" id="tukDropoffLink" placeholder="لصق الرابط هنا..."></div>
+        </div>
+        <button class="send-btn order-btn-logic" id="tukSendBtn" onclick="sendTukOrder()">اطلب التكتك الآن</button>
+    </div>
 
-<div id="global-lock-screen">
-  <i class="fas fa-tools lock-icon" onclick="handleLockScreenSecret()"></i>
-  <h2 class="lock-title">تم إيقاف التطبيق مؤقتاً</h2>
-  <p>نحن نقوم ببعض التحديثات، يرجى المحاولة لاحقاً.</p>
-</div>
+    <div id="mediator-screen" class="screen container">
+        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> <span>خدمة الوسيط</span></h2>
+        <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-user-circle"></i> <span>بيانات المرسل</span></div>
+            <div class="form-group"><input type="text" id="medName" placeholder="الاسم الكامل"></div>
+            <div class="form-group"><input type="tel" id="medPhone" placeholder="رقم الموبايل"></div>
+            <button class="location-btn" id="loc-btn-med" onclick="getLocation('med')">تحديد موقعي الحالي 📍</button>
+        </div>
+        <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-box-open"></i> <span>تفاصيل الطلب</span></div>
+            <div class="form-group"><textarea id="medOrder" rows="4" placeholder="ما هو الغرض؟ وإلى أين؟"></textarea></div>
+        </div>
+        <button class="send-btn order-btn-logic" id="medSendBtn" onclick="sendMedFinal()">تأكيد طلب الوسيط</button>
+    </div>
 
-<div id="offline-screen">
-  <h2 class="offline-title">لا يوجد إتصال بالانترنت</h2>
-  <p style="color:var(--text-muted);margin-bottom:20px;">يرجى التحقق من اتصالك والمحاولة مجدداً.</p>
-  <button class="offline-btn-primary" onclick="window.location.href='intent:#Intent;action=android.settings.WIFI_SETTINGS;end'">إعدادات الـ Wi-Fi</button>
-</div>
+    <div id="plaza-screen" class="screen container">
+        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-chart-pie" style="color:#8B5CF6;"></i> لوحة الكابتن</h2>
+        <div class="form-card" style="text-align: center;"><button id="statusToggleBtn" class="send-btn" style="background: var(--secondary); margin-top: 0;" onclick="toggleDriverStatus()">أنا متاح للعمل</button></div>
+        <div class="form-card" style="background: var(--primary); color:white; border:none; text-align:center;"><h4>الطلبات المنجزة 📦</h4><p id="stat-count" style="font-size: 45px; font-weight:800; margin:10px 0 0;">0</p></div>
+        <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-qrcode"></i> تأكيد تسليم طلب</div>
+            <div class="form-group"><input type="tel" id="driverVerifyPhoneInput" placeholder="رقم الزبون"></div>
+            <div class="form-group"><input type="number" id="driverVerifyInput" placeholder="كود التأكيد"></div>
+            <button class="send-btn" style="background: var(--secondary);" onclick="processVerifyCode()">تأكيد العملية</button>
+        </div>
+        <button class="resign-btn" onclick="resignDriver()">تسجيل خروج / استقالة</button>
+    </div>
 
-<div id="toast-container"></div>
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-<div class="sidebar" id="appSidebar">
-  <div class="sidebar-item" onclick="closeSidebar()" style="background:transparent;border:1px solid var(--border-color)"><i class="fas fa-arrow-right"></i> إغلاق</div>
-  <div style="text-align:center;margin:20px 0"><i class="fas fa-box-open" style="font-size:40px;color:var(--primary)"></i><h3 style="margin:10px 0 0">البندر</h3><p style="margin:0;font-size:12px">الإصدار 2.0.9</p></div>
-  <div class="sidebar-item" onclick="toggleTheme();closeSidebar();"><i class="fas fa-moon" style="color:var(--primary)"></i> تفعيل الوضع الليلي</div>
-  <a href="https://wa.me/9647739470354" class="sidebar-item"><i class="fab fa-whatsapp" style="color:#25d366"></i> مراسلة الدعم الفني</a>
-</div>
+    <script>
+      const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
+      const PUBLIC_CHANNEL = "@uumqaser";
+      const ADMIN_CHAT_ID = "7479342799"; 
+      const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
-<div class="bottom-nav">
-  <div class="nav-item active" onclick="showScreen('home-screen');updateNav(this)"><i class="fas fa-compass"></i>الرئيسية</div>
-  <div class="nav-item" onclick="showScreen('order-screen');updateNav(this)"><i class="fas fa-shopping-basket"></i>مسواكك</div>
-  <div class="nav-item" onclick="openJoinScreen();updateNav(this)"><i class="fas fa-user-circle"></i>حسابي</div>
-</div>
+      let userCoords = ""; 
+      const CURRENT_VERSION = "2.0.8";
 
-<button class="theme-toggle" onclick="openSidebar()"><i class="fas fa-bars"></i></button>
+      function showToast(msg) {
+          const container = document.getElementById('toast-container');
+          const toast = document.createElement('div');
+          toast.className = 'toast';
+          toast.innerHTML = `<i class="fas fa-bell"></i> <span>${msg}</span>`;
+          container.appendChild(toast);
+          setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 3000);
+      }
 
-<div id="welcome-overlay" onclick="location.reload()">
-  <i class="fas fa-check-circle lock-icon" style="color:var(--secondary)"></i>
-  <h1 style="margin:0">تم التفعيل! 🥳</h1>
-  <p>أنت الآن مندوب رسمي في البندر</p>
-</div>
+      function getLocation(type) {
+          const btn = document.getElementById(`loc-btn-${type}`);
+          btn.innerHTML = 'جاري التحديد...';
+          navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                  userCoords = `https://www.google.com/maps?q=$${pos.coords.latitude},${pos.coords.longitude}`;
+                  btn.innerHTML = 'تم التحديد بنجاح ✅';
+                  btn.style.background = "rgba(16, 185, 129, 0.1)";
+              },
+              () => { showToast("يرجى تفعيل الـ GPS 📍"); btn.innerHTML = 'تحديد الموقع 📍'; }
+          );
+      }
 
-<div id="splash-screen">
-  <div id="app-logo-splash"><i class="fas fa-box-open" style="font-size:65px;color:var(--primary)"></i></div>
-  <h2 style="color:white;margin-top:20px">البندر</h2>
-</div>
+      async function checkRemoteReset() {
+          const myPhone = localStorage.getItem('driver_phone');
+          if(!myPhone) return;
+          try {
+              const resp = await fetch(`${GS_URL}?action=checkReset&phone=${myPhone}`);
+              const result = await resp.text();
+              if (result === "kick_now") {
+                  localStorage.clear();
+                  showToast("تم سحب صلاحياتك 🚫");
+                  setTimeout(() => location.reload(), 2000);
+              }
+          } catch(e) {}
+      }
 
-<div id="admin-panel" class="screen container">
-  <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-  <h2><i class="fas fa-user-shield"></i> لوحة التحكم</h2>
-  <div class="form-card" style="text-align:center">
-    <button class="send-btn" style="background:var(--secondary);margin-bottom:10px" onclick="setGlobalAppStatus('online')">فتح التطبيق للكل</button>
-    <button class="send-btn" style="background:var(--danger)" onclick="setGlobalAppStatus('offline')">إغلاق التطبيق</button>
-  </div>
-</div>
+      function checkStatus() {
+          if (localStorage.getItem('isVerifiedDriver') === 'true') {
+              document.getElementById('driver-plaza-card').style.display = 'flex';
+              document.getElementById('driver-status-badge').style.display = 'block';
+              setInterval(checkRemoteReset, 15000);
+          }
+          showScreen('home-screen');
+          setTimeout(() => { document.getElementById('app-logo-splash').classList.add('show-logo'); }, 500);
+          setTimeout(() => { document.getElementById('splash-screen').style.display = 'none'; }, 2500);
+      }
 
-<div id="home-screen" class="screen container">
-  <div class="header-main">
-    <div id="admin-status-badge" class="driver-status-bar" style="background:var(--danger);color:white">التطبيق مغلق حالياً 🔴</div>
-    <div id="driver-status-badge" class="driver-status-bar">أنت كابتن نشط 🟢</div>
-    <h1 onclick="handleSecretClick()">ماذا تحتاج اليوم؟</h1>
-    <p>اختر الخدمة ودع الباقي علينا</p>
-  </div>
-  <div class="services-grid">
-    <div class="select-card card-full card-cart" onclick="showScreen('order-screen')"><div class="icon-wrapper icon-pulse"><i class="fas fa-shopping-cart"></i></div><div style="flex:1;text-align:right"><h3>تسوق مسواكك</h3><small>مطاعم، سوبر ماركت</small></div></div>
-    <div class="select-card card-half card-tuk" onclick="showScreen('tuk-screen')"><div class="icon-wrapper icon-pulse"><i class="fas fa-taxi"></i></div><h3>تكتك توصيلة</h3></div>
-    <div class="select-card card-half card-med" onclick="showScreen('mediator-screen')"><div class="icon-wrapper icon-pulse"><i class="fas fa-handshake"></i></div><h3>الوسيط</h3></div>
-    <div class="select-card card-full" style="background:var(--secondary);color:white;border:none" onclick="shareApp()"><div class="icon-wrapper" style="background:rgba(255,255,255,0.2)"><i class="fas fa-gift"></i></div><div style="flex:1;text-align:right"><h3>شارك واربح</h3><small>انسخ الرابط لدعوة اصدقائك 🎁</small></div></div>
-    <div id="join-driver-card" class="select-card card-full" onclick="openJoinScreen()"><div class="icon-wrapper" style="background:rgba(16,185,129,0.1);color:var(--secondary)"><i class="fas fa-id-card"></i></div><div style="flex:1;text-align:right"><h3>انضم ككابتن</h3><small>سجل معنا</small></div></div>
-    <div id="driver-plaza-card" class="select-card card-full" style="display:none" onclick="showScreen('plaza-screen')"><div class="icon-wrapper" style="background:rgba(139,92,246,0.1);color:#8B5CF6"><i class="fas fa-chart-pie"></i></div><div style="flex:1;text-align:right"><h3>لوحة الكابتن</h3></div></div>
-  </div>
-</div>
+      function toggleTheme() {
+          document.body.classList.toggle('dark-mode');
+          localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+      }
 
-<div id="tuk-screen" class="screen container">
-  <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button><h2>تكتك توصيلة 🚖</h2>
-  <div class="form-card">
-    <input type="text" id="tukName" placeholder="الاسم الكامل"><input type="tel" id="tukPhone" placeholder="رقم الهاتف">
-    <button class="location-btn" id="loc-btn-tuk" onclick="getLocation('tuk')">تحديد موقعي 📍</button>
-    <input type="url" id="tukDropoffLink" placeholder="رابط موقع النزول (إجباري)"><input type="text" id="tukLandmark" placeholder="أقرب نقطة دالة">
-  </div>
-  <button class="send-btn order-btn-logic" id="tukSendBtn" onclick="sendTukOrder()">اطلب التكتك الآن</button>
-</div>
+      function showScreen(id) {
+          document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+          document.getElementById(id).classList.add('active-screen');
+          window.scrollTo(0, 0);
+      }
 
-<div id="mediator-screen" class="screen container">
-  <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button><h2>الوسيط 🤝</h2>
-  <div class="form-card">
-    <input type="text" id="medName" placeholder="الاسم الكامل"><input type="tel" id="medPhone" placeholder="رقم الهاتف">
-    <button class="location-btn" id="loc-btn-med" onclick="getLocation('med')">تحديد موقعي 📍</button>
-    <textarea id="medOrder" rows="3" placeholder="ما هو الغرض وإلى أين؟"></textarea>
-  </div>
-  <button class="send-btn order-btn-logic" id="medSendBtn" onclick="sendMedFinal()">أرسل طلب الوسيط</button>
-</div>
-
-<div id="order-screen" class="screen container">
-  <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button><h2>تسوق مسواكك 🛒</h2>
-  <div class="form-card" style="text-align:center"><h3 style="color:var(--primary);margin:0">طلبك رقم <span id="current-order-count">0</span> / 7</h3><p style="margin:5px 0 0;font-size:13px" id="loyalty-gift-msg">أوصل 7 وكروتك مجانية 🎁</p></div>
-  <div class="form-card">
-    <input type="text" id="custName" placeholder="الاسم الكامل"><input type="tel" id="custPhone" placeholder="رقم الهاتف" onblur="syncLoyalty()"><input type="text" id="custLandmark" placeholder="نقطة دالة">
-    <button class="location-btn" id="loc-btn-cust" onclick="getLocation('cust')">تحديد موقعي 📍</button>
-    <textarea id="custOrder" rows="3" placeholder="اكتب طلبك بالتفصيل..."></textarea>
-    <input type="file" id="custImages" multiple style="display:none" onchange="previewImages()">
-    <button class="location-btn" style="border:1px solid;color:var(--text-main)" onclick="document.getElementById('custImages').click()">إضافة صور للطلب 📸</button>
-    <div id="image-preview-container" style="display:flex;gap:5px;overflow:auto"></div>
-  </div>
-  <button class="send-btn order-btn-logic" id="sendBtn" onclick="sendFinal()">أرسل الطلب</button>
-</div>
-
-<div id="join-screen" class="screen container">
-  <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button><h2>انضم ككابتن 🛵</h2>
-  <div class="form-card"><input type="text" id="driverJoinName" placeholder="الاسم الثلاثي"><input type="tel" id="driverJoinPhone" placeholder="رقم الهاتف"><select id="bikeType"><option value="ايراني">دراجة ايراني</option><option value="بوكسر">بوكسر</option><option value="تكتك">تكتك</option></select></div>
-  <button class="send-btn" id="joinSendBtn" onclick="submitJoin()">إرسال الطلب</button>
-</div>
-
-<div id="activation-screen" class="screen container">
-  <div class="form-card" style="text-align:center;padding:40px 20px">
-    <h3>طلبك قيد المراجعة</h3><p>أدخل كود التفعيل المكون من 6 أرقام</p>
-    <input type="number" id="activationCodeInput" style="text-align:center;font-size:20px;letter-spacing:4px">
-    <button class="send-btn" onclick="verifyCode()">تفعيل الحساب</button>
-    <button class="location-btn" style="margin-top:15px;color:var(--danger);border-color:var(--danger)" onclick="localStorage.clear();location.reload()">إلغاء</button>
-  </div>
-</div>
-
-<div id="plaza-screen" class="screen container">
-  <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button><h2>لوحة الكابتن 📊</h2>
-  <div class="form-card" style="background:var(--primary);color:white;text-align:center"><h4 style="margin:0">الطلبات المنجزة</h4><p id="stat-count" style="font-size:40px;margin:5px 0">0</p></div>
-  <div class="form-card">
-    <h4 style="margin-top:0;color:var(--primary)">تأكيد تسليم</h4>
-    <input type="tel" id="driverVerifyPhoneInput" placeholder="رقم الزبون"><input type="number" id="driverVerifyInput" placeholder="كود الزبون">
-    <button class="send-btn" style="background:var(--secondary)" onclick="processVerify()">تأكيد</button>
-  </div>
-  <div class="form-card">
-    <h4 style="margin-top:0;color:var(--primary)">إشعار وصول</h4>
-    <input type="tel" id="arrivePhoneInput" placeholder="رقم الزبون">
-    <button class="send-btn" style="background:#25D366" onclick="notifyArrive()">رسالة واتساب 💬</button>
-  </div>
-</div>
-  <script>
-const BOT="8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM",CH="@uumqaser",ADM="7479342799",GS="https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
-let userCoords="",appIsActive=true,sc=0;
-
-/* الفحص الذكي للإنترنت (Smart Ping) */
-async function smartInternetCheck(){
-  if(!navigator.onLine){
-    try{ await fetch("https://www.google.com/favicon.ico?_="+new Date().getTime(),{mode:'no-cors'}); document.getElementById('offline-screen').style.display='none'; }
-    catch(e){ document.getElementById('offline-screen').style.display='flex'; }
-  }else{ document.getElementById('offline-screen').style.display='none'; }
-}
-window.addEventListener('offline',smartInternetCheck);
-window.addEventListener('online',smartInternetCheck);
-setInterval(smartInternetCheck,8000);
-
-function showToast(m){let c=document.getElementById('toast-container'),t=document.createElement('div');t.className='toast';t.innerHTML=`<i class="fas fa-bell"></i> ${m}`;c.appendChild(t);setTimeout(()=>t.remove(),3000);}
-window.alert=showToast;
-function toggleTheme(){document.body.classList.toggle('dark-mode');localStorage.setItem('theme',document.body.classList.contains('dark-mode')?'dark':'light');}
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active-screen'));document.getElementById(id).classList.add('active-screen');window.scrollTo(0,0);}
-function updateNav(e){document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));e.classList.add('active');}
-function openSidebar(){document.getElementById('appSidebar').classList.add('open');document.getElementById('sidebarOverlay').style.display='block';}
-function closeSidebar(){document.getElementById('appSidebar').classList.remove('open');document.getElementById('sidebarOverlay').style.display='none';}
-
-function checkStatus(){
-  smartInternetCheck();
-  let hr=new Date().getHours();if(localStorage.getItem('theme')==='dark'||(!localStorage.getItem('theme')&&(hr>=18||hr<6)))document.body.classList.add('dark-mode');
-  ['cust','med','tuk'].forEach(p=>{
-    if(document.getElementById(p+'Name'))document.getElementById(p+'Name').value=localStorage.getItem('my_name')||'';
-    if(document.getElementById(p+'Phone'))document.getElementById(p+'Phone').value=localStorage.getItem('my_phone')||'';
-  });
-  syncLoyalty();
-  fetch(`${GS}?action=getAppStatus`).then(r=>r.text()).then(s=>{
-    appIsActive=s!=='offline';
-    document.getElementById('admin-status-badge').style.display=appIsActive?'none':'block';
-    document.querySelectorAll('.order-btn-logic').forEach(b=>b.disabled=!appIsActive&&!localStorage.getItem('isAdmin'));
-    if(!appIsActive&&!localStorage.getItem('isAdmin'))document.getElementById('global-lock-screen').style.display='flex';
-  });
-  if(localStorage.getItem('isVerifiedDriver')==='true'){
-    document.getElementById('join-driver-card').style.display='none';document.getElementById('driver-plaza-card').style.display='flex';
-    document.getElementById('driver-status-badge').style.display='block';
-    setInterval(async()=>{try{
-      let r=await fetch(`${GS}?action=checkReset&phone=${localStorage.getItem('driver_phone')}`);let t=await r.text();
-      if(t==='kick_now'){localStorage.clear();location.reload();}
-    }catch(e){}},15000);
-  }
-  showScreen('home-screen');
-  setTimeout(()=>document.getElementById('app-logo-splash').classList.add('show-logo'),500);
-  setTimeout(()=>{let s=document.getElementById('splash-screen');s.style.opacity=0;setTimeout(()=>s.style.display='none',500);},2000);
-}
-
-function handleSecretClick(){if(++sc===5){sc=0;if(prompt("الرمز السري:")==="2006"){localStorage.setItem('isAdmin','true');showScreen('admin-panel');document.getElementById('global-lock-screen').style.display='none';}}}
-function handleLockScreenSecret(){handleSecretClick();}
-async function setGlobalAppStatus(s){await fetch(`${GS}?action=setAppStatus&status=${s}`);showToast('تم التحديث');setTimeout(()=>location.reload(),1000);}
-function getLocation(t){
-  let b=document.getElementById(`loc-btn-${t}`);b.innerHTML="جاري التحديد...";
-  navigator.geolocation.getCurrentPosition(p=>{userCoords=`https://www.google.com/maps?q=$${p.coords.latitude},${p.coords.longitude}`;b.innerHTML="تم التحديد 📍";b.style.color="var(--secondary)";b.style.borderColor="var(--secondary)";},()=>showToast("فعل الـ GPS"));
-}
-function shareApp(){
-  let p=localStorage.getItem('my_phone');if(!p)return showToast("سجل رقمك بطلب مسواك أولاً!");
-  let l=window.location.href.split('?')[0]+"?ref="+p;
-  if(navigator.share)navigator.share({title:'البندر',text:'نزل تطبيق البندر واطلب!',url:l});else{navigator.clipboard.writeText(l);showToast("تم النسخ");}
-}
-
-async function syncLoyalty(){
-  let p=document.getElementById('custPhone').value||localStorage.getItem('my_phone');if(!p)return;
-  try{let r=await fetch(`${GS}?action=getCustomerOrders&phone=${p}`);let c=parseInt(await r.text());if(!isNaN(c)){localStorage.setItem('loy_c',c);document.getElementById('current-order-count').innerText=c%7;}}catch(e){}
-}
-
-function previewImages(){let i=document.getElementById('custImages'),c=document.getElementById('image-preview-container');c.innerHTML='';for(let j=0;j<i.files.length;j++)c.innerHTML+=`<img src="${URL.createObjectURL(i.files[j])}" style="width:50px;height:50px;border-radius:8px">`;}
-
-async function sendFinal(){
-  if(!navigator.onLine)return showToast("لا يوجد انترنت");
-  let n=document.getElementById('custName').value,p=document.getElementById('custPhone').value,o=document.getElementById('custOrder').value,l=document.getElementById('custLandmark').value,f=document.getElementById('custImages').files;
-  if(!n||!p||(!o&&f.length===0)||!userCoords)return showToast("أكمل البيانات");
-  let b=document.getElementById('sendBtn');b.disabled=true;b.innerText="جاري...";
-  localStorage.setItem('my_name',n);localStorage.setItem('my_phone',p);
-  let vc=Math.floor(1000+Math.random()*9000);let arr=[];
-  if(f.length>0)for(let i=0;i<f.length;i++){let fd=new FormData();fd.append('chat_id',"-1003786625443");fd.append('photo',f[i]);let r=await fetch(`https://api.telegram.org/bot${BOT}/sendPhoto`,{method:'POST',body:fd});let d=await r.json();if(d.ok)arr.push(d.result.message_id);}
-  await fetch(`${GS}?action=saveOrderCode&phone=${p}&code=${vc}&photoMsgs=${arr.join(',')}`);
-  let msg=`🔵 طلب مسواك\n👤 ${n}\n📞 ${p}\n📌 ${l}\n📝 ${o||'صور'}\n📍 ${userCoords}`;
-  await fetch(`https://api.telegram.org/bot${BOT}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CH,text:msg,reply_markup:{inline_keyboard:[[{text:"حجز",callback_data:`claim|${n}|${vc}`}]]}})});
-  showToast("تم الإرسال ✅");b.disabled=false;b.innerText="أرسل الطلب";document.getElementById('custOrder').value="";syncLoyalty();
-}
-
-async function sendTukOrder(){
-  if(!navigator.onLine)return;let n=document.getElementById('tukName').value,p=document.getElementById('tukPhone').value,d=document.getElementById('tukDropoffLink').value;
-  if(!n||!p||!userCoords||!d)return showToast("أكمل البيانات");let b=document.getElementById('tukSendBtn');b.disabled=true;
-  localStorage.setItem('my_name',n);localStorage.setItem('my_phone',p);let vc=Math.floor(1000+Math.random()*9000);
-  await fetch(`${GS}?action=saveOrderCode&phone=${p}&code=${vc}&isTuk=true`);
-  await fetch(`https://api.telegram.org/bot${BOT}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CH,text:`🚖 طلب تكتك\n👤 ${n}\n📞 ${p}\n📍 ${userCoords}\nنزول: ${d}`,reply_markup:{inline_keyboard:[[{text:"حجز",callback_data:`claim|${n}|${vc}`}]]}})});
-  showToast("تم طلب التكتك ✅");b.disabled=false;
-}
-
-async function sendMedFinal(){
-  if(!navigator.onLine)return;let n=document.getElementById('medName').value,p=document.getElementById('medPhone').value,o=document.getElementById('medOrder').value;
-  if(!n||!p||!o||!userCoords)return showToast("أكمل البيانات");let b=document.getElementById('medSendBtn');b.disabled=true;
-  localStorage.setItem('my_name',n);localStorage.setItem('my_phone',p);let vc=Math.floor(1000+Math.random()*9000);
-  await fetch(`${GS}?action=saveOrderCode&phone=${p}&code=${vc}`);
-  await fetch(`https://api.telegram.org/bot${BOT}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CH,text:`🔵 طلب وسيط\n👤 ${n}\n📞 ${p}\n📝 ${o}\n📍 ${userCoords}`,reply_markup:{inline_keyboard:[[{text:"حجز",callback_data:`claimMed|${n}|${vc}`}]]}})});
-  showToast("تم إرسال الوسيط ✅");b.disabled=false;
-}
-
-function openJoinScreen(){localStorage.getItem('pending_join')==='true'?showScreen('activation-screen'):showScreen('join-screen');}
-async function submitJoin(){
-  let n=document.getElementById('driverJoinName').value,p=document.getElementById('driverJoinPhone').value,b=document.getElementById('bikeType').value;
-  if(!n||!p||!b)return showToast("أكمل البيانات");
-  let c=Math.floor(100000+Math.random()*900000);localStorage.setItem('temp_n',n);localStorage.setItem('temp_p',p);localStorage.setItem('temp_c',c);localStorage.setItem('pending_join','true');
-  await fetch(`https://api.telegram.org/bot${BOT}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:ADM,text:`📥 انضمام\n👤 ${n}\n📞 ${p}\n🏍️ ${b}\n🔑 ${c}`})});
-  showScreen('activation-screen');
-}
-function verifyCode(){if(document.getElementById('activationCodeInput').value==localStorage.getItem('temp_c')){localStorage.setItem('isVerifiedDriver','true');localStorage.setItem('driver_phone',localStorage.getItem('temp_p'));document.getElementById('welcome-overlay').style.display='flex';}else showToast("خطأ");}
-
-async function processVerify(){
-  let p=document.getElementById('driverVerifyPhoneInput').value,c=document.getElementById('driverVerifyInput').value;if(!p||!c)return;
-  let r=await fetch(`${GS}?action=verifyOrder&phone=${p}&code=${c}`);if((await r.text()).includes("valid")){
-    let cc=parseInt(localStorage.getItem('d_count')||0)+1;localStorage.setItem('d_count',cc);document.getElementById('stat-count').innerText=cc;
-    fetch(`${GS}?action=updateStats&name=كابتن&phone=${localStorage.getItem('driver_phone')}&inCount=${cc}&leagueCount=${cc}&inDriver=0&inAdmin=${cc*500}`);
-    showToast("تم التأكيد!");confetti();
-  }else showToast("الكود خطأ");
-}
-
-function notifyArrive(){let p=document.getElementById('arrivePhoneInput').value;if(!p)return;window.open(`https://wa.me/${p.startsWith('0')?'964'+p.substring(1):p}?text=`+encodeURIComponent("السلام عليكم، كابتن البندر بالباب 🛵"),'_blank');}
-</script>
+      function openSidebar() { document.getElementById('appSidebar').classList.add('open'); document.getElementById('sidebarOverlay').style.display = 'block'; }
+      function closeSidebar() { document.getElementById('appSidebar').classList.remove('open'); document.getElementById('sidebarOverlay').style.display = 'none'; }
+      
+      function resignDriver() { if(confirm("هل تريد الخروج؟")) { localStorage.clear(); location.reload(); } }
+    </script>
 </body>
 </html>
-
