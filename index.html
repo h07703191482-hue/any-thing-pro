@@ -323,7 +323,6 @@
           </div>
       </div>
     </div>
-
     <div id="tuk-screen" class="screen container">
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-taxi" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
@@ -336,18 +335,16 @@
             </div>
             <div class="form-group">
                 <label id="lbl-tuk-phone">رقم الموبايل</label>
-                <input type="tel" id="tukPhone" placeholder="مثال: 07700000000">
+                <input type="tel" id="tukPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 <span id="tuk-phone-n" class="phone-note">تأكد من الرقم لتسهيل التواصل</span>
             </div>
         </div>
 
         <div class="form-card">
             <div class="form-card-title"><i class="fas fa-route"></i> <span id="tuk-r-info">تفاصيل الرحلة</span></div>
-            
             <button class="location-btn" id="loc-btn-tuk" onclick="getLocation('tuk')" style="margin-top:5px;">
                 <i class="fas fa-location-crosshairs"></i> <span id="tuk-gps-btn">تحديد نقطة الصعود الحالية 📍</span>
             </button>
-
             <div class="form-group" style="margin-top: 20px;">
                 <label style="color:var(--danger);" id="lbl-tuk-drop">نقطة النزول (إجباري)</label>
                 <div class="note" style="padding:12px; font-size:12px; margin-bottom:10px; background:var(--bg-color); border-right-color:var(--primary); color:var(--text-main);">
@@ -359,13 +356,11 @@
                 </button>
                 <input type="url" id="tukDropoffLink" placeholder="لصق الرابط هنا...">
             </div>
-
             <div class="form-group">
                 <label>أقرب نقطة دالة لمكان الصعود (اختياري)</label>
                 <input type="text" id="tukLandmark" placeholder="مدرسة، جامع، أو تقاطع...">
             </div>
         </div>
-        
         <button class="send-btn order-btn-logic" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">اطلب التكتك الآن</span></button>
     </div>
 
@@ -387,7 +382,7 @@
             </div>
             <div class="form-group">
                 <label>رقم الموبايل</label>
-                <input type="tel" id="medPhone" placeholder="رقم الهاتف">
+                <input type="tel" id="medPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             </div>
             <div class="form-group">
                 <label>أقرب نقطة دالة لمكانك</label>
@@ -405,7 +400,6 @@
                 <textarea id="medOrder" rows="4" placeholder="مثال: أريد توصيل مفاتيح من تقاطع الميناء إلى حي المهندسين..."></textarea>
             </div>
         </div>
-
         <button class="send-btn order-btn-logic" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
     </div>
 
@@ -433,7 +427,7 @@
             </div>
             <div class="form-group">
                 <label>رقم الهاتف</label>
-                <input type="tel" id="custPhone" placeholder="رقمك" oninput="updateLoyaltyUI()" onblur="syncLoyaltyWithServer()">
+                <input type="tel" id="custPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); updateLoyaltyUI()" onblur="syncLoyaltyWithServer()">
                 <span class="phone-note">تأكد من الرقم للاتصال بك</span>
             </div>
             <div class="form-group">
@@ -450,7 +444,6 @@
             <div class="form-group">
                 <textarea id="custOrder" rows="5" placeholder="اكتب طلباتك هنا بالتفصيل (أكل، مسواك، صيدلية)..."></textarea>
             </div>
-            
             <div class="form-group" style="margin-top: 10px;">
                 <input type="file" id="custImages" accept="image/*" multiple style="display:none;" onchange="previewImages()">
                 <button type="button" class="location-btn" style="border: 2px dashed var(--primary); background: var(--bg-color); color: var(--text-main); margin-bottom: 0;" onclick="document.getElementById('custImages').click()">
@@ -459,9 +452,9 @@
                 <div id="image-preview-container" style="display:flex; gap:10px; overflow-x:auto; margin-top:10px; padding-bottom:5px; flex-wrap: wrap;"></div>
             </div>
         </div>
-
         <button class="send-btn order-btn-logic" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
+
     <div id="join-screen" class="screen container">
         <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:var(--secondary);"></i> انضم ككابتن</h2>
@@ -474,7 +467,7 @@
             </div>
             <div class="form-group">
                 <label>رقم الهاتف</label>
-                <input type="tel" id="driverJoinPhone" placeholder="رقم شغال للاتصال">
+                <input type="tel" id="driverJoinPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             </div>
             <div class="form-group">
                 <label>نوع المركبة</label>
@@ -522,7 +515,7 @@
             <div class="form-card-title"><i class="fas fa-map-marker-alt"></i> إشعار وصول للزبون</div>
             <div class="form-group">
                 <label>رقم هاتف الزبون</label>
-                <input type="tel" id="arrivePhoneInput" placeholder="ادخل رقم الزبون هنا" style="text-align:center;">
+                <input type="tel" id="arrivePhoneInput" placeholder="مثال: 07700000000" style="text-align:center;" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             </div>
             <div style="display: flex; gap: 10px;">
                 <button class="location-btn success" style="flex: 1; margin: 0; background: #25D366; color: white; border: none;" onclick="notifyArriveWhatsApp()">
@@ -538,7 +531,7 @@
             <div class="form-card-title"><i class="fas fa-qrcode"></i> تأكيد تسليم طلب جديد</div>
             <div class="form-group">
                 <label>رقم هاتف الزبون</label>
-                <input type="tel" id="driverVerifyPhoneInput" placeholder="ادخل رقم الزبون" style="text-align:center;">
+                <input type="tel" id="driverVerifyPhoneInput" placeholder="مثال: 07700000000" style="text-align:center;" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             </div>
             <div class="form-group">
                 <label>كود التأكيد (الذي وصل للزبون)</label>
@@ -849,7 +842,9 @@
       }
 
       function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
-      function validateIraqiPhone(phone) { return /^\+?\d{8,15}$/.test(phone); }
+      
+      // تحديث التحقق من الرقم العراقي (يبدأ بـ 07 وطوله 11 رقم)
+      function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
 
       function getLocation(type) {
           const btn = document.getElementById(`loc-btn-${type}`);
@@ -982,7 +977,7 @@
           const name = document.getElementById('driverJoinName').value.trim();
           const phone = document.getElementById('driverJoinPhone').value.trim();
           const bike = document.getElementById('bikeType').value;
-          if(!name || !validateIraqiPhone(phone) || !bike) { return showToast("يرجى إكمال البيانات بشكل صحيح 📝"); }
+          if(!name || !validateIraqiPhone(phone) || !bike) { return showToast("يرجى إكمال البيانات بشكل صحيح (تأكد من رقم الهاتف) 📝"); }
           
           const btn = document.getElementById('joinSendBtn');
           const originalText = btn.innerHTML;
@@ -1034,7 +1029,7 @@
           const land = document.getElementById('tukLandmark').value.trim();
           const dropLink = document.getElementById('tukDropoffLink').value.trim(); 
           
-          if(!name || !validateIraqiPhone(phone) || !userCoords || !dropLink) return showToast("أكمل البيانات وحدد نقطة الصعود والنزول 📍");
+          if(!name || !validateIraqiPhone(phone) || !userCoords || !dropLink) return showToast("أكمل البيانات وحدد نقطة الصعود والنزول 📍 (وتأكد من صحة رقمك)");
           const btn = document.getElementById('tukSendBtn');
           const originalText = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الطلب...'; btn.disabled = true;
@@ -1062,7 +1057,7 @@
           const name = document.getElementById('medName').value.trim();
           const phone = document.getElementById('medPhone').value.trim();
           const order = document.getElementById('medOrder').value.trim();
-          if(!name || !validateIraqiPhone(phone) || !userCoords) return showToast("أكمل البيانات وحدد الموقع 📍");
+          if(!name || !validateIraqiPhone(phone) || !userCoords) return showToast("أكمل البيانات وحدد الموقع 📍 (وتأكد من صحة رقمك)");
           const btn = document.getElementById('medSendBtn');
           const originalText = btn.innerHTML;
           btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...'; btn.disabled = true;
@@ -1111,7 +1106,7 @@
           const land = document.getElementById('custLandmark').value.trim();
           const files = document.getElementById('custImages').files;
 
-          if(!name || !validateIraqiPhone(phone) || (!order && files.length === 0) || !userCoords) return showToast("أكمل البيانات وحدد موقعك، واكتب الطلب أو أضف صورة 📍📸");
+          if(!name || !validateIraqiPhone(phone) || (!order && files.length === 0) || !userCoords) return showToast("أكمل البيانات، وتأكد من رقمك، وحدد موقعك، واكتب الطلب أو أضف صورة 📍📸");
           
           const btn = document.getElementById('sendBtn');
           const originalText = btn.innerHTML;
@@ -1170,7 +1165,7 @@
           if (!navigator.onLine) return showToast("لا يوجد إنترنت للطلب ❌");
           const code = document.getElementById('driverVerifyInput').value.trim();
           const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
-          if(!validateIraqiPhone(custPhone) || !code) return showToast("أدخل بيانات صحيحة ⚠️");
+          if(!validateIraqiPhone(custPhone) || !code) return showToast("أدخل بيانات صحيحة ورقم هاتف زبون صحيح ⚠️");
           
           const btn = document.querySelector('#plaza-screen .send-btn');
           const oldText = btn.innerHTML;
@@ -1322,4 +1317,4 @@
       }
     </script>
 </body>
-    </html>
+</html>
