@@ -1,4 +1,4 @@
-ط<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"><meta name="theme-color" content="#4F46E5">
@@ -185,8 +185,7 @@ body.dark-mode .toast{background:rgba(255,255,255,0.95);color:#111827}
     <button class="send-btn" style="background:#25D366" onclick="notifyArrive()">رسالة واتساب 💬</button>
   </div>
 </div>
-
-<script>
+  <script>
 const BOT="8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM",CH="@uumqaser",ADM="7479342799",GS="https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 let userCoords="",appIsActive=true,sc=0;
 
@@ -241,7 +240,7 @@ function handleLockScreenSecret(){handleSecretClick();}
 async function setGlobalAppStatus(s){await fetch(`${GS}?action=setAppStatus&status=${s}`);showToast('تم التحديث');setTimeout(()=>location.reload(),1000);}
 function getLocation(t){
   let b=document.getElementById(`loc-btn-${t}`);b.innerHTML="جاري التحديد...";
-  navigator.geolocation.getCurrentPosition(p=>{userCoords=`https://www.google.com/maps?q=$${p.coords.latitude},${p.coords.longitude}`;b.innerHTML="تم التحديد 📍";},()=>showToast("فعل الـ GPS"));
+  navigator.geolocation.getCurrentPosition(p=>{userCoords=`https://www.google.com/maps?q=$${p.coords.latitude},${p.coords.longitude}`;b.innerHTML="تم التحديد 📍";b.style.color="var(--secondary)";b.style.borderColor="var(--secondary)";},()=>showToast("فعل الـ GPS"));
 }
 function shareApp(){
   let p=localStorage.getItem('my_phone');if(!p)return showToast("سجل رقمك بطلب مسواك أولاً!");
@@ -310,4 +309,5 @@ async function processVerify(){
 function notifyArrive(){let p=document.getElementById('arrivePhoneInput').value;if(!p)return;window.open(`https://wa.me/${p.startsWith('0')?'964'+p.substring(1):p}?text=`+encodeURIComponent("السلام عليكم، كابتن البندر بالباب 🛵"),'_blank');}
 </script>
 </body>
-                                                                                                                                                                                                                                </html>
+</html>
+
