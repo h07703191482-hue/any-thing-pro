@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#4F46E5">
+    <meta name="theme-color" content="#5A228B">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -31,51 +31,85 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
       :root { 
-          --primary: #0000FF; --primary-hover: #0000CC; --secondary: #10B981;       
-          --gold: #F59E0B; --danger: #EF4444; --bg-color: #F3F4F6;        
-          --surface: #FFFFFF; --text-main: #111827; --text-muted: #6B7280;      
-          --border-color: #E5E7EB; --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.03);
-          --shadow-md: 0 10px 30px rgba(0, 0, 255, 0.08); --shadow-floating: 0 20px 40px rgba(0, 0, 0, 0.1);
-          --radius-md: 16px; --radius-lg: 24px; --radius-pill: 9999px;
+          /* ألوان ثيم بلي (Baly Theme) */
+          --primary: #5A228B; 
+          --primary-hover: #4A1A75; 
+          --secondary: #FFC107;       
+          --gold: #FFC107; 
+          --danger: #EF4444; 
+          --bg-color: #F4F6F9;        
+          --surface: #FFFFFF; 
+          --text-main: #111827; 
+          --text-muted: #6B7280;      
+          --border-color: #E5E7EB; 
+          --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.04);
+          --shadow-md: 0 10px 30px rgba(90, 34, 139, 0.1); 
+          --shadow-floating: 0 20px 40px rgba(0, 0, 0, 0.12);
+          --radius-md: 20px; 
+          --radius-lg: 24px; 
+          --radius-pill: 9999px;
       }
       body.dark-mode {
-          --primary: #4D4DFF; --bg-color: #0F172A; --surface: #1E293B; --text-main: #F9FAFB;
-          --text-muted: #9CA3AF; --border-color: #334155; --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.2);
+          --primary: #7A3BBA; --bg-color: #121212; --surface: #1E1E1E; --text-main: #F9FAFB;
+          --text-muted: #9CA3AF; --border-color: #334155; --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.2);
           --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.4); --shadow-floating: 0 20px 40px rgba(0, 0, 0, 0.5);
       }
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
       body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; color: var(--text-main); min-height: 100vh; line-height: 1.6; overflow-x: hidden; transition: background-color 0.4s ease, color 0.4s ease; }
-      body::before { content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(0, 0, 255, 0.03) 0%, transparent 50%); z-index: -1; pointer-events: none; }
-      body.dark-mode::before { background: radial-gradient(circle at 50% 0%, rgba(77, 77, 255, 0.08) 0%, transparent 50%); }
+      body::before { content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(90, 34, 139, 0.03) 0%, transparent 50%); z-index: -1; pointer-events: none; }
+      body.dark-mode::before { background: radial-gradient(circle at 50% 0%, rgba(122, 59, 186, 0.08) 0%, transparent 50%); }
+      
+      /* تأثير النقر (Ripple Effect) */
+      .ripple { position: relative; overflow: hidden; }
+      .ripple::after { content: ""; position: absolute; top: 50%; left: 50%; width: 150%; padding-top: 150%; background: rgba(255, 255, 255, 0.3); border-radius: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; transition: transform 0.4s, opacity 0.4s; pointer-events: none; }
+      .ripple:active::after { transform: translate(-50%, -50%) scale(1); opacity: 1; transition: 0s; }
+      .ripple-dark::after { background: rgba(0, 0, 0, 0.1); }
+
+      /* دائرة التحميل الاحترافية */
+      .baly-spinner { width: 26px; height: 26px; border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; display: inline-block; vertical-align: middle; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      /* السلايدر (شريط العروض) */
+      .baly-slider-container { width: 100%; overflow: hidden; margin-top: -45px; margin-bottom: 25px; position: relative; z-index: 5; }
+      .baly-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding: 0 20px 10px 20px; }
+      .baly-slider::-webkit-scrollbar { display: none; }
+      .baly-slide { flex: 0 0 85%; scroll-snap-align: center; border-radius: var(--radius-lg); padding: 25px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); cursor: pointer; }
+      .slide-text h3 { margin: 0; font-weight: 800; font-size: 18px; line-height: 1.3; }
+      .slide-text p { margin: 5px 0 0; font-size: 13px; font-weight: 600; opacity: 0.9; }
+      .slide-icon { font-size: 45px; opacity: 0.8; }
+
       .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 10001; background: var(--surface); color: var(--primary); border: 1px solid var(--border-color); width: 48px; height: 48px; border-radius: var(--radius-pill); cursor: pointer; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
       .theme-toggle:active { transform: scale(0.9); }
       .lang-toggle { position: fixed; top: 20px; left: 80px; z-index: 10001; background: var(--surface); color: var(--primary); border: 1px solid var(--border-color); padding: 0 15px; height: 48px; border-radius: var(--radius-pill); cursor: pointer; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; transition: 0.3s; }
+      
+      /* إعدادات الشاشات لمنع التداخل */
       .screen { display: none; width: 100%; min-height: 100vh; animation: fadeSlideUp 0.4s ease-out forwards; }
       .active-screen { display: block !important; }
+      #login-screen.active-screen { display: flex !important; flex-direction: column; justify-content: center; min-height: 100vh; position: relative; z-index: 100; padding-bottom: 20px; }
+      
       .container { max-width: 480px; margin: auto; padding: 20px; padding-bottom: 120px; }
       @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes iconPulse { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.08); filter: brightness(1.2); } 100% { transform: scale(1); filter: brightness(1); } }
       .icon-pulse { animation: iconPulse 2s infinite ease-in-out; }
-      #global-lock-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 9999999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; box-sizing: border-box; }
+      
+      #global-lock-screen, #offline-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 9999999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; box-sizing: border-box; }
       .lock-icon { font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: scaleIn 0.5s ease; cursor: pointer; }
-      .lock-title { font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
-      .lock-text { font-size: 16px; font-weight: 600; color: var(--text-muted); line-height: 1.6; }
-      #offline-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 999999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; box-sizing: border-box; }
-      .offline-title { font-size: 24px; font-weight: 800; color: var(--text-main); margin-bottom: 20px; }
-      .offline-text { font-size: 15px; font-weight: 600; color: var(--text-muted); margin-bottom: 40px; line-height: 1.6; }
-      .offline-btn-primary { background: var(--primary); color: white; width: 100%; padding: 18px; border-radius: 12px; border: none; font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
+      .lock-title, .offline-title { font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
+      .lock-text, .offline-text { font-size: 16px; font-weight: 600; color: var(--text-muted); line-height: 1.6; }
+      .offline-btn-primary { background: var(--primary); color: white; width: 100%; padding: 18px; border-radius: var(--radius-md); border: none; font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
       .offline-btn-primary:active { transform: scale(0.96); background: var(--primary-hover); }
-      .offline-btn-outline { background: transparent; color: var(--primary); width: 100%; padding: 18px; border-radius: 12px; border: 2px solid var(--primary); font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+      .offline-btn-outline { background: transparent; color: var(--primary); width: 100%; padding: 18px; border-radius: var(--radius-md); border: 2px solid var(--primary); font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+      
       #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease-in, transform 0.5s ease-in; overflow: hidden; }
       #app-logo-splash { width: 130px; height: 130px; background: white; border-radius: 35px; display: flex; align-items: center; justify-content: center; margin-top: -100px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); opacity: 0; transform: scale(0.5); transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 20; }
       #app-logo-splash i { font-size: 65px; color: var(--primary); }
       .show-logo { opacity: 1 !important; transform: scale(1) !important; }
       .splash-welcome-text { position: absolute; top: 18%; text-align: center; width: 100%; color: white; animation: fadeInDown 1s ease-out; }
-      .splash-welcome-text h2 { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: 1px; }
+      .splash-welcome-text h2 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 1px; }
       .splash-welcome-text p { margin: 8px 0 0; opacity: 0.9; font-size: 16px; font-weight: 500; }
       @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
       .road-realistic { position: absolute; bottom: 25%; width: 100%; height: 60px; background: rgba(0,0,0,0.2); border-top: 3px solid rgba(255,255,255,0.1); border-bottom: 3px solid rgba(255,255,255,0.1); display: flex; align-items: center; }
-      .road-lines { width: 100%; height: 4px; background: repeating-linear-gradient(90deg, #F59E0B 0, #F59E0B 40px, transparent 40px, transparent 80px); animation: road-scroll 0.5s linear infinite; }
+      .road-lines { width: 100%; height: 4px; background: repeating-linear-gradient(90deg, #FFC107 0, #FFC107 40px, transparent 40px, transparent 80px); animation: road-scroll 0.5s linear infinite; }
       @keyframes road-scroll { from { transform: translateX(0); } to { transform: translateX(80px); } }
       .bike-box { position: absolute; bottom: calc(25% + 15px); left: 110%; font-size: 70px; color: white; transform: scaleX(-1); animation: drive-left 2s linear forwards; z-index: 10; animation-delay: 0.5s; }
       .exhaust { position: absolute; right: -10px; bottom: 10px; display: flex; flex-direction: column; }
@@ -84,30 +118,33 @@
       .smoke:nth-child(3) { animation-delay: 0.4s; }
       @keyframes smoke-bloom { 0% { transform: translate(0, 0) scale(1); opacity: 0; } 20% { opacity: 0.7; } 100% { transform: translate(40px, -40px) scale(3); opacity: 0; filter: blur(5px); } }
       @keyframes drive-left { 0% { left: 110%; } 100% { left: -30%; } }
-      .header-main { background: var(--primary); background: linear-gradient(135deg, var(--primary) 0%, #3730A3 100%); color: white; padding: 50px 20px 60px; text-align: center; border-radius: 0 0 40px 40px; margin: -20px -20px 20px -20px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
-      .header-main h1 { margin: 0; font-size: 32px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.2); cursor: pointer; }
-      .header-main p { margin: 10px 0 0; font-size: 15px; opacity: 0.9; font-weight: 500; }
-      .driver-status-bar { display: none; background: var(--gold); color: #000; font-weight: 800; letter-spacing: 0.5px; font-size: 12px; padding: 6px 0; position: absolute; top: 0; left: 0; width: 100%; z-index: 10; transition: background 0.3s ease, color 0.3s ease; }
-      .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; position: relative; z-index: 5; margin-top: -40px; }
-      .select-card { background: var(--surface); border-radius: var(--radius-lg); display: flex; box-shadow: var(--shadow-md); cursor: pointer; border: 1px solid var(--border-color); color: var(--text-main); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+      
+      .header-main { background: var(--primary); background: linear-gradient(135deg, var(--primary) 0%, #3B1261 100%); color: white; padding: 70px 20px 80px; text-align: right; border-radius: 0 0 30px 30px; margin: -20px -20px 20px -20px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+      .header-main h1 { margin: 0; font-size: 28px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.2); cursor: pointer; }
+      .header-main p { margin: 8px 0 0; font-size: 15px; opacity: 0.9; font-weight: 600; }
+      .driver-status-bar { display: none; background: var(--gold); color: #000; font-weight: 800; letter-spacing: 0.5px; font-size: 12px; padding: 6px 0; position: absolute; top: 0; left: 0; width: 100%; z-index: 10; text-align: center; transition: background 0.3s ease, color 0.3s ease; }
+      
+      .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; position: relative; z-index: 5; }
+      .select-card { background: var(--surface); border-radius: var(--radius-lg); display: flex; box-shadow: var(--shadow-sm); cursor: pointer; border: 1px solid var(--border-color); color: var(--text-main); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
       .select-card:hover, .select-card:active { transform: translateY(-3px) scale(0.98); box-shadow: var(--shadow-floating); border-color: var(--primary); }
-      .card-full { grid-column: span 2; flex-direction: row; align-items: center; padding: 20px; gap: 18px; }
-      .card-full .icon-wrapper { width: 65px; height: 65px; font-size: 28px; border-radius: 20px; display: flex; align-items: center; justify-content: center; }
+      .card-full { grid-column: span 2; flex-direction: row; align-items: center; padding: 22px 20px; gap: 18px; }
+      .card-full .icon-wrapper { width: 65px; height: 65px; font-size: 28px; border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
       .card-full .card-text { flex: 1; text-align: right; }
       .card-full h3 { margin: 0 0 4px 0; font-size: 18px; font-weight: 800; }
       .card-full small { color: var(--text-muted); font-size: 13px; font-weight: 600; }
       .card-full .arrow-icon { color: var(--border-color); font-size: 14px; transition: 0.3s; margin-right: auto; }
       .card-full:hover .arrow-icon { color: var(--primary); transform: translateX(-5px); }
       .card-half { flex-direction: column; align-items: center; text-align: center; padding: 25px 10px; gap: 12px; }
-      .card-half .icon-wrapper { width: 55px; height: 55px; font-size: 24px; border-radius: 18px; display: flex; align-items: center; justify-content: center; }
+      .card-half .icon-wrapper { width: 55px; height: 55px; font-size: 24px; border-radius: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
       .card-half h3 { margin: 0; font-size: 16px; font-weight: 800; }
       .card-half small { color: var(--text-muted); font-size: 12px; font-weight: 600; line-height: 1.4; display: block; }
       .card-half .arrow-icon { display: none; }
-      .card-cart .icon-wrapper { background: rgba(0, 0, 255, 0.1); color: var(--primary); }
+      .card-cart .icon-wrapper { background: rgba(90, 34, 139, 0.1); color: var(--primary); }
       .card-med .icon-wrapper { background: rgba(249, 115, 22, 0.1); color: #F97316; }
-      .card-tuk .icon-wrapper { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
+      .card-tuk .icon-wrapper { background: rgba(255, 193, 7, 0.15); color: #D97706; }
       .card-join .icon-wrapper { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
       .card-plaza .icon-wrapper { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
+      
       .form-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards; }
       .form-card-title { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
       .form-card-title i { font-size: 18px; color: var(--gold); }
@@ -116,13 +153,13 @@
       .form-group label { display: block; font-size: 13px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; }
       input, textarea, select { width: 100%; padding: 16px 20px; border: 1.5px solid var(--border-color); border-radius: var(--radius-md); font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-main); background: var(--bg-color); transition: all 0.3s ease; appearance: none; }
       input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 0.7; font-weight: 500;}
-      input:focus, textarea:focus, select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 4px rgba(0, 0, 255, 0.1); outline: none; }
+      input:focus, textarea:focus, select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 4px rgba(90, 34, 139, 0.1); outline: none; }
       .location-btn { background: var(--bg-color); color: var(--primary); border: 2px dashed var(--primary); padding: 14px; border-radius: var(--radius-md); width: 100%; font-family: 'Cairo'; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 12px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
       .location-btn:active { transform: scale(0.96); }
-      .location-btn.success { background: rgba(16, 185, 129, 0.1); color: var(--secondary); border-color: var(--secondary); border-style: solid; }
+      .location-btn.success { background: rgba(16, 185, 129, 0.1); color: #10B981; border-color: #10B981; border-style: solid; }
       .phone-note { color: var(--danger); font-size: 12px; font-weight: 600; margin-top: 6px; display: block; text-align: right; padding-right: 5px; }
-      .send-btn { background: linear-gradient(135deg, var(--primary) 0%, #3730A3 100%); color: white; width: 100%; padding: 18px; border-radius: var(--radius-md); border: none; font-weight: 800; font-size: 18px; letter-spacing: 0.5px; cursor: pointer; box-shadow: 0 8px 20px rgba(0, 0, 255, 0.3); margin-top: 10px; transition: all 0.3s ease; }
-      .send-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(0, 0, 255, 0.2); }
+      .send-btn { background: linear-gradient(135deg, var(--primary) 0%, #3B1261 100%); color: white; width: 100%; padding: 18px; border-radius: var(--radius-md); border: none; font-weight: 800; font-size: 18px; letter-spacing: 0.5px; cursor: pointer; box-shadow: 0 8px 20px rgba(90, 34, 139, 0.3); margin-top: 10px; transition: all 0.3s ease; }
+      .send-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(90, 34, 139, 0.2); }
       .send-btn:disabled { background: var(--border-color) !important; color: var(--text-muted) !important; cursor: not-allowed; box-shadow: none !important; transform: none !important; }
       .back-btn { background: var(--surface); border: 1px solid var(--border-color); font-size: 18px; color: var(--text-main); width: 45px; height: 45px; border-radius: 14px; margin-bottom: 25px; box-shadow: var(--shadow-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
       .back-btn:active { transform: translateX(5px); }
@@ -134,11 +171,11 @@
       body.dark-mode .price-indicator { border-color: rgba(255,255,255,0.05); }
       .price-indicator span { font-size: 14px; color: var(--text-muted); font-weight: 600; display: block; }
       .price-indicator .amount { font-size: 32px; font-weight: 800; color: var(--primary); display: block; margin: 5px 0; }
-      .bottom-nav { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 400px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); display: flex; justify-content: space-around; align-items: center; padding: 8px 12px; border-radius: var(--radius-pill); box-shadow: var(--shadow-floating); z-index: 9998; border: 1px solid rgba(255,255,255,0.4); }
-      body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.85); border-color: rgba(255,255,255,0.05); }
+      .bottom-nav { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 400px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); display: flex; justify-content: space-around; align-items: center; padding: 8px 12px; border-radius: var(--radius-pill); box-shadow: var(--shadow-floating); z-index: 9998; border: 1px solid rgba(255,255,255,0.4); }
+      body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.9); border-color: rgba(255,255,255,0.05); }
       .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 20px; color: var(--text-muted); text-decoration: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; border-radius: var(--radius-pill); position: relative; }
       .nav-item i { font-size: 20px; transition: transform 0.3s; }
-      .nav-item.active { color: var(--primary); background: rgba(0, 0, 255, 0.1); }
+      .nav-item.active { color: var(--primary); background: rgba(90, 34, 139, 0.1); }
       .nav-item.active i { transform: translateY(-2px); }
       #toast-container { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 100000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 350px; }
       .toast { background: rgba(17, 24, 39, 0.95); color: white; padding: 16px 20px; border-radius: var(--radius-lg); box-shadow: var(--shadow-floating); font-family: 'Cairo', sans-serif; font-size: 14px; font-weight: 700; animation: slideDownToast 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards, fadeOutToast 0.4s ease forwards 3s; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px); }
@@ -160,7 +197,7 @@
       .driver-rank:last-child { border-bottom: none; }
       .rank-info { display: flex; align-items: center; gap: 12px; font-weight: 700; color: var(--text-main); font-size: 15px; }
       .rank-medal { font-size: 22px; width: 30px; text-align: center; display: inline-block; }
-      .rank-score { color: var(--secondary); font-weight: 800; background: rgba(16, 185, 129, 0.1); padding: 4px 12px; border-radius: var(--radius-pill); font-size: 13px; }
+      .rank-score { color: #10B981; font-weight: 800; background: rgba(16, 185, 129, 0.1); padding: 4px 12px; border-radius: var(--radius-pill); font-size: 13px; }
       .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); box-shadow: -10px 0 30px rgba(0,0,0,0.1); z-index: 100002; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
       body.dark-mode .sidebar { background: rgba(15, 23, 42, 0.95); border-left: 1px solid rgba(255,255,255,0.05); }
       .sidebar.open { right: 0; }
@@ -197,47 +234,47 @@
             <path d="M90 20 L130 -5" stroke="#EF4444" stroke-width="3" fill="none" stroke-linecap="round"/>
         </svg>
         <p id="off-text" class="offline-text">للمتابعة، يرجى الاتصال بالإنترنت أو المحاولة مرة أخرى.</p>
-        <button id="off-btn-wifi" class="offline-btn-primary" onclick="openWiFiSettings()">الاتصال عبر ال WiFi</button>
-        <button id="off-btn-data" class="offline-btn-outline" onclick="openDataSettings()">الاتصال عبر انترنت الهاتف</button>
+        <button id="off-btn-wifi" class="offline-btn-primary ripple" onclick="openWiFiSettings()">الاتصال عبر ال WiFi</button>
+        <button id="off-btn-data" class="offline-btn-outline ripple" onclick="openDataSettings()">الاتصال عبر انترنت الهاتف</button>
     </div>
 
     <div id="toast-container"></div>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
     <div class="sidebar" id="appSidebar">
-        <div class="sidebar-close" id="side-close-text" onclick="closeSidebar()"><i class="fas fa-arrow-right"></i> إغلاق</div>
+        <div class="sidebar-close ripple-dark" id="side-close-text" onclick="closeSidebar()"><i class="fas fa-arrow-right"></i> إغلاق</div>
         <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width:80px; height:80px; background:rgba(0, 0, 255, 0.1); border-radius:24px; display:flex; align-items:center; justify-content:center; margin: 0 auto 15px;">
+            <div style="width:80px; height:80px; background:rgba(90, 34, 139, 0.1); border-radius:24px; display:flex; align-items:center; justify-content:center; margin: 0 auto 15px;">
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
             </div>
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">تطبيق البندر</h3>
             <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.8</p>
         </div>
-        <div class="sidebar-item" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
+        <div class="sidebar-item ripple-dark" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
             <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
         </div>
-        <a id="side-support-link" href="https://wa.me/9647739470354" target="_blank" class="sidebar-item">
+        <a id="side-support-link" href="https://wa.me/9647739470354" target="_blank" class="sidebar-item ripple-dark">
             <i class="fab fa-whatsapp" style="color: #25d366; font-size: 22px; width: 25px;"></i> <span id="side-support-text">مراسلة الدعم الفني</span>
         </a>
     </div>
 
     <div class="bottom-nav" id="bottomNavigation">
-        <div class="nav-item active" onclick="showScreen('home-screen'); updateNav(this)">
+        <div class="nav-item active ripple-dark" onclick="showScreen('home-screen'); updateNav(this)">
             <i class="fas fa-compass"></i><span id="nav-home-text">الرئيسية</span>
         </div>
-        <div class="nav-item" onclick="showScreen('order-screen'); updateNav(this)" style="position: relative;">
+        <div class="nav-item ripple-dark" onclick="showScreen('order-screen'); updateNav(this)" style="position: relative;">
             <i class="fas fa-shopping-basket"></i><span id="nav-shop-text">مسواكك</span>
             <div id="local-cart-badge" class="local-order-counter" style="display:none;">0</div>
         </div>
-        <div class="nav-item" onclick="openJoinScreen(); updateNav(this)">
+        <div class="nav-item ripple-dark" onclick="openJoinScreen(); updateNav(this)">
             <i class="fas fa-user-circle"></i><span id="nav-acc-text">حسابي</span>
         </div>
     </div>
 
-    <button class="theme-toggle" onclick="openSidebar()" id="menu-btn"><i class="fas fa-bars"></i></button>
-    <button class="lang-toggle" onclick="toggleLanguage()" id="langBtn">English</button>
+    <button class="theme-toggle ripple" onclick="openSidebar()" id="menu-btn"><i class="fas fa-bars"></i></button>
+    <button class="lang-toggle ripple" onclick="toggleLanguage()" id="langBtn">English</button>
 
     <div id="welcome-overlay" onclick="skipWelcome()">
-        <i class="fas fa-check-circle" style="font-size: 80px; color: var(--secondary); margin-bottom: 20px; animation: scaleIn 0.5s ease;"></i>
+        <i class="fas fa-check-circle" style="font-size: 80px; color: #10B981; margin-bottom: 20px; animation: scaleIn 0.5s ease;"></i>
         <h1 id="welcome-title" style="margin:0 0 10px; font-weight:800;">تم التفعيل! 🥳</h1>
         <p id="welcome-msg" style="font-size: 18px; color: var(--text-muted); margin-bottom: 30px;"></p>
         <div style="background: var(--bg-color); padding: 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
@@ -256,17 +293,38 @@
       <div class="bike-box"><i class="fas fa-motorcycle"></i><div class="exhaust"><div class="smoke"></div><div class="smoke"></div><div class="smoke"></div></div></div>
     </div>
 
+    <div id="login-screen" class="screen container">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="width:100px; height:100px; background:rgba(90, 34, 139, 0.1); border-radius:30px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: var(--shadow-sm);">
+                <i class="fas fa-user-circle" style="font-size: 50px; color: var(--primary);"></i>
+            </div>
+            <h2 style="margin: 0; font-weight: 800; font-size: 28px; color: var(--text-main);">أهلاً بيك في البندر</h2>
+            <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 15px; font-weight: 600;">سجل بياناتك مرة وحدة واطلب براحتك!</p>
+        </div>
+        <div class="form-card">
+            <div class="form-group">
+                <label>الاسم الكريم</label>
+                <input type="text" id="loginName" placeholder="اكتب اسمك هنا">
+            </div>
+            <div class="form-group">
+                <label>رقم الهاتف (واتساب)</label>
+                <input type="tel" id="loginPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            </div>
+        </div>
+        <button class="send-btn ripple" onclick="startAppLogin()"><i class="fas fa-sign-in-alt"></i> دخول للتطبيق</button>
+    </div>
+
     <div id="admin-panel" class="screen container">
-        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> <span id="adm-title">لوحة التحكم السرية</span></h2>
         <div class="form-card" style="text-align: center;">
             <p id="adm-status-desc" style="font-weight: 700; margin-bottom: 20px;">حالة استقبال الطلبات للزبائن</p>
             
             <div style="display: flex; gap: 15px; justify-content: center;">
-                <button id="btn-open-app" class="send-btn" style="margin-top: 0; background: var(--secondary);" onclick="setGlobalAppStatus('online')">
+                <button id="btn-open-app" class="send-btn ripple" style="margin-top: 0; background: #10B981;" onclick="setGlobalAppStatus('online')">
                     <i class="fas fa-unlock"></i> فتح التطبيق
                 </button>
-                <button id="btn-close-app" class="send-btn" style="margin-top: 0; background: var(--danger);" onclick="setGlobalAppStatus('offline')">
+                <button id="btn-close-app" class="send-btn ripple" style="margin-top: 0; background: var(--danger);" onclick="setGlobalAppStatus('offline')">
                     <i class="fas fa-lock"></i> إغلاق التطبيق
                 </button>
             </div>
@@ -282,27 +340,46 @@
         <h1 id="main-title" onclick="handleSecretClick()">ماذا تحتاج اليوم؟</h1>
         <p id="main-sub">اختر الخدمة ودع الباقي علينا</p>
       </div>
+
+      <div class="baly-slider-container">
+          <div class="baly-slider">
+              <div class="baly-slide ripple" style="background: linear-gradient(135deg, var(--primary) 0%, #8B5CF6 100%);" onclick="showScreen('order-screen')">
+                  <div class="slide-text">
+                      <h3>🎁 الطلب السابع مجاني!</h3>
+                      <p>اجمع 6 طلبات ومسواكك السابع علينا.</p>
+                  </div>
+                  <i class="fas fa-shopping-basket slide-icon"></i>
+              </div>
+              <div class="baly-slide ripple" style="background: linear-gradient(135deg, var(--secondary) 0%, #F59E0B 100%); color: #111;" onclick="showScreen('tuk-screen')">
+                  <div class="slide-text">
+                      <h3>🚀 أسرع تكتك بأم قصر</h3>
+                      <p>توصيلة مضمونة وسريعة وين ما تحب.</p>
+                  </div>
+                  <i class="fas fa-taxi slide-icon" style="color: #111;"></i>
+              </div>
+          </div>
+      </div>
       
       <div class="services-grid">
-          <div class="select-card card-full card-cart" onclick="showScreen('order-screen')">
+          <div class="select-card card-full card-cart ripple-dark" onclick="showScreen('order-screen')">
             <div class="icon-wrapper icon-pulse"><i class="fas fa-shopping-cart"></i></div>
             <div class="card-text"><h3 id="srv-shop-title">تسوق مسواكك</h3><small id="srv-shop-sub">مطاعم، سوبر ماركت، صيدليات والمزيد</small></div>
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
           
-          <div class="select-card card-half card-tuk" onclick="showScreen('tuk-screen')">
+          <div class="select-card card-half card-tuk ripple-dark" onclick="showScreen('tuk-screen')">
             <div class="icon-wrapper icon-pulse"><i class="fas fa-taxi"></i></div>
             <h3 id="srv-tuk-title">تكتك توصيلة</h3>
             <small id="srv-tuk-sub">مشوارك سريع<br>ومضمون</small>
           </div>
           
-          <div class="select-card card-half card-med" onclick="showScreen('mediator-screen')">
+          <div class="select-card card-half card-med ripple-dark" onclick="showScreen('mediator-screen')">
             <div class="icon-wrapper icon-pulse"><i class="fas fa-handshake"></i></div>
             <h3 id="srv-med-title">الوسيط</h3>
             <small id="srv-med-sub">نقل الأغراض<br>بين شخصين</small>
           </div>
 
-          <div class="select-card card-full" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; margin-bottom: 5px;" onclick="shareApp()">
+          <div class="select-card card-full ripple" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; margin-bottom: 5px;" onclick="shareApp()">
             <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-gift"></i></div>
             <div class="card-text">
                 <h3 id="srv-share-title">شارك واربح توصيل مجاني</h3>
@@ -310,13 +387,13 @@
             </div>
           </div>
           
-          <div id="join-driver-card" class="select-card card-full card-join" onclick="openJoinScreen()">
+          <div id="join-driver-card" class="select-card card-full card-join ripple-dark" onclick="openJoinScreen()">
             <div class="icon-wrapper"><i class="fas fa-id-card"></i></div>
             <div class="card-text"><h3 id="srv-join-title">انضم ككابتن</h3><small id="srv-join-sub">سجل معنا وابدأ بتحقيق الدخل</small></div>
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
           
-          <div id="driver-plaza-card" class="select-card card-full card-plaza" style="display: none;" onclick="showScreen('plaza-screen')">
+          <div id="driver-plaza-card" class="select-card card-full card-plaza ripple-dark" style="display: none;" onclick="showScreen('plaza-screen')">
             <div class="icon-wrapper"><i class="fas fa-chart-pie"></i></div>
             <div class="card-text"><h3 id="srv-plaza-title">لوحة الكابتن</h3><small id="srv-plaza-sub">تسليم الطلبات والإحصائيات</small></div>
             <i class="fas fa-chevron-left arrow-icon"></i>
@@ -324,7 +401,7 @@
       </div>
     </div>
     <div id="tuk-screen" class="screen container">
-        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-taxi" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
         
         <div class="form-card">
@@ -342,7 +419,7 @@
 
         <div class="form-card">
             <div class="form-card-title"><i class="fas fa-route"></i> <span id="tuk-r-info">تفاصيل الرحلة</span></div>
-            <button class="location-btn" id="loc-btn-tuk" onclick="getLocation('tuk')" style="margin-top:5px;">
+            <button class="location-btn ripple-dark" id="loc-btn-tuk" onclick="getLocation('tuk')" style="margin-top:5px;">
                 <i class="fas fa-location-crosshairs"></i> <span id="tuk-gps-btn">تحديد نقطة الصعود الحالية 📍</span>
             </button>
             <div class="form-group" style="margin-top: 20px;">
@@ -351,7 +428,7 @@
                     💡 <strong>شلون تنسخ الرابط؟</strong> افتح الخريطة من الزر الجوه، حدد المكان بضغطة مطولة، دوس مشاركة واختار (نسخ 📄).<br>
                     <span style="color:var(--danger); font-weight:800;">اذا ما طلعت نسخ 📄 روح سوي مشاركه لنفسك على التلكرام او الواتساب وانسخ الرابط ورجع خلي بالخانه.</span>
                 </div>
-                <button type="button" class="location-btn" style="border:1px solid var(--border-color); background:var(--surface); color:var(--text-main);" onclick="window.location.href='https://maps.google.com'">
+                <button type="button" class="location-btn ripple-dark" style="border:1px solid var(--border-color); background:var(--surface); color:var(--text-main);" onclick="window.location.href='https://maps.google.com'">
                     <i class="fas fa-map"></i> افتح الخريطة لنسخ الرابط
                 </button>
                 <input type="url" id="tukDropoffLink" placeholder="لصق الرابط هنا...">
@@ -361,11 +438,11 @@
                 <input type="text" id="tukLandmark" placeholder="مدرسة، جامع، أو تقاطع...">
             </div>
         </div>
-        <button class="send-btn order-btn-logic" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">اطلب التكتك الآن</span></button>
+        <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">اطلب التكتك الآن</span></button>
     </div>
 
     <div id="mediator-screen" class="screen container">
-        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> <span id="med-head">خدمة الوسيط</span></h2>
         
         <div class="price-indicator" style="display: block;">
@@ -388,7 +465,7 @@
                 <label>أقرب نقطة دالة لمكانك</label>
                 <input type="text" id="medLandmark" placeholder="لتسهيل وصول المندوب">
             </div>
-            <button class="location-btn" id="loc-btn-med" onclick="getLocation('med')" style="margin-top:5px;">
+            <button class="location-btn ripple-dark" id="loc-btn-med" onclick="getLocation('med')" style="margin-top:5px;">
                 <i class="fas fa-location-crosshairs"></i> <span id="med-gps-btn">تحديد موقعي الحالي بدقة</span>
             </button>
         </div>
@@ -400,11 +477,11 @@
                 <textarea id="medOrder" rows="4" placeholder="مثال: أريد توصيل مفاتيح من تقاطع الميناء إلى حي المهندسين..."></textarea>
             </div>
         </div>
-        <button class="send-btn order-btn-logic" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
+        <button class="send-btn order-btn-logic ripple" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
     </div>
 
     <div id="order-screen" class="screen container">
-        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-shopping-cart" style="color:var(--primary);"></i> <span id="shop-head">تسوق مسواكك</span></h2>
         
         <div id="loyalty-info" class="loyalty-card">
@@ -434,7 +511,7 @@
                 <label>نقطة دالة</label>
                 <input type="text" id="custLandmark" placeholder="وصف سريع لمكانك">
             </div>
-            <button class="location-btn" id="loc-btn-cust" onclick="getLocation('cust')" style="margin-top:5px;">
+            <button class="location-btn ripple-dark" id="loc-btn-cust" onclick="getLocation('cust')" style="margin-top:5px;">
                 <i class="fas fa-location-crosshairs"></i> <span id="shop-gps-btn">تحديد موقعي بدقة</span>
             </button>
         </div>
@@ -446,18 +523,18 @@
             </div>
             <div class="form-group" style="margin-top: 10px;">
                 <input type="file" id="custImages" accept="image/*" multiple style="display:none;" onchange="previewImages()">
-                <button type="button" class="location-btn" style="border: 2px dashed var(--primary); background: var(--bg-color); color: var(--text-main); margin-bottom: 0;" onclick="document.getElementById('custImages').click()">
+                <button type="button" class="location-btn ripple-dark" style="border: 2px dashed var(--primary); background: var(--bg-color); color: var(--text-main); margin-bottom: 0;" onclick="document.getElementById('custImages').click()">
                     <i class="fas fa-camera" style="color: var(--primary);"></i> <span id="shop-img-btn">إضافة صور للطلبات (اختياري)</span>
                 </button>
                 <div id="image-preview-container" style="display:flex; gap:10px; overflow-x:auto; margin-top:10px; padding-bottom:5px; flex-wrap: wrap;"></div>
             </div>
         </div>
-        <button class="send-btn order-btn-logic" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
+        <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
 
     <div id="join-screen" class="screen container">
-        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:var(--secondary);"></i> انضم ككابتن</h2>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> انضم ككابتن</h2>
         
         <div class="form-card">
             <div class="form-card-title"><i class="fas fa-user-edit"></i> بيانات التسجيل</div>
@@ -479,7 +556,7 @@
                 </select>
             </div>
         </div>
-        <button class="send-btn" id="joinSendBtn" onclick="submitJoinRequest()">إرسال طلب الانضمام</button>
+        <button class="send-btn ripple" id="joinSendBtn" onclick="submitJoinRequest()">إرسال طلب الانضمام</button>
     </div>
 
     <div id="activation-screen" class="screen container">
@@ -490,17 +567,17 @@
             <div class="form-group">
                 <input type="number" id="activationCodeInput" placeholder="أدخل الكود هنا..." style="text-align:center; font-size:20px; letter-spacing:4px; font-weight:bold;">
             </div>
-            <button class="send-btn" onclick="verifyActivationCode()">تفعيل الحساب</button>
-            <button class="resign-btn" onclick="cancelJoinRequest()" style="margin-top:15px;">إلغاء الطلب</button>
+            <button class="send-btn ripple" onclick="verifyActivationCode()">تفعيل الحساب</button>
+            <button class="resign-btn ripple-dark" onclick="cancelJoinRequest()" style="margin-top:15px;">إلغاء الطلب</button>
         </div>
     </div>
 
     <div id="plaza-screen" class="screen container">
-        <button class="back-btn" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-chart-pie" style="color:#8B5CF6;"></i> لوحة الكابتن</h2>
 
         <div class="form-card" style="text-align: center; padding: 15px;">
-            <button id="statusToggleBtn" class="send-btn" style="background: var(--secondary); margin-top: 0; box-shadow: none;" onclick="toggleDriverStatus()">
+            <button id="statusToggleBtn" class="send-btn ripple" style="background: #10B981; margin-top: 0; box-shadow: none;" onclick="toggleDriverStatus()">
                 <i class="fas fa-check-circle"></i> أنا متاح للعمل
             </button>
         </div>
@@ -518,10 +595,10 @@
                 <input type="tel" id="arrivePhoneInput" placeholder="مثال: 07700000000" style="text-align:center;" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             </div>
             <div style="display: flex; gap: 10px;">
-                <button class="location-btn success" style="flex: 1; margin: 0; background: #25D366; color: white; border: none;" onclick="notifyArriveWhatsApp()">
+                <button class="location-btn success ripple" style="flex: 1; margin: 0; background: #25D366; color: white; border: none;" onclick="notifyArriveWhatsApp()">
                     <i class="fab fa-whatsapp"></i> رسالة واتساب
                 </button>
-                <button class="location-btn" style="flex: 1; margin: 0; background: var(--primary); color: white; border: none;" onclick="notifyArriveCall()">
+                <button class="location-btn ripple" style="flex: 1; margin: 0; background: var(--primary); color: white; border: none;" onclick="notifyArriveCall()">
                     <i class="fas fa-phone-alt"></i> اتصال سريع
                 </button>
             </div>
@@ -537,7 +614,7 @@
                 <label>كود التأكيد (الذي وصل للزبون)</label>
                 <input type="number" id="driverVerifyInput" placeholder="مثال: 1234" style="text-align:center; font-size:22px; letter-spacing:4px; font-weight:bold;">
             </div>
-            <button class="send-btn" style="background: var(--secondary); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); margin-top:5px;" onclick="processVerifyCode()"><i class="fas fa-check-circle"></i> تأكيد العملية</button>
+            <button class="send-btn ripple" style="background: #10B981; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); margin-top:5px;" onclick="processVerifyCode()"><i class="fas fa-check-circle"></i> تأكيد العملية</button>
         </div>
 
         <div class="leaderboard-card">
@@ -548,15 +625,15 @@
             <small style="display: block; text-align: center; margin-top: 15px; color: var(--text-muted); font-weight:600;">المنافسة مستمرة حتى إعلان النتائج 🏆</small>
         </div>
 
-        <a href="tg://resolve?domain=uumqaser" class="select-card" style="background: #0088cc; color: white; border:none; padding:15px; text-decoration: none; display: flex;">
+        <a href="tg://resolve?domain=uumqaser" class="select-card ripple-dark" style="background: #0088cc; color: white; border:none; padding:15px; text-decoration: none; display: flex;">
             <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color:white; width:50px; height:50px;"><i class="fab fa-telegram-plane" style="font-size:22px;"></i></div>
             <div class="card-text"><h3 style="margin:0; font-size:16px;">قناة المناديب الرسمية</h3><small style="color:rgba(255,255,255,0.8);">انضم لتلقي الإشعارات والطلبات</small></div>
         </a>
 
         <p id="driver-display-name" style="text-align: center; font-weight: 700; color: var(--text-muted); margin-top:30px;"></p>
-        <button class="resign-btn" onclick="resignDriver()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج / استقالة</button>
+        <button class="resign-btn ripple-dark" onclick="resignDriver()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج / استقالة</button>
     </div>
-    <script>
+        <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
@@ -616,9 +693,9 @@
           const btnClose = document.getElementById('btn-close-app');
           
           if(newStatus === 'online') {
-              btnOpen.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+              btnOpen.innerHTML = '<span class="baly-spinner"></span>';
           } else {
-              btnClose.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+              btnClose.innerHTML = '<span class="baly-spinner"></span>';
           }
           btnOpen.disabled = true;
           btnClose.disabled = true;
@@ -843,13 +920,12 @@
 
       function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
       
-      // تحديث التحقق من الرقم العراقي (يبدأ بـ 07 وطوله 11 رقم)
       function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
 
       function getLocation(type) {
           const btn = document.getElementById(`loc-btn-${type}`);
           const originalHTML = btn.innerHTML;
-          btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> جاري التحديد...';
+          btn.innerHTML = '<span class="baly-spinner" style="width:16px;height:16px;border-width:2px;border-top-color:var(--primary);"></span> جاري التحديد...';
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
                   (position) => {
@@ -868,12 +944,26 @@
           }
       }
 
+      // دالة تسجيل الدخول
+      function startAppLogin() {
+          const name = document.getElementById('loginName').value.trim();
+          const phone = document.getElementById('loginPhone').value.trim();
+          
+          if(!name || !validateIraqiPhone(phone)) {
+              return showToast("يرجى كتابة الاسم ورقم عراقي صحيح (يبدأ بـ 07) ⚠️");
+          }
+          
+          saveCustomerData(name, phone);
+          loadSavedCustomerData();
+          syncLoyaltyWithServer();
+          showScreen('home-screen');
+          showToast("هلا بيك نورت البندر! 🎉");
+      }
+
       function checkStatus() {
           trackLiveVisit(); 
           checkConnection(); 
           applyAutoTheme(); 
-          loadSavedCustomerData();
-          syncLoyaltyWithServer(); 
           
           checkGlobalStatusFromServer(); 
 
@@ -892,8 +982,18 @@
               initDriverStatus();
               setInterval(checkRemoteReset, 15000); 
               setInterval(refreshLeaderboard, 30000);
+              showScreen('home-screen');
+          } else {
+              // التحقق من تسجيل الدخول
+              if(!localStorage.getItem('saved_customer_phone')) {
+                  showScreen('login-screen');
+              } else {
+                  loadSavedCustomerData();
+                  syncLoyaltyWithServer();
+                  showScreen('home-screen');
+              }
           }
-          showScreen('home-screen');
+          
           setTimeout(() => { document.getElementById('app-logo-splash').classList.add('show-logo'); }, 500);
           setTimeout(skipSplash, 2500); 
       }
@@ -981,7 +1081,7 @@
           
           const btn = document.getElementById('joinSendBtn');
           const originalText = btn.innerHTML;
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+          btn.innerHTML = '<span class="baly-spinner"></span>';
           btn.disabled = true;
           try {
               localStorage.setItem('temp_name', name); localStorage.setItem('temp_phone', phone);
@@ -1018,6 +1118,13 @@
           document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
           document.getElementById(id).classList.add('active-screen');
           window.scrollTo({ top: 0, behavior: 'smooth' });
+          
+          // إخفاء الشريط السفلي في شاشة تسجيل الدخول
+          const bottomNav = document.getElementById('bottomNavigation');
+          if(bottomNav) {
+              bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel') ? 'none' : 'flex';
+          }
+          
           if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
           if(id === 'order-screen') updateLoyaltyUI();
       }
@@ -1032,7 +1139,7 @@
           if(!name || !validateIraqiPhone(phone) || !userCoords || !dropLink) return showToast("أكمل البيانات وحدد نقطة الصعود والنزول 📍 (وتأكد من صحة رقمك)");
           const btn = document.getElementById('tukSendBtn');
           const originalText = btn.innerHTML;
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الطلب...'; btn.disabled = true;
+          btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
               saveCustomerData(name, phone);
               const vc = generateSecureVC();
@@ -1060,7 +1167,7 @@
           if(!name || !validateIraqiPhone(phone) || !userCoords) return showToast("أكمل البيانات وحدد الموقع 📍 (وتأكد من صحة رقمك)");
           const btn = document.getElementById('medSendBtn');
           const originalText = btn.innerHTML;
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...'; btn.disabled = true;
+          btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
               saveCustomerData(name, phone);
               const vc = generateSecureVC();
@@ -1110,14 +1217,14 @@
           
           const btn = document.getElementById('sendBtn');
           const originalText = btn.innerHTML;
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التجهيز...'; btn.disabled = true;
+          btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
               saveCustomerData(name, phone);
               const vc = generateSecureVC();
               let photoMsgs = [];
 
               if (files.length > 0) {
-                  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري رفع الصور بسرية...';
+                  btn.innerHTML = '<span class="baly-spinner"></span>';
                   for (let i = 0; i < files.length; i++) {
                       let fd = new FormData();
                       fd.append('chat_id', "-1003786625443"); 
@@ -1134,7 +1241,7 @@
                   clearImages();
               }
 
-              btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+              btn.innerHTML = '<span class="baly-spinner"></span>';
               
               let photoIdsStr = photoMsgs.join(',');
               let referrer = localStorage.getItem('referred_by') || "";
@@ -1169,7 +1276,7 @@
           
           const btn = document.querySelector('#plaza-screen .send-btn');
           const oldText = btn.innerHTML;
-          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التأكيد...'; btn.disabled = true;
+          btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           
           try {
               const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
