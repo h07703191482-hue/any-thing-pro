@@ -13,25 +13,28 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
     <link rel="manifest" href="manifest.json">
 
-    <title>تطبيق البندر - خدمات توصيل في أم قصر</title>
+    <title>تطبيق البندر - خدمات توصيل وتحصيل في أم قصر</title>
     
-    <meta name="apple-mobile-web-app-title" content="البندر">
+    <meta name="apple-mobile-web-app-title" content="البندر للتحصيل">
     <meta name="application-name" content="البندر">
     
-    <meta name="description" content="تطبيق البندر هو أسرع تطبيق لتوصيل المسواك، التكتك، والوسيط في أم قصر. اطلب الآن نصلك أينما كنت بأفضل الأسعار.">
-    <meta name="keywords" content="البندر, تطبيق البندر, توصيل البندر, توصيل، أم قصر، تكتك، مسواك، طلبات، البصرة، مندوب">
+    <meta name="description" content="تطبيق البندر للتحصيل هو أسرع تطبيق لتوصيل المسواك، التحصيل، والخدمات اللوجستية في أم قصر. اطلب الآن نصلك أينما كنت.">
+    <meta name="keywords" content="البندر, تطبيق البندر, توصيل البندر, تحصيل، أم قصر، تكتك، مسواك، طلبات، البصرة، مندوب">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
       :root { 
-          /* ألوان ثيم بلي (Baly Theme) */
+          /* ألوان ثيم بلي (Baly Theme) المحدثة مع الأيقونة */
           --primary: #5A228B; 
           --primary-hover: #4A1A75; 
           --secondary: #FFC107;       
@@ -59,17 +62,14 @@
       body::before { content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(90, 34, 139, 0.03) 0%, transparent 50%); z-index: -1; pointer-events: none; }
       body.dark-mode::before { background: radial-gradient(circle at 50% 0%, rgba(122, 59, 186, 0.08) 0%, transparent 50%); }
       
-      /* تأثير النقر (Ripple Effect) */
       .ripple { position: relative; overflow: hidden; }
       .ripple::after { content: ""; position: absolute; top: 50%; left: 50%; width: 150%; padding-top: 150%; background: rgba(255, 255, 255, 0.3); border-radius: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; transition: transform 0.4s, opacity 0.4s; pointer-events: none; }
       .ripple:active::after { transform: translate(-50%, -50%) scale(1); opacity: 1; transition: 0s; }
       .ripple-dark::after { background: rgba(0, 0, 0, 0.1); }
 
-      /* دائرة التحميل الاحترافية */
       .baly-spinner { width: 26px; height: 26px; border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; display: inline-block; vertical-align: middle; }
       @keyframes spin { to { transform: rotate(360deg); } }
 
-      /* السلايدر (شريط العروض) */
       .baly-slider-container { width: 100%; overflow: hidden; margin-top: -45px; margin-bottom: 25px; position: relative; z-index: 5; }
       .baly-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding: 0 20px 10px 20px; }
       .baly-slider::-webkit-scrollbar { display: none; }
@@ -82,7 +82,6 @@
       .theme-toggle:active { transform: scale(0.9); }
       .lang-toggle { position: fixed; top: 20px; left: 80px; z-index: 10001; background: var(--surface); color: var(--primary); border: 1px solid var(--border-color); padding: 0 15px; height: 48px; border-radius: var(--radius-pill); cursor: pointer; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; transition: 0.3s; }
       
-      /* إعدادات الشاشات لمنع التداخل */
       .screen { display: none; width: 100%; min-height: 100vh; animation: fadeSlideUp 0.4s ease-out forwards; }
       .active-screen { display: block !important; }
       #login-screen.active-screen { display: flex !important; flex-direction: column; justify-content: center; min-height: 100vh; position: relative; z-index: 100; padding-bottom: 20px; }
@@ -286,8 +285,8 @@
     <div id="splash-screen" onclick="skipSplash()">
       <div id="app-logo-splash"><i class="fas fa-box-open" style="font-size: 55px;"></i></div>
       <div class="splash-welcome-text">
-          <h2 id="splash-title">البندر</h2>
-          <p id="splash-subtitle">نصلك أينما كنت في أم قصر</p>
+          <h2 id="splash-title">البندر للتحصيل</h2>
+          <p id="splash-subtitle">أسرع تطبيق للتوصيل والتحصيل في أم قصر</p>
       </div>
       <div class="road-realistic"><div class="road-lines"></div></div>
       <div class="bike-box"><i class="fas fa-motorcycle"></i><div class="exhaust"><div class="smoke"></div><div class="smoke"></div><div class="smoke"></div></div></div>
@@ -335,10 +334,10 @@
 
     <div id="home-screen" class="screen container">
       <div class="header-main">
-        <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً - Service Offline 🔴</div>
-        <div id="driver-status-badge" class="driver-status-bar">أنت الآن في وضع المندوب النشط 🟢</div>
-        <h1 id="main-title" onclick="handleSecretClick()">ماذا تحتاج اليوم؟</h1>
-        <p id="main-sub">اختر الخدمة ودع الباقي علينا</p>
+        <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
+        <div id="driver-status-badge" class="driver-status-bar">أنت الآن في وضع التحصيل النشط 🟢</div>
+        <h1 id="main-title" onclick="handleSecretClick()">البندر للتحصيل</h1>
+        <p id="main-sub">أسرع خدمات التوصيل والتحصيل في أم قصر</p>
       </div>
 
       <div class="baly-slider-container">
@@ -352,10 +351,10 @@
               </div>
               <div class="baly-slide ripple" style="background: linear-gradient(135deg, var(--secondary) 0%, #F59E0B 100%); color: #111;" onclick="showScreen('tuk-screen')">
                   <div class="slide-text">
-                      <h3>🚀 أسرع تكتك بأم قصر</h3>
-                      <p>توصيلة مضمونة وسريعة وين ما تحب.</p>
+                      <h3>🚖 تحصيل سريع وآمن</h3>
+                      <p>نوصل أغراضك ونحصل أموالك بسرعة.</p>
                   </div>
-                  <i class="fas fa-taxi slide-icon" style="color: #111;"></i>
+                  <i class="fas fa-money-bill-wave slide-icon" style="color: #111;"></i>
               </div>
           </div>
       </div>
@@ -368,9 +367,9 @@
           </div>
           
           <div class="select-card card-half card-tuk ripple-dark" onclick="showScreen('tuk-screen')">
-            <div class="icon-wrapper icon-pulse"><i class="fas fa-taxi"></i></div>
-            <h3 id="srv-tuk-title">تكتك توصيلة</h3>
-            <small id="srv-tuk-sub">مشوارك سريع<br>ومضمون</small>
+            <div class="icon-wrapper icon-pulse"><i class="fas fa-money-bill-wave"></i></div>
+            <h3 id="srv-tuk-title">تحصيل أموال</h3>
+            <small id="srv-tuk-sub">خدمات تحصيل<br>سريعة وآمنة</small>
           </div>
           
           <div class="select-card card-half card-med ripple-dark" onclick="showScreen('mediator-screen')">
@@ -394,7 +393,7 @@
           </div>
           
           <div id="driver-plaza-card" class="select-card card-full card-plaza ripple-dark" style="display: none;" onclick="showScreen('plaza-screen')">
-            <div class="icon-wrapper"><i class="fas fa-chart-pie"></i></div>
+            <div class="icon-wrapper"><i class="fas fa-briefcase"></i></div>
             <div class="card-text"><h3 id="srv-plaza-title">لوحة الكابتن</h3><small id="srv-plaza-sub">تسليم الطلبات والإحصائيات</small></div>
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
@@ -402,10 +401,10 @@
     </div>
     <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-taxi" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
+        <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">خدمات التحصيل</span></h2>
         
         <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="tuk-p-info">بيانات الراكب</span></div>
+            <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="tuk-p-info">بيانات العميل</span></div>
             <div class="form-group">
                 <label id="lbl-tuk-name">الاسم الكامل</label>
                 <input type="text" id="tukName" placeholder="اكتب اسمك هنا">
@@ -418,15 +417,15 @@
         </div>
 
         <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-route"></i> <span id="tuk-r-info">تفاصيل الرحلة</span></div>
+            <div class="form-card-title"><i class="fas fa-route"></i> <span id="tuk-r-info">تفاصيل العملية</span></div>
             <button class="location-btn ripple-dark" id="loc-btn-tuk" onclick="getLocation('tuk')" style="margin-top:5px;">
-                <i class="fas fa-location-crosshairs"></i> <span id="tuk-gps-btn">تحديد نقطة الصعود الحالية 📍</span>
+                <i class="fas fa-location-crosshairs"></i> <span id="tuk-gps-btn">تحديد موقعك الحالي 📍</span>
             </button>
             <div class="form-group" style="margin-top: 20px;">
-                <label style="color:var(--danger);" id="lbl-tuk-drop">نقطة النزول (إجباري)</label>
+                <label style="color:var(--danger);" id="lbl-tuk-drop">موقع التحصيل/التسليم (إجباري)</label>
                 <div class="note" style="padding:12px; font-size:12px; margin-bottom:10px; background:var(--bg-color); border-right-color:var(--primary); color:var(--text-main);">
                     💡 <strong>شلون تنسخ الرابط؟</strong> افتح الخريطة من الزر الجوه، حدد المكان بضغطة مطولة، دوس مشاركة واختار (نسخ 📄).<br>
-                    <span style="color:var(--danger); font-weight:800;">اذا ما طلعت نسخ 📄 روح سوي مشاركه لنفسك على التلكرام او الواتساب وانسخ الرابط ورجع خلي بالخانه.</span>
+                    <span style="color:var(--danger); font-weight:800;">اذا ما طلعت نسخ 📄 روح سوي مشاركهلنفسك على التلكرام او الواتساب وانسخ الرابط ورجع خلي بالخانه.</span>
                 </div>
                 <button type="button" class="location-btn ripple-dark" style="border:1px solid var(--border-color); background:var(--surface); color:var(--text-main);" onclick="window.location.href='https://maps.google.com'">
                     <i class="fas fa-map"></i> افتح الخريطة لنسخ الرابط
@@ -434,11 +433,11 @@
                 <input type="url" id="tukDropoffLink" placeholder="لصق الرابط هنا...">
             </div>
             <div class="form-group">
-                <label>أقرب نقطة دالة لمكان الصعود (اختياري)</label>
+                <label>أقرب نقطة دالة (اختياري)</label>
                 <input type="text" id="tukLandmark" placeholder="مدرسة، جامع، أو تقاطع...">
             </div>
         </div>
-        <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">اطلب التكتك الآن</span></button>
+        <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">طلب تحصيل أموال</span></button>
     </div>
 
     <div id="mediator-screen" class="screen container">
@@ -574,7 +573,9 @@
 
     <div id="plaza-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-chart-pie" style="color:#8B5CF6;"></i> لوحة الكابتن</h2>
+        <h2 class="screen-header-title">
+            <i class="fas fa-briefcase" style="color:#8B5CF6;"></i> لوحة التحصيل والعمل
+        </h2>
 
         <div class="form-card" style="text-align: center; padding: 15px;">
             <button id="statusToggleBtn" class="send-btn ripple" style="background: #10B981; margin-top: 0; box-shadow: none;" onclick="toggleDriverStatus()">
@@ -583,7 +584,7 @@
         </div>
         
         <div class="form-card" style="background: linear-gradient(135deg, var(--primary) 0%, #818CF8 100%); color:white; border:none;">
-            <h4 style="color:rgba(255,255,255,0.8); margin:0; font-size:15px;">إجمالي الطلبات المنجزة 📦</h4>
+            <h4 style="color:rgba(255,255,255,0.8); margin:0; font-size:15px;">إجمالي العمليات المنجزة 📦</h4>
             <p id="stat-count" style="font-size: 45px; font-weight:800; color:white; margin:10px 0 0;">0</p>
             <div style="display:none;"><span id="stat-driver">0</span><span id="stat-admin">0</span></div>
         </div>
@@ -605,35 +606,11 @@
         </div>
 
         <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-qrcode"></i> تأكيد تسليم طلب جديد</div>
+            <div class="form-card-title"><i class="fas fa-qrcode"></i> تأكيد تسليم/تحصيل جديد</div>
             <div class="form-group">
                 <label>رقم هاتف الزبون</label>
-                <input type="tel" id="driverVerifyPhoneInput" placeholder="مثال: 07700000000" style="text-align:center;" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-            </div>
-            <div class="form-group">
-                <label>كود التأكيد (الذي وصل للزبون)</label>
-                <input type="number" id="driverVerifyInput" placeholder="مثال: 1234" style="text-align:center; font-size:22px; letter-spacing:4px; font-weight:bold;">
-            </div>
-            <button class="send-btn ripple" style="background: #10B981; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); margin-top:5px;" onclick="processVerifyCode()"><i class="fas fa-check-circle"></i> تأكيد العملية</button>
-        </div>
-
-        <div class="leaderboard-card">
-            <div class="form-card-title" style="justify-content:center;"><i class="fas fa-trophy"></i> دوري الأبطال</div>
-            <div id="leaderboard-list">
-                <p style="text-align: center; color: var(--text-muted);">جاري تحميل الترتيب...</p>
-            </div>
-            <small style="display: block; text-align: center; margin-top: 15px; color: var(--text-muted); font-weight:600;">المنافسة مستمرة حتى إعلان النتائج 🏆</small>
-        </div>
-
-        <a href="tg://resolve?domain=uumqaser" class="select-card ripple-dark" style="background: #0088cc; color: white; border:none; padding:15px; text-decoration: none; display: flex;">
-            <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color:white; width:50px; height:50px;"><i class="fab fa-telegram-plane" style="font-size:22px;"></i></div>
-            <div class="card-text"><h3 style="margin:0; font-size:16px;">قناة المناديب الرسمية</h3><small style="color:rgba(255,255,255,0.8);">انضم لتلقي الإشعارات والطلبات</small></div>
-        </a>
-
-        <p id="driver-display-name" style="text-align: center; font-weight: 700; color: var(--text-muted); margin-top:30px;"></p>
-        <button class="resign-btn ripple-dark" onclick="resignDriver()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج / استقالة</button>
-    </div>
-        <script>
+                <input type="
+    <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
@@ -750,7 +727,7 @@
               }
           } else {
               badge.style.display = 'none';
-              document.getElementById('tukSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> ' + (currentLang === 'ar' ? 'اطلب التكتك الآن' : 'Order TukTuk');
+              document.getElementById('tukSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> ' + (currentLang === 'ar' ? 'طلب تحصيل أموال' : 'Request Collection');
               document.getElementById('medSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> ' + (currentLang === 'ar' ? 'تأكيد طلب الوسيط' : 'Confirm Order');
               document.getElementById('sendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> ' + (currentLang === 'ar' ? 'أرسل الطلب الآن' : 'Send Order Now');
               orderButtons.forEach(btn => btn.disabled = false);
@@ -764,30 +741,30 @@
           
           const t = {
               ar: { 
-                  title: "ماذا تحتاج اليوم؟", sub: "اختر الخدمة ودع الباقي علينا", shop: "تسوق مسواكك", shop_s: "مطاعم، سوبر ماركت والمزيد",
-                  tuk: "تكتك توصيلة", tuk_s: "مشوارك سريع ومضمون", med: "الوسيط", med_s: "نقل الأغراض بين شخصين",
+                  title: "البندر للتحصيل", sub: "أسرع خدمات التوصيل والتحصيل في أم قصر", shop: "تسوق مسواكك", shop_s: "مطاعم، سوبر ماركت والمزيد",
+                  tuk: "تحصيل أموال", tuk_s: "خدمات تحصيل سريعة وآمنة", med: "الوسيط", med_s: "نقل الأغراض بين شخصين",
                   share: "شارك واربح", share_s: "انسخ رابطك ودزه لأصدقائك 🎁", join: "انضم ككابتن", join_s: "سجل معنا وابدأ بالعمل",
-                  plaza: "لوحة الكابتن", plaza_s: "إحصائيات المندوب", h: "الرئيسية", o: "مسواكك", p: "حسابي",
+                  plaza: "لوحة التحصيل والعمل", plaza_s: "إحصائيات المندوب", h: "الرئيسية", o: "مسواكك", p: "حسابي",
                   off_t: "لا يوجد اتصال", off_m: "يرجى الاتصال بالإنترنت", btn_w: "واي فاي", btn_d: "بيانات الهاتف",
                   side_close: "إغلاق", side_v: "الإصدار 2.0.8", side_wa: "الدعم الفني", side_dark: "تفعيل الوضع الليلي",
                   shop_h: "تسوق مسواكك", shop_info: "بيانات التوصيل", shop_gps: "تحديد الموقع بدقة", shop_btn: "أرسل الطلب الآن", shop_img: "إضافة صور", shop_o: "ماذا تريد أن نشتري لك؟",
-                  tuk_h: "تكتك توصيلة", tuk_info: "بيانات الراكب", tuk_gps: "تحديد مكان الصعود 📍", tuk_btn: "اطلب التكتك الآن", tuk_trip: "تفاصيل الرحلة",
+                  tuk_h: "خدمات التحصيل", tuk_info: "بيانات العميل", tuk_gps: "تحديد موقعك الحالي 📍", tuk_btn: "طلب تحصيل أموال", tuk_trip: "تفاصيل العملية",
                   med_h: "خدمة الوسيط", med_info: "بيانات المرسل", med_gps: "تحديد موقعي", med_btn: "تأكيد طلب الوسيط",
-                  loy_t: "طلبك رقم", wait_h: "طلبك قيد المراجعة", splash_t: "البندر", splash_s: "نصلك أينما كنت في أم قصر",
+                  loy_t: "طلبك رقم", wait_h: "طلبك قيد المراجعة", splash_t: "البندر للتحصيل", splash_s: "أسرع تطبيق للتوصيل والتحصيل في أم قصر",
                   lock_h: "تم إيقاف التطبيق مؤقتاً", lock_p: "نحن نقوم ببعض التحديثات أو الصيانة، يرجى المحاولة في وقت لاحق.",
                   btn_open: '<i class="fas fa-unlock"></i> فتح التطبيق', btn_close: '<i class="fas fa-lock"></i> إغلاق التطبيق'
               },
               en: { 
-                  title: "What do you need?", sub: "Pick a service and let us handle it", shop: "Shopping", shop_s: "Restaurants, Market and more",
-                  tuk: "TukTuk Ride", tuk_s: "Fast and reliable ride", med: "Mediator", med_s: "Transfer items between people",
+                  title: "Al-Bandar Collection", sub: "Fastest Delivery and Collection Services in Um Qasr", shop: "Shopping", shop_s: "Restaurants, Market and more",
+                  tuk: "Money Collection", tuk_s: "Fast and secure collection services", med: "Mediator", med_s: "Transfer items between people",
                   share: "Share & Win", share_s: "Copy link to your friends 🎁", join: "Join as Captain", join_s: "Register and start working",
-                  plaza: "Captain Panel", plaza_s: "Delegate Statistics", h: "Home", o: "Shopping", p: "Profile",
+                  plaza: "Collection & Work Panel", plaza_s: "Delegate Statistics", h: "Home", o: "Shopping", p: "Profile",
                   off_t: "No Connection", off_m: "Please connect to internet", btn_w: "Wi-Fi", btn_d: "Mobile Data",
                   side_close: "Close", side_v: "Version 2.0.8", side_wa: "Support", side_dark: "Night Mode",
                   shop_h: "Shopping", shop_info: "Delivery Details", shop_gps: "Detect My Location", shop_btn: "Send Order Now", shop_img: "Add Photos", shop_o: "What do you want us to buy?",
-                  tuk_h: "TukTuk Ride", tuk_info: "Passenger Details", tuk_gps: "Detect Pickup Point 📍", tuk_btn: "Order TukTuk Now", tuk_trip: "Trip Details",
+                  tuk_h: "Collection Services", tuk_info: "Customer Details", tuk_gps: "Detect My Location 📍", tuk_btn: "Request Money Collection", tuk_trip: "Process Details",
                   med_h: "Mediator", med_info: "Sender Details", med_gps: "Detect My Location", med_btn: "Confirm Request",
-                  loy_t: "Order No.", wait_h: "Application Under Review", splash_t: "Al-Bandar", splash_s: "Delivering everywhere in Um Qasr",
+                  loy_t: "Order No.", wait_h: "Application Under Review", splash_t: "Al-Bandar Collection", splash_s: "Fastest Delivery and Collection App in Um Qasr",
                   lock_h: "App Temporarily Offline", lock_p: "We are doing some maintenance, please try again later.",
                   btn_open: '<i class="fas fa-unlock"></i> Open App', btn_close: '<i class="fas fa-lock"></i> Close App'
               }
@@ -944,7 +921,6 @@
           }
       }
 
-      // دالة تسجيل الدخول
       function startAppLogin() {
           const name = document.getElementById('loginName').value.trim();
           const phone = document.getElementById('loginPhone').value.trim();
@@ -984,7 +960,6 @@
               setInterval(refreshLeaderboard, 30000);
               showScreen('home-screen');
           } else {
-              // التحقق من تسجيل الدخول
               if(!localStorage.getItem('saved_customer_phone')) {
                   showScreen('login-screen');
               } else {
@@ -1119,7 +1094,6 @@
           document.getElementById(id).classList.add('active-screen');
           window.scrollTo({ top: 0, behavior: 'smooth' });
           
-          // إخفاء الشريط السفلي في شاشة تسجيل الدخول
           const bottomNav = document.getElementById('bottomNavigation');
           if(bottomNav) {
               bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel') ? 'none' : 'flex';
@@ -1148,12 +1122,12 @@
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`);
               localStorage.removeItem('referred_by'); 
               
-              const msg = `🚖 طلب تكتك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📍 صعود من: ${userCoords}\nنزول في: ${dropLink}`;
+              const msg = `🚖 طلب تحصيل أموال\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الموقع: ${userCoords}\n📝 تفاصيل: ${dropLink}\nدالة: ${land}`;
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
+                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية", callback_data: `claim|${name}|${vc}` }]] } })
               });
-              showToast("تم طلب التكتك بنجاح ✅");
+              showToast("تم إرسال طلب التحصيل بنجاح ✅");
               document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = "";
               syncLoyaltyWithServer(); 
           } catch (e) { showToast("حدث خطأ أثناء الإرسال"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
@@ -1296,7 +1270,7 @@
                   let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
                   fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
                   
-                  showToast(`تم تأكيد التسليم بنجاح! عاشت ايدك 👏`);
+                  showToast(`تم تأكيد العملية بنجاح! عاشت ايدك 👏`);
                   refreshLeaderboard();
                   document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
               } else {
@@ -1319,7 +1293,7 @@
               const drivers = await response.json();
               drivers.sort((a, b) => (parseInt(b.leagueCount) || 0) - (parseInt(a.leagueCount) || 0));
               listDiv.innerHTML = "";
-              if(drivers.length === 0) { listDiv.innerHTML = '<p style="text-align: center; color: var(--text-muted);">لا يوجد منافسين حالياً</p>'; return; }
+              if(drivers.length === 0) { listDiv.innerHTML = '<p style="text-align: center; color: var(--text-muted);">لا يوجد كباتن حالياً</p>'; return; }
               drivers.forEach((d, index) => {
                   let medal = (index === 0) ? "🥇" : (index === 1) ? "🥈" : (index === 2) ? "🥉" : `<span style="font-size:16px; color:var(--text-muted);">${index + 1}</span>`;
                   let isMe = d.phone === localStorage.getItem('driver_phone') ? " (أنت)" : "";
@@ -1389,7 +1363,7 @@
               btn.style.background = 'var(--secondary)';
               btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل';
               if(badge) {
-                  badge.innerText = 'أنت الآن في وضع المندوب النشط 🟢';
+                  badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢';
                   badge.style.background = 'var(--gold)';
                   badge.style.color = '#000';
               }
@@ -1405,7 +1379,7 @@
               if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; }
           } else {
               if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; }
-              if(badge) { badge.innerText = 'أنت الآن في وضع المندوب النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; }
+              if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; }
           }
       }
 
@@ -1413,7 +1387,7 @@
           const phone = document.getElementById('arrivePhoneInput').value.trim();
           if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️");
           let formattedPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone;
-          let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (البندر) بالباب، يرجى استلام الطلب 🛵");
+          let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (البندر) بالباب، يرجى استلام الطلب/الأموال 🛵");
           window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank');
       }
 
