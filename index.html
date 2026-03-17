@@ -33,9 +33,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
+      /* تصميم نافذة الخريطة المنبثقة */
+      #map-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100005; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+      .map-container { width: 95%; max-width: 450px; background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; position: relative; box-shadow: var(--shadow-floating); display: flex; flex-direction: column; }
+      .map-header { padding: 15px; background: var(--primary); color: white; text-align: center; font-weight: 800; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
+      .close-map-btn { background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0; }
+      #map-view { width: 100%; height: 350px; z-index: 1; }
+      .map-center-marker { position: absolute; top: calc(50% + 20px); left: 50%; transform: translate(-50%, -100%); z-index: 1000; font-size: 45px; color: var(--danger); text-shadow: 0 4px 10px rgba(0,0,0,0.4); pointer-events: none; animation: bouncePin 0.5s ease infinite alternate; }
+      .map-footer { padding: 15px; text-align: center; background: var(--surface); }
+      @keyframes bouncePin { from { transform: translate(-50%, -100%); } to { transform: translate(-50%, -110%); } }
+
       :root { 
           --primary: #5A228B; 
           --primary-hover: #4A1A75; 
@@ -210,6 +223,24 @@
     </style>
 </head>
 <body>
+    <div id="map-modal">
+        <div class="map-container">
+            <div class="map-header">
+                <span>تحديد موقع النزول 📍</span>
+                <button class="close-map-btn" onclick="closeMapModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="position: relative;">
+                <div id="map-view"></div>
+                <i class="fas fa-map-marker-alt map-center-marker"></i>
+            </div>
+            <div class="map-footer">
+                <p style="margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--text-muted);">حرك الخريطة ليصير الدبوس على المكان المضبوط</p>
+                <button class="send-btn ripple" style="margin-top: 0; background: #10B981;" onclick="confirmMapLocation()">
+                    تأكيد الموقع <i class="fas fa-check"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <div id="global-lock-screen">
         <i class="fas fa-tools lock-icon" onclick="handleLockScreenSecret()"></i>
@@ -405,8 +436,9 @@
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
       </div>
-                                                                                                             </div>
-                                                                                                                 <div id="tuk-screen" class="screen container">
+    </div>
+
+    <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
         
@@ -430,14 +462,17 @@
             </button>
             <div class="form-group" style="margin-top: 20px;">
                 <label style="color:var(--danger);" id="lbl-tuk-drop">موقع التحصيل/التسليم (إجباري)</label>
-                <div class="note" style="padding:12px; font-size:12px; margin-bottom:10px; background:var(--bg-color); border-right-color:var(--primary); color:var(--text-main);">
-                    💡 <strong>شلون تنسخ الرابط؟</strong> افتح الخريطة من الزر الجوه، حدد المكان بضغطة مطولة، دوس مشاركة واختار (نسخ 📄).<br>
-                    <span style="color:var(--danger); font-weight:800;">اذا ما طلعت نسخ 📄 روح سوي مشاركه لنفسك على التلكرام او الواتساب وانسخ الرابط ورجع خلي بالخانه.</span>
+                
+                <div class="note" style="padding:12px; font-size:13px; margin-bottom:10px; background:rgba(16, 185, 129, 0.1); border-right-color:#10B981; color:var(--text-main);">
+                    💡 <strong>تحديث جديد:</strong> هسه تگدر تحدد مكان النزول مباشرة من الخريطة داخل التطبيق بدون ما تطلع وتنسخ روابط! 🗺️
                 </div>
-                <button type="button" class="location-btn ripple-dark" style="border:1px solid var(--border-color); background:var(--surface); color:var(--text-main);" onclick="window.location.href='https://maps.google.com'">
-                    <i class="fas fa-map"></i> افتح الخريطة لنسخ الرابط
+                
+                <button type="button" class="location-btn ripple-dark" style="border: 2px dashed var(--primary); background: var(--surface); color: var(--primary);" onclick="openMapModal()">
+                    <i class="fas fa-map-marked-alt"></i> افتح الخريطة وحدد المكان 📍
                 </button>
-                <input type="url" id="tukDropoffLink" placeholder="لصق الرابط هنا...">
+                
+                <input type="hidden" id="tukDropoffLink" value="">
+                <p id="map-success-msg" style="display: none; color: #10B981; font-weight: 800; font-size: 14px; margin-top: 10px; text-align: center;"><i class="fas fa-check-circle"></i> تم تحديد المكان بنجاح!</p>
             </div>
             <div class="form-group">
                 <label>أقرب نقطة دالة (اختياري)</label>
@@ -446,7 +481,6 @@
         </div>
         <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">طلب تكتك توصيلة</span></button>
     </div>
-
     <div id="mediator-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> <span id="med-head">خدمة الوسيط</span></h2>
@@ -1112,7 +1146,8 @@
 
       function notifyArriveWhatsApp() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); let formattedPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone; let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (البندر) بالباب، يرجى استلام الطلب/الأموال 🛵"); window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank'); }
       function notifyArriveCall() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); window.location.href = `tel:${phone}`; }
-              // كود تشغيل دخول كوكل - البندر
+      
+      // كود تشغيل دخول كوكل - البندر
       const provider = new firebase.auth.GoogleAuthProvider();
       function googleSignIn() {
           const btn = document.getElementById('googleSignInBtn');
@@ -1134,6 +1169,45 @@
           });
       }
 
+      // -------------------------------------------------------------------
+      // إضافة نظام الخريطة الحية لتحديد موقع النزول (خرائط كوكل الأصلية) - البندر
+      // -------------------------------------------------------------------
+      let appMap = null;
+
+      function openMapModal() {
+          document.getElementById('map-modal').style.display = 'flex';
+          
+          if (!appMap) {
+              // إحداثيات أم قصر
+              appMap = L.map('map-view', { attributionControl: false }).setView([30.0396, 47.9298], 15);
+              
+              // سحب خرائط كوكل الأصلية (Google Maps) باللغة العربية
+              L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', {
+                  maxZoom: 20,
+              }).addTo(appMap);
+          }
+          
+          setTimeout(() => { appMap.invalidateSize(); }, 300);
+      }
+
+      function closeMapModal() {
+          document.getElementById('map-modal').style.display = 'none';
+      }
+
+      function confirmMapLocation() {
+          const center = appMap.getCenter();
+          const lat = center.lat;
+          const lng = center.lng;
+          
+          // تحويل الإحداثيات إلى رابط خرائط كوكل جاهز
+          const googleMapsLink = `https://maps.google.com/?q=${lat},${lng}`;
+          
+          document.getElementById('tukDropoffLink').value = googleMapsLink;
+          document.getElementById('map-success-msg').style.display = 'block';
+          
+          closeMapModal();
+      }
+
     </script>
 </body>
-    </html>
+</html>
