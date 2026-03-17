@@ -32,6 +32,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
     <style>
       :root { 
           --primary: #5A228B; 
@@ -296,6 +299,13 @@
             </div>
             <h2 style="margin: 0; font-weight: 800; font-size: 28px; color: var(--text-main);">أهلاً بيك في البندر</h2>
             <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 15px; font-weight: 600;">سجل بياناتك مرة وحدة واطلب براحتك!</p>
+                   <div id="google-login-section" style="text-align: center; margin-top: 15px;">
+            <button class="send-btn ripple" id="googleSignInBtn" onclick="googleSignIn()" style="background: #4285F4; display: flex; align-items: center; justify-content: center; gap: 10px; border: none; box-shadow: var(--shadow-sm);">
+                <i class="fab fa-google" style="font-size: 20px;"></i> تسجيل الدخول بواسطة كوكل
+            </button>
+            <p style="margin: 10px 0; color: var(--text-muted); font-size: 13px; font-weight: bold;">— أو سجل يدوياً —</p>
+        </div>
+ 
         </div>
         <div class="form-card">
             <div class="form-group">
@@ -1102,6 +1112,28 @@
 
       function notifyArriveWhatsApp() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); let formattedPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone; let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (البندر) بالباب، يرجى استلام الطلب/الأموال 🛵"); window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank'); }
       function notifyArriveCall() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); window.location.href = `tel:${phone}`; }
+              // كود تشغيل دخول كوكل - البندر
+      const provider = new firebase.auth.GoogleAuthProvider();
+      function googleSignIn() {
+          const btn = document.getElementById('googleSignInBtn');
+          const originalContent = btn.innerHTML;
+          btn.innerHTML = '<span class="baly-spinner"></span> جاري التحميل...';
+          btn.disabled = true;
+
+          firebase.auth().signInWithPopup(provider).then((result) => {
+              const user = result.user;
+              localStorage.setItem('saved_customer_name', user.displayName);
+              localStorage.setItem('saved_customer_phone', user.phoneNumber || "07700000000"); 
+              showToast("هلا بيك نورت البندر يا " + user.displayName + " 🎉");
+              showScreen('home-screen');
+          }).catch((err) => {
+              console.error(err);
+              showToast("فشل تسجيل الدخول ❌");
+              btn.innerHTML = originalContent;
+              btn.disabled = false;
+          });
+      }
+
     </script>
 </body>
     </html>
