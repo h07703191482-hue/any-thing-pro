@@ -205,7 +205,7 @@
       .leaderboard-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
       .leaderboard-title { text-align: center; color: var(--text-main); margin: 0 0 20px 0; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; }
       .driver-rank { display: flex; align-items: center; justify-content: space-between; padding: 14px; border-bottom: 1px solid var(--border-color); transition: 0.3s; border-radius: 12px; }
-      .driver-rank:hover { background: var(--bg-color); }
+              .driver-rank:hover { background: var(--bg-color); }
       .driver-rank:last-child { border-bottom: none; }
       .rank-info { display: flex; align-items: center; gap: 12px; font-weight: 700; color: var(--text-main); font-size: 15px; }
       .rank-medal { font-size: 22px; width: 30px; text-align: center; display: inline-block; }
@@ -285,6 +285,9 @@
         <a id="side-support-link" href="https://wa.me/9647739470354" target="_blank" class="sidebar-item ripple-dark">
             <i class="fab fa-whatsapp" style="color: #25d366; font-size: 22px; width: 25px;"></i> <span id="side-support-text">مراسلة الدعم الفني</span>
         </a>
+        <div class="sidebar-item ripple-dark" style="color: var(--danger); margin-top: 5px;" onclick="userLogout(); closeSidebar();">
+            <i class="fas fa-sign-out-alt" style="color: var(--danger); font-size: 20px; width: 25px;"></i> <span style="font-weight: 800;">تسجيل خروج</span>
+        </div>
     </div>
 
     <div class="bottom-nav" id="bottomNavigation">
@@ -372,8 +375,7 @@
             </div>
         </div>
     </div>
-
-    <div id="admin-panel" class="screen container">
+        <div id="admin-panel" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> <span id="adm-title">لوحة التحكم السرية</span></h2>
         <div class="form-card" style="text-align: center;">
@@ -715,8 +717,7 @@
       // متغيرات البوت الجديد الخاص بتسجيل الدخول
       const NEW_BOT_TOKEN = "8757179280:AAHEgp3YTaVv6qZNr32ZA7fgk4fT8v-cqCk";
       const NEW_BOT_USER = "CodAlbanderbot";
-
-      let userCoords = ""; 
+                  let userCoords = ""; 
       const CURRENT_VERSION = "2.0.13"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
@@ -896,6 +897,15 @@
           currentLang = currentLang === 'ar' ? 'en' : 'ar';
           document.getElementById('langBtn').innerText = currentLang === 'ar' ? 'English' : 'عربي';
           document.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+      }
+
+      function userLogout() {
+          if (confirm(currentLang === 'ar' ? "هل أنت متأكد من تسجيل الخروج؟" : "Are you sure you want to logout?")) {
+              localStorage.removeItem('saved_customer_name');
+              localStorage.removeItem('saved_customer_phone');
+              localStorage.removeItem('my_loyalty_orders');
+              location.reload();
+          }
       }
 
       async function syncLoyaltyWithServer() {
