@@ -221,7 +221,8 @@
       #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--text-main); text-align: center; padding: 20px; }
     </style>
 </head>
-<body>    <div id="map-modal">
+<body>
+        <div id="map-modal">
         <div class="map-container">
             <div class="map-header">
                 <span>تحديد موقع النزول 📍</span>
@@ -275,7 +276,7 @@
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
             </div>
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">البندر</h3>
-            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.8</p>
+            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.9</p>
         </div>
         <div class="sidebar-item ripple-dark" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
             <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
@@ -334,13 +335,6 @@
             </div>
             <h2 style="margin: 0; font-weight: 800; font-size: 28px; color: var(--text-main);">أهلاً بيك في البندر</h2>
             <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 15px; font-weight: 600;">سجل بياناتك مرة وحدة واطلب براحتك!</p>
-                   <div id="google-login-section" style="text-align: center; margin-top: 15px;">
-            <button class="send-btn ripple" id="googleSignInBtn" onclick="googleSignIn()" style="background: #4285F4; display: flex; align-items: center; justify-content: center; gap: 10px; border: none; box-shadow: var(--shadow-sm);">
-                <i class="fab fa-google" style="font-size: 20px;"></i> تسجيل الدخول بواسطة كوكل
-            </button>
-            <p style="margin: 10px 0; color: var(--text-muted); font-size: 13px; font-weight: bold;">— أو سجل يدوياً —</p>
-        </div>
- 
         </div>
         <div class="form-card">
             <div class="form-group">
@@ -441,7 +435,7 @@
           </div>
       </div>
     </div>
-    <div id="tuk-screen" class="screen container">
+        <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
         
@@ -626,6 +620,10 @@
                 <i class="fas fa-check-circle"></i> أنا متاح للعمل
             </button>
             
+            <button id="soundToggleBtn" class="send-btn ripple" style="background: var(--text-muted); margin-top: 10px; box-shadow: none;" onclick="toggleOrderSound()">
+                <i class="fas fa-bell-slash"></i> جرس الطلبات: معطل
+            </button>
+            
             <button class="send-btn ripple" style="background: var(--bg-color); color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; box-shadow: none;" onclick="showScreen('log-screen')">
                 <i class="fas fa-list-alt"></i> سجل الطلبات المنجزة
             </button>
@@ -689,15 +687,15 @@
         
         <div id="driver-log-container">
             </div>
-                    </div>
-                        <script>
+    </div>
+        <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.8"; 
+      const CURRENT_VERSION = "2.0.9"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -711,6 +709,54 @@
       let lockSecretCounter = 0;
       let currentLang = 'ar';
       let appIsActive = true;
+
+      // نظام الإشعار الصوتي للمندوبين
+      let lastOrderCount = -1;
+      let orderPollInterval = null;
+      let isSoundEnabled = false;
+      const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+
+      function toggleOrderSound() {
+          isSoundEnabled = !isSoundEnabled;
+          const btn = document.getElementById('soundToggleBtn');
+          if (isSoundEnabled) {
+              btn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل';
+              btn.style.background = '#F59E0B'; // لون برتقالي مميز للجرس
+              btn.style.color = 'white';
+              newOrderAudio.play().catch(e => {}); // تفعيل إذن الصوت من المتصفح
+              startOrderPolling();
+              showToast("🔔 تم تفعيل جرس تنبيه الطلبات!");
+          } else {
+              btn.innerHTML = '<i class="fas fa-bell-slash"></i> جرس الطلبات: معطل';
+              btn.style.background = 'var(--text-muted)';
+              btn.style.color = 'white';
+              clearInterval(orderPollInterval);
+              showToast("تم إيقاف الجرس 🔕");
+          }
+      }
+
+      async function checkNewOrdersForSound() {
+          if(!isSoundEnabled || !navigator.onLine) return;
+          try {
+              const resp = await fetch(`${GS_URL}?action=checkNewOrders`);
+              const currentCount = parseInt(await resp.text());
+              if(!isNaN(currentCount)) {
+                  if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
+                      // تشغيل الصوت عند وجود طلب جديد
+                      newOrderAudio.play().catch(e=>{});
+                      showToast("🔔 طلب جديد نزل بالساحة!");
+                      if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                  }
+                  lastOrderCount = currentCount;
+              }
+          } catch(e) {}
+      }
+
+      function startOrderPolling() {
+          if(orderPollInterval) clearInterval(orderPollInterval);
+          checkNewOrdersForSound(); 
+          orderPollInterval = setInterval(checkNewOrdersForSound, 10000); // يفحص كل 10 ثواني
+      }
 
       function handleSecretClick() {
           secretCounter++;
@@ -1001,7 +1047,6 @@
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
-      // الدالة المحدثة لإرسال إشعار التفعيل
       async function verifyActivationCode() {
           const input = document.getElementById('activationCodeInput').value.trim();
           if(input === localStorage.getItem('temp_activation')) {
@@ -1013,7 +1058,6 @@
               localStorage.setItem('driver_phone', dPhone);
               localStorage.removeItem('pending_join');
               
-              // إرسال إشعار للإدارة بدخول كابتن جديد
               try {
                   const msg = `✅ تم تفعيل كابتن جديد بنجاح:\n👤 الاسم: ${dName}\n📞 الهاتف: ${dPhone}`;
                   await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -1029,17 +1073,14 @@
 
       function cancelJoinRequest() { if(confirm("تأكيد الإلغاء؟")) { localStorage.clear(); location.reload(); } }
       
-      // الدالة المحدثة لإرسال إشعار الاستقالة
       async function resignDriver() { 
           if (confirm("هل أنت متأكد من تسجيل الخروج والاستقالة؟")) { 
               const dName = localStorage.getItem('driver_name') || "غير معروف";
               const dPhone = localStorage.getItem('driver_phone') || "غير معروف";
               
-              // تغيير شكل الزر للتحميل لتجنب الضغط المتكرر
               const btn = document.querySelector('.resign-btn');
               if(btn) btn.innerHTML = '<span class="baly-spinner" style="border-top-color:var(--danger);"></span> جاري الخروج...';
 
-              // إرسال إشعار للإدارة بخروج الكابتن
               try {
                   const msg = `❌ استقالة / تسجيل خروج كابتن:\n👤 الاسم: ${dName}\n📞 الهاتف: ${dPhone}`;
                   await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
@@ -1261,27 +1302,6 @@
       function notifyArriveWhatsApp() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); let formattedPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone; let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (البندر) بالباب، يرجى استلام الطلب/الأموال 🛵"); window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank'); }
       function notifyArriveCall() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); window.location.href = `tel:${phone}`; }
       
-      const provider = new firebase.auth.GoogleAuthProvider();
-      function googleSignIn() {
-          const btn = document.getElementById('googleSignInBtn');
-          const originalContent = btn.innerHTML;
-          btn.innerHTML = '<span class="baly-spinner"></span> جاري التحميل...';
-          btn.disabled = true;
-
-          firebase.auth().signInWithPopup(provider).then((result) => {
-              const user = result.user;
-              localStorage.setItem('saved_customer_name', user.displayName);
-              localStorage.setItem('saved_customer_phone', user.phoneNumber || "07700000000"); 
-              showToast("هلا بيك نورت البندر يا " + user.displayName + " 🎉");
-              showScreen('home-screen');
-          }).catch((err) => {
-              console.error(err);
-              showToast("فشل تسجيل الدخول ❌");
-              btn.innerHTML = originalContent;
-              btn.disabled = false;
-          });
-      }
-
       let appMap = null;
 
       function openMapModal() {
@@ -1315,4 +1335,4 @@
           closeMapModal();
       }
 
-    </script>
+        </script>
