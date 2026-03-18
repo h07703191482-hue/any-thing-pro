@@ -367,8 +367,7 @@
             
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
-    </div>
-        <div id="home-screen" class="screen container">
+    </div>    <div id="home-screen" class="screen container">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
         <div id="driver-status-badge" class="driver-status-bar">أنت الآن في وضع العمل النشط 🟢</div>
@@ -691,7 +690,7 @@
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.11"; 
+      const CURRENT_VERSION = "2.0.12"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -711,7 +710,6 @@
       let isSoundEnabled = false;
       const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
-      // دالة فحص الرقم مباشرة أثناء الكتابة
       function checkPhoneLive(input) {
           let errorSpan = input.parentNode.querySelector('.phone-error');
           if (!errorSpan) return;
@@ -724,7 +722,7 @@
               input.style.borderColor = 'var(--danger)';
           } else {
               errorSpan.style.display = 'none';
-              input.style.borderColor = '#10B981'; // أخضر للرقم الصحيح
+              input.style.borderColor = '#10B981'; 
           }
       }
 
@@ -996,7 +994,6 @@
 
       function saveCustomerData(name, phone) { localStorage.setItem('saved_customer_name', name); localStorage.setItem('saved_customer_phone', phone); }
       
-      // تم التحديث هنا: لتفعيل اللون الأخضر تلقائياً للبيانات المحفوظة
       function loadSavedCustomerData() {
           const name = localStorage.getItem('saved_customer_name'); 
           const phone = localStorage.getItem('saved_customer_phone');
@@ -1283,6 +1280,10 @@
                   updateStatsUI();
                   let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
                   fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
+                  
+                  // الإضافة الجديدة هنا: إجبار التطبيق على جلب النقاط الجديدة للمشتري
+                  syncLoyaltyWithServer(); 
+
                   showToast(`تم تأكيد العملية بنجاح! عاشت ايدك 👏`); refreshLeaderboard();
                   document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
               } else { showToast("الكود غير صحيح ❌"); }
