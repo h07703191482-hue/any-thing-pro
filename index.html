@@ -939,14 +939,32 @@
           if (welcome && welcome.style.display !== 'none') { welcome.style.display = 'none'; location.reload(); }
       }
 
+      // دالة التصفير المحدثة التي تحذف السجل تلقائياً
       async function checkRemoteReset() {
           try {
               const myPhone = localStorage.getItem('driver_phone');
               if(!myPhone) return;
               const response = await fetch(`${GS_URL}?action=checkReset&phone=${myPhone}`);
               const result = await response.text();
-              if (result === "reset_now") { localStorage.setItem('d_count', 0); localStorage.setItem('league_count', 0); updateStatsUI(); } 
-              else if (result.includes("reset_league")) { localStorage.setItem('league_count', 0); updateStatsUI(); }
+              
+              if (result === "reset_now") { 
+                  localStorage.setItem('d_count', 0); 
+                  localStorage.setItem('league_count', 0); 
+                  
+                  // مسح السجل تلقائياً عند استلام أمر الحذف من البوت
+                  localStorage.removeItem('driver_logs'); 
+                  
+                  updateStatsUI(); 
+                  
+                  // تحديث الواجهة إذا كان المندوب فاتح صفحة السجل حالياً
+                  if(document.getElementById('log-screen').classList.contains('active-screen')) {
+                      renderDriverLog();
+                  }
+              } 
+              else if (result.includes("reset_league")) { 
+                  localStorage.setItem('league_count', 0); 
+                  updateStatsUI(); 
+              }
           } catch(e) {}
       }
 
@@ -997,7 +1015,7 @@
           if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel') ? 'none' : 'flex';
           
           if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
-          if(id === 'log-screen') { renderDriverLog(); } // تحديث السجل عند فتحه
+          if(id === 'log-screen') { renderDriverLog(); } 
           
           if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') {
               loadSavedCustomerData();
@@ -1088,7 +1106,6 @@
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
-      // إضافة الطلب إلى السجل عند التأكيد بنجاح
       async function processVerifyCode() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const code = document.getElementById('driverVerifyInput').value.trim(); const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
@@ -1105,7 +1122,7 @@
                   logs.unshift({
                       date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }),
                       phone: custPhone,
-                      price: "2,500 د.ع" // الأجرة الثابتة المتفق عليها
+                      price: "2,500 د.ع" 
                   });
                   localStorage.setItem('driver_logs', JSON.stringify(logs));
 
@@ -1127,7 +1144,7 @@
           let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
           
           if(logs.length === 0) {
-              container.innerHTML = '<div class="form-card" style="text-align:center;"><i class="fas fa-box-open" style="font-size:40px; color:var(--border-color); margin-bottom:10px;"></i><p style="color:var(--text-muted); font-weight:bold; margin:0;">السجل فارغ. لم تقم بتأكيد أي طلب بعد.</p></div>';
+              container.innerHTML = '<div class="form-card" style="text-align:center;"><i class="fas fa-box-open" style="font-size:40px; color:var(--border-color); margin-bottom:10px;"></i><p style="color:var(--text-muted); font-weight:bold; margin:0;">السجل فارغ حالياً.</p></div>';
               return;
           }
           
@@ -1142,15 +1159,6 @@
                   <div style="font-size:14px;"><i class="fas fa-money-bill-wave" style="color:var(--gold); width:20px;"></i> أجرة التوصيل: <strong>${log.price}</strong></div>
               </div>
           `).join('');
-      }
-
-      // وظيفة مسح السجل
-      function clearDriverLog() {
-          if(confirm("هل أنت متأكد من مسح جميع السجلات؟ لا يمكن التراجع عن هذا الإجراء.")) {
-              localStorage.removeItem('driver_logs');
-              renderDriverLog();
-              showToast("تم مسح السجل بنجاح 🗑️");
-          }
       }
 
       function updateStatsUI() { if(document.getElementById('stat-count')) document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0; }
