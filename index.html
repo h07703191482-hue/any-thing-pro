@@ -221,7 +221,8 @@
       #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--text-main); text-align: center; padding: 20px; }
     </style>
 </head>
-<body>    <div id="map-modal">
+<body>
+    <div id="map-modal">
         <div class="map-container">
             <div class="map-header">
                 <span>تحديد موقع النزول 📍</span>
@@ -609,7 +610,7 @@
             <button class="resign-btn ripple-dark" onclick="cancelJoinRequest()" style="margin-top:15px;">إلغاء الطلب</button>
         </div>
     </div>
-        <div id="plaza-screen" class="screen container">
+    <div id="plaza-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-briefcase" style="color:#8B5CF6;"></i> لوحة الكابتن</h2>
 
@@ -681,8 +682,6 @@
         
         <div id="driver-log-container">
             </div>
-        
-        <button class="resign-btn ripple-dark" onclick="clearDriverLog()"><i class="fas fa-trash-alt"></i> مسح السجل بالكامل</button>
     </div>
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
