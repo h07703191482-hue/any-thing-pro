@@ -220,8 +220,8 @@
       .sidebar-item:hover, .sidebar-item:active { transform: translateX(-5px); border-color: var(--primary); background: var(--surface); box-shadow: var(--shadow-sm); }
       .sidebar-close { align-self: flex-start; font-size: 15px; color: var(--text-muted); cursor: pointer; background: var(--bg-color); padding: 10px 20px; border-radius: var(--radius-pill); display: flex; align-items: center; gap: 8px; transition: 0.3s; font-weight: 700; margin-bottom: 20px; }
       #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--text-main); text-align: center; padding: 20px; }
-    </style>
-</head>
+                             </style>
+                             </head>
 <body>
     <div id="map-modal">
         <div class="map-container">
@@ -442,7 +442,7 @@
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
         
-        <div class="form-card">
+        <div class="form-card" id="tuk-user-card">
             <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="tuk-p-info">بيانات العميل</span></div>
             <div class="form-group">
                 <label id="lbl-tuk-name">الاسم الكامل</label>
@@ -481,7 +481,7 @@
         </div>
         <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">طلب تكتك توصيلة</span></button>
     </div>
-    <div id="mediator-screen" class="screen container">
+        <div id="mediator-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> <span id="med-head">خدمة الوسيط</span></h2>
         
@@ -491,7 +491,7 @@
             <small style="color: var(--secondary); font-weight: bold;"><i class="fas fa-bolt"></i> نوصل أغراضك بسرعة وأمان</small>
         </div>
         
-        <div class="form-card">
+        <div class="form-card" id="med-user-card">
             <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="med-p-info">بيانات المرسل</span></div>
             <div class="form-group">
                 <label>الاسم الكامل</label>
@@ -536,7 +536,7 @@
             <small style="color: var(--secondary); font-weight: bold;"><i class="fas fa-motorcycle"></i> خدمة توصيل سريعة ومضمونة</small>
         </div>
 
-        <div class="form-card">
+        <div class="form-card" id="shop-user-card">
             <div class="form-card-title"><i class="fas fa-address-card"></i> <span id="shop-p-info">بيانات التوصيل</span></div>
             <div class="form-group">
                 <label>الاسم</label>
@@ -857,7 +857,8 @@
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
                   (position) => {
-                      userCoords = `https://www.google.com/maps?q=$${position.coords.latitude},${position.coords.longitude}`;
+                      // تم تعديل الرابط هنا ليكون رسمي ومضبوط
+                      userCoords = `https://maps.google.com/?q=$${position.coords.latitude},${position.coords.longitude}`;
                       btn.innerHTML = '<i class="fas fa-check-circle"></i> تم التحديد بنجاح';
                       btn.classList.add('success');
                   },
@@ -914,11 +915,19 @@
       }
 
       function saveCustomerData(name, phone) { localStorage.setItem('saved_customer_name', name); localStorage.setItem('saved_customer_phone', phone); }
+      
       function loadSavedCustomerData() {
-          const name = localStorage.getItem('saved_customer_name'); const phone = localStorage.getItem('saved_customer_phone');
+          const name = localStorage.getItem('saved_customer_name'); 
+          const phone = localStorage.getItem('saved_customer_phone');
           if (name && phone) {
+              // تعبئة البيانات بالخفاء
               ['custName', 'medName', 'tukName'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = name; });
               ['custPhone', 'medPhone', 'tukPhone'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = phone; });
+              
+              // إخفاء الخانات للزبون المسجل
+              if(document.getElementById('tuk-user-card')) document.getElementById('tuk-user-card').style.display = 'none';
+              if(document.getElementById('med-user-card')) document.getElementById('med-user-card').style.display = 'none';
+              if(document.getElementById('shop-user-card')) document.getElementById('shop-user-card').style.display = 'none';
           }
       }
 
@@ -1004,7 +1013,7 @@
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية", callback_data: `claim|${name}|${vc}` }]] } })
               });
-              showToast("تم الإرسال بنجاح ✅"); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); 
+              showToast("تم الإرسال بنجاح ✅"); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1020,7 +1029,7 @@
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
               });
-              showToast("تم الإرسال بنجاح ✅"); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); 
+              showToast("تم الإرسال بنجاح ✅"); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1064,7 +1073,7 @@
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
-              showToast("تم إرسال طلبك بنجاح ✅"); document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = ""; syncLoyaltyWithServer(); 
+              showToast("تم إرسال طلبك بنجاح ✅"); document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1178,7 +1187,6 @@
           document.getElementById('map-modal').style.display = 'flex';
           
           if (!appMap) {
-              // إحداثيات أم قصر
               appMap = L.map('map-view', { attributionControl: false }).setView([30.0396, 47.9298], 15);
               
               // سحب خرائط كوكل الأصلية (Google Maps) باللغة العربية
@@ -1199,8 +1207,8 @@
           const lat = center.lat;
           const lng = center.lng;
           
-          // تحويل الإحداثيات إلى رابط خرائط كوكل جاهز
-          const googleMapsLink = `https://maps.google.com/?q=${lat},${lng}`;
+          // تم تعديل الرابط هنا ليكون رسمي ومضبوط
+          const googleMapsLink = `https://maps.google.com/?q=$${lat},${lng}`;
           
           document.getElementById('tukDropoffLink').value = googleMapsLink;
           document.getElementById('map-success-msg').style.display = 'block';
