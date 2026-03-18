@@ -39,7 +39,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-      /* تصميم نافذة الخريطة المنبثقة */
       #map-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100005; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
       .map-container { width: 95%; max-width: 450px; background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; position: relative; box-shadow: var(--shadow-floating); display: flex; flex-direction: column; }
       .map-header { padding: 15px; background: var(--primary); color: white; text-align: center; font-weight: 800; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
@@ -158,7 +157,7 @@
       .card-tuk .icon-wrapper { background: rgba(255, 193, 7, 0.15); color: #D97706; }
       .card-join .icon-wrapper { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
       .card-plaza .icon-wrapper { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
-              .form-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards; }
+      .form-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards; }
       .form-card-title { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
       .form-card-title i { font-size: 18px; color: var(--gold); }
       .screen-header-title { margin: 0 0 20px; font-weight: 800; font-size: 24px; display: flex; align-items: center; gap: 10px; }
@@ -223,7 +222,7 @@
     </style>
 </head>
 <body>
-    <div id="map-modal">
+        <div id="map-modal">
         <div class="map-container">
             <div class="map-header">
                 <span>تحديد موقع النزول 📍</span>
@@ -610,11 +609,13 @@
             <button class="send-btn ripple" onclick="verifyActivationCode()">تفعيل الحساب</button>
             <button class="resign-btn ripple-dark" onclick="cancelJoinRequest()" style="margin-top:15px;">إلغاء الطلب</button>
         </div>
-    </div>
-
-    <div id="plaza-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-briefcase" style="color:#8B5CF6;"></i> لوحة الكابتن</h2>
+        </div>
+            <div id="plaza-screen" class="screen container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <button class="back-btn ripple-dark" style="margin-bottom: 0;" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+            <button class="back-btn ripple-dark" style="margin-bottom: 0; color: var(--primary);" onclick="showScreen('log-screen')"><i class="fas fa-list-alt"></i> السجل</button>
+        </div>
+        <h2 class="screen-header-title" style="margin-top: -10px;"><i class="fas fa-briefcase" style="color:#8B5CF6;"></i> لوحة الكابتن</h2>
 
         <div class="form-card" style="text-align: center; padding: 15px;">
             <button id="statusToggleBtn" class="send-btn ripple" style="background: #10B981; margin-top: 0; box-shadow: none;" onclick="toggleDriverStatus()">
@@ -672,6 +673,16 @@
 
         <p id="driver-display-name" style="text-align: center; font-weight: 700; color: var(--text-muted); margin-top:30px;"></p>
         <button class="resign-btn ripple-dark" onclick="resignDriver()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج / استقالة</button>
+    </div>
+
+    <div id="log-screen" class="screen container">
+        <button class="back-btn ripple-dark" onclick="showScreen('plaza-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
+        
+        <div id="driver-log-container">
+            </div>
+        
+        <button class="resign-btn ripple-dark" onclick="clearDriverLog()"><i class="fas fa-trash-alt"></i> مسح السجل بالكامل</button>
     </div>
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
@@ -857,7 +868,6 @@
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
                   (position) => {
-                      // رابط كوكل مابس الرسمي والمضبوط 100%
                       userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
                       btn.innerHTML = '<i class="fas fa-check-circle"></i> تم التحديد بنجاح';
                       btn.classList.add('success');
@@ -916,7 +926,6 @@
 
       function saveCustomerData(name, phone) { localStorage.setItem('saved_customer_name', name); localStorage.setItem('saved_customer_phone', phone); }
       
-      // الدالة اللي تترس الخانات تلقائياً
       function loadSavedCustomerData() {
           const name = localStorage.getItem('saved_customer_name'); 
           const phone = localStorage.getItem('saved_customer_phone');
@@ -989,8 +998,8 @@
           if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel') ? 'none' : 'flex';
           
           if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
+          if(id === 'log-screen') { renderDriverLog(); } // تحديث السجل عند فتحه
           
-          // هنا الحركة: التطبيق يترس الخانات تلقائياً بالاسم والرقم المحفوظ
           if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') {
               loadSavedCustomerData();
           }
@@ -1066,7 +1075,6 @@
               let photoIdsStr = photoMsgs.join(','); let referrer = localStorage.getItem('referred_by') || "";
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&photoMsgs=${photoIdsStr}&referrer=${referrer}`); localStorage.removeItem('referred_by');
               
-              // التعديل هنا: الطلب رقم (x) من أصل 7 بدل 6
               let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0); let orderNum = (tempLoyalty % 7); 
               let loyaltyMsg = orderNum === 6 ? "🎁 هذا الطلب مجاني (الطلب السابع)" : `الطلب رقم ${orderNum + 1} من أصل 7`;
               
@@ -1081,6 +1089,7 @@
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
+      // إضافة الطلب إلى السجل عند التأكيد بنجاح
       async function processVerifyCode() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const code = document.getElementById('driverVerifyInput').value.trim(); const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
@@ -1091,6 +1100,16 @@
               const checkResult = await checkResp.text();
               if (checkResult.startsWith("valid")) {
                   try { const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); cashAudio.play(); confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } }); } catch(e) {}
+                  
+                  // حفظ الطلب في السجل المحلي
+                  let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
+                  logs.unshift({
+                      date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }),
+                      phone: custPhone,
+                      price: "2,500 د.ع" // الأجرة الثابتة المتفق عليها
+                  });
+                  localStorage.setItem('driver_logs', JSON.stringify(logs));
+
                   localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
                   localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
                   updateStatsUI();
@@ -1100,6 +1119,39 @@
                   document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
               } else { showToast("الكود غير صحيح ❌"); }
           } catch(e) {} finally { btn.innerHTML = oldText; btn.disabled = false; }
+      }
+
+      // وظيفة عرض السجل
+      function renderDriverLog() {
+          const container = document.getElementById('driver-log-container');
+          if(!container) return;
+          let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
+          
+          if(logs.length === 0) {
+              container.innerHTML = '<div class="form-card" style="text-align:center;"><i class="fas fa-box-open" style="font-size:40px; color:var(--border-color); margin-bottom:10px;"></i><p style="color:var(--text-muted); font-weight:bold; margin:0;">السجل فارغ. لم تقم بتأكيد أي طلب بعد.</p></div>';
+              return;
+          }
+          
+          container.innerHTML = logs.map((log, i) => `
+              <div class="form-card" style="border-right: 4px solid var(--primary); padding: 15px;">
+                  <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:8px;">
+                      <span style="font-weight:800; color:var(--primary);">الطلب #${logs.length - i}</span>
+                      <span style="font-size:12px; color:var(--text-muted);" dir="ltr">${log.date}</span>
+                  </div>
+                  <div style="font-size:14px; margin-bottom:5px;"><i class="fas fa-phone-alt" style="color:var(--text-muted); width:20px;"></i> هاتف الزبون: <strong>${log.phone}</strong></div>
+                  <div style="font-size:14px; margin-bottom:5px;"><i class="fas fa-map-marker-alt" style="color:var(--danger); width:20px;"></i> الموقع: <strong>أم قصر</strong></div>
+                  <div style="font-size:14px;"><i class="fas fa-money-bill-wave" style="color:var(--gold); width:20px;"></i> أجرة التوصيل: <strong>${log.price}</strong></div>
+              </div>
+          `).join('');
+      }
+
+      // وظيفة مسح السجل
+      function clearDriverLog() {
+          if(confirm("هل أنت متأكد من مسح جميع السجلات؟ لا يمكن التراجع عن هذا الإجراء.")) {
+              localStorage.removeItem('driver_logs');
+              renderDriverLog();
+              showToast("تم مسح السجل بنجاح 🗑️");
+          }
       }
 
       function updateStatsUI() { if(document.getElementById('stat-count')) document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0; }
@@ -1160,7 +1212,6 @@
       function notifyArriveWhatsApp() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); let formattedPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone; let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (البندر) بالباب، يرجى استلام الطلب/الأموال 🛵"); window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank'); }
       function notifyArriveCall() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); window.location.href = `tel:${phone}`; }
       
-      // كود تشغيل دخول كوكل - البندر
       const provider = new firebase.auth.GoogleAuthProvider();
       function googleSignIn() {
           const btn = document.getElementById('googleSignInBtn');
@@ -1182,9 +1233,6 @@
           });
       }
 
-      // -------------------------------------------------------------------
-      // إضافة نظام الخريطة الحية لتحديد موقع النزول (خرائط كوكل الأصلية) - البندر
-      // -------------------------------------------------------------------
       let appMap = null;
 
       function openMapModal() {
@@ -1193,7 +1241,6 @@
           if (!appMap) {
               appMap = L.map('map-view', { attributionControl: false }).setView([30.0396, 47.9298], 15);
               
-              // سحب خرائط كوكل الأصلية (Google Maps) باللغة العربية
               L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', {
                   maxZoom: 20,
               }).addTo(appMap);
@@ -1211,7 +1258,6 @@
           const lat = center.lat;
           const lng = center.lng;
           
-          // رابط كوكل مابس الرسمي والمضبوط 100% للمندوب
           const googleMapsLink = `https://maps.google.com/?q=${lat},${lng}`;
           
           document.getElementById('tukDropoffLink').value = googleMapsLink;
