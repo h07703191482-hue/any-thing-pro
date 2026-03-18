@@ -220,8 +220,7 @@
       .sidebar-item:hover, .sidebar-item:active { transform: translateX(-5px); border-color: var(--primary); background: var(--surface); box-shadow: var(--shadow-sm); }
       .sidebar-close { align-self: flex-start; font-size: 15px; color: var(--text-muted); cursor: pointer; background: var(--bg-color); padding: 10px 20px; border-radius: var(--radius-pill); display: flex; align-items: center; gap: 8px; transition: 0.3s; font-weight: 700; margin-bottom: 20px; }
       #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--text-main); text-align: center; padding: 20px; }
-                             </style>
-                             </head>
+                                                                                                </style></head>
 <body>
     <div id="map-modal">
         <div class="map-container">
@@ -480,8 +479,7 @@
             </div>
         </div>
         <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">طلب تكتك توصيلة</span></button>
-    </div>
-        <div id="mediator-screen" class="screen container">
+    </div>    <div id="mediator-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> <span id="med-head">خدمة الوسيط</span></h2>
         
@@ -857,8 +855,8 @@
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
                   (position) => {
-                      // تم تعديل الرابط هنا ليكون رسمي ومضبوط
-                      userCoords = `https://maps.google.com/?q=$${position.coords.latitude},${position.coords.longitude}`;
+                      // تم تعديل الرابط إلى رابط كوكل مابس الرسمي والمضبوط
+                      userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
                       btn.innerHTML = '<i class="fas fa-check-circle"></i> تم التحديد بنجاح';
                       btn.classList.add('success');
                   },
@@ -920,14 +918,9 @@
           const name = localStorage.getItem('saved_customer_name'); 
           const phone = localStorage.getItem('saved_customer_phone');
           if (name && phone) {
-              // تعبئة البيانات بالخفاء
+              // تعبئة البيانات بالخفاء مع إبقاء الخانات ظاهرة حتى يكدر يعدلها الزبون
               ['custName', 'medName', 'tukName'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = name; });
               ['custPhone', 'medPhone', 'tukPhone'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = phone; });
-              
-              // إخفاء الخانات للزبون المسجل
-              if(document.getElementById('tuk-user-card')) document.getElementById('tuk-user-card').style.display = 'none';
-              if(document.getElementById('med-user-card')) document.getElementById('med-user-card').style.display = 'none';
-              if(document.getElementById('shop-user-card')) document.getElementById('shop-user-card').style.display = 'none';
           }
       }
 
@@ -1207,8 +1200,8 @@
           const lat = center.lat;
           const lng = center.lng;
           
-          // تم تعديل الرابط هنا ليكون رسمي ومضبوط
-          const googleMapsLink = `https://maps.google.com/?q=$${lat},${lng}`;
+          // تم تعديل الرابط إلى رابط كوكل مابس الرسمي والمضبوط
+          const googleMapsLink = `https://maps.google.com/?q=${lat},${lng}`;
           
           document.getElementById('tukDropoffLink').value = googleMapsLink;
           document.getElementById('map-success-msg').style.display = 'block';
