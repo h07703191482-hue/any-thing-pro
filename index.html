@@ -222,7 +222,7 @@
     </style>
 </head>
 <body>
-        <div id="map-modal">
+    <div id="map-modal">
         <div class="map-container">
             <div class="map-header">
                 <span>تحديد موقع النزول 📍</span>
@@ -276,7 +276,7 @@
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
             </div>
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">البندر</h3>
-            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.9</p>
+            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.11</p>
         </div>
         <div class="sidebar-item ripple-dark" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
             <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
@@ -343,7 +343,8 @@
             </div>
             <div class="form-group">
                 <label>رقم الهاتف (واتساب)</label>
-                <input type="tel" id="loginPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <input type="tel" id="loginPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
             </div>
         </div>
         <button class="send-btn ripple" onclick="startAppLogin()"><i class="fas fa-sign-in-alt"></i> دخول للتطبيق</button>
@@ -367,8 +368,7 @@
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
-
-    <div id="home-screen" class="screen container">
+        <div id="home-screen" class="screen container">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
         <div id="driver-status-badge" class="driver-status-bar">أنت الآن في وضع العمل النشط 🟢</div>
@@ -435,7 +435,8 @@
           </div>
       </div>
     </div>
-        <div id="tuk-screen" class="screen container">
+
+    <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
         
@@ -447,21 +448,18 @@
             </div>
             <div class="form-group">
                 <label id="lbl-tuk-phone">رقم الموبايل</label>
-                <input type="tel" id="tukPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                <span id="tuk-phone-n" class="phone-note">تأكد من الرقم لتسهيل التواصل</span>
+                <input type="tel" id="tukPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
             </div>
         </div>
 
         <div class="form-card">
             <div class="form-card-title"><i class="fas fa-route"></i> <span id="tuk-r-info">تفاصيل العملية</span></div>
-            <button class="location-btn ripple-dark" id="loc-btn-tuk" onclick="getLocation('tuk')" style="margin-top:5px;">
-                <i class="fas fa-location-crosshairs"></i> <span id="tuk-gps-btn">تحديد موقعك الحالي 📍</span>
-            </button>
-            <div class="form-group" style="margin-top: 20px;">
+            <div class="form-group">
                 <label style="color:var(--danger);" id="lbl-tuk-drop">موقع التحصيل/التسليم (إجباري)</label>
                 
                 <div class="note" style="padding:12px; font-size:13px; margin-bottom:10px; background:rgba(16, 185, 129, 0.1); border-right-color:#10B981; color:var(--text-main);">
-                    💡 <strong>تحديث جديد:</strong> هسه تگدر تحدد مكان النزول مباشرة من الخريطة داخل التطبيق بدون ما تطلع وتنسخ روابط! 🗺️
+                    💡 هسه تگدر تحدد مكان النزول مباشرة من الخريطة داخل التطبيق بدون ما تطلع وتنسخ روابط! 🗺️
                 </div>
                 
                 <button type="button" class="location-btn ripple-dark" style="border: 2px dashed var(--primary); background: var(--surface); color: var(--primary);" onclick="openMapModal()">
@@ -497,15 +495,13 @@
             </div>
             <div class="form-group">
                 <label>رقم الموبايل</label>
-                <input type="tel" id="medPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <input type="tel" id="medPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
             </div>
             <div class="form-group">
                 <label>أقرب نقطة دالة لمكانك</label>
                 <input type="text" id="medLandmark" placeholder="لتسهيل وصول المندوب">
             </div>
-            <button class="location-btn ripple-dark" id="loc-btn-med" onclick="getLocation('med')" style="margin-top:5px;">
-                <i class="fas fa-location-crosshairs"></i> <span id="med-gps-btn">تحديد موقعي الحالي بدقة</span>
-            </button>
         </div>
 
         <div class="form-card">
@@ -542,16 +538,13 @@
             </div>
             <div class="form-group">
                 <label>رقم الهاتف</label>
-                <input type="tel" id="custPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); updateLoyaltyUI()" onblur="syncLoyaltyWithServer()">
-                <span class="phone-note">تأكد من الرقم للاتصال بك</span>
+                <input type="tel" id="custPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); updateLoyaltyUI(); checkPhoneLive(this)" onblur="syncLoyaltyWithServer()">
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
             </div>
             <div class="form-group">
                 <label>نقطة دالة</label>
                 <input type="text" id="custLandmark" placeholder="وصف سريع لمكانك">
             </div>
-            <button class="location-btn ripple-dark" id="loc-btn-cust" onclick="getLocation('cust')" style="margin-top:5px;">
-                <i class="fas fa-location-crosshairs"></i> <span id="shop-gps-btn">تحديد موقعي بدقة</span>
-            </button>
         </div>
 
         <div class="form-card">
@@ -582,7 +575,8 @@
             </div>
             <div class="form-group">
                 <label>رقم الهاتف</label>
-                <input type="tel" id="driverJoinPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <input type="tel" id="driverJoinPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
             </div>
             <div class="form-group">
                 <label>نوع المركبة</label>
@@ -639,7 +633,8 @@
             <div class="form-card-title"><i class="fas fa-map-marker-alt"></i> إشعار وصول للزبون</div>
             <div class="form-group">
                 <label>رقم هاتف الزبون</label>
-                <input type="tel" id="arrivePhoneInput" placeholder="مثال: 07700000000" style="text-align:center;" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <input type="tel" id="arrivePhoneInput" placeholder="مثال: 07700000000" style="text-align:center;" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
             </div>
             <div style="display: flex; gap: 10px;">
                 <button class="location-btn success ripple" style="flex: 1; margin: 0; background: #25D366; color: white; border: none;" onclick="notifyArriveWhatsApp()">
@@ -655,7 +650,8 @@
             <div class="form-card-title"><i class="fas fa-qrcode"></i> تأكيد تسليم/تحصيل جديد</div>
             <div class="form-group">
                 <label>رقم هاتف الزبون</label>
-                <input type="tel" id="driverVerifyPhoneInput" placeholder="مثال: 07700000000" style="text-align:center;" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <input type="tel" id="driverVerifyPhoneInput" placeholder="مثال: 07700000000" style="text-align:center;" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
             </div>
             <div class="form-group">
                 <label>كود التأكيد (من الزبون)</label>
@@ -695,7 +691,7 @@
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.9"; 
+      const CURRENT_VERSION = "2.0.11"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -710,20 +706,36 @@
       let currentLang = 'ar';
       let appIsActive = true;
 
-      // نظام الإشعار الصوتي للمندوبين
       let lastOrderCount = -1;
       let orderPollInterval = null;
       let isSoundEnabled = false;
       const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+
+      // دالة فحص الرقم مباشرة أثناء الكتابة
+      function checkPhoneLive(input) {
+          let errorSpan = input.parentNode.querySelector('.phone-error');
+          if (!errorSpan) return;
+          
+          if (input.value.length === 0) {
+              errorSpan.style.display = 'none';
+              input.style.borderColor = '';
+          } else if (!/^07[0-9]{9}$/.test(input.value)) {
+              errorSpan.style.display = 'block';
+              input.style.borderColor = 'var(--danger)';
+          } else {
+              errorSpan.style.display = 'none';
+              input.style.borderColor = '#10B981'; // أخضر للرقم الصحيح
+          }
+      }
 
       function toggleOrderSound() {
           isSoundEnabled = !isSoundEnabled;
           const btn = document.getElementById('soundToggleBtn');
           if (isSoundEnabled) {
               btn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل';
-              btn.style.background = '#F59E0B'; // لون برتقالي مميز للجرس
+              btn.style.background = '#F59E0B'; 
               btn.style.color = 'white';
-              newOrderAudio.play().catch(e => {}); // تفعيل إذن الصوت من المتصفح
+              newOrderAudio.play().catch(e => {}); 
               startOrderPolling();
               showToast("🔔 تم تفعيل جرس تنبيه الطلبات!");
           } else {
@@ -742,7 +754,6 @@
               const currentCount = parseInt(await resp.text());
               if(!isNaN(currentCount)) {
                   if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
-                      // تشغيل الصوت عند وجود طلب جديد
                       newOrderAudio.play().catch(e=>{});
                       showToast("🔔 طلب جديد نزل بالساحة!");
                       if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
@@ -755,7 +766,21 @@
       function startOrderPolling() {
           if(orderPollInterval) clearInterval(orderPollInterval);
           checkNewOrdersForSound(); 
-          orderPollInterval = setInterval(checkNewOrdersForSound, 10000); // يفحص كل 10 ثواني
+          orderPollInterval = setInterval(checkNewOrdersForSound, 10000); 
+      }
+
+      function initAutoLocation() {
+          if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                      userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
+                  },
+                  (error) => {
+                      console.warn("GPS Denied on load");
+                  },
+                  { enableHighAccuracy: true }
+              );
+          }
       }
 
       function handleSecretClick() {
@@ -913,22 +938,6 @@
       function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
       function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
 
-      function getLocation(type) {
-          const btn = document.getElementById(`loc-btn-${type}`);
-          const originalHTML = btn.innerHTML;
-          btn.innerHTML = '<span class="baly-spinner" style="width:16px;height:16px;border-width:2px;border-top-color:var(--primary);"></span> جاري التحديد...';
-          if (navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition(
-                  (position) => {
-                      userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
-                      btn.innerHTML = '<i class="fas fa-check-circle"></i> تم التحديد بنجاح';
-                      btn.classList.add('success');
-                  },
-                  (error) => { showToast("يرجى تفعيل خدمة الموقع (GPS) 📍"); btn.innerHTML = originalHTML; }
-              );
-          } else { showToast("المتصفح لا يدعم تحديد الموقع"); btn.innerHTML = originalHTML; }
-      }
-
       function startAppLogin() {
           const name = document.getElementById('loginName').value.trim();
           const phone = document.getElementById('loginPhone').value.trim();
@@ -966,6 +975,7 @@
 
       document.addEventListener('DOMContentLoaded', () => {
           checkStatus();
+          initAutoLocation(); 
           setTimeout(() => {
               const splash = document.getElementById('splash-screen');
               if(splash) {
@@ -986,12 +996,19 @@
 
       function saveCustomerData(name, phone) { localStorage.setItem('saved_customer_name', name); localStorage.setItem('saved_customer_phone', phone); }
       
+      // تم التحديث هنا: لتفعيل اللون الأخضر تلقائياً للبيانات المحفوظة
       function loadSavedCustomerData() {
           const name = localStorage.getItem('saved_customer_name'); 
           const phone = localStorage.getItem('saved_customer_phone');
           if (name && phone) {
               ['custName', 'medName', 'tukName'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = name; });
-              ['custPhone', 'medPhone', 'tukPhone'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = phone; });
+              ['custPhone', 'medPhone', 'tukPhone'].forEach(id => { 
+                  let el = document.getElementById(id);
+                  if(el) {
+                      el.value = phone; 
+                      checkPhoneLive(el);
+                  }
+              });
           }
       }
 
@@ -1114,7 +1131,24 @@
           const phone = document.getElementById('tukPhone').value.trim();
           const land = document.getElementById('tukLandmark').value.trim();
           const dropLink = document.getElementById('tukDropoffLink').value.trim(); 
-          if(!name || !validateIraqiPhone(phone) || !userCoords || !dropLink) return showToast("أكمل البيانات وحدد الموقع 📍");
+          
+          if(!name || !validateIraqiPhone(phone) || !dropLink) return showToast("أكمل البيانات وحدد موقع النزول 📍");
+
+          if(!userCoords) {
+              showToast("جاري تحديد موقعك الحالي للطلب... 📍");
+              if(navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition(
+                      (pos) => { 
+                          userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; 
+                          sendTukOrder(); 
+                      },
+                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); },
+                      { enableHighAccuracy: true }
+                  );
+              } else { showToast("جهازك لا يدعم تحديد الموقع ❌"); }
+              return;
+          }
+
           const btn = document.getElementById('tukSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
               saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
@@ -1132,7 +1166,24 @@
       async function sendMedFinal() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const name = document.getElementById('medName').value.trim(); const phone = document.getElementById('medPhone').value.trim(); const order = document.getElementById('medOrder').value.trim();
-          if(!name || !validateIraqiPhone(phone) || !userCoords) return showToast("أكمل البيانات وحدد الموقع 📍");
+          
+          if(!name || !validateIraqiPhone(phone) || !order) return showToast("أكمل البيانات بشكل صحيح 📝");
+
+          if(!userCoords) {
+              showToast("جاري تحديد موقعك الحالي للطلب... 📍");
+              if(navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition(
+                      (pos) => { 
+                          userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; 
+                          sendMedFinal(); 
+                      },
+                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); },
+                      { enableHighAccuracy: true }
+                  );
+              }
+              return;
+          }
+
           const btn = document.getElementById('medSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
               saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
@@ -1160,7 +1211,24 @@
           const name = document.getElementById('custName').value.trim(); const phone = document.getElementById('custPhone').value.trim();
           const order = document.getElementById('custOrder').value.trim(); const land = document.getElementById('custLandmark').value.trim();
           const files = document.getElementById('custImages').files;
-          if(!name || !validateIraqiPhone(phone) || (!order && files.length === 0) || !userCoords) return showToast("أكمل البيانات وحدد الموقع 📍📸");
+          
+          if(!name || !validateIraqiPhone(phone) || (!order && files.length === 0)) return showToast("أكمل البيانات من فضلك 📝📸");
+
+          if(!userCoords) {
+              showToast("جاري تحديد موقعك الحالي للطلب... 📍");
+              if(navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition(
+                      (pos) => { 
+                          userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; 
+                          sendFinal(); 
+                      },
+                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); },
+                      { enableHighAccuracy: true }
+                  );
+              }
+              return;
+          }
+
           const btn = document.getElementById('sendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
               saveCustomerData(name, phone); const vc = generateSecureVC(); let photoMsgs = [];
