@@ -139,7 +139,7 @@
       
       .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; position: relative; z-index: 5; }
       .select-card { background: var(--surface); border-radius: var(--radius-lg); display: flex; box-shadow: var(--shadow-sm); cursor: pointer; border: 1px solid var(--border-color); color: var(--text-main); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
-      .select-card:hover, .select-card:active { transform: translateY(-3px) scale(0.98); box-shadow: var(--shadow-floating); border-color: var(--primary); }
+      .select-card:hover, .select-card:active { transform: translateY(-3px) scale(0.98); box-shadow: var(--floating-shadow); border-color: var(--primary); }
       .card-full { grid-column: span 2; flex-direction: row; align-items: center; padding: 22px 20px; gap: 18px; }
       .card-full .icon-wrapper { width: 65px; height: 65px; font-size: 28px; border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
       .card-full .card-text { flex: 1; text-align: right; }
@@ -267,7 +267,8 @@
         <button id="off-btn-wifi" class="offline-btn-primary ripple" onclick="openWiFiSettings()">الاتصال عبر ال WiFi</button>
         <button id="off-btn-data" class="offline-btn-outline ripple" onclick="openDataSettings()">الاتصال عبر انترنت الهاتف</button>
     </div>
-        <div id="toast-container"></div>
+    
+    <div id="toast-container"></div>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
     <div class="sidebar" id="appSidebar">
         <div class="sidebar-close ripple-dark" id="side-close-text" onclick="closeSidebar()"><i class="fas fa-arrow-right"></i> إغلاق</div>
@@ -336,18 +337,40 @@
             <h2 style="margin: 0; font-weight: 800; font-size: 28px; color: var(--text-main);">أهلاً بيك في البندر</h2>
             <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 15px; font-weight: 600;">سجل بياناتك مرة وحدة واطلب براحتك!</p>
         </div>
-        <div class="form-card">
-            <div class="form-group">
-                <label>الاسم الكريم</label>
-                <input type="text" id="loginName" placeholder="اكتب اسمك هنا">
+
+        <div id="login-step-1">
+            <div class="form-card">
+                <div class="form-group">
+                    <label>الاسم الكريم</label>
+                    <input type="text" id="loginName" placeholder="اكتب اسمك هنا">
+                </div>
+                <div class="form-group">
+                    <label>رقم الهاتف (واتساب)</label>
+                    <input type="tel" id="loginPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                    <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                </div>
             </div>
-            <div class="form-group">
-                <label>رقم الهاتف (واتساب)</label>
-                <input type="tel" id="loginPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+            <button class="send-btn ripple" onclick="requestTelegramCode()"><i class="fab fa-telegram-plane"></i> اضغط هنا للحصول على كود الدخول مجاناً عبر تليكرام</button>
+        </div>
+
+        <div id="login-step-2" style="display: none; text-align: center;">
+            <div class="form-card">
+                <i class="fab fa-telegram-plane" style="font-size: 40px; color: #0088cc; margin-bottom: 15px;"></i>
+                <h3 style="margin-top: 0;">التحقق عبر الرابط السريع</h3>
+                <p style="font-size: 14px; color: var(--text-muted); font-weight: bold; margin-bottom: 20px;">اضغط على الزر بالأسفل لفتح البوت الخاص بنا للحصول على الكود، ثم ارجع واكتب الكود هنا.</p>
+                
+                <a id="telegram-bot-link" href="#" target="_blank" class="send-btn ripple" style="background: #0088cc; display: block; text-decoration: none; margin-bottom: 20px;" onclick="showCodeInput()"><i class="fas fa-external-link-alt"></i> فتح البوت في تليكرام</a>
+
+                <div id="code-input-area" style="display: none; margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                    <div class="form-group">
+                        <label>أدخل الكود الذي وصلك من البوت:</label>
+                        <input type="number" id="loginAuthCode" placeholder="مثال: 1234" style="text-align: center; font-size: 24px; letter-spacing: 6px; font-weight: bold;">
+                    </div>
+                    <button class="send-btn ripple" style="background: #10B981;" onclick="verifyTelegramCode()"><i class="fas fa-check-circle"></i> تفعيل الحساب</button>
+                    <button class="resign-btn ripple-dark" style="margin-top: 10px;" onclick="resetLoginStep()">تعديل البيانات السابقة</button>
+                </div>
             </div>
         </div>
-        <button class="send-btn ripple" onclick="startAppLogin()"><i class="fas fa-sign-in-alt"></i> دخول للتطبيق</button>
     </div>
 
     <div id="admin-panel" class="screen container">
@@ -367,7 +390,9 @@
             
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
-    </div>    <div id="home-screen" class="screen container">
+    </div>
+
+    <div id="home-screen" class="screen container">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
         <div id="driver-status-badge" class="driver-status-bar">أنت الآن في وضع العمل النشط 🟢</div>
@@ -679,15 +704,17 @@
     <div id="log-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('plaza-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
-        
-        <div id="driver-log-container">
-            </div>
+        <div id="driver-log-container"></div>
     </div>
         <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
+
+      // متغيرات البوت الجديد الخاص بتسجيل الدخول
+      const NEW_BOT_TOKEN = "8757179280:AAHEgp3YTaVv6qZNr32ZA7fgk4fT8v-cqCk";
+      const NEW_BOT_USER = "CodAlbanderbot";
 
       let userCoords = ""; 
       const CURRENT_VERSION = "2.0.13"; 
@@ -923,13 +950,68 @@
       function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
       function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
 
-      function startAppLogin() {
+      // ==========================================
+      // إضافة وتحديث دوال التحقق عبر الرابط السريع (البوت الجديد)
+      // ==========================================
+      function requestTelegramCode() {
           const name = document.getElementById('loginName').value.trim();
           const phone = document.getElementById('loginPhone').value.trim();
           if(!name || !validateIraqiPhone(phone)) return showToast("يرجى كتابة الاسم ورقم عراقي صحيح ⚠️");
-          saveCustomerData(name, phone); loadSavedCustomerData(); syncLoyaltyWithServer();
-          showScreen('home-screen'); showToast("هلا بيك نورت البندر! 🎉");
+          
+          // إنشاء كود عشوائي للتحقق
+          const code = Math.floor(1000 + Math.random() * 9000); 
+          localStorage.setItem('temp_login_code', code);
+          localStorage.setItem('temp_login_name', name);
+          localStorage.setItem('temp_login_phone', phone);
+
+          // إخفاء الواجهة الأولى وإظهار الواجهة الثانية للرابط
+          document.getElementById('login-step-1').style.display = 'none';
+          document.getElementById('login-step-2').style.display = 'block';
+          
+          // تحديث الرابط الخاص بالبوت ودمج الكود بداخله
+          document.getElementById('telegram-bot-link').href = `https://t.me/${NEW_BOT_USER}?start=${code}`;
       }
+
+      function showCodeInput() {
+          document.getElementById('code-input-area').style.display = 'block';
+      }
+
+      function verifyTelegramCode() {
+          const inputCode = document.getElementById('loginAuthCode').value.trim();
+          const expectedCode = localStorage.getItem('temp_login_code');
+
+          if(inputCode === expectedCode) {
+              const name = localStorage.getItem('temp_login_name');
+              const phone = localStorage.getItem('temp_login_phone');
+              
+              saveCustomerData(name, phone); 
+              loadSavedCustomerData(); 
+              syncLoyaltyWithServer();
+              
+              showScreen('home-screen'); 
+              showToast("هلا بيك نورت البندر! تم التفعيل بنجاح 🎉");
+
+              // مسح البيانات المؤقتة
+              localStorage.removeItem('temp_login_code');
+              localStorage.removeItem('temp_login_name');
+              localStorage.removeItem('temp_login_phone');
+              
+              // تنظيف المدخلات في حال تسجيل خروج مستقبلاً
+              document.getElementById('loginName').value = "";
+              document.getElementById('loginPhone').value = "";
+              document.getElementById('loginAuthCode').value = "";
+              resetLoginStep();
+          } else {
+              showToast("الكود غير صحيح، يرجى التأكد من الكود المتبقي بالبوت ❌");
+          }
+      }
+
+      function resetLoginStep() {
+          document.getElementById('login-step-1').style.display = 'block';
+          document.getElementById('login-step-2').style.display = 'none';
+          document.getElementById('code-input-area').style.display = 'none';
+      }
+      // ==========================================
 
       function checkStatus() {
           trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
@@ -1082,8 +1164,7 @@
           if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') { loadSavedCustomerData(); }
           if(id === 'order-screen') updateLoyaltyUI();
       }
-
-      async function sendTukOrder() {
+                  async function sendTukOrder() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const name = document.getElementById('tukName').value.trim();
           const phone = document.getElementById('tukPhone').value.trim();
@@ -1152,7 +1233,6 @@
       }
       function clearImages() { document.getElementById('custImages').value = ''; document.getElementById('image-preview-container').innerHTML = ''; }
 
-      // التحديث الجديد: زيادة العداد فور إرسال الطلب (تسوك مسواكك)
       async function sendFinal() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const name = document.getElementById('custName').value.trim(); const phone = document.getElementById('custPhone').value.trim();
@@ -1186,7 +1266,6 @@
               let photoIdsStr = photoMsgs.join(','); let referrer = localStorage.getItem('referred_by') || "";
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&photoMsgs=${photoIdsStr}&referrer=${referrer}`); localStorage.removeItem('referred_by');
               
-              // التعديل هنا: زيادة العداد محلياً فور الإرسال
               let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0); 
               tempLoyalty++; 
               localStorage.setItem('my_loyalty_orders', tempLoyalty);
@@ -1327,3 +1406,5 @@
           closeMapModal();
       }
     </script>
+</body>
+</html>
