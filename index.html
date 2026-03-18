@@ -23,12 +23,18 @@
 
     <title>تطبيق البندر - خدمات توصيل وتحصيل في أم قصر</title>
     
+    <meta name="apple-mobile-web-app-title" content="البندر">
+    <meta name="application-name" content="البندر">
+    
     <meta name="description" content="تطبيق البندر هو أسرع تطبيق لتوصيل المسواك، التحصيل، والخدمات اللوجستية في أم قصر. اطلب الآن نصلك أينما كنت.">
     <meta name="keywords" content="البندر, تطبيق البندر, توصيل البندر, تحصيل، أم قصر، تكتك، مسواك، طلبات، البصرة، مندوب">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -43,22 +49,11 @@
       @keyframes bouncePin { from { transform: translate(-50%, -100%); } to { transform: translate(-50%, -110%); } }
 
       :root { 
-          --primary: #5A228B; 
-          --primary-hover: #4A1A75; 
-          --secondary: #FFC107;       
-          --gold: #FFC107; 
-          --danger: #EF4444; 
-          --bg-color: #F4F6F9;        
-          --surface: #FFFFFF; 
-          --text-main: #111827; 
-          --text-muted: #6B7280;      
-          --border-color: #E5E7EB; 
-          --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.04);
-          --shadow-md: 0 10px 30px rgba(90, 34, 139, 0.1); 
-          --shadow-floating: 0 20px 40px rgba(0, 0, 0, 0.12);
-          --radius-md: 20px; 
-          --radius-lg: 24px; 
-          --radius-pill: 9999px;
+          --primary: #5A228B; --primary-hover: #4A1A75; --secondary: #FFC107; --gold: #FFC107; 
+          --danger: #EF4444; --bg-color: #F4F6F9; --surface: #FFFFFF; --text-main: #111827; 
+          --text-muted: #6B7280; --border-color: #E5E7EB; --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.04);
+          --shadow-md: 0 10px 30px rgba(90, 34, 139, 0.1); --shadow-floating: 0 20px 40px rgba(0, 0, 0, 0.12);
+          --radius-md: 20px; --radius-lg: 24px; --radius-pill: 9999px;
       }
       body.dark-mode {
           --primary: #7A3BBA; --bg-color: #121212; --surface: #1E1E1E; --text-main: #F9FAFB;
@@ -90,7 +85,7 @@
       .theme-toggle:active { transform: scale(0.9); }
       .lang-toggle { position: fixed; top: 20px; left: 80px; z-index: 10001; background: var(--surface); color: var(--primary); border: 1px solid var(--border-color); padding: 0 15px; height: 48px; border-radius: var(--radius-pill); cursor: pointer; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; transition: 0.3s; }
       
-      /* التعديل هنا لإصلاح تداخل الشاشات */
+      /* التصليح هنا: الشاشات تأخذ المساحة كاملة وتختفي تماماً إذا لم تكن مفعلة */
       .screen { display: none; width: 100%; min-height: 100vh; position: relative; z-index: 1; animation: fadeSlideUp 0.4s ease-out forwards; }
       .active-screen { display: block !important; z-index: 10; }
       #login-screen.active-screen { display: flex !important; flex-direction: column; justify-content: center; min-height: 100vh; position: relative; z-index: 100; padding-bottom: 20px; }
@@ -321,24 +316,15 @@
         </div>
     </div>
 
-    <div id="splash-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease-in, transform 0.5s ease-in; overflow: hidden;">
-      <div id="app-logo-splash" style="width: 130px; height: 130px; background: white; border-radius: 35px; display: flex; align-items: center; justify-content: center; margin-top: -100px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); opacity: 0; transform: scale(0.5); transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 20; }
-      #app-logo-splash i { font-size: 65px; color: var(--primary); }
-      .show-logo { opacity: 1 !important; transform: scale(1) !important; }
-      .splash-welcome-text { position: absolute; top: 18%; text-align: center; width: 100%; color: white; animation: fadeInDown 1s ease-out; }
-      .splash-welcome-text h2 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 1px; }
-      .splash-welcome-text p { margin: 8px 0 0; opacity: 0.9; font-size: 16px; font-weight: 500; }
-      @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-      .road-realistic { position: absolute; bottom: 25%; width: 100%; height: 60px; background: rgba(0,0,0,0.2); border-top: 3px solid rgba(255,255,255,0.1); border-bottom: 3px solid rgba(255,255,255,0.1); display: flex; align-items: center; }
-      .road-lines { width: 100%; height: 4px; background: repeating-linear-gradient(90deg, #FFC107 0, #FFC107 40px, transparent 40px, transparent 80px); animation: road-scroll 0.5s linear infinite; }
-      @keyframes road-scroll { from { transform: translateX(0); } to { transform: translateX(80px); } }
-      .bike-box { position: absolute; bottom: calc(25% + 15px); left: 110%; font-size: 70px; color: white; transform: scaleX(-1); animation: drive-left 2s linear forwards; z-index: 10; animation-delay: 0.5s; }
-      .exhaust { position: absolute; right: -10px; bottom: 10px; display: flex; flex-direction: column; }
-      .smoke { width: 12px; height: 12px; background: rgba(255, 255, 255, 0.6); border-radius: 50%; margin-top: -5px; opacity: 0; animation: smoke-bloom 0.8s infinite; }
-      .smoke:nth-child(2) { animation-delay: 0.2s; }
-      .smoke:nth-child(3) { animation-delay: 0.4s; }
-      @keyframes smoke-bloom { 0% { transform: translate(0, 0) scale(1); opacity: 0; } 20% { opacity: 0.7; } 100% { transform: translate(40px, -40px) scale(3); opacity: 0; filter: blur(5px); } }
-      @keyframes drive-left { 0% { left: 110%; } 100% { left: -30%; } }
+    <div id="splash-screen">
+      <div id="app-logo-splash"><i class="fas fa-box-open" style="font-size: 65px; color: var(--primary);"></i></div>
+      <div class="splash-welcome-text">
+          <h2 id="splash-title" style="margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 1px;">البندر</h2>
+          <p id="splash-subtitle" style="margin: 8px 0 0; opacity: 0.9; font-size: 16px; font-weight: 500;">أسرع تطبيق للتوصيل والتحصيل في أم قصر</p>
+      </div>
+      <div class="road-realistic"><div class="road-lines"></div></div>
+      <div class="bike-box"><i class="fas fa-motorcycle"></i><div class="exhaust"><div class="smoke"></div><div class="smoke"></div><div class="smoke"></div></div></div>
+    </div>
 
     <div id="login-screen" class="screen container">
         <div style="text-align: center; margin-bottom: 30px;">
@@ -742,16 +728,15 @@
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
     </div>
-        <script>
+    <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
-      // متغيرات البوت الجديد الخاص بتسجيل الدخول
       const NEW_BOT_TOKEN = "8757179280:AAHEgp3YTaVv6qZNr32ZA7fgk4fT8v-cqCk";
       const NEW_BOT_USER = "CodAlbanderbot";
-                  let userCoords = ""; 
+      let userCoords = ""; 
       const CURRENT_VERSION = "2.0.13"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
@@ -832,7 +817,7 @@
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
                   (position) => {
-                      userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
+                      userCoords = `https://maps.google.com/?q=$${position.coords.latitude},${position.coords.longitude}`;
                   },
                   (error) => { console.warn("GPS Denied on load"); },
                   { enableHighAccuracy: true }
@@ -992,25 +977,19 @@
       function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
       function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
 
-      // ==========================================
-      // إضافة وتحديث دوال التحقق عبر الرابط السريع (البوت الجديد)
-      // ==========================================
       function requestTelegramCode() {
           const name = document.getElementById('loginName').value.trim();
           const phone = document.getElementById('loginPhone').value.trim();
           if(!name || !validateIraqiPhone(phone)) return showToast("يرجى كتابة الاسم ورقم عراقي صحيح ⚠️");
           
-          // إنشاء كود عشوائي للتحقق
           const code = Math.floor(1000 + Math.random() * 9000); 
           localStorage.setItem('temp_login_code', code);
           localStorage.setItem('temp_login_name', name);
           localStorage.setItem('temp_login_phone', phone);
 
-          // إخفاء الواجهة الأولى وإظهار الواجهة الثانية للرابط
           document.getElementById('login-step-1').style.display = 'none';
           document.getElementById('login-step-2').style.display = 'block';
           
-          // تحديث الرابط الخاص بالبوت ودمج الكود بداخله
           document.getElementById('telegram-bot-link').href = `https://t.me/${NEW_BOT_USER}?start=${code}`;
       }
 
@@ -1037,12 +1016,10 @@
               showScreen('home-screen'); 
               showToast("هلا بيك نورت البندر! تم التفعيل بنجاح 🎉");
 
-              // مسح البيانات المؤقتة
               localStorage.removeItem('temp_login_code');
               localStorage.removeItem('temp_login_name');
               localStorage.removeItem('temp_login_phone');
               
-              // تنظيف المدخلات في حال تسجيل خروج مستقبلاً
               document.getElementById('loginName').value = "";
               document.getElementById('loginPhone').value = "";
               document.getElementById('loginAuthCode').value = "";
@@ -1057,7 +1034,6 @@
           document.getElementById('login-step-2').style.display = 'none';
           document.getElementById('code-input-area').style.display = 'none';
       }
-      // ==========================================
 
       function checkStatus() {
           trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
@@ -1201,26 +1177,26 @@
       }
 
       function showScreen(id) {
-          // التعديل هنا: إخفاء جميع الشاشات بشكل قطعي لحل مشكلة التداخل
+          // الإصلاح القاطع: مسح أي شاشة قديمة من الظهور نهائياً قبل إظهار الجديدة
           document.querySelectorAll('.screen').forEach(s => {
               s.classList.remove('active-screen');
-              s.style.display = 'none';
           });
           
           const target = document.getElementById(id);
           if (target) {
               target.classList.add('active-screen');
-              target.style.display = 'block';
           }
           
           window.scrollTo(0, 0);
           const bottomNav = document.getElementById('bottomNavigation');
           if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel') ? 'none' : 'flex';
+          
           if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
           if(id === 'log-screen') { renderDriverLog(); } 
           if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') { loadSavedCustomerData(); }
           if(id === 'order-screen') updateLoyaltyUI();
           
+          // إخفاء القائمة الجانبية في حال كانت مفتوحة
           if (typeof closeSidebar === 'function') closeSidebar();
       }
 
