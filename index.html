@@ -85,7 +85,6 @@
       .theme-toggle:active { transform: scale(0.9); }
       .lang-toggle { position: fixed; top: 20px; left: 80px; z-index: 10001; background: var(--surface); color: var(--primary); border: 1px solid var(--border-color); padding: 0 15px; height: 48px; border-radius: var(--radius-pill); cursor: pointer; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; transition: 0.3s; }
       
-      /* التصليح هنا: الشاشات تأخذ المساحة كاملة وتختفي تماماً إذا لم تكن مفعلة */
       .screen { display: none; width: 100%; min-height: 100vh; position: relative; z-index: 1; animation: fadeSlideUp 0.4s ease-out forwards; }
       .active-screen { display: block !important; z-index: 10; }
       #login-screen.active-screen { display: flex !important; flex-direction: column; justify-content: center; min-height: 100vh; position: relative; z-index: 100; padding-bottom: 20px; }
@@ -210,7 +209,6 @@
       .sidebar-close { align-self: flex-start; font-size: 15px; color: var(--text-muted); cursor: pointer; background: var(--bg-color); padding: 10px 20px; border-radius: var(--radius-pill); display: flex; align-items: center; gap: 8px; transition: 0.3s; font-weight: 700; margin-bottom: 20px; }
       #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--text-main); text-align: center; padding: 20px; }
       
-      /* تنسيق الأرقام وملاحظة الموقع */
       .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(90, 34, 139, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
       .location-notice { font-size: 13px; font-weight: 700; color: #10B981; text-align: center; margin-bottom: 15px; display: block; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: var(--radius-md); border: 1px dashed #10B981;}
     </style>
@@ -332,43 +330,22 @@
                 <i class="fas fa-user-circle" style="font-size: 50px; color: var(--primary);"></i>
             </div>
             <h2 style="margin: 0; font-weight: 800; font-size: 28px; color: var(--text-main);">أهلاً بيك في البندر</h2>
-            <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 15px; font-weight: 600;">سجل بياناتك مرة وحدة واطلب براحتك!</p>
+            <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 15px; font-weight: 600;">سجل دخولك بضغطة زر وبدون تعب!</p>
         </div>
 
-        <div id="login-step-1">
-            <div class="form-card">
-                <div class="form-group">
-                    <label>الاسم الكريم</label>
-                    <input type="text" id="loginName" placeholder="اكتب اسمك هنا">
-                    <span class="step-number">خطوة رقم (1)</span>
-                </div>
-                <div class="form-group">
-                    <label>رقم الهاتف (واتساب)</label>
-                    <input type="tel" id="loginPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-                    <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-                    <span class="step-number">خطوة رقم (2)</span>
-                </div>
-            </div>
-            <button class="send-btn ripple" onclick="requestTelegramCode()"><i class="fab fa-telegram-plane"></i> اضغط هنا للحصول على كود الدخول مجاناً عبر تليكرام</button>
-        </div>
+        <div class="form-card" style="text-align: center; padding: 30px 20px;">
+            <i class="fab fa-telegram-plane icon-pulse" style="font-size: 60px; color: #0088cc; margin-bottom: 20px;"></i>
+            <h3 style="margin-top: 0;">تفعيل الحساب السريع</h3>
+            <p style="font-size: 14px; color: var(--text-muted); font-weight: bold; margin-bottom: 25px;">
+                اضغط على الزر الجوه راح يفتح بوت تليكرام، انطيه "مشاركة جهة الاتصال" وراح يتفعل حسابك هنا تلقائياً!
+            </p>
+            
+            <button id="tg-login-btn" class="send-btn ripple" style="background: #0088cc; font-size: 18px;" onclick="startTelegramLogin()">
+                <i class="fab fa-telegram-plane"></i> تسجيل الدخول عبر تليكرام
+            </button>
 
-        <div id="login-step-2" style="display: none; text-align: center;">
-            <div class="form-card">
-                <i class="fab fa-telegram-plane" style="font-size: 40px; color: #0088cc; margin-bottom: 15px;"></i>
-                <h3 style="margin-top: 0;">التحقق عبر الرابط السريع</h3>
-                <p style="font-size: 14px; color: var(--text-muted); font-weight: bold; margin-bottom: 20px;">اضغط على الزر بالأسفل لفتح البوت الخاص بنا للحصول على الكود، ثم ارجع واكتب الكود هنا.</p>
-                
-                <a id="telegram-bot-link" href="#" target="_blank" class="send-btn ripple" style="background: #0088cc; display: block; text-decoration: none; margin-bottom: 20px;" onclick="showCodeInput()"><i class="fas fa-external-link-alt"></i> فتح البوت في تليكرام</a>
-
-                <div id="code-input-area" style="display: none; margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 20px;">
-                    <div class="form-group">
-                        <label>أدخل الكود الذي وصلك من البوت:</label>
-                        <input type="number" id="loginAuthCode" placeholder="مثال: 1234" style="text-align: center; font-size: 24px; letter-spacing: 6px; font-weight: bold;">
-                        <span class="step-number">خطوة رقم (3)</span>
-                    </div>
-                    <button class="send-btn ripple" style="background: #10B981;" onclick="verifyTelegramCode()"><i class="fas fa-check-circle"></i> تفعيل الحساب</button>
-                    <button class="resign-btn ripple-dark" style="margin-top: 10px;" onclick="resetLoginStep()">تعديل البيانات السابقة</button>
-                </div>
+            <div id="cancel-login-area" style="display: none; margin-top: 15px;">
+                <button class="resign-btn ripple-dark" onclick="cancelTelegramLogin()">إلغاء العملية</button>
             </div>
         </div>
     </div>
@@ -391,7 +368,6 @@
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
-
     <div id="home-screen" class="screen container">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
@@ -459,6 +435,7 @@
           </div>
       </div>
     </div>
+
     <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
@@ -727,8 +704,8 @@
         <button class="back-btn ripple-dark" onclick="showScreen('plaza-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
-    </div>
-    <script>
+                    </div>
+                        <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
@@ -737,7 +714,7 @@
       const NEW_BOT_TOKEN = "8757179280:AAHEgp3YTaVv6qZNr32ZA7fgk4fT8v-cqCk";
       const NEW_BOT_USER = "CodAlbanderbot";
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.13"; 
+      const CURRENT_VERSION = "2.0.14"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -977,63 +954,69 @@
       function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
       function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
 
-      function requestTelegramCode() {
-          const name = document.getElementById('loginName').value.trim();
-          const phone = document.getElementById('loginPhone').value.trim();
-          if(!name || !validateIraqiPhone(phone)) return showToast("يرجى كتابة الاسم ورقم عراقي صحيح ⚠️");
-          
-          const code = Math.floor(1000 + Math.random() * 9000); 
-          localStorage.setItem('temp_login_code', code);
-          localStorage.setItem('temp_login_name', name);
-          localStorage.setItem('temp_login_phone', phone);
+      /* =========================================
+         منظومة تسجيل الدخول الجديدة عبر تليكرام
+      ========================================= */
+      let loginPollInterval = null;
+      let currentLoginSession = "";
 
-          document.getElementById('login-step-1').style.display = 'none';
-          document.getElementById('login-step-2').style.display = 'block';
+      function startTelegramLogin() {
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           
-          document.getElementById('telegram-bot-link').href = `https://t.me/${NEW_BOT_USER}?start=${code}`;
+          currentLoginSession = Math.floor(10000000 + Math.random() * 90000000).toString();
+          
+          const btn = document.getElementById('tg-login-btn');
+          btn.innerHTML = '<span class="baly-spinner"></span> جاري انتظار تليكرام...';
+          btn.disabled = true;
+          document.getElementById('cancel-login-area').style.display = 'block';
+
+          // فتح البوت مع كود الجلسة
+          window.open(`https://t.me/${NEW_BOT_USER}?start=login_${currentLoginSession}`, '_blank');
+
+          // بدأ الفحص كل 3 ثواني للتأكد إذا الزبون ضغط "مشاركة جهة الاتصال" بالبوت لو بعده
+          loginPollInterval = setInterval(checkTelegramLoginStatus, 3000);
       }
 
-      function showCodeInput() {
-          document.getElementById('code-input-area').style.display = 'block';
-      }
-
-      function verifyTelegramCode() {
-          const inputCode = document.getElementById('loginAuthCode').value.trim();
-          const expectedCode = localStorage.getItem('temp_login_code');
-
-          if(inputCode === expectedCode) {
-              const name = localStorage.getItem('temp_login_name');
-              const phone = localStorage.getItem('temp_login_phone');
+      async function checkTelegramLoginStatus() {
+          if (!currentLoginSession) return;
+          try {
+              const resp = await fetch(`${GS_URL}?action=checkTelegramLogin&session=${currentLoginSession}`);
+              const data = await resp.json();
               
-              if (navigator.onLine) {
-                  fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => console.log("Stats error"));
+              if (data.status === 'success') {
+                  clearInterval(loginPollInterval);
+                  
+                  if (navigator.onLine) {
+                      fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => console.log("Stats error"));
+                  }
+
+                  saveCustomerData(data.name, data.phone); 
+                  loadSavedCustomerData(); 
+                  syncLoyaltyWithServer();
+                  
+                  showScreen('home-screen'); 
+                  showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
+
+                  currentLoginSession = "";
+                  resetLoginUI();
               }
-
-              saveCustomerData(name, phone); 
-              loadSavedCustomerData(); 
-              syncLoyaltyWithServer();
-              
-              showScreen('home-screen'); 
-              showToast("هلا بيك نورت البندر! تم التفعيل بنجاح 🎉");
-
-              localStorage.removeItem('temp_login_code');
-              localStorage.removeItem('temp_login_name');
-              localStorage.removeItem('temp_login_phone');
-              
-              document.getElementById('loginName').value = "";
-              document.getElementById('loginPhone').value = "";
-              document.getElementById('loginAuthCode').value = "";
-              resetLoginStep();
-          } else {
-              showToast("الكود غير صحيح، يرجى التأكد من الكود المتبقي بالبوت ❌");
-          }
+          } catch(e) {}
       }
 
-      function resetLoginStep() {
-          document.getElementById('login-step-1').style.display = 'block';
-          document.getElementById('login-step-2').style.display = 'none';
-          document.getElementById('code-input-area').style.display = 'none';
+      function cancelTelegramLogin() {
+          if (loginPollInterval) clearInterval(loginPollInterval);
+          currentLoginSession = "";
+          resetLoginUI();
+          showToast("تم إلغاء عملية تسجيل الدخول ❌");
       }
+
+      function resetLoginUI() {
+          const btn = document.getElementById('tg-login-btn');
+          btn.innerHTML = '<i class="fab fa-telegram-plane"></i> تسجيل الدخول عبر تليكرام';
+          btn.disabled = false;
+          document.getElementById('cancel-login-area').style.display = 'none';
+      }
+      /* ========================================= */
 
       function checkStatus() {
           trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
@@ -1177,7 +1160,6 @@
       }
 
       function showScreen(id) {
-          // الإصلاح القاطع: مسح أي شاشة قديمة من الظهور نهائياً قبل إظهار الجديدة
           document.querySelectorAll('.screen').forEach(s => {
               s.classList.remove('active-screen');
           });
@@ -1196,7 +1178,6 @@
           if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') { loadSavedCustomerData(); }
           if(id === 'order-screen') updateLoyaltyUI();
           
-          // إخفاء القائمة الجانبية في حال كانت مفتوحة
           if (typeof closeSidebar === 'function') closeSidebar();
       }
 
