@@ -323,30 +323,47 @@
       <div class="road-realistic"><div class="road-lines"></div></div>
       <div class="bike-box"><i class="fas fa-motorcycle"></i><div class="exhaust"><div class="smoke"></div><div class="smoke"></div><div class="smoke"></div></div></div>
     </div>
-
     <div id="login-screen" class="screen container">
         <div style="text-align: center; margin-bottom: 30px;">
             <div style="width:100px; height:100px; background:rgba(90, 34, 139, 0.1); border-radius:30px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: var(--shadow-sm);">
                 <i class="fas fa-user-circle" style="font-size: 50px; color: var(--primary);"></i>
             </div>
             <h2 style="margin: 0; font-weight: 800; font-size: 28px; color: var(--text-main);">أهلاً بيك في البندر</h2>
-            <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 15px; font-weight: 600;">سجل دخولك بضغطة زر وبدون تعب!</p>
+            <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 15px; font-weight: 600;">سجل دخولك بخطوتين بسيطة!</p>
         </div>
 
-        <div class="form-card" style="text-align: center; padding: 30px 20px;">
-            <i class="fab fa-telegram-plane icon-pulse" style="font-size: 60px; color: #0088cc; margin-bottom: 20px;"></i>
-            <h3 style="margin-top: 0;">تفعيل الحساب السريع</h3>
+        <div class="form-card" id="login-step-1" style="text-align: center; padding: 30px 20px;">
+            <i class="fas fa-signature icon-pulse" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
+            <h3 style="margin-top: 0;">شنو اسمك الكريم؟</h3>
             <p style="font-size: 14px; color: var(--text-muted); font-weight: bold; margin-bottom: 25px;">
-                اضغط على الزر الجوه راح يفتح بوت تليكرام، انطيه "مشاركة جهة الاتصال" وراح يتفعل حسابك هنا تلقائياً!
+                اكتب اسمك حتى نتعرف عليك ونخدمك بأفضل طريقة
+            </p>
+            <div class="form-group" style="text-align: right;">
+                <input type="text" id="loginNameInput" placeholder="اكتب اسمك الثلاثي هنا..." style="text-align: center; font-size: 18px; font-weight: bold;">
+            </div>
+            <button class="send-btn ripple" onclick="goToLoginStep2()">
+                التالي <i class="fas fa-arrow-left"></i>
+            </button>
+        </div>
+
+        <div class="form-card" id="login-step-2" style="display: none; text-align: center; padding: 30px 20px;">
+            <i class="fab fa-telegram-plane icon-pulse" style="font-size: 60px; color: #0088cc; margin-bottom: 20px;"></i>
+            <h3 style="margin-top: 0;">تفعيل الحساب برقمك</h3>
+            <p style="font-size: 14px; color: var(--text-muted); font-weight: bold; margin-bottom: 25px;">
+                اضغط على الزر الجوه راح يفتح بوت تليكرام، انطيه "مشاركة جهة الاتصال" وراح يتفعل حسابك!
             </p>
             
             <button id="tg-login-btn" class="send-btn ripple" style="background: #0088cc; font-size: 18px;" onclick="startTelegramLogin()">
-                <i class="fab fa-telegram-plane"></i> تسجيل الدخول عبر تليكرام
+                <i class="fab fa-telegram-plane"></i> شارك رقمك عبر تليكرام
             </button>
 
             <div id="cancel-login-area" style="display: none; margin-top: 15px;">
                 <button class="resign-btn ripple-dark" onclick="cancelTelegramLogin()">إلغاء العملية</button>
             </div>
+            
+            <button class="resign-btn ripple-dark" style="margin-top: 15px; border: none; color: var(--text-muted);" onclick="backToLoginStep1()">
+                <i class="fas fa-arrow-right"></i> رجوع لتعديل الاسم
+            </button>
         </div>
     </div>
 
@@ -578,7 +595,6 @@
         </div>
         <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
-
     <div id="join-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> انضم ككابتن</h2>
@@ -704,8 +720,9 @@
         <button class="back-btn ripple-dark" onclick="showScreen('plaza-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
-                    </div>
-                        <script>
+    </div>
+    
+    <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
@@ -714,7 +731,7 @@
       const NEW_BOT_TOKEN = "8757179280:AAHEgp3YTaVv6qZNr32ZA7fgk4fT8v-cqCk";
       const NEW_BOT_USER = "CodAlbanderbot";
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.14"; 
+      const CURRENT_VERSION = "2.0.15"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -789,7 +806,6 @@
           checkNewOrdersForSound(); 
           orderPollInterval = setInterval(checkNewOrdersForSound, 10000); 
       }
-
       function initAutoLocation() {
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
@@ -955,10 +971,22 @@
       function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
 
       /* =========================================
-         منظومة تسجيل الدخول الجديدة عبر تليكرام
+         منظومة تسجيل الدخول الجديدة عبر تليكرام (تحديث البندر)
       ========================================= */
       let loginPollInterval = null;
       let currentLoginSession = "";
+
+      function goToLoginStep2() {
+          const nameInput = document.getElementById('loginNameInput').value.trim();
+          if(!nameInput) return showToast("يرجى كتابة اسمك أولاً ⚠️");
+          document.getElementById('login-step-1').style.display = 'none';
+          document.getElementById('login-step-2').style.display = 'block';
+      }
+
+      function backToLoginStep1() {
+          document.getElementById('login-step-2').style.display = 'none';
+          document.getElementById('login-step-1').style.display = 'block';
+      }
 
       function startTelegramLogin() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
@@ -990,10 +1018,21 @@
                       fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => console.log("Stats error"));
                   }
 
-                  saveCustomerData(data.name, data.phone); 
+                  const userName = document.getElementById('loginNameInput').value.trim();
+                  const userPhone = data.phone;
+
+                  saveCustomerData(userName, userPhone); 
                   loadSavedCustomerData(); 
                   syncLoyaltyWithServer();
                   
+                  // إرسال رسالة للمدير (لك) بالبوت الجديد تحتوي على الاسم والرقم
+                  const msg = `👤 تسجيل دخول جديد\nالاسم: ${userName}\nالرقم: ${userPhone}`;
+                  fetch(`https://api.telegram.org/bot${NEW_BOT_TOKEN}/sendMessage`, {
+                      method: "POST", 
+                      headers: { "Content-Type": "application/json" }, 
+                      body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+                  }).catch(e => {});
+
                   showScreen('home-screen'); 
                   showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
 
@@ -1012,9 +1051,14 @@
 
       function resetLoginUI() {
           const btn = document.getElementById('tg-login-btn');
-          btn.innerHTML = '<i class="fab fa-telegram-plane"></i> تسجيل الدخول عبر تليكرام';
+          btn.innerHTML = '<i class="fab fa-telegram-plane"></i> شارك رقمك عبر تليكرام';
           btn.disabled = false;
           document.getElementById('cancel-login-area').style.display = 'none';
+          
+          // إرجاع الواجهة للحالة الأولى
+          document.getElementById('login-step-2').style.display = 'none';
+          document.getElementById('login-step-1').style.display = 'block';
+          document.getElementById('loginNameInput').value = '';
       }
       /* ========================================= */
 
