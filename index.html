@@ -496,6 +496,11 @@
                 <span class="step-number">خطوة رقم (4)</span>
             </div>
         </div>
+
+        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
+        </div>
+
         <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">طلب تكتك توصيلة</span></button>
     </div>
     
@@ -538,6 +543,11 @@
                 <span class="step-number">خطوة رقم (4)</span>
             </div>
         </div>
+
+        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
+        </div>
+
         <button class="send-btn order-btn-logic ripple" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
     </div>
 
@@ -593,8 +603,14 @@
                 <span class="step-number">خطوة رقم (5)</span>
             </div>
         </div>
+
+        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل شراء المواد. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
+        </div>
+
         <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
+    
     <div id="join-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> انضم ككابتن</h2>
@@ -640,10 +656,14 @@
             <button class="resign-btn ripple-dark" onclick="cancelJoinRequest()" style="margin-top:15px;">إلغاء الطلب</button>
         </div>
     </div>
-
     <div id="plaza-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-briefcase" style="color:#8B5CF6;"></i> لوحة الكابتن</h2>
+
+        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 14px; font-weight: 800; margin-bottom: 20px;">
+            <i class="fas fa-exclamation-circle" style="font-size: 20px;"></i> 
+            <span style="display: block; margin-top: 5px;">قانون صارم: ممنوع تشتري أي مسواك أو تتحرك قبل ما تتصل بالزبون وتتأكد منه! إذا الزبون ما جاوب، الغي الطلب فوراً. المندوب اللي يخالف ويشتري بدون اتصال يتحمل الخسارة.</span>
+        </div>
 
         <div class="form-card" style="text-align: center; padding: 15px;">
             <button id="statusToggleBtn" class="send-btn ripple" style="background: #10B981; margin-top: 0; box-shadow: none;" onclick="toggleDriverStatus()">
@@ -847,7 +867,6 @@
               }
           }
       }
-
       async function setGlobalAppStatus(newStatus) {
           const btnOpen = document.getElementById('btn-open-app');
           const btnClose = document.getElementById('btn-close-app');
@@ -998,10 +1017,7 @@
           btn.disabled = true;
           document.getElementById('cancel-login-area').style.display = 'block';
 
-          // فتح البوت مع كود الجلسة
           window.open(`https://t.me/${NEW_BOT_USER}?start=login_${currentLoginSession}`, '_blank');
-
-          // بدأ الفحص كل 3 ثواني للتأكد إذا الزبون ضغط "مشاركة جهة الاتصال" بالبوت لو بعده
           loginPollInterval = setInterval(checkTelegramLoginStatus, 3000);
       }
 
@@ -1025,7 +1041,6 @@
                   loadSavedCustomerData(); 
                   syncLoyaltyWithServer();
                   
-                  // إرسال رسالة للمدير (لك) بالبوت الجديد تحتوي على الاسم والرقم
                   const msg = `👤 تسجيل دخول جديد\nالاسم: ${userName}\nالرقم: ${userPhone}`;
                   fetch(`https://api.telegram.org/bot${NEW_BOT_TOKEN}/sendMessage`, {
                       method: "POST", 
@@ -1055,7 +1070,6 @@
           btn.disabled = false;
           document.getElementById('cancel-login-area').style.display = 'none';
           
-          // إرجاع الواجهة للحالة الأولى
           document.getElementById('login-step-2').style.display = 'none';
           document.getElementById('login-step-1').style.display = 'block';
           document.getElementById('loginNameInput').value = '';
