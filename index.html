@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -81,7 +82,7 @@
 
       .baly-spinner { width: 26px; height: 26px; border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; display: inline-block; vertical-align: middle; }
       @keyframes spin { to { transform: rotate(360deg); } }
-      .baly-slider-container { width: 100%; overflow: hidden; margin-top: -45px; margin-bottom: 25px; position: relative; z-index: 5; }
+              .baly-slider-container { width: 100%; overflow: hidden; margin-top: -45px; margin-bottom: 25px; position: relative; z-index: 5; }
       .baly-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding: 0 20px 10px 20px; }
       .baly-slider::-webkit-scrollbar { display: none; }
       .baly-slide { flex: 0 0 85%; scroll-snap-align: center; border-radius: var(--radius-lg); padding: 25px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); cursor: pointer; }
@@ -154,22 +155,6 @@
       .card-tuk .icon-wrapper { background: rgba(255, 193, 7, 0.15); color: #D97706; }
       .card-join .icon-wrapper { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
       .card-plaza .icon-wrapper { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
-
-      /* =========================================
-         ستايلات السوق المفتوح الجديدة (التصميم المطابق)
-      ========================================= */
-      .card-market .icon-wrapper { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
-      .market-cat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; direction: rtl; }
-      .market-cat-item { background: var(--surface); border-radius: 12px; padding: 10px 5px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); transition: 0.3s; }
-      .market-cat-item:active { transform: scale(0.95); }
-      .market-cat-item.active { border-color: #3B82F6; background: rgba(59, 130, 246, 0.05); }
-      .market-cat-img-box { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; }
-      .market-cat-img { width: 100%; height: 100%; object-fit: contain; }
-      .market-cat-name { font-size: 11px; font-weight: 800; color: var(--text-main); text-align: center; }
-      .empty-market-state { grid-column: span 2; text-align: center; padding: 40px 20px; color: var(--text-muted); }
-      .empty-market-state i { font-size: 50px; margin-bottom: 15px; opacity: 0.2; }
-      .empty-market-state p { font-weight: 800; font-size: 16px; margin: 0; }
-
       .form-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards; }
       .form-card-title { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
       .form-card-title i { font-size: 18px; color: var(--gold); }
@@ -238,7 +223,7 @@
     </style>
 </head>
 <body>
-        <div id="map-modal">
+    <div id="map-modal">
         <div class="map-container">
             <div class="map-header">
                 <span>تحديد موقع النزول 📍</span>
@@ -347,7 +332,6 @@
       <div class="road-realistic"><div class="road-lines"></div></div>
       <div class="bike-box"><i class="fas fa-motorcycle"></i><div class="exhaust"><div class="smoke"></div><div class="smoke"></div><div class="smoke"></div></div></div>
     </div>
-    
     <div id="login-screen" class="screen container">
         <div style="text-align: center; margin-bottom: 30px;">
             <div style="width:100px; height:100px; background:rgba(90, 34, 139, 0.1); border-radius:30px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: var(--shadow-sm);">
@@ -410,7 +394,6 @@
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
-
     <div id="home-screen" class="screen container">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
@@ -464,12 +447,6 @@
                 <small id="srv-share-sub">انسخ رابطك ودزه لأصدقائك 🎁</small>
             </div>
           </div>
-
-          <div class="select-card card-full card-market ripple-dark" onclick="showScreen('market-screen')">
-            <div class="icon-wrapper icon-pulse"><i class="fas fa-store"></i></div>
-            <div class="card-text"><h3 id="srv-market-title">بيع واشتري</h3><small id="srv-market-sub">سوق أم قصر المفتوح للأغراض المستعملة</small></div>
-            <i class="fas fa-chevron-left arrow-icon"></i>
-          </div>
           
           <div id="join-driver-card" class="select-card card-full card-join ripple-dark" onclick="openJoinScreen()">
             <div class="icon-wrapper"><i class="fas fa-id-card"></i></div>
@@ -484,115 +461,6 @@
           </div>
       </div>
     </div>
-    <div id="market-screen" class="screen container" style="padding-bottom: 160px;">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-store" style="color:#3B82F6;"></i> بيع واشتري</h2>
-        
-        <div class="market-cat-grid">
-            <div class="market-cat-item active" onclick="filterMarket(this)">
-                <div class="market-cat-img-box"><img src="https://cdn-icons-png.flaticon.com/512/4042/4042079.png" class="market-cat-img" style="padding: 10px;" alt="المتاجر"></div>
-                <span class="market-cat-name">المتاجر</span>
-            </div>
-            <div class="market-cat-item" onclick="filterMarket(this)">
-                <div class="market-cat-img-box"><img src="https://cdn-icons-png.flaticon.com/512/3204/3204933.png" class="market-cat-img" style="padding: 10px;" alt="سيارات"></div>
-                <span class="market-cat-name">سيارات ومركبات</span>
-            </div>
-            <div class="market-cat-item" onclick="filterMarket(this)">
-                <div class="market-cat-img-box"><img src="https://cdn-icons-png.flaticon.com/512/1048/1048313.png" class="market-cat-img" style="padding: 10px;" alt="دراجات"></div>
-                <span class="market-cat-name">دراجات نارية</span>
-            </div>
-            <div class="market-cat-item" onclick="filterMarket(this)">
-                <div class="market-cat-img-box"><img src="https://cdn-icons-png.flaticon.com/512/8061/8061033.png" class="market-cat-img" style="padding: 10px;" alt="الخدمات"></div>
-                <span class="market-cat-name">الخدمات</span>
-            </div>
-            <div class="market-cat-item" onclick="filterMarket(this)">
-                <div class="market-cat-img-box"><img src="https://cdn-icons-png.flaticon.com/512/2800/2800155.png" class="market-cat-img" style="padding: 10px;" alt="وظائف"></div>
-                <span class="market-cat-name">وظائف</span>
-            </div>
-            <div class="market-cat-item" onclick="filterMarket(this)">
-                <div class="market-cat-img-box"><img src="https://cdn-icons-png.flaticon.com/512/1940/1940922.png" class="market-cat-img" style="padding: 10px;" alt="أثاث"></div>
-                <span class="market-cat-name">منزل وحديقة</span>
-            </div>
-            <div class="market-cat-item" onclick="filterMarket(this)">
-                <div class="market-cat-img-box"><img src="https://cdn-icons-png.flaticon.com/512/11260/11260128.png" class="market-cat-img" style="padding: 10px;" alt="موبايلات"></div>
-                <span class="market-cat-name">موبايل وتابلت</span>
-            </div>
-            <div class="market-cat-item" onclick="filterMarket(this)">
-                <div class="market-cat-img-box"><img src="https://cdn-icons-png.flaticon.com/512/2830/2830305.png" class="market-cat-img" style="padding: 10px;" alt="الكترونيات"></div>
-                <span class="market-cat-name">الالكترونيات</span>
-            </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;" id="market-items-container">
-            <div class="empty-market-state">
-                <i class="fas fa-box-open"></i>
-                <p>لا توجد أغراض معروضة في هذا القسم حالياً</p>
-                <small style="display: block; margin-top: 5px; color: var(--text-muted);">كن أول من يضيف إعلاناً!</small>
-            </div>
-        </div>
-
-        <div style="position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); z-index: 99; display: flex; flex-direction: column; align-items: center;" onclick="showScreen('add-ad-screen')">
-            <div class="ripple" style="width: 65px; height: 65px; background: #F59E0B; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4); cursor: pointer; border: 4px solid var(--bg-color);">
-                <i class="fas fa-plus" style="color: white; font-size: 26px;"></i>
-            </div>
-            <span style="font-size: 13px; font-weight: 800; color: var(--text-main); margin-top: 5px; text-shadow: 0 2px 4px rgba(255,255,255,0.8);">أضف إعلان</span>
-        </div>
-    </div>
-
-    <div id="add-ad-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('market-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-plus-circle" style="color:#F59E0B;"></i> أضف إعلانك</h2>
-        
-        <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-info-circle"></i> تفاصيل الغرض</div>
-            <div class="form-group">
-                <label>عنوان الإعلان</label>
-                <input type="text" id="adTitle" placeholder="مثال: دراجة ايراني موديل 2020">
-            </div>
-            <div class="form-group">
-                <label>السعر (بالدينار العراقي)</label>
-                <input type="number" id="adPrice" placeholder="مثال: 250000">
-            </div>
-            <div class="form-group">
-                <label>القسم</label>
-                <select id="adCategory">
-                    <option value="" disabled selected>اختر القسم...</option>
-                    <option value="المتاجر">المتاجر</option>
-                    <option value="سيارات">سيارات ومركبات</option>
-                    <option value="دراجات">دراجات نارية</option>
-                    <option value="موبايلات">موبايل وتابلت</option>
-                    <option value="أثاث">منزل وحديقة</option>
-                    <option value="الكترونيات">الالكترونيات</option>
-                    <option value="أخرى">أخرى</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>التفاصيل والمواصفات</label>
-                <textarea id="adDesc" rows="4" placeholder="اكتب حالة الغرض، النظافة، وأي تفاصيل ثانية..."></textarea>
-            </div>
-            <div class="form-group" style="margin-top: 10px;">
-                <input type="file" id="adImages" accept="image/*" multiple style="display:none;" onchange="previewAdImages()">
-                <button type="button" class="location-btn ripple-dark" style="border: 2px dashed #F59E0B; background: var(--bg-color); color: #F59E0B; margin-bottom: 0;" onclick="document.getElementById('adImages').click()">
-                    <i class="fas fa-camera"></i> أضف صور للغرض
-                </button>
-                <div id="ad-image-preview-container" style="display:flex; gap:10px; overflow-x:auto; margin-top:10px; padding-bottom:5px; flex-wrap: wrap;"></div>
-            </div>
-        </div>
-        
-        <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-phone-alt"></i> معلومات التواصل</div>
-            <div class="form-group">
-                <label>رقم هاتفك (تم سحبه تلقائياً)</label>
-                <input type="tel" id="adPhone" dir="ltr" readonly style="background: var(--bg-color); cursor: not-allowed; opacity: 0.8; font-weight: 800; border-color: #10B981;">
-                <span style="font-size: 12px; color: #10B981; font-weight: bold; margin-top: 5px; display: block;"><i class="fas fa-check-circle"></i> تم ربط رقمك المسجل تلقائياً.</span>
-            </div>
-        </div>
-
-        <button class="send-btn ripple" style="background: #F59E0B; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.3);" onclick="showToast('سيتم تفعيل رفع الإعلانات قريباً بعد التحديث السحابي!')">
-            <i class="fas fa-upload"></i> انشر الإعلان
-        </button>
-    </div>
-
     <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
@@ -896,32 +764,6 @@
           window.location.reload(true); 
       }
 
-      /* الميزة الجديدة: دالة الفلترة للأقسام وعرض "لا توجد أغراض" */
-      function filterMarket(element) {
-          document.querySelectorAll('.market-cat-item').forEach(el => el.classList.remove('active'));
-          element.classList.add('active');
-          const catName = element.querySelector('.market-cat-name').innerText;
-          const container = document.getElementById('market-items-container');
-          container.innerHTML = `
-              <div class="empty-market-state">
-                  <i class="fas fa-box-open"></i>
-                  <p>لا توجد أغراض معروضة في قسم (${catName}) حالياً</p>
-                  <small style="display: block; margin-top: 5px; color: var(--text-muted);">كن أول من يضيف إعلاناً!</small>
-              </div>
-          `;
-      }
-
-      /* الميزة الجديدة: دالة معاينة صور الإعلانات (بيع واشتري) */
-      function previewAdImages() {
-          const input = document.getElementById('adImages'); const container = document.getElementById('ad-image-preview-container'); container.innerHTML = '';
-          for (let i = 0; i < input.files.length; i++) {
-              const url = URL.createObjectURL(input.files[i]);
-              container.innerHTML += `<img src="${url}" style="width:70px; height:70px; border-radius:10px; object-fit:cover; border:1px solid var(--border-color);">`;
-          }
-          if(input.files.length > 0) container.innerHTML += `<div style="display:flex; align-items:center; color:var(--danger); font-size:13px; font-weight:bold; cursor:pointer; padding:5px; width: 100%;" onclick="clearAdImages()"><i class="fas fa-trash-alt" style="margin-left:5px;"></i> مسح الصور</div>`;
-      }
-      function clearAdImages() { document.getElementById('adImages').value = ''; document.getElementById('ad-image-preview-container').innerHTML = ''; }
-
       async function trackLiveVisit() {
           try { fetch(`${GS_URL}?action=trackVisit`); } catch(e) {}
       }
@@ -1101,7 +943,7 @@
               window.location.replace(window.location.href.split('?')[0]);
           }
       }
-              async function syncLoyaltyWithServer() {
+      async function syncLoyaltyWithServer() {
           const phoneInput = document.getElementById('custPhone');
           const phone = (phoneInput && phoneInput.value.trim() !== "") ? phoneInput.value.trim() : localStorage.getItem('saved_customer_phone');
           if (!phone || !validateIraqiPhone(phone)) return;
@@ -1153,6 +995,9 @@
       function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
       function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
 
+      /* =========================================
+         منظومة تسجيل الدخول الجديدة عبر تليكرام (تحديث البندر)
+      ========================================= */
       let loginPollInterval = null;
       let currentLoginSession = "";
 
@@ -1235,6 +1080,7 @@
           document.getElementById('login-step-1').style.display = 'block';
           document.getElementById('loginNameInput').value = '';
       }
+      /* ========================================= */
 
       function checkStatus() {
           trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
@@ -1375,6 +1221,28 @@
               } catch(e) {}
               localStorage.clear(); location.reload(); 
           } 
+      }
+
+      function showScreen(id) {
+          document.querySelectorAll('.screen').forEach(s => {
+              s.classList.remove('active-screen');
+          });
+          
+          const target = document.getElementById(id);
+          if (target) {
+              target.classList.add('active-screen');
+          }
+          
+          window.scrollTo(0, 0);
+          const bottomNav = document.getElementById('bottomNavigation');
+          if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel') ? 'none' : 'flex';
+          
+          if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
+          if(id === 'log-screen') { renderDriverLog(); } 
+          if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') { loadSavedCustomerData(); }
+          if(id === 'order-screen') updateLoyaltyUI();
+          
+          if (typeof closeSidebar === 'function') closeSidebar();
       }
 
       async function sendTukOrder() {
@@ -1620,4 +1488,4 @@
       }
     </script>
 </body>
-</html>
+                </html>
