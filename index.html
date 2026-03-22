@@ -223,15 +223,17 @@
       /* =========================================
          إضافات CSS الخاصة بالسوق المفتوح
       ========================================= */
-      .market-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px; }
-      .market-cat-card { background: var(--surface); border-radius: var(--radius-lg); padding: 25px 15px; text-align: center; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; }
-      .market-cat-card:active { transform: scale(0.95); border-color: #3B82F6; }
-      .market-cat-icon { font-size: 45px; margin-bottom: 10px; line-height: 1; }
-      .market-cat-title { font-size: 16px; font-weight: 800; color: var(--text-main); margin: 0; }
+      .market-cat-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; padding: 10px 5px 20px 5px; margin-bottom: 20px; margin-top: 10px; }
+      .market-cat-slider::-webkit-scrollbar { display: none; }
+      .market-cat-item { flex: 0 0 110px; scroll-snap-align: start; background: var(--surface); border-radius: var(--radius-lg); padding: 15px 10px; text-align: center; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; }
+      .market-cat-item:active { transform: scale(0.95); border-color: #3B82F6; }
+      .market-cat-icon { font-size: 35px; margin-bottom: 8px; line-height: 1; }
+      .market-cat-title { font-size: 14px; font-weight: 800; color: var(--text-main); margin: 0; }
+      .market-offers-area { text-align: center; padding: 40px 20px; background: var(--surface); border-radius: var(--radius-lg); border: 1px dashed var(--border-color); box-shadow: var(--shadow-sm); }
+      .no-offers-text { color: var(--text-muted); font-size: 16px; font-weight: bold; margin-top: 15px; }
       .market-add-btn { background: #3B82F6; color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; position: fixed; bottom: 90px; right: 20px; box-shadow: var(--shadow-floating); z-index: 100; cursor: pointer; transition: 0.3s; border: none; }
       .market-add-btn:active { transform: scale(0.9); }
-    </style>
-    </head>
+    </style></head>
 <body>
     <div id="map-modal">
         <div class="map-container">
@@ -774,33 +776,37 @@
     <div id="market-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-store" style="color:#3B82F6;"></i> السوق المفتوح</h2>
-        <p style="color: var(--text-muted); font-weight: 600; margin-bottom: 20px;">اختر القسم اللي تريد تتصفحه أو تبيع بيه:</p>
         
-        <div class="market-grid">
-            <div class="market-cat-card ripple-dark" onclick="openMarketCategory('سيارات')">
+        <div class="market-cat-slider">
+            <div class="market-cat-item ripple-dark" onclick="openMarketCategory('سيارات')">
                 <div class="market-cat-icon">🚗</div>
                 <h3 class="market-cat-title">سيارات</h3>
             </div>
-            <div class="market-cat-card ripple-dark" onclick="openMarketCategory('عقارات')">
+            <div class="market-cat-item ripple-dark" onclick="openMarketCategory('عقارات')">
                 <div class="market-cat-icon">🏠</div>
                 <h3 class="market-cat-title">عقارات</h3>
             </div>
-            <div class="market-cat-card ripple-dark" onclick="openMarketCategory('أجهزة إلكترونية')">
+            <div class="market-cat-item ripple-dark" onclick="openMarketCategory('أجهزة إلكترونية')">
                 <div class="market-cat-icon">📱</div>
                 <h3 class="market-cat-title">إلكترونيات</h3>
             </div>
-            <div class="market-cat-card ripple-dark" onclick="openMarketCategory('أثاث')">
+            <div class="market-cat-item ripple-dark" onclick="openMarketCategory('أثاث')">
                 <div class="market-cat-icon">🛋️</div>
                 <h3 class="market-cat-title">أثاث</h3>
             </div>
-            <div class="market-cat-card ripple-dark" onclick="openMarketCategory('وظائف')">
+            <div class="market-cat-item ripple-dark" onclick="openMarketCategory('وظائف')">
                 <div class="market-cat-icon">💼</div>
                 <h3 class="market-cat-title">وظائف</h3>
             </div>
-            <div class="market-cat-card ripple-dark" onclick="openMarketCategory('أخرى')">
+            <div class="market-cat-item ripple-dark" onclick="openMarketCategory('أخرى')">
                 <div class="market-cat-icon">📦</div>
                 <h3 class="market-cat-title">أخرى</h3>
             </div>
+        </div>
+
+        <div class="market-offers-area" id="marketOffersArea">
+            <i class="fas fa-box-open" style="font-size: 50px; color: var(--border-color);"></i>
+            <p class="no-offers-text">اختر قسماً لعرض الإعلانات المتاحة</p>
         </div>
         
         <button class="market-add-btn ripple" onclick="showScreen('market-add-screen')"><i class="fas fa-plus"></i></button>
@@ -844,13 +850,13 @@
                 <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
             </div>
             <div class="form-group">
-                <label>التفاصيل والمواصفات</label>
+                <label>التفاصيل والمواصفات (اختياري)</label>
                 <textarea id="marketAdDesc" rows="4" placeholder="اكتب تفاصيل الغرض، موديله، وموقعه..."></textarea>
             </div>
             <div class="form-group" style="margin-top: 10px;">
                 <input type="file" id="marketAdImages" accept="image/*" multiple style="display:none;" onchange="previewMarketImages()">
                 <button type="button" class="location-btn ripple-dark" style="border: 2px dashed #3B82F6; background: var(--bg-color); color: var(--text-main); margin-bottom: 0;" onclick="document.getElementById('marketAdImages').click()">
-                    <i class="fas fa-camera" style="color: #3B82F6;"></i> <span>إضافة صور للإعلان (مهم جداً)</span>
+                    <i class="fas fa-camera" style="color: #3B82F6;"></i> <span>إضافة صور للإعلان (اختياري)</span>
                 </button>
                 <div id="market-image-preview-container" style="display:flex; gap:10px; overflow-x:auto; margin-top:10px; padding-bottom:5px; flex-wrap: wrap;"></div>
             </div>
@@ -1600,11 +1606,21 @@
       }
 
       /* =========================================
-         دوال السوق المفتوح (الجديدة)
+         دوال السوق المفتوح (الجديدة والمعدلة)
       ========================================= */
       function openMarketCategory(category) {
-          // حالياً تطلع رسالة بسيطة للمستخدم لحد ما نسوي قاعدة بيانات تعرض الإعلانات المنشورة
-          showToast(`جاري تحميل إعلانات قسم ${category}... (قريباً)`);
+          const area = document.getElementById('marketOffersArea');
+          
+          // إظهار حركة تحميل بسيطة
+          area.innerHTML = '<span class="baly-spinner" style="border-top-color: var(--primary);"></span><p class="no-offers-text">جاري البحث عن عروض...</p>';
+          
+          // تأخير بسيط وبعدها عرض رسالة لا يوجد عروض
+          setTimeout(() => {
+              area.innerHTML = `
+                  <i class="fas fa-box-open" style="font-size: 50px; color: var(--border-color);"></i>
+                  <p class="no-offers-text">عذراً، لا يوجد عروض في قسم (${category}) حالياً.</p>
+              `;
+          }, 800);
       }
 
       function previewMarketImages() {
@@ -1631,14 +1647,12 @@
           const price = document.getElementById('marketAdPrice').value.trim();
           const condition = document.getElementById('marketAdCondition').value;
           const phone = document.getElementById('marketAdPhone').value.trim();
-          const desc = document.getElementById('marketAdDesc').value.trim();
-          const files = document.getElementById('marketAdImages').files;
+          const desc = document.getElementById('marketAdDesc').value.trim(); // اختياري
+          const files = document.getElementById('marketAdImages').files; // اختياري
           
-          if(!title || !category || !price || !validateIraqiPhone(phone) || !desc) {
-              return showToast("أكمل كل البيانات ورقم الموبايل بشكل صحيح 📝");
-          }
-          if(files.length === 0) {
-              return showToast("لازم ترفع صورة وحدة على الأقل للإعلان 📸");
+          // شلنا التحقق من الصور والتفاصيل لأنها صارت اختيارية
+          if(!title || !category || !price || !validateIraqiPhone(phone)) {
+              return showToast("أكمل البيانات الأساسية ورقم الموبايل بشكل صحيح 📝");
           }
 
           const btn = document.getElementById('submitAdBtn'); 
@@ -1647,17 +1661,32 @@
           btn.disabled = true;
           
           try {
-              // رفع الإعلان للوحة التحكم (كروب الإدارة) حتى تشوفه وتنشره
-              for (let i = 0; i < files.length; i++) {
-                  let fd = new FormData(); 
-                  fd.append('chat_id', ADMIN_CHAT_ID); 
-                  fd.append('photo', files[i]); 
-                  if(i === 0) {
-                      fd.append('caption', `🏪 إعلان جديد بالسوق المفتوح\n📌 القسم: ${category}\n🏷️ العنوان: ${title}\n💰 السعر: ${price} دينار\n✨ الحالة: ${condition}\n📞 للتواصل: ${phone}\n📝 التفاصيل: ${desc}`);
+              // تجهيز النص الخاص بالإعلان
+              let captionText = `🏪 إعلان جديد بالسوق المفتوح\n📌 القسم: ${category}\n🏷️ العنوان: ${title}\n💰 السعر: ${price} دينار\n✨ الحالة: ${condition}\n📞 للتواصل: ${phone}`;
+              if(desc) captionText += `\n📝 التفاصيل: ${desc}`;
+
+              // إذا اكو صور يرفعها، وإذا ماكو يرسل رسالة نصية فقط للكروب
+              if (files.length > 0) {
+                  for (let i = 0; i < files.length; i++) {
+                      let fd = new FormData(); 
+                      fd.append('chat_id', ADMIN_CHAT_ID); 
+                      fd.append('photo', files[i]); 
+                      if(i === 0) {
+                          fd.append('caption', captionText);
+                      }
+                      try {
+                          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
+                      } catch(err) {}
                   }
-                  try {
-                      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
-                  } catch(err) {}
+              } else {
+                  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { 
+                      method: 'POST', 
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                          chat_id: ADMIN_CHAT_ID,
+                          text: captionText
+                      })
+                  });
               }
               
               showToast("تم إرسال إعلانك بنجاح! سيتم مراجعته ونشره ✅"); 
