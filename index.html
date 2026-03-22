@@ -116,7 +116,7 @@
       .empty-market-state { text-align: center; padding: 40px 20px; color: var(--text-muted); grid-column: span 2; }
       .empty-market-state i { font-size: 60px; margin-bottom: 15px; opacity: 0.3; }
       .empty-market-state p { font-size: 16px; font-weight: 800; margin: 0; }
-              .form-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards; }
+      .form-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards; }
       .form-card-title { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
       .form-card-title i { font-size: 18px; color: var(--gold); }
       .screen-header-title { margin: 0 0 20px; font-weight: 800; font-size: 24px; display: flex; align-items: center; gap: 10px; }
@@ -430,7 +430,7 @@
           </div>
       </div>
     </div>
-        <div id="market-screen" class="screen container" style="padding-bottom: 160px;">
+    <div id="market-screen" class="screen container" style="padding-bottom: 160px;">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-store" style="color:#3B82F6;"></i> بيع واشتري</h2>
         
@@ -682,7 +682,7 @@
 
         <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
-        <div id="join-screen" class="screen container">
+    <div id="join-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> انضم ككابتن</h2>
         
@@ -1516,3 +1516,73 @@
           try {
               const response = await fetch(`${GS_URL}?action=getAllDriverStats`); const drivers = await response.json();
               drivers.sort((a, b) => (parseInt(b.leagueCount) || 0) - (parseInt(a.leagueCount) || 0));
+              listDiv.innerHTML = "";
+              if(drivers.length === 0) { listDiv.innerHTML = '<p style="text-align: center; color: var(--text-muted);">لا يوجد كباتن حالياً</p>'; return; }
+              drivers.forEach((d, index) => {
+                  let medal = (index === 0) ? "🥇" : (index === 1) ? "🥈" : (index === 2) ? "🥉" : `<span style="font-size:16px; color:var(--text-muted);">${index + 1}</span>`;
+                  let isMe = d.phone === localStorage.getItem('driver_phone') ? " (أنت)" : "";
+                  let bgColor = isMe ? "background: var(--bg-color); border: 1px solid var(--primary);" : "";
+                  const div = document.createElement('div'); div.className = "driver-rank"; div.style = bgColor;
+                  div.innerHTML = `<div class="rank-info"><span class="rank-medal">${medal}</span> <span>${d.name}${isMe}</span></div><span class="rank-score">${d.leagueCount || 0}</span>`;
+                  listDiv.appendChild(div);
+              });
+          } catch (e) { listDiv.innerHTML = '<p style="text-align: center; color: var(--danger);">فشل التحميل</p>'; }
+      }
+
+      function updateNav(element) { document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); element.classList.add('active'); }
+      function openSidebar() { document.getElementById('appSidebar').classList.add('open'); const overlay = document.getElementById('sidebarOverlay'); overlay.style.display = 'block'; setTimeout(() => overlay.classList.add('show'), 10); }
+      function closeSidebar() { document.getElementById('appSidebar').classList.remove('open'); const overlay = document.getElementById('sidebarOverlay'); overlay.classList.remove('show'); setTimeout(() => overlay.style.display = 'none', 300); }
+
+      let loyaltyCount = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
+      function updateLocalLoyaltyUI() {
+          const displayCount = document.getElementById('current-order-count'); const progressBar = document.getElementById('loyalty-bar'); const giftMsg = document.getElementById('loyalty-gift-msg');
+          let currentCount = parseInt(loyaltyCount % 10); 
+          if(displayCount) displayCount.innerText = currentCount;
+          if(progressBar) progressBar.style.width = (currentCount / 10 * 100) + "%";
+          if(currentCount === 9) { if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i> اطلب الآن! هذا طلبك المجاني 🎁"; giftMsg.style.color = "var(--secondary)"; } if(progressBar) progressBar.style.background = "var(--secondary)"; } 
+          else { if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i> أوصل للطلب 10 وكروتك مجانية"; giftMsg.style.color = "var(--primary)"; } if(progressBar) progressBar.style.background = "var(--gold)"; }
+      }
+      function updateLoyaltyUI() { updateLocalLoyaltyUI(); } updateLocalLoyaltyUI();
+
+      function toggleDriverStatus() {
+          const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
+          let current = localStorage.getItem('driver_status') || 'available';
+          if(current === 'available') {
+              localStorage.setItem('driver_status', 'busy'); btn.style.background = 'var(--danger)'; btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً';
+              if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; }
+          } else {
+              localStorage.setItem('driver_status', 'available'); btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل';
+              if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; }
+          }
+      }
+
+      function initDriverStatus() {
+          let current = localStorage.getItem('driver_status') || 'available';
+          const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
+          if(current === 'busy') { if(btn) { btn.style.background = 'var(--danger)'; btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً'; } if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; } } 
+          else { if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; } if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; } }
+      }
+
+      function notifyArriveWhatsApp() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); let formattedPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone; let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (البندر) بالباب، يرجى استلام الطلب/الأموال 🛵"); window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank'); }
+      function notifyArriveCall() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); window.location.href = `tel:${phone}`; }
+      
+      let appMap = null;
+      function openMapModal() {
+          document.getElementById('map-modal').style.display = 'flex';
+          if (!appMap) {
+              appMap = L.map('map-view', { attributionControl: false }).setView([30.0396, 47.9298], 15);
+              L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(appMap);
+          }
+          setTimeout(() => { appMap.invalidateSize(); }, 300);
+      }
+      function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
+      function confirmMapLocation() {
+          const center = appMap.getCenter();
+          const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng}`;
+          document.getElementById('tukDropoffLink').value = googleMapsLink;
+          document.getElementById('map-success-msg').style.display = 'block';
+          closeMapModal();
+      }
+    </script>
+</body>
+</html>
