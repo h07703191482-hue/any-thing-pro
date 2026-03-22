@@ -233,7 +233,8 @@
       .no-offers-text { color: var(--text-muted); font-size: 16px; font-weight: bold; margin-top: 15px; }
       .market-add-btn { background: #3B82F6; color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; position: fixed; bottom: 90px; right: 20px; box-shadow: var(--shadow-floating); z-index: 100; cursor: pointer; transition: 0.3s; border: none; }
       .market-add-btn:active { transform: scale(0.9); }
-    </style></head>
+    </style>
+</head>
 <body>
     <div id="map-modal">
         <div class="map-container">
@@ -1606,21 +1607,56 @@
       }
 
       /* =========================================
-         دوال السوق المفتوح (الجديدة والمعدلة)
+         دوال السوق المفتوح (الجديدة والمربوطة بقاعدة البيانات)
       ========================================= */
-      function openMarketCategory(category) {
+      async function openMarketCategory(category) {
           const area = document.getElementById('marketOffersArea');
           
-          // إظهار حركة تحميل بسيطة
-          area.innerHTML = '<span class="baly-spinner" style="border-top-color: var(--primary);"></span><p class="no-offers-text">جاري البحث عن عروض...</p>';
+          // إظهار حركة تحميل حلوة
+          area.innerHTML = '<div style="padding: 30px;"><span class="baly-spinner" style="border-top-color: var(--primary); width: 40px; height: 40px;"></span><p class="no-offers-text" style="margin-top:15px;">جاري جلب إعلانات ' + category + '...</p></div>';
           
-          // تأخير بسيط وبعدها عرض رسالة لا يوجد عروض
-          setTimeout(() => {
+          try {
+              // جلب البيانات من السيرفر 
+              const response = await fetch(`${GS_URL}?action=getMarketAds&category=${encodeURIComponent(category)}`);
+              const ads = await response.json();
+              
+              if (ads.length === 0) {
+                  area.innerHTML = `
+                      <i class="fas fa-box-open" style="font-size: 50px; color: var(--border-color);"></i>
+                      <p class="no-offers-text">عذراً، لا توجد إعلانات في قسم (${category}) حالياً.</p>
+                  `;
+              } else {
+                  // عرض الإعلانات بتصميم مرتب
+                  let adsHTML = `<h3 style="text-align: right; margin-bottom: 15px; color: var(--primary);">أحدث إعلانات ${category}</h3>`;
+                  adsHTML += '<div style="display: flex; flex-direction: column; gap: 15px;">';
+                  
+                  ads.forEach(ad => {
+                      adsHTML += `
+                      <div class="form-card" style="text-align: right; padding: 15px; border-right: 4px solid #3B82F6;">
+                          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                              <h4 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--text-main);">${ad.title}</h4>
+                              <span style="background: rgba(59, 130, 246, 0.1); color: #3B82F6; padding: 3px 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: bold;">${ad.condition}</span>
+                          </div>
+                          <p style="margin: 0 0 10px 0; font-size: 18px; font-weight: 800; color: #10B981;">${ad.price} <span style="font-size: 12px; color: var(--text-muted);">د.ع</span></p>
+                          ${ad.desc ? `<p style="margin: 0 0 15px 0; font-size: 13px; color: var(--text-muted); line-height: 1.5;">${ad.desc}</p>` : ''}
+                          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                              <span style="font-size: 11px; color: var(--text-muted);"><i class="fas fa-clock"></i> ${ad.date.split(',')[0]}</span>
+                              <button class="location-btn success ripple" style="width: auto; padding: 6px 15px; margin: 0; background: #25D366; color: white; border: none; font-size: 13px;" onclick="window.open('https://wa.me/964${ad.phone.substring(1)}', '_blank')">
+                                  <i class="fab fa-whatsapp"></i> مراسلة البائع
+                              </button>
+                          </div>
+                      </div>`;
+                  });
+                  
+                  adsHTML += '</div>';
+                  area.innerHTML = adsHTML;
+              }
+          } catch (e) {
               area.innerHTML = `
-                  <i class="fas fa-box-open" style="font-size: 50px; color: var(--border-color);"></i>
-                  <p class="no-offers-text">عذراً، لا يوجد عروض في قسم (${category}) حالياً.</p>
+                  <i class="fas fa-exclamation-triangle" style="font-size: 50px; color: var(--danger);"></i>
+                  <p class="no-offers-text">حدث خطأ في تحميل الإعلانات. تأكد من اتصالك بالإنترنت.</p>
               `;
-          }, 800);
+          }
       }
 
       function previewMarketImages() {
@@ -1647,10 +1683,9 @@
           const price = document.getElementById('marketAdPrice').value.trim();
           const condition = document.getElementById('marketAdCondition').value;
           const phone = document.getElementById('marketAdPhone').value.trim();
-          const desc = document.getElementById('marketAdDesc').value.trim(); // اختياري
-          const files = document.getElementById('marketAdImages').files; // اختياري
+          const desc = document.getElementById('marketAdDesc').value.trim(); 
+          const files = document.getElementById('marketAdImages').files; 
           
-          // شلنا التحقق من الصور والتفاصيل لأنها صارت اختيارية
           if(!title || !category || !price || !validateIraqiPhone(phone)) {
               return showToast("أكمل البيانات الأساسية ورقم الموبايل بشكل صحيح 📝");
           }
@@ -1661,35 +1696,30 @@
           btn.disabled = true;
           
           try {
-              // تجهيز النص الخاص بالإعلان
+              // 1. إرسال الإعلان للمشرفين على التليكرام
               let captionText = `🏪 إعلان جديد بالسوق المفتوح\n📌 القسم: ${category}\n🏷️ العنوان: ${title}\n💰 السعر: ${price} دينار\n✨ الحالة: ${condition}\n📞 للتواصل: ${phone}`;
               if(desc) captionText += `\n📝 التفاصيل: ${desc}`;
 
-              // إذا اكو صور يرفعها، وإذا ماكو يرسل رسالة نصية فقط للكروب
               if (files.length > 0) {
                   for (let i = 0; i < files.length; i++) {
                       let fd = new FormData(); 
                       fd.append('chat_id', ADMIN_CHAT_ID); 
                       fd.append('photo', files[i]); 
-                      if(i === 0) {
-                          fd.append('caption', captionText);
-                      }
-                      try {
-                          await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
-                      } catch(err) {}
+                      if(i === 0) fd.append('caption', captionText);
+                      try { await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd }); } catch(err) {}
                   }
               } else {
                   await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { 
-                      method: 'POST', 
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                          chat_id: ADMIN_CHAT_ID,
-                          text: captionText
-                      })
+                      method: 'POST', headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: captionText })
                   });
               }
               
-              showToast("تم إرسال إعلانك بنجاح! سيتم مراجعته ونشره ✅"); 
+              // 2. حفظ الإعلان بقاعدة البيانات حتى يطلع للناس
+              const saveUrl = `${GS_URL}?action=saveMarketAd&category=${encodeURIComponent(category)}&title=${encodeURIComponent(title)}&price=${encodeURIComponent(price)}&condition=${encodeURIComponent(condition)}&phone=${encodeURIComponent(phone)}&desc=${encodeURIComponent(desc)}`;
+              await fetch(saveUrl);
+
+              showToast("تم نشر إعلانك بنجاح! ✅"); 
               
               // تصفير الحقول بعد الإرسال
               document.getElementById('marketAdTitle').value = "";
@@ -1700,6 +1730,7 @@
               clearMarketImages();
               
               showScreen('market-screen');
+              openMarketCategory(category); 
           } catch (e) {
               showToast("حدث خطأ أثناء رفع الإعلان ⚠️");
           } finally { 
