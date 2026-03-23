@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -220,7 +219,40 @@
       
       .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(90, 34, 139, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
       .location-notice { font-size: 13px; font-weight: 700; color: #10B981; text-align: center; margin-bottom: 15px; display: block; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: var(--radius-md); border: 1px dashed #10B981;}
-    </style>
+
+      /* --- إضافات السوق المفتوح (CSS) --- */
+      .market-search { position: relative; margin-bottom: 20px; }
+      .market-search input { width: 100%; padding: 14px 45px 14px 15px; border-radius: var(--radius-pill); border: 2px solid var(--border-color); font-family: 'Cairo'; font-weight: 600; box-shadow: var(--shadow-sm); background: var(--surface); color: var(--text-main); transition: 0.3s; }
+      .market-search input:focus { border-color: var(--primary); }
+      .market-search i { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 16px; }
+      .market-cat-container { display: flex; overflow-x: auto; gap: 12px; margin-bottom: 20px; padding-bottom: 10px; scroll-snap-type: x mandatory; }
+      .market-cat-container::-webkit-scrollbar { display: none; }
+      .market-cat { min-width: 75px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; scroll-snap-align: start; }
+      .market-cat-icon { width: 60px; height: 60px; border-radius: 18px; background: var(--surface); box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--text-muted); border: 1px solid var(--border-color); transition: 0.3s; }
+      .market-cat.active .market-cat-icon { color: var(--primary); border-color: var(--primary); background: rgba(90, 34, 139, 0.05); }
+      .market-cat span { font-size: 12px; font-weight: 700; color: var(--text-main); }
+      .market-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding-bottom: 80px; }
+      .market-item { background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); position: relative; cursor: pointer; transition: 0.3s; }
+      .market-item:active { transform: scale(0.97); }
+      .market-item img { width: 100%; height: 130px; object-fit: cover; }
+      .market-item-condition { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 4px 10px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 800; backdrop-filter: blur(4px); }
+      .market-item-info { padding: 12px; }
+      .market-item-title { font-size: 14px; font-weight: 800; margin: 0 0 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
+      .market-item-price { font-size: 16px; font-weight: 800; color: var(--primary); margin: 0; }
+      .market-bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); display: flex; justify-content: space-around; padding: 10px 0 15px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 9999; border-top: 1px solid var(--border-color); }
+      body.dark-mode .market-bottom-nav { background: #1E1E1E; border-top-color: #334155; }
+      .market-nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer; width: 33%; }
+      .market-nav-item.active { color: var(--primary); }
+      .market-nav-item i { font-size: 20px; transition: 0.3s; }
+      .market-nav-item.active i { transform: translateY(-3px); }
+      #market-details-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); z-index: 100005; overflow-y: auto; flex-direction: column; animation: fadeSlideUp 0.3s ease; }
+      .post-img-header { width: 100%; height: 300px; position: relative; background: #ddd; }
+      .post-img-header img { width: 100%; height: 100%; object-fit: cover; }
+      .post-back-btn { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.9); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #111; cursor: pointer; box-shadow: var(--shadow-sm); z-index: 10; }
+      .post-details-body { padding: 25px 20px; background: var(--bg-color); border-radius: 30px 30px 0 0; margin-top: -30px; position: relative; z-index: 5; min-height: calc(100vh - 270px); }
+      .market-add-btn { background: var(--primary); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 10px 20px rgba(90, 34, 139, 0.4); margin-top: -30px; border: 4px solid var(--bg-color); transition: 0.3s; }
+      .market-add-btn:active { transform: scale(0.9); }
+      /* ----------------------------- */
 </head>
 <body>
     <div id="map-modal">
@@ -394,7 +426,7 @@
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
-    <div id="home-screen" class="screen container">
+    <div id="home-screen" class="screen container active-screen">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
         <div id="driver-status-badge" class="driver-status-bar">أنت الآن في وضع العمل النشط 🟢</div>
@@ -422,6 +454,14 @@
       </div>
       
       <div class="services-grid">
+          
+          <div class="select-card card-full ripple" style="background: linear-gradient(135deg, #EAB308 0%, #D97706 100%); color: white; border: none; margin-bottom: 5px;" onclick="showMarketScreen()">
+            <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-store"></i></div>
+            <div class="card-text">
+                <h3 id="srv-market-title">السوق المفتوح</h3>
+                <small id="srv-market-sub">بيع واشتري براحتك 🛒</small>
+            </div>
+          </div>
           <div class="select-card card-full card-cart ripple-dark" onclick="showScreen('order-screen')">
             <div class="icon-wrapper icon-pulse"><i class="fas fa-shopping-cart"></i></div>
             <div class="card-text"><h3 id="srv-shop-title">تسوق مسواكك</h3><small id="srv-shop-sub">مطاعم، سوبر ماركت، صيدليات والمزيد</small></div>
@@ -748,7 +788,177 @@
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
     </div>
-    
+
+    <div id="market-screen" class="screen container" style="padding-bottom: 80px;">
+        <button class="back-btn ripple-dark" onclick="closeMarket()"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-store" style="color:#D97706;"></i> السوق المفتوح</h2>
+        
+        <div class="market-search">
+            <input type="text" id="marketSearchInput" placeholder="ابحث عن سيارة، دراجة، أثاث..." onkeyup="filterMarket()">
+            <i class="fas fa-search"></i>
+        </div>
+
+        <div class="market-cat-container">
+            <div class="market-cat active" onclick="filterCategory('الكل', this)">
+                <div class="market-cat-icon"><i class="fas fa-th-large"></i></div>
+                <span>الكل</span>
+            </div>
+            <div class="market-cat" onclick="filterCategory('سيارات', this)">
+                <div class="market-cat-icon"><i class="fas fa-car"></i></div>
+                <span>سيارات</span>
+            </div>
+            <div class="market-cat" onclick="filterCategory('دراجات', this)">
+                <div class="market-cat-icon"><i class="fas fa-motorcycle"></i></div>
+                <span>دراجات</span>
+            </div>
+            <div class="market-cat" onclick="filterCategory('عقارات', this)">
+                <div class="market-cat-icon"><i class="fas fa-home"></i></div>
+                <span>عقارات</span>
+            </div>
+            <div class="market-cat" onclick="filterCategory('أثاث', this)">
+                <div class="market-cat-icon"><i class="fas fa-couch"></i></div>
+                <span>أثاث</span>
+            </div>
+            <div class="market-cat" onclick="filterCategory('إلكترونيات', this)">
+                <div class="market-cat-icon"><i class="fas fa-laptop"></i></div>
+                <span>إلكترونيات</span>
+            </div>
+            <div class="market-cat" onclick="filterCategory('أخرى', this)">
+                <div class="market-cat-icon"><i class="fas fa-box"></i></div>
+                <span>أخرى</span>
+            </div>
+        </div>
+
+        <div class="market-grid" id="market-items-container">
+            </div>
+
+        <div class="market-bottom-nav">
+            <div class="market-nav-item active" onclick="showMarketScreen()">
+                <i class="fas fa-store"></i>
+                <span>السوق</span>
+            </div>
+            <div class="market-nav-item" style="position: relative; top: -20px;" onclick="showAddPostScreen()">
+                <div class="market-add-btn ripple">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span style="margin-top: 5px;">أضف إعلان</span>
+            </div>
+            <div class="market-nav-item" onclick="showMyPostsScreen()">
+                <i class="fas fa-list-alt"></i>
+                <span>منشوراتك</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="market-my-posts-screen" class="screen container" style="padding-bottom: 80px;">
+        <h2 class="screen-header-title"><i class="fas fa-list-alt" style="color:var(--primary);"></i> إعلاناتي</h2>
+        
+        <div id="my-posts-container" style="display: flex; flex-direction: column; gap: 15px;">
+            </div>
+
+        <div class="market-bottom-nav">
+            <div class="market-nav-item" onclick="showMarketScreen()">
+                <i class="fas fa-store"></i>
+                <span>السوق</span>
+            </div>
+            <div class="market-nav-item" style="position: relative; top: -20px;" onclick="showAddPostScreen()">
+                <div class="market-add-btn ripple">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span style="margin-top: 5px;">أضف إعلان</span>
+            </div>
+            <div class="market-nav-item active" onclick="showMyPostsScreen()">
+                <i class="fas fa-list-alt"></i>
+                <span>منشوراتك</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="market-add-post-screen" class="screen container" style="padding-bottom: 80px;">
+        <h2 class="screen-header-title"><i class="fas fa-plus-circle" style="color:#10B981;"></i> إعلان جديد</h2>
+        <div class="form-card">
+            <div class="form-group">
+                <label>صورة الغرض (رابط الصورة مؤقتاً لحين ربط السيرفر)</label>
+                <input type="text" id="postImage" placeholder="ضع رابط الصورة هنا...">
+            </div>
+            <div class="form-group">
+                <label>اسم الغرض (عنوان الإعلان)</label>
+                <input type="text" id="postTitle" placeholder="مثال: دراجة بوكسر للبيع">
+            </div>
+            <div class="form-group">
+                <label>القسم</label>
+                <select id="postCategory">
+                    <option value="سيارات">سيارات</option>
+                    <option value="دراجات">دراجات</option>
+                    <option value="عقارات">عقارات</option>
+                    <option value="أثاث">أثاث</option>
+                    <option value="إلكترونيات">إلكترونيات</option>
+                    <option value="أخرى">أخرى</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>السعر (دينار عراقي)</label>
+                <input type="number" id="postPrice" placeholder="مثال: 500000">
+            </div>
+            <div class="form-group">
+                <label>حالة المنتج</label>
+                <select id="postCondition">
+                    <option value="جديد">جديد</option>
+                    <option value="مستعمل">مستعمل</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>رقم للتواصل (يفضل واتساب)</label>
+                <input type="tel" id="postPhone" placeholder="مثال: 07700000000" maxlength="11" dir="ltr">
+            </div>
+            <div class="form-group">
+                <label>تفاصيل أكثر</label>
+                <textarea id="postDetails" rows="4" placeholder="اكتب تفاصيل ومواصفات الغرض..."></textarea>
+            </div>
+            <button class="send-btn ripple" onclick="submitPost()">نشر الإعلان <i class="fas fa-upload"></i></button>
+        </div>
+        
+        <div class="market-bottom-nav">
+            <div class="market-nav-item" onclick="showMarketScreen()">
+                <i class="fas fa-store"></i>
+                <span>السوق</span>
+            </div>
+            <div class="market-nav-item active" style="position: relative; top: -20px;" onclick="showAddPostScreen()">
+                <div class="market-add-btn ripple">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <span style="margin-top: 5px;">أضف إعلان</span>
+            </div>
+            <div class="market-nav-item" onclick="showMyPostsScreen()">
+                <i class="fas fa-list-alt"></i>
+                <span>منشوراتك</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="market-details-modal">
+        <div class="post-img-header">
+            <div class="post-back-btn ripple" onclick="closeMarketDetails()"><i class="fas fa-arrow-right"></i></div>
+            <img id="detail-img" src="" alt="صورة الإعلان">
+        </div>
+        <div class="post-details-body">
+            <span id="detail-condition" style="background:#10B981; color:white; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:bold;"></span>
+            <span id="detail-category" style="background:var(--border-color); color:var(--text-main); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:bold; margin-right:5px;"></span>
+            
+            <h2 id="detail-title" style="margin: 15px 0 5px; font-weight:800; font-size:24px;"></h2>
+            <h3 id="detail-price" style="margin: 0 0 20px; font-weight:800; color:var(--primary); font-size:20px;"></h3>
+            
+            <div style="background:var(--surface); border:1px solid var(--border-color); padding:15px; border-radius:var(--radius-md); margin-bottom:20px;">
+                <h4 style="margin:0 0 10px; font-size:16px; border-bottom:1px solid var(--border-color); padding-bottom:8px;">التفاصيل والمواصفات:</h4>
+                <p id="detail-desc" style="margin:0; font-size:14px; color:var(--text-muted); line-height:1.6; white-space: pre-line;"></p>
+            </div>
+            
+            <a id="detail-contact-btn" href="#" target="_blank" class="send-btn ripple" style="background:#25D366; display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none;">
+                <i class="fab fa-whatsapp" style="font-size:22px;"></i> تواصل مع البائع
+            </a>
+        </div>
+    </div>
+    ```
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
@@ -1235,7 +1445,7 @@
           
           window.scrollTo(0, 0);
           const bottomNav = document.getElementById('bottomNavigation');
-          if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel') ? 'none' : 'flex';
+          if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id.includes('market')) ? 'none' : 'flex';
           
           if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
           if(id === 'log-screen') { renderDriverLog(); } 
@@ -1481,11 +1691,194 @@
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
       function confirmMapLocation() {
           const center = appMap.getCenter();
-          const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng}`;
+          const googleMapsLink = `https://maps.google.com/?q=$${center.lat},${center.lng}`;
           document.getElementById('tukDropoffLink').value = googleMapsLink;
           document.getElementById('map-success-msg').style.display = 'block';
           closeMapModal();
       }
+
+      /* =========================================
+         إضافات السوق المفتوح (JavaScript)
+      ========================================= */
+      let marketItems = JSON.parse(localStorage.getItem('market_items') || '[]');
+      let currentCategory = 'الكل';
+
+      function showMarketScreen() {
+          showScreen('market-screen');
+          document.getElementById('bottomNavigation').style.display = 'none'; // إخفاء الشريط الأصلي
+          renderMarketItems();
+      }
+
+      function showMyPostsScreen() {
+          showScreen('market-my-posts-screen');
+          document.getElementById('bottomNavigation').style.display = 'none';
+          renderMyPosts();
+      }
+
+      function showAddPostScreen() {
+          showScreen('market-add-post-screen');
+          document.getElementById('bottomNavigation').style.display = 'none';
+      }
+
+      function closeMarket() {
+          showScreen('home-screen');
+          document.getElementById('bottomNavigation').style.display = 'flex'; // إرجاع الشريط الأصلي
+      }
+
+      function filterCategory(cat, element) {
+          currentCategory = cat;
+          document.querySelectorAll('.market-cat').forEach(el => el.classList.remove('active'));
+          element.classList.add('active');
+          renderMarketItems();
+      }
+
+      function filterMarket() {
+          renderMarketItems();
+      }
+
+      function submitPost() {
+          const myPhone = localStorage.getItem('saved_customer_phone');
+          if (!myPhone) return showToast("يرجى تسجيل الدخول وإضافة رقمك أولاً لنشر إعلان ⚠️");
+
+          // في الوضع الحقيقي، ترفع الصورة للسيرفر. حالياً نستخدم رابط أو نعطيه صورة افتراضية
+          let image = document.getElementById('postImage').value.trim();
+          if(!image) image = 'https://via.placeholder.com/300x200?text=لا+توجد+صورة';
+          
+          const title = document.getElementById('postTitle').value.trim();
+          const category = document.getElementById('postCategory').value;
+          const price = document.getElementById('postPrice').value.trim();
+          const condition = document.getElementById('postCondition').value;
+          const phone = document.getElementById('postPhone').value.trim();
+          const details = document.getElementById('postDetails').value.trim();
+
+          if (!title || !price || !phone) return showToast("يرجى ملء الحقول الأساسية (الاسم، السعر، ورقم الهاتف) 📝");
+          if(!validateIraqiPhone(phone)) return showToast("رقم الهاتف غير صحيح ⚠️");
+
+          const post = {
+              id: Date.now(),
+              userId: myPhone,
+              image,
+              title,
+              category,
+              price,
+              condition,
+              phone,
+              details,
+              date: new Date().toLocaleDateString('en-GB')
+          };
+
+          marketItems.unshift(post);
+          localStorage.setItem('market_items', JSON.stringify(marketItems));
+          
+          showToast("تم نشر إعلانك بنجاح ✅");
+          
+          // مسح الحقول
+          document.getElementById('postImage').value = '';
+          document.getElementById('postTitle').value = '';
+          document.getElementById('postPrice').value = '';
+          document.getElementById('postPhone').value = '';
+          document.getElementById('postDetails').value = '';
+          
+          showMyPostsScreen();
+      }
+
+      function renderMarketItems() {
+          const container = document.getElementById('market-items-container');
+          const searchQ = document.getElementById('marketSearchInput').value.toLowerCase();
+          container.innerHTML = '';
+
+          const filteredItems = marketItems.filter(item => {
+              const matchCat = currentCategory === 'الكل' || item.category === currentCategory;
+              const matchSearch = item.title.toLowerCase().includes(searchQ) || (item.details && item.details.toLowerCase().includes(searchQ));
+              return matchCat && matchSearch;
+          });
+
+          if (filteredItems.length === 0) {
+              container.innerHTML = '<div style="grid-column: span 2; text-align: center; padding: 30px; color: var(--text-muted); font-weight: bold;">لا توجد إعلانات مطابقة 🔍</div>';
+              return;
+          }
+
+          filteredItems.forEach(item => {
+              container.innerHTML += `
+                  <div class="market-item" onclick="openMarketDetails(${item.id})">
+                      <span class="market-item-condition" style="background: ${item.condition === 'جديد' ? '#10B981' : 'rgba(0,0,0,0.7)'}">${item.condition}</span>
+                      <img src="${item.image}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/300x200?text=خطأ+في+الصورة'">
+                      <div class="market-item-info">
+                          <h3 class="market-item-title">${item.title}</h3>
+                          <p class="market-item-price">${Number(item.price).toLocaleString()} د.ع</p>
+                      </div>
+                  </div>
+              `;
+          });
+      }
+
+      function renderMyPosts() {
+          const container = document.getElementById('my-posts-container');
+          const myPhone = localStorage.getItem('saved_customer_phone');
+          container.innerHTML = '';
+
+          if (!myPhone) {
+              container.innerHTML = '<div style="text-align: center; padding: 30px; color: var(--text-muted); font-weight: bold;">سجل دخولك لتتمكن من رؤية إعلاناتك ⚠️</div>';
+              return;
+          }
+
+          const myItems = marketItems.filter(item => item.userId === myPhone);
+
+          if (myItems.length === 0) {
+              container.innerHTML = '<div style="text-align: center; padding: 30px; color: var(--text-muted); font-weight: bold;">لم تقم بنشر أي إعلان بعد 📦</div>';
+              return;
+          }
+
+          myItems.forEach(item => {
+              container.innerHTML += `
+                  <div class="form-card" style="display: flex; gap: 10px; padding: 10px; margin-bottom: 0;">
+                      <img src="${item.image}" style="width: 80px; height: 80px; border-radius: 12px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/80?text=صورة'">
+                      <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; min-width: 0;">
+                          <h3 style="margin: 0 0 5px; font-size: 14px; font-weight: 800; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.title}</h3>
+                          <p style="margin: 0 0 5px; color: var(--primary); font-weight: 800; font-size: 14px;">${Number(item.price).toLocaleString()} د.ع</p>
+                          <span style="font-size: 11px; color: var(--text-muted);">${item.date} • ${item.category}</span>
+                      </div>
+                      <div style="display: flex; flex-direction: column; gap: 5px; justify-content: center;">
+                          <button class="location-btn ripple" style="padding: 6px 12px; margin: 0; font-size: 12px; background: rgba(16, 185, 129, 0.1); color: #10B981; border: none;" onclick="openMarketDetails(${item.id})">عرض</button>
+                          <button class="location-btn ripple" style="padding: 6px 12px; margin: 0; font-size: 12px; background: rgba(239, 68, 68, 0.1); color: var(--danger); border: none;" onclick="deletePost(${item.id})">حذف</button>
+                      </div>
+                  </div>
+              `;
+          });
+      }
+
+      function deletePost(id) {
+          if (confirm("هل أنت متأكد من حذف هذا الإعلان؟ لا يمكن التراجع عن هذا الإجراء.")) {
+              marketItems = marketItems.filter(item => item.id !== id);
+              localStorage.setItem('market_items', JSON.stringify(marketItems));
+              renderMyPosts(); // تحديث شاشة منشوراتي
+              renderMarketItems(); // تحديث السوق الرئيسي
+              showToast("تم حذف الإعلان 🗑️");
+          }
+      }
+
+      function openMarketDetails(id) {
+          const item = marketItems.find(i => i.id === id);
+          if (!item) return;
+
+          document.getElementById('detail-img').src = item.image;
+          document.getElementById('detail-condition').innerText = item.condition;
+          document.getElementById('detail-condition').style.background = item.condition === 'جديد' ? '#10B981' : '#374151';
+          document.getElementById('detail-category').innerText = item.category;
+          document.getElementById('detail-title').innerText = item.title;
+          document.getElementById('detail-price').innerText = Number(item.price).toLocaleString() + " د.ع";
+          document.getElementById('detail-desc').innerText = item.details || "لا توجد تفاصيل إضافية.";
+          
+          let formattedPhone = item.phone.startsWith('0') ? '964' + item.phone.substring(1) : item.phone;
+          document.getElementById('detail-contact-btn').href = `https://wa.me/${formattedPhone}?text=مرحباً، بخصوص إعلانك (${item.title}) في تطبيق البندر.`;
+
+          document.getElementById('market-details-modal').style.display = 'flex';
+      }
+
+      function closeMarketDetails() {
+          document.getElementById('market-details-modal').style.display = 'none';
+      }
+      /* ========================================= */
     </script>
 </body>
-    </html>
+</html>
