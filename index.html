@@ -1073,7 +1073,8 @@
         </div>
 
         <button class="send-btn ripple" style="background: #3B82F6;" id="submitAdBtn" onclick="submitMarketAd()"><i class="fas fa-paper-plane"></i> <span id="submitAdBtnText">انشر الإعلان الآن</span></button>
-    </div>    <script>
+    </div>
+        <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
@@ -1320,7 +1321,7 @@
       function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
 
       /* =========================================
-         منظومة تسجيل الدخول الجديدة عبر تليكرام
+         منظومة تسجيل الدخول
       ========================================= */
       let loginPollInterval = null;
       let currentLoginSession = "";
@@ -1341,12 +1342,10 @@
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           
           currentLoginSession = Math.floor(10000000 + Math.random() * 90000000).toString();
-          
           const btn = document.getElementById('tg-login-btn');
           btn.innerHTML = '<span class="baly-spinner"></span> جاري انتظار تليكرام...';
           btn.disabled = true;
           document.getElementById('cancel-login-area').style.display = 'block';
-
           window.open(`https://t.me/${NEW_BOT_USER}?start=login_${currentLoginSession}`, '_blank');
           loginPollInterval = setInterval(checkTelegramLoginStatus, 3000);
       }
@@ -1356,31 +1355,23 @@
           try {
               const resp = await fetch(`${GS_URL}?action=checkTelegramLogin&session=${currentLoginSession}`);
               const data = await resp.json();
-              
               if (data.status === 'success') {
                   clearInterval(loginPollInterval);
+                  if (navigator.onLine) fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => console.log("Stats error"));
                   
-                  if (navigator.onLine) {
-                      fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => console.log("Stats error"));
-                  }
-
                   const userName = document.getElementById('loginNameInput').value.trim();
                   const userPhone = data.phone;
-
                   saveCustomerData(userName, userPhone); 
                   loadSavedCustomerData(); 
                   syncLoyaltyWithServer();
                   
                   const msg = `👤 تسجيل دخول جديد\nالاسم: ${userName}\nالرقم: ${userPhone}`;
                   fetch(`https://api.telegram.org/bot${NEW_BOT_TOKEN}/sendMessage`, {
-                      method: "POST", 
-                      headers: { "Content-Type": "application/json" }, 
-                      body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+                      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
                   }).catch(e => {});
 
                   showScreen('home-screen'); 
                   showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
-
                   currentLoginSession = "";
                   resetLoginUI();
               }
@@ -1399,7 +1390,6 @@
           btn.innerHTML = '<i class="fab fa-telegram-plane"></i> شارك رقمك عبر تليكرام';
           btn.disabled = false;
           document.getElementById('cancel-login-area').style.display = 'none';
-          
           document.getElementById('login-step-2').style.display = 'none';
           document.getElementById('login-step-1').style.display = 'block';
           document.getElementById('loginNameInput').value = '';
@@ -1430,17 +1420,17 @@
       }
 
       document.addEventListener('DOMContentLoaded', () => {
+          // إخفاء شاشة البداية أول أمر ينفذ حتى ما يعلك البرنامج
           setTimeout(() => {
               const splash = document.getElementById('splash-screen');
-              if(splash) { 
-                  splash.style.opacity = '0'; 
-                  setTimeout(() => splash.style.display = 'none', 500); 
-              }
+              if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 500); }
           }, 1500);
 
           try {
               checkStatus();
               initAutoLocation(); 
+              // تحميل السوق الافتراضي إذا فتح المستخدم الشاشة
+              openMarketCategory('الكل');
           } catch(e) { console.error("Error on load:", e); }
       });
 
@@ -1555,12 +1545,6 @@
           } 
       }
 
-      function updateMarketBottomNav(activeId) {
-          document.querySelectorAll('.market-nav-btn').forEach(btn => btn.classList.remove('active'));
-          const btn = document.getElementById(activeId);
-          if (btn) btn.classList.add('active');
-      }
-
       function showScreen(id) {
           document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
           const target = document.getElementById(id);
@@ -1568,16 +1552,12 @@
           
           window.scrollTo(0, 0);
           const bottomNav = document.getElementById('bottomNavigation');
-          if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id === 'market-add-screen' || id === 'my-ads-screen' || id === 'market-screen') ? 'none' : 'flex';
+          if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id === 'market-add-screen' || id === 'my-ads-screen') ? 'none' : 'flex';
           
           if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
           if(id === 'log-screen') { renderDriverLog(); } 
-          if(['order-screen', 'tuk-screen', 'mediator-screen', 'market-add-screen'].includes(id)) { loadSavedCustomerData(); }
+          if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen' || id === 'market-add-screen') { loadSavedCustomerData(); }
           if(id === 'order-screen') updateLoyaltyUI();
-          
-          if(id === 'market-screen') {
-              if (allMarketAds.length === 0) openMarketCategory('الكل');
-          }
           if(id === 'market-add-screen') {
               const editIdEl = document.getElementById('editAdId');
               if(editIdEl && !editIdEl.value) {
@@ -1834,12 +1814,13 @@
       }
 
       /* =========================================
-         دوال السوق المفتوح (المربوطة بقاعدة البيانات)
+         دوال السوق المفتوح (الجديدة كلياً والاحترافية)
       ========================================= */
       
-      let allMarketAds = []; 
+      let allMarketAds = []; // مصفوفة لحفظ الإعلانات للبحث
 
       async function openMarketCategory(category) {
+          // تغيير لون الزر الفعال
           document.querySelectorAll('.market-cat-item').forEach(el => el.classList.remove('active'));
           const btn = document.getElementById('cat-' + category);
           if(btn) btn.classList.add('active');
@@ -1865,31 +1846,242 @@
               return;
           }
 
-          const myPhone = localStorage.getItem('saved_customer_phone') || "";
-          
-          let adsHTML = `<h3 style="text-align: right; margin-bottom: 15px; color: var(--primary); font-size:16px; padding-right:10px;">إعلانات (${categoryName || 'نتائج البحث'})</h3>`;
-          adsHTML += '<div style="display: flex; flex-direction: column; gap: 15px; padding: 0 10px;">';
+          let adsHTML = `<h3 style="text-align: right; margin-bottom: 15px; color: var(--primary); font-size:16px;">إعلانات (${categoryName || 'نتائج البحث'})</h3>`;
+          adsHTML += '<div style="display: flex; flex-direction: column; gap: 15px;">';
           
           adsArray.forEach(ad => {
-              const safeAd = encodeURIComponent(JSON.stringify(ad));
-              
-              let actionButtons = '';
-              // التعديل: إذا الإعلان مالتك، نطلعلك أزرار التعديل والحذف مباشرة. وإذا الإعلان قديم (بدون ID)، راح ندز الـ Title كأنه هو الـ ID حتى ينحذف.
-              if (ad.phone === myPhone) {
-                  let adIdentifier = ad.id || ad.title; // الفلتر الذكي لحذف الإعلانات القديمة
-                  actionButtons = `
-                  <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px dashed var(--border-color); padding-top: 12px; margin-top: 12px;">
-                      <button class="action-btn delete ripple" onclick="deleteMarketAd('${adIdentifier}', '${ad.category}')"><i class="fas fa-trash"></i> حذف</button>
-                      <button class="action-btn edit ripple" onclick="editMarketAd('${safeAd}')"><i class="fas fa-edit"></i> تعديل</button>
-                  </div>`;
-              }
-              
               adsHTML += `
-              <div class="form-card" style="text-align: right; padding: 15px; border: 1px solid var(--border-color); border-right: 4px solid #3B82F6; margin-bottom:0;">
+              <div class="form-card" style="text-align: right; padding: 15px; border: 1px solid var(--border-color); border-right: 4px solid #3B82F6;">
                   <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
                       <h4 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--text-main);">${ad.title}</h4>
                       <span style="background: rgba(59, 130, 246, 0.1); color: #3B82F6; padding: 3px 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: bold;">${ad.condition}</span>
                   </div>
                   <p style="margin: 0 0 10px 0; font-size: 18px; font-weight: 800; color: #10B981;">${ad.price} <span style="font-size: 12px; color: var(--text-muted);">د.ع</span></p>
                   
-                  ${ad.image ? `<img src="${ad.image}" class="ad-card-img" onclick
+                  ${ad.image ? `<img src="${ad.image}" class="ad-card-img" onclick="window.open('${ad.image}', '_blank')">` : ''}
+                  
+                  ${ad.desc ? `<p style="margin: 0 0 15px 0; font-size: 13px; color: var(--text-muted); line-height: 1.5; white-space: pre-wrap;">${ad.desc}</p>` : ''}
+                  
+                  <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                      <span style="font-size: 11px; color: var(--text-muted);"><i class="fas fa-clock"></i> ${ad.date ? ad.date.split(',')[0] : ''}</span>
+                      <button class="location-btn success ripple" style="width: auto; padding: 6px 15px; margin: 0; background: #25D366; color: white; border: none; font-size: 13px;" onclick="window.open('https://wa.me/964${ad.phone.substring(1)}', '_blank')">
+                          <i class="fab fa-whatsapp"></i> مراسلة
+                      </button>
+                  </div>
+              </div>`;
+          });
+          
+          adsHTML += '</div>';
+          containerElement.innerHTML = adsHTML;
+      }
+
+      function searchMarketAds(query) {
+          if(!query || !query.trim()) {
+              let catName = 'الكل';
+              let activeEl = document.querySelector('.market-cat-item.active .market-cat-title');
+              if(activeEl) catName = activeEl.innerText;
+              renderMarketAds(allMarketAds, document.getElementById('marketOffersArea'), catName);
+              return;
+          }
+          
+          const lowerQuery = query.toLowerCase();
+          const filteredAds = allMarketAds.filter(ad => {
+              let titleMatch = ad.title && ad.title.toLowerCase().indexOf(lowerQuery) !== -1;
+              let descMatch = ad.desc && ad.desc.toLowerCase().indexOf(lowerQuery) !== -1;
+              return titleMatch || descMatch;
+          });
+          
+          renderMarketAds(filteredAds, document.getElementById('marketOffersArea'), 'نتائج البحث');
+      }
+
+      function previewMarketImage() {
+          const fileEl = document.getElementById('marketAdImages');
+          if(!fileEl || !fileEl.files[0]) return clearMarketImages();
+          const file = fileEl.files[0];
+          
+          const reader = new FileReader();
+          reader.onload = function(e) {
+              const img = new Image();
+              img.onload = function() {
+                  const canvas = document.createElement('canvas');
+                  const ctx = canvas.getContext('2d');
+                  const MAX_WIDTH = 500;
+                  const scaleSize = MAX_WIDTH / img.width;
+                  canvas.width = MAX_WIDTH;
+                  canvas.height = img.height * scaleSize;
+                  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                  
+                  const base64 = canvas.toDataURL('image/jpeg', 0.6); 
+                  let b64El = document.getElementById('marketAdBase64');
+                  if(b64El) b64El.value = base64;
+                  
+                  let prevEl = document.getElementById('market-image-preview-container');
+                  if(prevEl) {
+                      prevEl.innerHTML = `
+                          <img src="${base64}" style="width:100px; height:100px; border-radius:10px; object-fit:cover; border:1px solid var(--border-color);">
+                          <div style="color:var(--danger); font-size:13px; font-weight:bold; cursor:pointer; padding:5px; display:inline-block; vertical-align:top;" onclick="clearMarketImages()"><i class="fas fa-trash-alt"></i> مسح</div>
+                      `;
+                  }
+              }
+              img.src = e.target.result;
+          }
+          reader.readAsDataURL(file);
+      }
+      
+      function clearMarketImages() { 
+          let imgInp = document.getElementById('marketAdImages'); if(imgInp) imgInp.value = ''; 
+          let base64Inp = document.getElementById('marketAdBase64'); if(base64Inp) base64Inp.value = ''; 
+          let prevCont = document.getElementById('market-image-preview-container'); if(prevCont) prevCont.innerHTML = ''; 
+      }
+
+      async function submitMarketAd() {
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          
+          const adId = document.getElementById('editAdId') ? document.getElementById('editAdId').value : '';
+          const oldCategory = document.getElementById('editAdOldCategory') ? document.getElementById('editAdOldCategory').value : '';
+          
+          const title = document.getElementById('marketAdTitle').value.trim(); 
+          const category = document.getElementById('marketAdCategory').value;
+          const price = document.getElementById('marketAdPrice').value.trim();
+          const condition = document.getElementById('marketAdCondition').value;
+          const phone = document.getElementById('marketAdPhone').value.trim();
+          const desc = document.getElementById('marketAdDesc').value.trim(); 
+          const imageBase64 = document.getElementById('marketAdBase64') ? document.getElementById('marketAdBase64').value : ''; 
+          
+          if(!title || !category || !price || !validateIraqiPhone(phone)) {
+              return showToast("أكمل البيانات الأساسية ورقم الموبايل بشكل صحيح 📝");
+          }
+
+          const btn = document.getElementById('submitAdBtn'); 
+          const originalText = btn.innerHTML; 
+          btn.innerHTML = '<span class="baly-spinner"></span>'; 
+          btn.disabled = true;
+          
+          try {
+              const payload = {
+                  action: adId ? 'editMarketAd' : 'saveMarketAd',
+                  id: adId || new Date().getTime().toString(),
+                  oldCategory: oldCategory,
+                  title: title, category: category, price: price, condition: condition, phone: phone, desc: desc,
+                  image: imageBase64
+              };
+
+              await fetch(GS_URL, { method: 'POST', body: JSON.stringify(payload) });
+              showToast(adId ? "تم تعديل الإعلان بنجاح! ✅" : "تم نشر إعلانك بنجاح! ✅"); 
+              
+              if(document.getElementById('editAdId')) document.getElementById('editAdId').value = "";
+              if(document.getElementById('editAdOldCategory')) document.getElementById('editAdOldCategory').value = "";
+              document.getElementById('marketAdTitle').value = "";
+              document.getElementById('marketAdPrice').value = "";
+              document.getElementById('marketAdDesc').value = "";
+              clearMarketImages();
+              
+              if(adId) {
+                  openMyAds(); 
+              } else {
+                  showScreen('market-screen');
+                  openMarketCategory(category); 
+              }
+          } catch (e) {
+              showToast("حدث خطأ أثناء الاتصال بالسيرفر ⚠️");
+          } finally { 
+              btn.innerHTML = originalText; 
+              btn.disabled = false; 
+          }
+      }
+
+      async function openMyAds() {
+          showScreen('my-ads-screen');
+          const area = document.getElementById('myAdsArea');
+          const myPhone = localStorage.getItem('saved_customer_phone');
+          
+          if(!myPhone) {
+              area.innerHTML = `<div style="padding:40px 10px;"><i class="fas fa-user-lock" style="font-size: 50px; color: var(--border-color);"></i><p class="no-offers-text">سجل رقمك أولاً لترى منشوراتك.</p></div>`;
+              return;
+          }
+
+          area.innerHTML = '<div style="padding: 30px;"><span class="baly-spinner" style="border-top-color: var(--primary); width: 40px; height: 40px;"></span><p class="no-offers-text" style="margin-top:15px;">جاري جلب إعلاناتك...</p></div>';
+          
+          try {
+              const response = await fetch(`${GS_URL}?action=getMarketAds&category=الكل`);
+              const allAds = await response.json();
+              const myAds = allAds.filter(ad => ad.phone === myPhone);
+              
+              if (myAds.length === 0) {
+                  area.innerHTML = `<div style="padding:40px 10px;"><i class="fas fa-folder-open" style="font-size: 50px; color: var(--border-color);"></i><p class="no-offers-text">لم تقم بنشر أي إعلان بعد.</p></div>`;
+                  return;
+              }
+
+              let adsHTML = '<div style="display: flex; flex-direction: column; gap: 15px; padding: 20px;">';
+              myAds.forEach(ad => {
+                  const safeAd = encodeURIComponent(JSON.stringify(ad));
+                  adsHTML += `
+                  <div class="form-card" style="text-align: right; padding: 15px; border: 1px solid var(--border-color);">
+                      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                          <h4 style="margin: 0; font-size: 16px; font-weight: 800;">${ad.title}</h4>
+                          <span style="color: var(--text-muted); font-size: 11px;">${ad.category}</span>
+                      </div>
+                      <p style="margin: 0 0 10px 0; font-size: 18px; font-weight: 800; color: #10B981;">${ad.price} <span style="font-size: 12px; color: var(--text-muted);">د.ع</span></p>
+                      ${ad.image ? `<img src="${ad.image}" class="ad-card-img">` : ''}
+                      
+                      <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 10px;">
+                          <button class="action-btn delete ripple" onclick="deleteMarketAd('${ad.id}', '${ad.category}')"><i class="fas fa-trash"></i> حذف</button>
+                          <button class="action-btn edit ripple" onclick="editMarketAd('${safeAd}')"><i class="fas fa-edit"></i> تعديل</button>
+                      </div>
+                  </div>`;
+              });
+              adsHTML += '</div>';
+              area.innerHTML = adsHTML;
+              
+          } catch (e) {
+              area.innerHTML = `<div style="padding: 30px;"><i class="fas fa-exclamation-triangle" style="font-size: 50px; color: var(--danger);"></i><p class="no-offers-text">حدث خطأ.</p></div>`;
+          }
+      }
+
+      function editMarketAd(encodedAd) {
+          const ad = JSON.parse(decodeURIComponent(encodedAd));
+          showScreen('market-add-screen');
+          
+          let titleText = document.getElementById('market-add-title-text');
+          if(titleText) titleText.innerHTML = '<i class="fas fa-edit" style="color:#3B82F6;"></i> تعديل الإعلان';
+          
+          let btnText = document.getElementById('submitAdBtnText');
+          if(btnText) btnText.innerText = "حفظ التعديلات";
+          
+          let editId = document.getElementById('editAdId'); if(editId) editId.value = ad.id;
+          let editCat = document.getElementById('editAdOldCategory'); if(editCat) editCat.value = ad.category;
+          let adTitle = document.getElementById('marketAdTitle'); if(adTitle) adTitle.value = ad.title;
+          let adCat = document.getElementById('marketAdCategory'); if(adCat) adCat.value = ad.category;
+          let adPrice = document.getElementById('marketAdPrice'); if(adPrice) adPrice.value = ad.price;
+          let adCond = document.getElementById('marketAdCondition'); if(adCond) adCond.value = ad.condition;
+          let adDesc = document.getElementById('marketAdDesc'); if(adDesc) adDesc.value = ad.desc || "";
+          
+          if(ad.image) {
+              let b64 = document.getElementById('marketAdBase64'); if(b64) b64.value = ad.image;
+              let prev = document.getElementById('market-image-preview-container');
+              if(prev) {
+                  prev.innerHTML = `
+                      <img src="${ad.image}" style="width:100px; height:100px; border-radius:10px; object-fit:cover; border:1px solid var(--border-color);">
+                      <div style="color:var(--danger); font-size:13px; font-weight:bold; cursor:pointer; padding:5px; display:inline-block; vertical-align:top;" onclick="clearMarketImages()"><i class="fas fa-trash-alt"></i> مسح الصورة</div>
+                  `;
+              }
+          } else {
+              clearMarketImages();
+          }
+      }
+
+      async function deleteMarketAd(id, category) {
+          if(!confirm("هل أنت متأكد من حذف هذا الإعلان نهائياً؟")) return;
+          showToast("جاري الحذف...");
+          try {
+              const payload = { action: 'deleteMarketAd', id: id, category: category };
+              await fetch(GS_URL, { method: 'POST', body: JSON.stringify(payload) });
+              showToast("تم حذف الإعلان بنجاح! 🗑️");
+              openMyAds(); 
+          } catch(e) {
+              showToast("فشل الحذف، تأكد من الإنترنت.");
+          }
+      }
+    </script>
+</body>
+</html>
