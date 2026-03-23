@@ -231,14 +231,21 @@
       .market-cat-title { font-size: 14px; font-weight: 800; color: var(--text-main); margin: 0; }
       .market-offers-area { text-align: center; padding: 20px 10px; background: var(--surface); border-radius: var(--radius-lg); border: 1px dashed var(--border-color); box-shadow: var(--shadow-sm); min-height: 200px; }
       .no-offers-text { color: var(--text-muted); font-size: 16px; font-weight: bold; margin-top: 15px; }
-      .market-add-btn { background: #3B82F6; color: white; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; position: fixed; bottom: 90px; right: 20px; box-shadow: var(--shadow-floating); z-index: 100; cursor: pointer; transition: 0.3s; border: none; }
-      .market-add-btn:active { transform: scale(0.9); }
       
-      .ad-card-img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border-color); background: var(--bg-color); }
+      /* إخفاء الزر العائم القديم وتفعيل الشريط السفلي */
+      .market-add-btn { display: none !important; }
+      .market-bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); box-shadow: 0 -5px 20px rgba(0,0,0,0.05); display: flex; z-index: 10000; border-top: 1px solid var(--border-color); padding-bottom: env(safe-area-inset-bottom); }
+      body.dark-mode .market-bottom-nav { background: var(--surface); border-color: rgba(255,255,255,0.05); }
+      .market-nav-btn { flex: 1; padding: 12px 0; text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 800; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px; border: none; background: transparent; font-family: 'Cairo'; }
+      .market-nav-btn i { font-size: 20px; }
+      .market-nav-btn.active, .market-nav-btn:active { color: #3B82F6; }
+      #market-screen { padding-bottom: 80px; }
+      
+      .ad-card-img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border-color); background: var(--bg-color); cursor: pointer; }
       .action-btn { background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 15px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s; }
       .action-btn.delete { color: var(--danger); background: rgba(239, 68, 68, 0.1); border-color: transparent; }
       .action-btn.edit { color: #3B82F6; background: rgba(59, 130, 246, 0.1); border-color: transparent; }
-                      </style></head>
+                     </style></head>
 <body>
     <div id="map-modal">
         <div class="map-container">
@@ -779,11 +786,7 @@
     </div>
 
     <div id="market-screen" class="screen container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <button class="back-btn ripple-dark" style="margin-bottom: 0;" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-            <button class="action-btn" onclick="openMyAds()"><i class="fas fa-list-ul"></i> منشوراتك</button>
-        </div>
-        
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title" style="margin-bottom: 10px;"><i class="fas fa-store" style="color:#3B82F6;"></i> السوق المفتوح</h2>
         
         <div class="form-group" style="margin-bottom: 20px;">
@@ -796,7 +799,7 @@
         <p style="color: var(--text-muted); font-weight: 600; margin-bottom: 10px;">أو تصفح حسب القسم:</p>
         
         <div class="market-cat-slider">
-            <div class="market-cat-item ripple-dark active" id="cat-all" onclick="openMarketCategory('الكل')">
+            <div class="market-cat-item ripple-dark active" id="cat-الكل" onclick="openMarketCategory('الكل')">
                 <div class="market-cat-icon">🌟</div>
                 <h3 class="market-cat-title">الكل</h3>
             </div>
@@ -826,10 +829,20 @@
             </div>
         </div>
 
-        <div class="market-offers-area" id="marketOffersArea" style="background: transparent; border: none; padding: 0;">
+        <div class="market-offers-area" id="marketOffersArea" style="background: transparent; border: none; padding: 0; margin-bottom: 70px;">
             </div>
         
-        <button class="market-add-btn ripple" onclick="showScreen('market-add-screen')"><i class="fas fa-plus"></i></button>
+        <div class="market-bottom-nav">
+            <button class="market-nav-btn active ripple" onclick="showScreen('market-screen'); openMarketCategory('الكل')">
+                <i class="fas fa-store"></i> السوق
+            </button>
+            <button class="market-nav-btn ripple" onclick="openMyAds()">
+                <i class="fas fa-list-ul"></i> منشوراتي
+            </button>
+            <button class="market-nav-btn ripple" onclick="showScreen('market-add-screen')">
+                <i class="fas fa-plus-circle"></i> أضف إعلان
+            </button>
+        </div>
     </div>
 
     <div id="my-ads-screen" class="screen container">
@@ -894,8 +907,8 @@
         </div>
 
         <button class="send-btn ripple" style="background: #3B82F6;" id="submitAdBtn" onclick="submitMarketAd()"><i class="fas fa-paper-plane"></i> <span id="submitAdBtnText">انشر الإعلان الآن</span></button>
-    </div>
-    <script>
+                                     </div>
+                                         <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
@@ -1142,7 +1155,7 @@
       function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
 
       /* =========================================
-         منظومة تسجيل الدخول
+         منظومة تسجيل الدخول الجديدة عبر تليكرام
       ========================================= */
       let loginPollInterval = null;
       let currentLoginSession = "";
@@ -1163,10 +1176,12 @@
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           
           currentLoginSession = Math.floor(10000000 + Math.random() * 90000000).toString();
+          
           const btn = document.getElementById('tg-login-btn');
           btn.innerHTML = '<span class="baly-spinner"></span> جاري انتظار تليكرام...';
           btn.disabled = true;
           document.getElementById('cancel-login-area').style.display = 'block';
+
           window.open(`https://t.me/${NEW_BOT_USER}?start=login_${currentLoginSession}`, '_blank');
           loginPollInterval = setInterval(checkTelegramLoginStatus, 3000);
       }
@@ -1176,23 +1191,31 @@
           try {
               const resp = await fetch(`${GS_URL}?action=checkTelegramLogin&session=${currentLoginSession}`);
               const data = await resp.json();
+              
               if (data.status === 'success') {
                   clearInterval(loginPollInterval);
-                  if (navigator.onLine) fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => console.log("Stats error"));
                   
+                  if (navigator.onLine) {
+                      fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => console.log("Stats error"));
+                  }
+
                   const userName = document.getElementById('loginNameInput').value.trim();
                   const userPhone = data.phone;
+
                   saveCustomerData(userName, userPhone); 
                   loadSavedCustomerData(); 
                   syncLoyaltyWithServer();
                   
                   const msg = `👤 تسجيل دخول جديد\nالاسم: ${userName}\nالرقم: ${userPhone}`;
                   fetch(`https://api.telegram.org/bot${NEW_BOT_TOKEN}/sendMessage`, {
-                      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+                      method: "POST", 
+                      headers: { "Content-Type": "application/json" }, 
+                      body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
                   }).catch(e => {});
 
                   showScreen('home-screen'); 
                   showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
+
                   currentLoginSession = "";
                   resetLoginUI();
               }
@@ -1211,6 +1234,7 @@
           btn.innerHTML = '<i class="fab fa-telegram-plane"></i> شارك رقمك عبر تليكرام';
           btn.disabled = false;
           document.getElementById('cancel-login-area').style.display = 'none';
+          
           document.getElementById('login-step-2').style.display = 'none';
           document.getElementById('login-step-1').style.display = 'block';
           document.getElementById('loginNameInput').value = '';
@@ -1241,17 +1265,18 @@
       }
 
       document.addEventListener('DOMContentLoaded', () => {
-          // إخفاء شاشة البداية أول أمر ينفذ حتى ما يعلك البرنامج
+          // إخفاء شاشة البداية فوراً حتى نتجنب تعليق التطبيق
           setTimeout(() => {
               const splash = document.getElementById('splash-screen');
-              if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 500); }
+              if(splash) { 
+                  splash.style.opacity = '0'; 
+                  setTimeout(() => splash.style.display = 'none', 500); 
+              }
           }, 1500);
 
           try {
               checkStatus();
               initAutoLocation(); 
-              // تحميل السوق الافتراضي إذا فتح المستخدم الشاشة
-              openMarketCategory('الكل');
           } catch(e) { console.error("Error on load:", e); }
       });
 
@@ -1366,6 +1391,12 @@
           } 
       }
 
+      function updateMarketBottomNav(activeId) {
+          document.querySelectorAll('.market-nav-btn').forEach(btn => btn.classList.remove('active'));
+          const btn = document.getElementById(activeId);
+          if (btn) btn.classList.add('active');
+      }
+
       function showScreen(id) {
           document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
           const target = document.getElementById(id);
@@ -1373,12 +1404,16 @@
           
           window.scrollTo(0, 0);
           const bottomNav = document.getElementById('bottomNavigation');
-          if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id === 'market-add-screen' || id === 'my-ads-screen') ? 'none' : 'flex';
+          if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id === 'market-add-screen' || id === 'my-ads-screen' || id === 'market-screen') ? 'none' : 'flex';
           
           if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
           if(id === 'log-screen') { renderDriverLog(); } 
-          if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen' || id === 'market-add-screen') { loadSavedCustomerData(); }
+          if(['order-screen', 'tuk-screen', 'mediator-screen', 'market-add-screen'].includes(id)) { loadSavedCustomerData(); }
           if(id === 'order-screen') updateLoyaltyUI();
+          
+          if(id === 'market-screen') {
+              if (allMarketAds.length === 0) openMarketCategory('الكل');
+          }
           if(id === 'market-add-screen') {
               const editIdEl = document.getElementById('editAdId');
               if(editIdEl && !editIdEl.value) {
@@ -1635,13 +1670,12 @@
       }
 
       /* =========================================
-         دوال السوق المفتوح (الجديدة كلياً والاحترافية)
+         دوال السوق المفتوح (المربوطة بقاعدة البيانات)
       ========================================= */
       
-      let allMarketAds = []; // مصفوفة لحفظ الإعلانات للبحث
+      let allMarketAds = []; 
 
       async function openMarketCategory(category) {
-          // تغيير لون الزر الفعال
           document.querySelectorAll('.market-cat-item').forEach(el => el.classList.remove('active'));
           const btn = document.getElementById('cat-' + category);
           if(btn) btn.classList.add('active');
@@ -1667,12 +1701,26 @@
               return;
           }
 
-          let adsHTML = `<h3 style="text-align: right; margin-bottom: 15px; color: var(--primary); font-size:16px;">إعلانات (${categoryName || 'نتائج البحث'})</h3>`;
-          adsHTML += '<div style="display: flex; flex-direction: column; gap: 15px;">';
+          const myPhone = localStorage.getItem('saved_customer_phone') || "";
+          
+          let adsHTML = `<h3 style="text-align: right; margin-bottom: 15px; color: var(--primary); font-size:16px; padding-right:10px;">إعلانات (${categoryName || 'نتائج البحث'})</h3>`;
+          adsHTML += '<div style="display: flex; flex-direction: column; gap: 15px; padding: 0 10px;">';
           
           adsArray.forEach(ad => {
+              const safeAd = encodeURIComponent(JSON.stringify(ad));
+              
+              let actionButtons = '';
+              // إذا كان الإعلان مالتك، نطلعلك أزرار التعديل والحذف مباشرة بكل مكان
+              if (ad.phone === myPhone) {
+                  actionButtons = `
+                  <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px dashed var(--border-color); padding-top: 12px; margin-top: 12px;">
+                      <button class="action-btn delete ripple" onclick="deleteMarketAd('${ad.id}', '${ad.category}')"><i class="fas fa-trash"></i> حذف</button>
+                      <button class="action-btn edit ripple" onclick="editMarketAd('${safeAd}')"><i class="fas fa-edit"></i> تعديل</button>
+                  </div>`;
+              }
+              
               adsHTML += `
-              <div class="form-card" style="text-align: right; padding: 15px; border: 1px solid var(--border-color); border-right: 4px solid #3B82F6;">
+              <div class="form-card" style="text-align: right; padding: 15px; border: 1px solid var(--border-color); border-right: 4px solid #3B82F6; margin-bottom:0;">
                   <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
                       <h4 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--text-main);">${ad.title}</h4>
                       <span style="background: rgba(59, 130, 246, 0.1); color: #3B82F6; padding: 3px 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: bold;">${ad.condition}</span>
@@ -1689,6 +1737,8 @@
                           <i class="fab fa-whatsapp"></i> مراسلة
                       </button>
                   </div>
+                  
+                  ${actionButtons}
               </div>`;
           });
           
@@ -1828,31 +1878,8 @@
               const allAds = await response.json();
               const myAds = allAds.filter(ad => ad.phone === myPhone);
               
-              if (myAds.length === 0) {
-                  area.innerHTML = `<div style="padding:40px 10px;"><i class="fas fa-folder-open" style="font-size: 50px; color: var(--border-color);"></i><p class="no-offers-text">لم تقم بنشر أي إعلان بعد.</p></div>`;
-                  return;
-              }
-
-              let adsHTML = '<div style="display: flex; flex-direction: column; gap: 15px; padding: 20px;">';
-              myAds.forEach(ad => {
-                  const safeAd = encodeURIComponent(JSON.stringify(ad));
-                  adsHTML += `
-                  <div class="form-card" style="text-align: right; padding: 15px; border: 1px solid var(--border-color);">
-                      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                          <h4 style="margin: 0; font-size: 16px; font-weight: 800;">${ad.title}</h4>
-                          <span style="color: var(--text-muted); font-size: 11px;">${ad.category}</span>
-                      </div>
-                      <p style="margin: 0 0 10px 0; font-size: 18px; font-weight: 800; color: #10B981;">${ad.price} <span style="font-size: 12px; color: var(--text-muted);">د.ع</span></p>
-                      ${ad.image ? `<img src="${ad.image}" class="ad-card-img">` : ''}
-                      
-                      <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 10px;">
-                          <button class="action-btn delete ripple" onclick="deleteMarketAd('${ad.id}', '${ad.category}')"><i class="fas fa-trash"></i> حذف</button>
-                          <button class="action-btn edit ripple" onclick="editMarketAd('${safeAd}')"><i class="fas fa-edit"></i> تعديل</button>
-                      </div>
-                  </div>`;
-              });
-              adsHTML += '</div>';
-              area.innerHTML = adsHTML;
+              // الاستعانة بنفس دالة عرض الإعلانات حتى تترتب
+              renderMarketAds(myAds, area, "منشوراتي");
               
           } catch (e) {
               area.innerHTML = `<div style="padding: 30px;"><i class="fas fa-exclamation-triangle" style="font-size: 50px; color: var(--danger);"></i><p class="no-offers-text">حدث خطأ.</p></div>`;
@@ -1898,11 +1925,16 @@
               const payload = { action: 'deleteMarketAd', id: id, category: category };
               await fetch(GS_URL, { method: 'POST', body: JSON.stringify(payload) });
               showToast("تم حذف الإعلان بنجاح! 🗑️");
-              openMyAds(); 
+              // تحديث الواجهة حسب المكان اللي انت بيه (السوق لو منشوراتي)
+              if(document.getElementById('my-ads-screen').classList.contains('active-screen')) {
+                  openMyAds(); 
+              } else {
+                  openMarketCategory(category);
+              }
           } catch(e) {
               showToast("فشل الحذف، تأكد من الإنترنت.");
           }
       }
     </script>
 </body>
-    </html>
+</html>
