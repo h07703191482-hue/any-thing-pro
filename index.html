@@ -1,3 +1,226 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#5A228B">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    
+    <meta name="google-site-verification" content="62BLEW3ojjyy5ymvZcQuB2D6rVkft8WSTDU6aKj6e20" />
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="android-chrome-512x512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="android-chrome-192x192.png">
+    <link rel="manifest" href="manifest.json">
+
+    <title>تطبيق البندر - خدمات توصيل وتحصيل في أم قصر</title>
+    
+    <meta name="apple-mobile-web-app-title" content="البندر">
+    <meta name="application-name" content="البندر">
+    
+    <meta name="description" content="تطبيق البندر هو أسرع تطبيق لتوصيل المسواك، التحصيل، والخدمات اللوجستية في أم قصر. اطلب الآن نصلك أينما كنت.">
+    <meta name="keywords" content="البندر, تطبيق البندر, توصيل البندر, تحصيل، أم قصر، تكتك، مسواك، طلبات، البصرة، مندوب">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "d1addf49-f17a-47b3-89ec-8444e997ac1a", 
+        });
+      });
+    </script>
+    <style>
+      #map-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100005; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+      .map-container { width: 95%; max-width: 450px; background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; position: relative; box-shadow: var(--shadow-floating); display: flex; flex-direction: column; }
+      .map-header { padding: 15px; background: var(--primary); color: white; text-align: center; font-weight: 800; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
+      .close-map-btn { background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0; }
+      #map-view { width: 100%; height: 350px; z-index: 1; }
+      .map-center-marker { position: absolute; top: calc(50% + 20px); left: 50%; transform: translate(-50%, -100%); z-index: 1000; font-size: 45px; color: var(--danger); text-shadow: 0 4px 10px rgba(0,0,0,0.4); pointer-events: none; animation: bouncePin 0.5s ease infinite alternate; }
+      .map-footer { padding: 15px; text-align: center; background: var(--surface); }
+      @keyframes bouncePin { from { transform: translate(-50%, -100%); } to { transform: translate(-50%, -110%); } }
+
+      :root { 
+          --primary: #5A228B; --primary-hover: #4A1A75; --secondary: #FFC107; --gold: #FFC107; 
+          --danger: #EF4444; --bg-color: #F4F6F9; --surface: #FFFFFF; --text-main: #111827; 
+          --text-muted: #6B7280; --border-color: #E5E7EB; --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.04);
+          --shadow-md: 0 10px 30px rgba(90, 34, 139, 0.1); --shadow-floating: 0 20px 40px rgba(0, 0, 0, 0.12);
+          --radius-md: 20px; --radius-lg: 24px; --radius-pill: 9999px;
+      }
+      body.dark-mode {
+          --primary: #7A3BBA; --bg-color: #121212; --surface: #1E1E1E; --text-main: #F9FAFB;
+          --text-muted: #9CA3AF; --border-color: #334155; --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.2);
+          --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.4); --shadow-floating: 0 20px 40px rgba(0, 0, 0, 0.5);
+      }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; color: var(--text-main); min-height: 100vh; line-height: 1.6; overflow-x: hidden; transition: background-color 0.4s ease, color 0.4s ease; }
+      body::before { content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(90, 34, 139, 0.03) 0%, transparent 50%); z-index: -1; pointer-events: none; }
+      body.dark-mode::before { background: radial-gradient(circle at 50% 0%, rgba(122, 59, 186, 0.08) 0%, transparent 50%); }
+      
+      .ripple { position: relative; overflow: hidden; }
+      .ripple::after { content: ""; position: absolute; top: 50%; left: 50%; width: 150%; padding-top: 150%; background: rgba(255, 255, 255, 0.3); border-radius: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; transition: transform 0.4s, opacity 0.4s; pointer-events: none; }
+      .ripple:active::after { transform: translate(-50%, -50%) scale(1); opacity: 1; transition: 0s; }
+      .ripple-dark::after { background: rgba(0, 0, 0, 0.1); }
+
+      .baly-spinner { width: 26px; height: 26px; border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; display: inline-block; vertical-align: middle; }
+      @keyframes spin { to { transform: rotate(360deg); } }
+              .baly-slider-container { width: 100%; overflow: hidden; margin-top: -45px; margin-bottom: 25px; position: relative; z-index: 5; }
+      .baly-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding: 0 20px 10px 20px; }
+      .baly-slider::-webkit-scrollbar { display: none; }
+      .baly-slide { flex: 0 0 85%; scroll-snap-align: center; border-radius: var(--radius-lg); padding: 25px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); cursor: pointer; }
+      .slide-text h3 { margin: 0; font-weight: 800; font-size: 18px; line-height: 1.3; }
+      .slide-text p { margin: 5px 0 0; font-size: 13px; font-weight: 600; opacity: 0.9; }
+      .slide-icon { font-size: 45px; opacity: 0.8; }
+
+      .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 10001; background: var(--surface); color: var(--primary); border: 1px solid var(--border-color); width: 48px; height: 48px; border-radius: var(--radius-pill); cursor: pointer; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+      .theme-toggle:active { transform: scale(0.9); }
+      .lang-toggle { position: fixed; top: 20px; left: 80px; z-index: 10001; background: var(--surface); color: var(--primary); border: 1px solid var(--border-color); padding: 0 15px; height: 48px; border-radius: var(--radius-pill); cursor: pointer; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; transition: 0.3s; }
+      
+      .screen { display: none; width: 100%; min-height: 100vh; position: relative; z-index: 1; animation: fadeSlideUp 0.4s ease-out forwards; }
+      .active-screen { display: block !important; z-index: 10; }
+      #login-screen.active-screen { display: flex !important; flex-direction: column; justify-content: center; min-height: 100vh; position: relative; z-index: 100; padding-bottom: 20px; }
+      
+      .container { max-width: 480px; margin: auto; padding: 20px; padding-bottom: 120px; }
+      @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes iconPulse { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.08); filter: brightness(1.2); } 100% { transform: scale(1); filter: brightness(1); } }
+      .icon-pulse { animation: iconPulse 2s infinite ease-in-out; }
+      
+      #global-lock-screen, #offline-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 9999999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; box-sizing: border-box; }
+      .lock-icon { font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: scaleIn 0.5s ease; cursor: pointer; }
+      .lock-title, .offline-title { font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
+      .lock-text, .offline-text { font-size: 16px; font-weight: 600; color: var(--text-muted); line-height: 1.6; }
+      .offline-btn-primary { background: var(--primary); color: white; width: 100%; padding: 18px; border-radius: var(--radius-md); border: none; font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
+      .offline-btn-primary:active { transform: scale(0.96); background: var(--primary-hover); }
+      .offline-btn-outline { background: transparent; color: var(--primary); width: 100%; padding: 18px; border-radius: var(--radius-md); border: 2px solid var(--primary); font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+      
+      #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease-in, transform 0.5s ease-in; overflow: hidden; }
+      #app-logo-splash { width: 130px; height: 130px; background: white; border-radius: 35px; display: flex; align-items: center; justify-content: center; margin-top: -100px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); opacity: 0; transform: scale(0.5); transition: 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 20; }
+      #app-logo-splash i { font-size: 65px; color: var(--primary); }
+      .show-logo { opacity: 1 !important; transform: scale(1) !important; }
+      .splash-welcome-text { position: absolute; top: 18%; text-align: center; width: 100%; color: white; animation: fadeInDown 1s ease-out; }
+      .splash-welcome-text h2 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 1px; }
+      .splash-welcome-text p { margin: 8px 0 0; opacity: 0.9; font-size: 16px; font-weight: 500; }
+      @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+      .road-realistic { position: absolute; bottom: 25%; width: 100%; height: 60px; background: rgba(0,0,0,0.2); border-top: 3px solid rgba(255,255,255,0.1); border-bottom: 3px solid rgba(255,255,255,0.1); display: flex; align-items: center; }
+      .road-lines { width: 100%; height: 4px; background: repeating-linear-gradient(90deg, #FFC107 0, #FFC107 40px, transparent 40px, transparent 80px); animation: road-scroll 0.5s linear infinite; }
+      @keyframes road-scroll { from { transform: translateX(0); } to { transform: translateX(80px); } }
+      .bike-box { position: absolute; bottom: calc(25% + 15px); left: 110%; font-size: 70px; color: white; transform: scaleX(-1); animation: drive-left 2s linear forwards; z-index: 10; animation-delay: 0.5s; }
+      .exhaust { position: absolute; right: -10px; bottom: 10px; display: flex; flex-direction: column; }
+      .smoke { width: 12px; height: 12px; background: rgba(255, 255, 255, 0.6); border-radius: 50%; margin-top: -5px; opacity: 0; animation: smoke-bloom 0.8s infinite; }
+      .smoke:nth-child(2) { animation-delay: 0.2s; }
+      .smoke:nth-child(3) { animation-delay: 0.4s; }
+      @keyframes smoke-bloom { 0% { transform: translate(0, 0) scale(1); opacity: 0; } 20% { opacity: 0.7; } 100% { transform: translate(40px, -40px) scale(3); opacity: 0; filter: blur(5px); } }
+      @keyframes drive-left { 0% { left: 110%; } 100% { left: -30%; } }
+      
+      .header-main { background: var(--primary); background: linear-gradient(135deg, var(--primary) 0%, #3B1261 100%); color: white; padding: 70px 20px 80px; text-align: center; border-radius: 0 0 30px 30px; margin: -20px -20px 20px -20px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+      .header-main h1 { margin: 0; font-size: 28px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.2); cursor: pointer; }
+      .header-main p { margin: 8px 0 0; font-size: 15px; opacity: 0.9; font-weight: 600; }
+      .driver-status-bar { display: none; background: var(--gold); color: #000; font-weight: 800; letter-spacing: 0.5px; font-size: 12px; padding: 6px 0; position: absolute; top: 0; left: 0; width: 100%; z-index: 10; text-align: center; transition: background 0.3s ease, color 0.3s ease; }
+      
+      .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; position: relative; z-index: 5; }
+      .select-card { background: var(--surface); border-radius: var(--radius-lg); display: flex; box-shadow: var(--shadow-sm); cursor: pointer; border: 1px solid var(--border-color); color: var(--text-main); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+      .select-card:hover, .select-card:active { transform: translateY(-3px) scale(0.98); box-shadow: var(--shadow-floating); border-color: var(--primary); }
+      .card-full { grid-column: span 2; flex-direction: row; align-items: center; padding: 22px 20px; gap: 18px; }
+      .card-full .icon-wrapper { width: 65px; height: 65px; font-size: 28px; border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+      .card-full .card-text { flex: 1; text-align: right; }
+      .card-full h3 { margin: 0 0 4px 0; font-size: 18px; font-weight: 800; }
+      .card-full small { color: var(--text-muted); font-size: 13px; font-weight: 600; }
+      .card-full .arrow-icon { color: var(--border-color); font-size: 14px; transition: 0.3s; margin-right: auto; }
+      .card-full:hover .arrow-icon { color: var(--primary); transform: translateX(-5px); }
+      .card-half { flex-direction: column; align-items: center; text-align: center; padding: 25px 10px; gap: 12px; }
+      .card-half .icon-wrapper { width: 55px; height: 55px; font-size: 24px; border-radius: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+      .card-half h3 { margin: 0; font-size: 16px; font-weight: 800; }
+      .card-half small { color: var(--text-muted); font-size: 12px; font-weight: 600; line-height: 1.4; display: block; }
+      .card-half .arrow-icon { display: none; }
+      .card-cart .icon-wrapper { background: rgba(90, 34, 139, 0.1); color: var(--primary); }
+      .card-med .icon-wrapper { background: rgba(249, 115, 22, 0.1); color: #F97316; }
+      .card-tuk .icon-wrapper { background: rgba(255, 193, 7, 0.15); color: #D97706; }
+      .card-join .icon-wrapper { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
+      .card-plaza .icon-wrapper { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
+      .form-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards; }
+      .form-card-title { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+      .form-card-title i { font-size: 18px; color: var(--gold); }
+      .screen-header-title { margin: 0 0 20px; font-weight: 800; font-size: 24px; display: flex; align-items: center; gap: 10px; }
+      .form-group { margin-bottom: 16px; position: relative; }
+      .form-group label { display: block; font-size: 13px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; }
+      input, textarea, select { width: 100%; padding: 16px 20px; border: 1.5px solid var(--border-color); border-radius: var(--radius-md); font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-main); background: var(--bg-color); transition: all 0.3s ease; appearance: none; }
+      input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 0.7; font-weight: 500;}
+      input:focus, textarea:focus, select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 4px rgba(90, 34, 139, 0.1); outline: none; }
+      .location-btn { background: var(--bg-color); color: var(--primary); border: 2px dashed var(--primary); padding: 14px; border-radius: var(--radius-md); width: 100%; font-family: 'Cairo'; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 12px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
+      .location-btn:active { transform: scale(0.96); }
+      .location-btn.success { background: rgba(16, 185, 129, 0.1); color: #10B981; border-color: #10B981; border-style: solid; }
+      .phone-note { color: var(--danger); font-size: 12px; font-weight: 600; margin-top: 6px; display: block; text-align: right; padding-right: 5px; }
+      .send-btn { background: linear-gradient(135deg, var(--primary) 0%, #3B1261 100%); color: white; width: 100%; padding: 18px; border-radius: var(--radius-md); border: none; font-weight: 800; font-size: 18px; letter-spacing: 0.5px; cursor: pointer; box-shadow: 0 8px 20px rgba(90, 34, 139, 0.3); margin-top: 10px; transition: all 0.3s ease; }
+      .send-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(90, 34, 139, 0.2); }
+      .send-btn:disabled { background: var(--border-color) !important; color: var(--text-muted) !important; cursor: not-allowed; box-shadow: none !important; transform: none !important; }
+      .back-btn { background: var(--surface); border: 1px solid var(--border-color); font-size: 18px; color: var(--text-main); width: 45px; height: 45px; border-radius: 14px; margin-bottom: 25px; box-shadow: var(--shadow-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+      .back-btn:active { transform: translateX(5px); }
+      .resign-btn { background: transparent; color: var(--danger); border: 2px solid rgba(239, 68, 68, 0.2); width: 100%; padding: 14px; border-radius: var(--radius-md); font-family: 'Cairo'; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 30px; }
+      .resign-btn:active { background: rgba(239, 68, 68, 0.1); }
+      .note { font-size: 13px; color: #854D0E; background: #FEF3C7; padding: 16px; border-radius: var(--radius-md); margin-bottom: 20px; border-right: 4px solid var(--gold); font-weight: 600; display: flex; gap: 10px; align-items: flex-start; line-height: 1.6; }
+      body.dark-mode .note { background: rgba(245, 158, 11, 0.1); color: var(--gold); }
+      .price-indicator { background: var(--surface); border: 2px solid var(--border-color); padding: 20px; border-radius: var(--radius-lg); margin-bottom: 20px; text-align: center; box-shadow: var(--shadow-sm); }
+      body.dark-mode .price-indicator { border-color: rgba(255,255,255,0.05); }
+      .price-indicator span { font-size: 14px; color: var(--text-muted); font-weight: 600; display: block; }
+      .price-indicator .amount { font-size: 32px; font-weight: 800; color: var(--primary); display: block; margin: 5px 0; }
+      .bottom-nav { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 400px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); display: flex; justify-content: space-around; align-items: center; padding: 8px 12px; border-radius: var(--radius-pill); box-shadow: var(--shadow-floating); z-index: 9998; border: 1px solid rgba(255,255,255,0.4); }
+      body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.9); border-color: rgba(255,255,255,0.05); }
+      .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 15px; color: var(--text-muted); text-decoration: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; border-radius: var(--radius-pill); position: relative; }
+      .nav-item i { font-size: 20px; transition: transform 0.3s; }
+      .nav-item.active { color: var(--primary); background: rgba(90, 34, 139, 0.1); }
+      .nav-item.active i { transform: translateY(-2px); }
+      #toast-container { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 100000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 350px; }
+      .toast { background: rgba(17, 24, 39, 0.95); color: white; padding: 16px 20px; border-radius: var(--radius-lg); box-shadow: var(--shadow-floating); font-family: 'Cairo', sans-serif; font-size: 14px; font-weight: 700; animation: slideDownToast 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards, fadeOutToast 0.4s ease forwards 3s; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px); }
+      body.dark-mode .toast { background: rgba(255, 255, 255, 0.95); color: #111827; }
+      @keyframes slideDownToast { from { opacity: 0; transform: translateY(-30px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+      @keyframes fadeOutToast { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-20px) scale(0.9); visibility: hidden; } }
+      .loyalty-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); text-align: center; }
+      .loyalty-progress { background: var(--bg-color); border-radius: var(--radius-pill); height: 10px; margin: 15px 0; overflow: hidden; }
+      .loyalty-bar { background: var(--gold); height: 100%; width: 0%; transition: 1s cubic-bezier(0.4, 0, 0.2, 1); border-radius: var(--radius-pill); }
+      .loyalty-text { font-size: 16px; font-weight: 800; color: var(--text-main); }
+      .gift-note { font-size: 14px; color: var(--primary); font-weight: 700; display: block; margin-top: 5px; }
+      .stat-box { background: var(--surface); padding: 20px; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+      .stat-box h4 { margin: 0; font-size: 15px; color: var(--text-muted); font-weight: 600; }
+      .stat-box p { margin: 8px 0 0; font-size: 28px; font-weight: 800; color: var(--primary); }
+      .leaderboard-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+      .leaderboard-title { text-align: center; color: var(--text-main); margin: 0 0 20px 0; font-size: 18px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; }
+      .driver-rank { display: flex; align-items: center; justify-content: space-between; padding: 14px; border-bottom: 1px solid var(--border-color); transition: 0.3s; border-radius: 12px; }
+      .driver-rank:hover { background: var(--bg-color); }
+      .driver-rank:last-child { border-bottom: none; }
+      .rank-info { display: flex; align-items: center; gap: 12px; font-weight: 700; color: var(--text-main); font-size: 15px; }
+      .rank-medal { font-size: 22px; width: 30px; text-align: center; display: inline-block; }
+      .rank-score { color: #10B981; font-weight: 800; background: rgba(16, 185, 129, 0.1); padding: 4px 12px; border-radius: var(--radius-pill); font-size: 13px; }
+      .sidebar { position: fixed; top: 0; right: -300px; width: 280px; height: 100%; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); box-shadow: -10px 0 30px rgba(0,0,0,0.1); z-index: 100002; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 15px; }
+      body.dark-mode .sidebar { background: rgba(15, 23, 42, 0.95); border-left: 1px solid rgba(255,255,255,0.05); }
+      .sidebar.open { right: 0; }
+      .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 100001; display: none; opacity: 0; transition: opacity 0.4s ease; }
+      .sidebar-overlay.show { display: block; opacity: 1; }
+      .sidebar-item { padding: 16px; border-radius: var(--radius-md); background: var(--bg-color); color: var(--text-main); text-decoration: none; display: flex; align-items: center; gap: 14px; font-weight: 700; cursor: pointer; transition: 0.3s; border: 1px solid transparent; }
+      .sidebar-item:hover, .sidebar-item:active { transform: translateX(-5px); border-color: var(--primary); background: var(--surface); box-shadow: var(--shadow-sm); }
+      .sidebar-close { align-self: flex-start; font-size: 15px; color: var(--text-muted); cursor: pointer; background: var(--bg-color); padding: 10px 20px; border-radius: var(--radius-pill); display: flex; align-items: center; gap: 8px; transition: 0.3s; font-weight: 700; margin-bottom: 20px; }
+      #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--text-main); text-align: center; padding: 20px; }
+      
+      .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(90, 34, 139, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
+      .location-notice { font-size: 13px; font-weight: 700; color: #10B981; text-align: center; margin-bottom: 15px; display: block; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: var(--radius-md); border: 1px dashed #10B981;}
+    </style>
 </head>
 <body>
     <div id="map-modal">
@@ -109,7 +332,6 @@
       <div class="road-realistic"><div class="road-lines"></div></div>
       <div class="bike-box"><i class="fas fa-motorcycle"></i><div class="exhaust"><div class="smoke"></div><div class="smoke"></div><div class="smoke"></div></div></div>
     </div>
-
     <div id="login-screen" class="screen container">
         <div style="text-align: center; margin-bottom: 30px;">
             <div style="width:100px; height:100px; background:rgba(90, 34, 139, 0.1); border-radius:30px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: var(--shadow-sm);">
@@ -172,7 +394,6 @@
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
-
     <div id="home-screen" class="screen container">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
@@ -217,14 +438,6 @@
             <div class="icon-wrapper icon-pulse"><i class="fas fa-handshake"></i></div>
             <h3 id="srv-med-title">الوسيط</h3>
             <small id="srv-med-sub">نقل الأغراض<br>بين شخصين</small>
-          </div>
-
-          <div class="select-card card-full ripple" style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); color: white; border: none; margin-bottom: 5px;" onclick="showScreen('market-screen')">
-            <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-store"></i></div>
-            <div class="card-text">
-                <h3 id="srv-market-title">السوق المفتوح</h3>
-                <small id="srv-market-sub">بيع وشراء سيارات، عقارات، وأكثر 🛒</small>
-            </div>
           </div>
 
           <div class="select-card card-full ripple" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; margin-bottom: 5px;" onclick="shareApp()">
@@ -450,7 +663,6 @@
             <button class="resign-btn ripple-dark" onclick="cancelJoinRequest()" style="margin-top:15px;">إلغاء الطلب</button>
         </div>
     </div>
-    
     <div id="plaza-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-briefcase" style="color:#8B5CF6;"></i> لوحة الكابتن</h2>
@@ -536,130 +748,7 @@
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
     </div>
-
-    <div id="market-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title" style="margin-bottom: 10px;"><i class="fas fa-store" style="color:#3B82F6;"></i> السوق المفتوح</h2>
-        
-        <div class="form-group" style="margin-bottom: 20px;">
-            <div style="position: relative;">
-                <input type="text" id="marketSearchInput" placeholder="ابحث عن إعلان، مثلاً: سيارة، تلفون..." style="padding-right: 40px;" onkeyup="searchMarketAds(this.value)">
-                <i class="fas fa-search" style="position: absolute; right: 15px; top: 18px; color: var(--text-muted);"></i>
-            </div>
-        </div>
-
-        <p style="color: var(--text-muted); font-weight: 600; margin-bottom: 10px;">أو تصفح حسب القسم:</p>
-        
-        <div class="market-cat-slider">
-            <div class="market-cat-item ripple-dark active" id="cat-الكل" onclick="openMarketCategory('الكل')">
-                <div class="market-cat-icon">🌟</div>
-                <h3 class="market-cat-title">الكل</h3>
-            </div>
-            <div class="market-cat-item ripple-dark" id="cat-سيارات" onclick="openMarketCategory('سيارات')">
-                <div class="market-cat-icon">🚗</div>
-                <h3 class="market-cat-title">سيارات</h3>
-            </div>
-            <div class="market-cat-item ripple-dark" id="cat-عقارات" onclick="openMarketCategory('عقارات')">
-                <div class="market-cat-icon">🏠</div>
-                <h3 class="market-cat-title">عقارات</h3>
-            </div>
-            <div class="market-cat-item ripple-dark" id="cat-أجهزة إلكترونية" onclick="openMarketCategory('أجهزة إلكترونية')">
-                <div class="market-cat-icon">📱</div>
-                <h3 class="market-cat-title">إلكترونيات</h3>
-            </div>
-            <div class="market-cat-item ripple-dark" id="cat-أثاث" onclick="openMarketCategory('أثاث')">
-                <div class="market-cat-icon">🛋️</div>
-                <h3 class="market-cat-title">أثاث</h3>
-            </div>
-            <div class="market-cat-item ripple-dark" id="cat-وظائف" onclick="openMarketCategory('وظائف')">
-                <div class="market-cat-icon">💼</div>
-                <h3 class="market-cat-title">وظائف</h3>
-            </div>
-            <div class="market-cat-item ripple-dark" id="cat-أخرى" onclick="openMarketCategory('أخرى')">
-                <div class="market-cat-icon">📦</div>
-                <h3 class="market-cat-title">أخرى</h3>
-            </div>
-        </div>
-
-        <div class="market-offers-area" id="marketOffersArea" style="background: transparent; border: none; padding: 0; margin-bottom: 70px;">
-            </div>
-        
-        <div class="market-bottom-nav">
-            <button class="market-nav-btn active ripple" onclick="showScreen('market-screen'); openMarketCategory('الكل')">
-                <i class="fas fa-store"></i> السوق
-            </button>
-            <button class="market-nav-btn ripple" onclick="openMyAds()">
-                <i class="fas fa-list-ul"></i> منشوراتي
-            </button>
-            <button class="market-nav-btn ripple" onclick="showScreen('market-add-screen')">
-                <i class="fas fa-plus-circle"></i> أضف إعلان
-            </button>
-        </div>
-    </div>
-
-    <div id="my-ads-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('market-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-list-ul" style="color:#10B981;"></i> إعلاناتي المنشورة</h2>
-        <div class="market-offers-area" id="myAdsArea" style="background: transparent; border: none; padding: 0;">
-            </div>
-    </div>
-
-    <div id="market-add-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('market-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title" id="market-add-title-text"><i class="fas fa-plus-circle" style="color:#10B981;"></i> إضافة إعلان جديد</h2>
-        
-        <input type="hidden" id="editAdId" value="">
-        <input type="hidden" id="editAdOldCategory" value="">
-
-        <div class="form-card">
-            <div class="form-group">
-                <label>عنوان الإعلان</label>
-                <input type="text" id="marketAdTitle" placeholder="مثال: سيارة سوناتا 2020 للبيع">
-            </div>
-            <div class="form-group">
-                <label>القسم</label>
-                <select id="marketAdCategory">
-                    <option value="" disabled selected>اختر القسم...</option>
-                    <option value="سيارات">سيارات 🚗</option>
-                    <option value="عقارات">عقارات 🏠</option>
-                    <option value="أجهزة إلكترونية">أجهزة إلكترونية 📱</option>
-                    <option value="أثاث">أثاث 🛋️</option>
-                    <option value="وظائف">وظائف 💼</option>
-                    <option value="أخرى">أخرى 📦</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>السعر (دينار عراقي)</label>
-                <input type="number" id="marketAdPrice" placeholder="مثال: 15000000">
-            </div>
-            <div class="form-group">
-                <label>حالة الغرض</label>
-                <select id="marketAdCondition">
-                    <option value="مستعمل">مستعمل</option>
-                    <option value="جديد">جديد</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>رقم الموبايل للتواصل</label>
-                <input type="tel" id="marketAdPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
-            </div>
-            <div class="form-group">
-                <label>التفاصيل والمواصفات (اختياري)</label>
-                <textarea id="marketAdDesc" rows="4" placeholder="اكتب تفاصيل الغرض، موديله، وموقعه..."></textarea>
-            </div>
-            <div class="form-group" style="margin-top: 10px;" id="image-upload-group">
-                <input type="file" id="marketAdImages" accept="image/*" style="display:none;" onchange="previewMarketImage()">
-                <input type="hidden" id="marketAdBase64" value="">
-                <button type="button" class="location-btn ripple-dark" style="border: 2px dashed #3B82F6; background: var(--bg-color); color: var(--text-main); margin-bottom: 0;" onclick="document.getElementById('marketAdImages').click()">
-                    <i class="fas fa-camera" style="color: #3B82F6;"></i> <span>إضافة صورة للإعلان (اختياري)</span>
-                </button>
-                <div id="market-image-preview-container" style="margin-top:10px;"></div>
-            </div>
-        </div>
-
-        <button class="send-btn ripple" style="background: #3B82F6;" id="submitAdBtn" onclick="submitMarketAd()"><i class="fas fa-paper-plane"></i> <span id="submitAdBtnText">انشر الإعلان الآن</span></button>
-    </div>
+    
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
@@ -907,7 +996,7 @@
       function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
 
       /* =========================================
-         منظومة تسجيل الدخول
+         منظومة تسجيل الدخول الجديدة عبر تليكرام (تحديث البندر)
       ========================================= */
       let loginPollInterval = null;
       let currentLoginSession = "";
@@ -928,10 +1017,12 @@
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           
           currentLoginSession = Math.floor(10000000 + Math.random() * 90000000).toString();
+          
           const btn = document.getElementById('tg-login-btn');
           btn.innerHTML = '<span class="baly-spinner"></span> جاري انتظار تليكرام...';
           btn.disabled = true;
           document.getElementById('cancel-login-area').style.display = 'block';
+
           window.open(`https://t.me/${NEW_BOT_USER}?start=login_${currentLoginSession}`, '_blank');
           loginPollInterval = setInterval(checkTelegramLoginStatus, 3000);
       }
@@ -941,23 +1032,31 @@
           try {
               const resp = await fetch(`${GS_URL}?action=checkTelegramLogin&session=${currentLoginSession}`);
               const data = await resp.json();
+              
               if (data.status === 'success') {
                   clearInterval(loginPollInterval);
-                  if (navigator.onLine) fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => console.log("Stats error"));
                   
+                  if (navigator.onLine) {
+                      fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => console.log("Stats error"));
+                  }
+
                   const userName = document.getElementById('loginNameInput').value.trim();
                   const userPhone = data.phone;
+
                   saveCustomerData(userName, userPhone); 
                   loadSavedCustomerData(); 
                   syncLoyaltyWithServer();
                   
                   const msg = `👤 تسجيل دخول جديد\nالاسم: ${userName}\nالرقم: ${userPhone}`;
                   fetch(`https://api.telegram.org/bot${NEW_BOT_TOKEN}/sendMessage`, {
-                      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+                      method: "POST", 
+                      headers: { "Content-Type": "application/json" }, 
+                      body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
                   }).catch(e => {});
 
                   showScreen('home-screen'); 
                   showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
+
                   currentLoginSession = "";
                   resetLoginUI();
               }
@@ -976,10 +1075,12 @@
           btn.innerHTML = '<i class="fab fa-telegram-plane"></i> شارك رقمك عبر تليكرام';
           btn.disabled = false;
           document.getElementById('cancel-login-area').style.display = 'none';
+          
           document.getElementById('login-step-2').style.display = 'none';
           document.getElementById('login-step-1').style.display = 'block';
           document.getElementById('loginNameInput').value = '';
       }
+      /* ========================================= */
 
       function checkStatus() {
           trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
@@ -1006,16 +1107,12 @@
       }
 
       document.addEventListener('DOMContentLoaded', () => {
+          checkStatus();
+          initAutoLocation(); 
           setTimeout(() => {
               const splash = document.getElementById('splash-screen');
               if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 500); }
           }, 1500);
-
-          try {
-              checkStatus();
-              initAutoLocation(); 
-              openMarketCategory('الكل');
-          } catch(e) { console.error("Error on load:", e); }
       });
 
       function shareApp() {
@@ -1033,11 +1130,8 @@
           const name = localStorage.getItem('saved_customer_name'); 
           const phone = localStorage.getItem('saved_customer_phone');
           if (name && phone) {
-              ['custName', 'medName', 'tukName', 'marketAdPhone'].forEach(id => { 
-                  let el = document.getElementById(id);
-                  if(el && el.tagName === 'INPUT' && id !== 'marketAdPhone') el.value = name; 
-              });
-              ['custPhone', 'medPhone', 'tukPhone', 'marketAdPhone'].forEach(id => { 
+              ['custName', 'medName', 'tukName'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = name; });
+              ['custPhone', 'medPhone', 'tukPhone'].forEach(id => { 
                   let el = document.getElementById(id);
                   if(el) { el.value = phone; checkPhoneLive(el); }
               });
@@ -1062,7 +1156,7 @@
                   updateStatsUI(); 
                   if(document.getElementById('log-screen').classList.contains('active-screen')) { renderDriverLog(); }
               } 
-              else if (result.indexOf("reset_league") !== -1) { localStorage.setItem('league_count', 0); updateStatsUI(); }
+              else if (result.includes("reset_league")) { localStorage.setItem('league_count', 0); updateStatsUI(); }
           } catch(e) {}
       }
 
@@ -1130,29 +1224,24 @@
       }
 
       function showScreen(id) {
-          document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+          document.querySelectorAll('.screen').forEach(s => {
+              s.classList.remove('active-screen');
+          });
+          
           const target = document.getElementById(id);
-          if (target) target.classList.add('active-screen');
+          if (target) {
+              target.classList.add('active-screen');
+          }
           
           window.scrollTo(0, 0);
           const bottomNav = document.getElementById('bottomNavigation');
-          if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id === 'market-add-screen' || id === 'my-ads-screen') ? 'none' : 'flex';
+          if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel') ? 'none' : 'flex';
           
           if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
           if(id === 'log-screen') { renderDriverLog(); } 
-          if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen' || id === 'market-add-screen') { loadSavedCustomerData(); }
+          if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') { loadSavedCustomerData(); }
           if(id === 'order-screen') updateLoyaltyUI();
-          if(id === 'market-add-screen') {
-              const editIdEl = document.getElementById('editAdId');
-              if(editIdEl && !editIdEl.value) {
-                  let t = document.getElementById('marketAdTitle'); if(t) t.value = "";
-                  let p = document.getElementById('marketAdPrice'); if(p) p.value = "";
-                  let d = document.getElementById('marketAdDesc'); if(d) d.value = "";
-                  clearMarketImages();
-                  let tText = document.getElementById('market-add-title-text'); if(tText) tText.innerHTML = '<i class="fas fa-plus-circle" style="color:#10B981;"></i> إضافة إعلان جديد';
-                  let bText = document.getElementById('submitAdBtnText'); if(bText) bText.innerText = "انشر الإعلان الآن";
-              }
-          }
+          
           if (typeof closeSidebar === 'function') closeSidebar();
       }
 
@@ -1284,7 +1373,7 @@
           try {
               const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
               const checkResult = await checkResp.text();
-              if (checkResult.indexOf("valid") === 0) {
+              if (checkResult.startsWith("valid")) {
                   try { const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); cashAudio.play(); confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } }); } catch(e) {}
                   let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
                   logs.unshift({ date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }), phone: custPhone, price: "2,500 د.ع" });
@@ -1322,7 +1411,7 @@
           `).join('');
       }
 
-      function updateStatsUI() { let e = document.getElementById('stat-count'); if(e) e.innerText = localStorage.getItem('d_count') || 0; }
+      function updateStatsUI() { if(document.getElementById('stat-count')) document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0; }
 
       async function refreshLeaderboard() {
           if (!navigator.onLine) return;
@@ -1377,7 +1466,7 @@
           else { if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; } if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; } }
       }
 
-      function notifyArriveWhatsApp() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); let formattedPhone = phone.indexOf('0') === 0 ? '964' + phone.substring(1) : phone; let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (البندر) بالباب، يرجى استلام الطلب/الأموال 🛵"); window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank'); }
+      function notifyArriveWhatsApp() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); let formattedPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone; let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (البندر) بالباب، يرجى استلام الطلب/الأموال 🛵"); window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank'); }
       function notifyArriveCall() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); window.location.href = `tel:${phone}`; }
       
       let appMap = null;
@@ -1392,280 +1481,11 @@
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
       function confirmMapLocation() {
           const center = appMap.getCenter();
-          document.getElementById('tukDropoffLink').value = `https://maps.google.com/?q=$${center.lat},${center.lng}`;
+          const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng}`;
+          document.getElementById('tukDropoffLink').value = googleMapsLink;
           document.getElementById('map-success-msg').style.display = 'block';
           closeMapModal();
       }
-
-      /* =========================================
-         دوال السوق المفتوح (الجديدة كلياً والاحترافية)
-      ========================================= */
-      
-      let allMarketAds = []; // مصفوفة لحفظ الإعلانات للبحث
-
-      async function openMarketCategory(category) {
-          // تغيير لون الزر الفعال
-          document.querySelectorAll('.market-cat-item').forEach(el => el.classList.remove('active'));
-          const btn = document.getElementById('cat-' + category);
-          if(btn) btn.classList.add('active');
-
-          const area = document.getElementById('marketOffersArea');
-          if(!area) return;
-          area.innerHTML = '<div style="padding: 30px;"><span class="baly-spinner" style="border-top-color: var(--primary); width: 40px; height: 40px;"></span><p class="no-offers-text" style="margin-top:15px;">جاري جلب الإعلانات...</p></div>';
-          
-          try {
-              const response = await fetch(`${GS_URL}?action=getMarketAds&category=${encodeURIComponent(category)}`);
-              allMarketAds = await response.json(); 
-              
-              renderMarketAds(allMarketAds, area, category);
-          } catch (e) {
-              area.innerHTML = `<div style="padding: 30px;"><i class="fas fa-exclamation-triangle" style="font-size: 50px; color: var(--danger);"></i><p class="no-offers-text">حدث خطأ في التحميل.</p></div>`;
-          }
-      }
-
-      function renderMarketAds(adsArray, containerElement, categoryName) {
-          if (!containerElement) return;
-          if (adsArray.length === 0) {
-              containerElement.innerHTML = `<div style="padding:40px 10px;"><i class="fas fa-box-open" style="font-size: 50px; color: var(--border-color);"></i><p class="no-offers-text">عذراً، لا توجد إعلانات هنا حالياً.</p></div>`;
-              return;
-          }
-
-          let adsHTML = `<h3 style="text-align: right; margin-bottom: 15px; color: var(--primary); font-size:16px;">إعلانات (${categoryName || 'نتائج البحث'})</h3>`;
-          adsHTML += '<div style="display: flex; flex-direction: column; gap: 15px;">';
-          
-          adsArray.forEach(ad => {
-              adsHTML += `
-              <div class="form-card" style="text-align: right; padding: 15px; border: 1px solid var(--border-color); border-right: 4px solid #3B82F6;">
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                      <h4 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--text-main);">${ad.title}</h4>
-                      <span style="background: rgba(59, 130, 246, 0.1); color: #3B82F6; padding: 3px 8px; border-radius: var(--radius-pill); font-size: 11px; font-weight: bold;">${ad.condition}</span>
-                  </div>
-                  <p style="margin: 0 0 10px 0; font-size: 18px; font-weight: 800; color: #10B981;">${ad.price} <span style="font-size: 12px; color: var(--text-muted);">د.ع</span></p>
-                  
-                  ${ad.image ? `<img src="${ad.image}" class="ad-card-img" onclick="window.open('${ad.image}', '_blank')">` : ''}
-                  
-                  ${ad.desc ? `<p style="margin: 0 0 15px 0; font-size: 13px; color: var(--text-muted); line-height: 1.5; white-space: pre-wrap;">${ad.desc}</p>` : ''}
-                  
-                  <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 10px;">
-                      <span style="font-size: 11px; color: var(--text-muted);"><i class="fas fa-clock"></i> ${ad.date ? ad.date.split(',')[0] : ''}</span>
-                      <button class="location-btn success ripple" style="width: auto; padding: 6px 15px; margin: 0; background: #25D366; color: white; border: none; font-size: 13px;" onclick="window.open('https://wa.me/964${ad.phone.substring(1)}', '_blank')">
-                          <i class="fab fa-whatsapp"></i> مراسلة
-                      </button>
-                  </div>
-              </div>`;
-          });
-          
-          adsHTML += '</div>';
-          containerElement.innerHTML = adsHTML;
-      }
-
-      function searchMarketAds(query) {
-          if(!query || !query.trim()) {
-              let catName = 'الكل';
-              let activeEl = document.querySelector('.market-cat-item.active .market-cat-title');
-              if(activeEl) catName = activeEl.innerText;
-              renderMarketAds(allMarketAds, document.getElementById('marketOffersArea'), catName);
-              return;
-          }
-          
-          const lowerQuery = query.toLowerCase();
-          const filteredAds = allMarketAds.filter(ad => {
-              let titleMatch = ad.title && ad.title.toLowerCase().indexOf(lowerQuery) !== -1;
-              let descMatch = ad.desc && ad.desc.toLowerCase().indexOf(lowerQuery) !== -1;
-              return titleMatch || descMatch;
-          });
-          
-          renderMarketAds(filteredAds, document.getElementById('marketOffersArea'), 'نتائج البحث');
-      }
-
-      function previewMarketImage() {
-          const fileEl = document.getElementById('marketAdImages');
-          if(!fileEl || !fileEl.files[0]) return clearMarketImages();
-          const file = fileEl.files[0];
-          
-          const reader = new FileReader();
-          reader.onload = function(e) {
-              const img = new Image();
-              img.onload = function() {
-                  const canvas = document.createElement('canvas');
-                  const ctx = canvas.getContext('2d');
-                  const MAX_WIDTH = 500;
-                  const scaleSize = MAX_WIDTH / img.width;
-                  canvas.width = MAX_WIDTH;
-                  canvas.height = img.height * scaleSize;
-                  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                  
-                  const base64 = canvas.toDataURL('image/jpeg', 0.6); 
-                  let b64El = document.getElementById('marketAdBase64');
-                  if(b64El) b64El.value = base64;
-                  
-                  let prevEl = document.getElementById('market-image-preview-container');
-                  if(prevEl) {
-                      prevEl.innerHTML = `
-                          <img src="${base64}" style="width:100px; height:100px; border-radius:10px; object-fit:cover; border:1px solid var(--border-color);">
-                          <div style="color:var(--danger); font-size:13px; font-weight:bold; cursor:pointer; padding:5px; display:inline-block; vertical-align:top;" onclick="clearMarketImages()"><i class="fas fa-trash-alt"></i> مسح</div>
-                      `;
-                  }
-              }
-              img.src = e.target.result;
-          }
-          reader.readAsDataURL(file);
-      }
-      
-      function clearMarketImages() { 
-          let imgInp = document.getElementById('marketAdImages'); if(imgInp) imgInp.value = ''; 
-          let base64Inp = document.getElementById('marketAdBase64'); if(base64Inp) base64Inp.value = ''; 
-          let prevCont = document.getElementById('market-image-preview-container'); if(prevCont) prevCont.innerHTML = ''; 
-      }
-
-      async function submitMarketAd() {
-          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
-          
-          const adId = document.getElementById('editAdId') ? document.getElementById('editAdId').value : '';
-          const oldCategory = document.getElementById('editAdOldCategory') ? document.getElementById('editAdOldCategory').value : '';
-          
-          const title = document.getElementById('marketAdTitle').value.trim(); 
-          const category = document.getElementById('marketAdCategory').value;
-          const price = document.getElementById('marketAdPrice').value.trim();
-          const condition = document.getElementById('marketAdCondition').value;
-          const phone = document.getElementById('marketAdPhone').value.trim();
-          const desc = document.getElementById('marketAdDesc').value.trim(); 
-          const imageBase64 = document.getElementById('marketAdBase64') ? document.getElementById('marketAdBase64').value : ''; 
-          
-          if(!title || !category || !price || !validateIraqiPhone(phone)) {
-              return showToast("أكمل البيانات الأساسية ورقم الموبايل بشكل صحيح 📝");
-          }
-
-          const btn = document.getElementById('submitAdBtn'); 
-          const originalText = btn.innerHTML; 
-          btn.innerHTML = '<span class="baly-spinner"></span>'; 
-          btn.disabled = true;
-          
-          try {
-              const payload = {
-                  action: adId ? 'editMarketAd' : 'saveMarketAd',
-                  id: adId || new Date().getTime().toString(),
-                  oldCategory: oldCategory,
-                  title: title, category: category, price: price, condition: condition, phone: phone, desc: desc,
-                  image: imageBase64
-              };
-
-              await fetch(GS_URL, { method: 'POST', body: JSON.stringify(payload) });
-              showToast(adId ? "تم تعديل الإعلان بنجاح! ✅" : "تم نشر إعلانك بنجاح! ✅"); 
-              
-              if(document.getElementById('editAdId')) document.getElementById('editAdId').value = "";
-              if(document.getElementById('editAdOldCategory')) document.getElementById('editAdOldCategory').value = "";
-              document.getElementById('marketAdTitle').value = "";
-              document.getElementById('marketAdPrice').value = "";
-              document.getElementById('marketAdDesc').value = "";
-              clearMarketImages();
-              
-              if(adId) {
-                  openMyAds(); 
-              } else {
-                  showScreen('market-screen');
-                  openMarketCategory(category); 
-              }
-          } catch (e) {
-              showToast("حدث خطأ أثناء الاتصال بالسيرفر ⚠️");
-          } finally { 
-              btn.innerHTML = originalText; 
-              btn.disabled = false; 
-          }
-      }
-
-      async function openMyAds() {
-          showScreen('my-ads-screen');
-          const area = document.getElementById('myAdsArea');
-          const myPhone = localStorage.getItem('saved_customer_phone');
-          
-          if(!myPhone) {
-              area.innerHTML = `<div style="padding:40px 10px;"><i class="fas fa-user-lock" style="font-size: 50px; color: var(--border-color);"></i><p class="no-offers-text">سجل رقمك أولاً لترى منشوراتك.</p></div>`;
-              return;
-          }
-
-          area.innerHTML = '<div style="padding: 30px;"><span class="baly-spinner" style="border-top-color: var(--primary); width: 40px; height: 40px;"></span><p class="no-offers-text" style="margin-top:15px;">جاري جلب إعلاناتك...</p></div>';
-          
-          try {
-              const response = await fetch(`${GS_URL}?action=getMarketAds&category=الكل`);
-              const allAds = await response.json();
-              const myAds = allAds.filter(ad => ad.phone === myPhone);
-              
-              if (myAds.length === 0) {
-                  area.innerHTML = `<div style="padding:40px 10px;"><i class="fas fa-folder-open" style="font-size: 50px; color: var(--border-color);"></i><p class="no-offers-text">لم تقم بنشر أي إعلان بعد.</p></div>`;
-                  return;
-              }
-
-              let adsHTML = '<div style="display: flex; flex-direction: column; gap: 15px; padding: 20px;">';
-              myAds.forEach(ad => {
-                  const safeAd = encodeURIComponent(JSON.stringify(ad));
-                  adsHTML += `
-                  <div class="form-card" style="text-align: right; padding: 15px; border: 1px solid var(--border-color);">
-                      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                          <h4 style="margin: 0; font-size: 16px; font-weight: 800;">${ad.title}</h4>
-                          <span style="color: var(--text-muted); font-size: 11px;">${ad.category}</span>
-                      </div>
-                      <p style="margin: 0 0 10px 0; font-size: 18px; font-weight: 800; color: #10B981;">${ad.price} <span style="font-size: 12px; color: var(--text-muted);">د.ع</span></p>
-                      ${ad.image ? `<img src="${ad.image}" class="ad-card-img">` : ''}
-                      
-                      <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 10px;">
-                          <button class="action-btn delete ripple" onclick="deleteMarketAd('${ad.id}', '${ad.category}')"><i class="fas fa-trash"></i> حذف</button>
-                          <button class="action-btn edit ripple" onclick="editMarketAd('${safeAd}')"><i class="fas fa-edit"></i> تعديل</button>
-                      </div>
-                  </div>`;
-              });
-              adsHTML += '</div>';
-              area.innerHTML = adsHTML;
-              
-          } catch (e) {
-              area.innerHTML = `<div style="padding: 30px;"><i class="fas fa-exclamation-triangle" style="font-size: 50px; color: var(--danger);"></i><p class="no-offers-text">حدث خطأ.</p></div>`;
-          }
-      }
-
-      function editMarketAd(encodedAd) {
-          const ad = JSON.parse(decodeURIComponent(encodedAd));
-          showScreen('market-add-screen');
-          
-          let titleText = document.getElementById('market-add-title-text');
-          if(titleText) titleText.innerHTML = '<i class="fas fa-edit" style="color:#3B82F6;"></i> تعديل الإعلان';
-          
-          let btnText = document.getElementById('submitAdBtnText');
-          if(btnText) btnText.innerText = "حفظ التعديلات";
-          
-          let editId = document.getElementById('editAdId'); if(editId) editId.value = ad.id;
-          let editCat = document.getElementById('editAdOldCategory'); if(editCat) editCat.value = ad.category;
-          let adTitle = document.getElementById('marketAdTitle'); if(adTitle) adTitle.value = ad.title;
-          let adCat = document.getElementById('marketAdCategory'); if(adCat) adCat.value = ad.category;
-          let adPrice = document.getElementById('marketAdPrice'); if(adPrice) adPrice.value = ad.price;
-          let adCond = document.getElementById('marketAdCondition'); if(adCond) adCond.value = ad.condition;
-          let adDesc = document.getElementById('marketAdDesc'); if(adDesc) adDesc.value = ad.desc || "";
-          
-          if(ad.image) {
-              let b64 = document.getElementById('marketAdBase64'); if(b64) b64.value = ad.image;
-              let prev = document.getElementById('market-image-preview-container');
-              if(prev) {
-                  prev.innerHTML = `
-                      <img src="${ad.image}" style="width:100px; height:100px; border-radius:10px; object-fit:cover; border:1px solid var(--border-color);">
-                      <div style="color:var(--danger); font-size:13px; font-weight:bold; cursor:pointer; padding:5px; display:inline-block; vertical-align:top;" onclick="clearMarketImages()"><i class="fas fa-trash-alt"></i> مسح الصورة</div>
-                  `;
-              }
-          } else {
-              clearMarketImages();
-          }
-      }
-
-      async function deleteMarketAd(id, category) {
-          if(!confirm("هل أنت متأكد من حذف هذا الإعلان نهائياً؟")) return;
-          showToast("جاري الحذف...");
-          try {
-              const payload = { action: 'deleteMarketAd', id: id, category: category };
-              await fetch(GS_URL, { method: 'POST', body: JSON.stringify(payload) });
-              showToast("تم حذف الإعلان بنجاح! 🗑️");
-              openMyAds(); 
-          } catch(e) {
-              showToast("فشل الحذف، تأكد من الإنترنت.");
-          }
-      }
     </script>
 </body>
-</html>
+    </html>
