@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -220,8 +219,8 @@
       
       .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(90, 34, 139, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
       .location-notice { font-size: 13px; font-weight: 700; color: #10B981; text-align: center; margin-bottom: 15px; display: block; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: var(--radius-md); border: 1px dashed #10B981;}
-    </style>
-</head>
+                        </style>
+                        </head>
 <body>
     <div id="map-modal">
         <div class="map-container">
@@ -332,6 +331,7 @@
       <div class="road-realistic"><div class="road-lines"></div></div>
       <div class="bike-box"><i class="fas fa-motorcycle"></i><div class="exhaust"><div class="smoke"></div><div class="smoke"></div><div class="smoke"></div></div></div>
     </div>
+    
     <div id="login-screen" class="screen container">
         <div style="text-align: center; margin-bottom: 30px;">
             <div style="width:100px; height:100px; background:rgba(90, 34, 139, 0.1); border-radius:30px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: var(--shadow-sm);">
@@ -394,6 +394,7 @@
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
+
     <div id="home-screen" class="screen container">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
@@ -461,7 +462,7 @@
           </div>
       </div>
     </div>
-    <div id="tuk-screen" class="screen container">
+        <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
         <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
@@ -518,8 +519,9 @@
         <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
         
         <div class="price-indicator" style="display: block;">
-            <span>سعر خدمة الوسيط لكافة مناطق أم قصر:</span>
-            <span class="amount">2,500 د.ع</span>
+            <span>أسعار خدمة الوسيط:</span>
+            <span class="amount" style="font-size: 20px;">داخل أم قصر: 1,500 د.ع</span>
+            <span class="amount" style="font-size: 20px;">خارج أم قصر (الميناء أو الهدامة): 2,500 د.ع</span>
             <small style="color: var(--secondary); font-weight: bold;"><i class="fas fa-bolt"></i> نوصل أغراضك بسرعة وأمان</small>
         </div>
         
@@ -571,8 +573,9 @@
         </div>
 
         <div class="price-indicator" style="display: block;">
-            <span>سعر التوصيل لكافة مناطق أم قصر:</span>
-            <span class="amount">2,500 د.ع</span>
+            <span>أسعار التوصيل:</span>
+            <span class="amount" style="font-size: 20px;">داخل أم قصر: 1,500 د.ع</span>
+            <span class="amount" style="font-size: 20px;">خارج أم قصر (الميناء أو الهدامة): 2,500 د.ع</span>
             <small style="color: var(--secondary); font-weight: bold;"><i class="fas fa-motorcycle"></i> خدمة توصيل سريعة ومضمونة</small>
         </div>
 
@@ -618,6 +621,7 @@
 
         <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
+    
     <div id="join-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> انضم ككابتن</h2>
@@ -663,9 +667,17 @@
             <button class="resign-btn ripple-dark" onclick="cancelJoinRequest()" style="margin-top:15px;">إلغاء الطلب</button>
         </div>
     </div>
+    
     <div id="plaza-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-briefcase" style="color:#8B5CF6;"></i> لوحة الكابتن</h2>
+
+        <div class="price-indicator" style="display: block; margin-bottom: 20px;">
+            <span>أجور التوصيل المعتمدة:</span>
+            <span class="amount" style="font-size: 20px;">داخل أم قصر: 1,500 د.ع</span>
+            <span class="amount" style="font-size: 20px;">خارج أم قصر (الميناء أو الهدامة): 2,500 د.ع</span>
+            <small style="color: var(--danger); font-weight: bold; display: block; margin-top: 10px; font-size: 14px;">لصاحب التطبيق 500 دينار على كل طلب</small>
+        </div>
 
         <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 14px; font-weight: 800; margin-bottom: 20px;">
             <i class="fas fa-exclamation-circle" style="font-size: 20px;"></i> 
@@ -748,7 +760,6 @@
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
     </div>
-    
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
@@ -1488,4 +1499,4 @@
       }
     </script>
 </body>
-                    </html>
+</html>
