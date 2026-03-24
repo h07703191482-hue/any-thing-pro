@@ -812,8 +812,8 @@
                 <p style="color:var(--text-muted); font-weight:bold; margin:0;"><i class="fas fa-box-open"></i> لا توجد طلبات في عهدتك حالياً</p>
             </div>
         </div>
-                                            </div>
-                                                <script>
+    </div>
+        <script>
       // ==========================================
       // سكربتات الحماية لمنع أدوات المطورين والسرقة
       // ==========================================
@@ -1449,4 +1449,26 @@
                       ${order.photoUrl ? `<img src="${order.photoUrl}" class="order-img-preview" style="display:block;">` : ''}
                       <div style="display:flex; gap:10px; margin-top:15px;">
                           <button class="location-btn success ripple" style="flex:1; margin:0; padding:10px;" onclick="window.location.href='tel:${safePhone}'"><i class="fas fa-phone"></i> اتصال</button>
-   
+                          <button class="location-btn success ripple" style="flex:1; margin:0; padding:10px; background:#25D366; color:white; border:none;" onclick="window.open('https://wa.me/${waPhone}', '_blank')"><i class="fab fa-whatsapp"></i> واتساب</button>
+                      </div>
+                  </div>
+              `}).join('');
+          } catch(e) { container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--danger); font-weight:bold; margin:0;">حدث خطأ أثناء جلب طلباتك.</p></div>'; }
+      }
+
+      async function claimOrderInApp(vc, customerName, btnElement) {
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          const myName = localStorage.getItem('driver_name'); const myPhone = localStorage.getItem('driver_phone');
+          const oldText = btnElement.innerHTML; btnElement.innerHTML = '<span class="baly-spinner" style="border-top-color:#000; width:18px; height:18px;"></span>'; btnElement.disabled = true;
+          try {
+              const response = await fetch(`${GS_URL}?action=claimLiveOrder&code=${vc}&driverName=${encodeURIComponent(myName)}&driverPhone=${myPhone}`);
+              const result = await response.text();
+              if(result.includes("success")) {
+                  showToast("تم حجز الطلب بنجاح! ✅");
+                  const msg = `✅ تم حجز الطلب\nالزبون: ${customerName}\nالكود: ${vc}\nالمندوب: ${myName}\n📞 هاتف المندوب: ${myPhone}`;
+                  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg }) });
+                  showScreen('my-orders-screen');
+              } else { showToast("عذراً، الطلب انحجز من قبل مندوب ثاني ⚠️"); fetchGeneralOrders(); }
+          } catch(e) { showToast("حدث خطأ بالاتصال ❌"); btnElement.innerHTML = oldText; btnElement.disabled = false; }
+      }
+        </script>
