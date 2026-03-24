@@ -225,8 +225,20 @@
       
       .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(90, 34, 139, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
       .location-notice { font-size: 13px; font-weight: 700; color: #10B981; text-align: center; margin-bottom: 15px; display: block; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: var(--radius-md); border: 1px dashed #10B981;}
+      
+      /* إضافات قسم الطلبات للمناديب */
+      .plaza-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+      .plaza-tab { flex: 1; padding: 12px; text-align: center; background: var(--surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-weight: 800; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
+      .plaza-tab.active { background: var(--primary); color: white; border-color: var(--primary); }
+      .orders-container { display: none; flex-direction: column; gap: 15px; }
+      .orders-container.active { display: flex; }
+      .order-card { background: var(--surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 15px; box-shadow: var(--shadow-sm); text-align: right; }
+      .order-card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
+      .order-badge { background: rgba(16, 185, 129, 0.1); color: #10B981; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 800; }
+      .book-btn { background: var(--secondary); color: #000; border: none; padding: 10px; width: 100%; border-radius: var(--radius-md); font-weight: 800; cursor: pointer; margin-top: 10px; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px;}
+      .book-btn:active { transform: scale(0.96); }
     </style>
-</head>
+</head></head>
 <body oncontextmenu="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;">
     <div id="map-modal">
         <div class="map-container">
@@ -672,7 +684,6 @@
             <button class="resign-btn ripple-dark" onclick="cancelJoinRequest()" style="margin-top:15px;">إلغاء الطلب</button>
         </div>
     </div>
-    
     <div id="plaza-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-briefcase" style="color:#8B5CF6;"></i> لوحة الكابتن</h2>
@@ -709,6 +720,22 @@
             <div style="display:none;"><span id="stat-driver">0</span><span id="stat-admin">0</span></div>
         </div>
 
+        <div class="plaza-tabs">
+            <div class="plaza-tab active" id="tab-general" onclick="switchPlazaTab('general')">الطلبات العامة</div>
+            <div class="plaza-tab" id="tab-my" onclick="switchPlazaTab('my')">طلباتك</div>
+        </div>
+
+        <div id="general-orders-container" class="orders-container active">
+            <div class="form-card" style="text-align:center; padding: 20px;">
+                <p style="color:var(--text-muted); font-weight:bold; margin:0;"><i class="fas fa-spinner fa-spin"></i> جاري جلب الطلبات...</p>
+            </div>
+        </div>
+
+        <div id="my-orders-container" class="orders-container">
+            <div class="form-card" style="text-align:center; padding: 20px;">
+                <p style="color:var(--text-muted); font-weight:bold; margin:0;"><i class="fas fa-box-open"></i> لا توجد طلبات في عهدتك حالياً</p>
+            </div>
+        </div>
         <div class="form-card">
             <div class="form-card-title"><i class="fas fa-map-marker-alt"></i> إشعار وصول للزبون</div>
             <div class="form-group">
@@ -864,6 +891,11 @@
                       newOrderAudio.play().catch(e=>{});
                       showToast("🔔 طلب جديد نزل بالساحة!");
                       if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                      
+                      // تحديث الطلبات العامة عند سماع طلب جديد
+                      if(document.getElementById('plaza-screen').classList.contains('active-screen')) {
+                          fetchGeneralOrders();
+                      }
                   }
                   lastOrderCount = currentCount;
               }
@@ -875,6 +907,7 @@
           checkNewOrdersForSound(); 
           orderPollInterval = setInterval(checkNewOrdersForSound, 10000); 
       }
+      
       function initAutoLocation() {
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
@@ -1279,7 +1312,14 @@
           const bottomNav = document.getElementById('bottomNavigation');
           if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel') ? 'none' : 'flex';
           
-          if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
+          if(id === 'plaza-screen') { 
+              updateStatsUI(); 
+              refreshLeaderboard(); 
+              document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); 
+              // تم إضافة التحديث التلقائي للطلبات العامة وطلباتك هنا
+              fetchGeneralOrders(); 
+              fetchMyOrders(); 
+          }
           if(id === 'log-screen') { renderDriverLog(); } 
           if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') { loadSavedCustomerData(); }
           if(id === 'order-screen') updateLoyaltyUI();
@@ -1527,6 +1567,137 @@
           document.getElementById('tukDropoffLink').value = googleMapsLink;
           document.getElementById('map-success-msg').style.display = 'block';
           closeMapModal();
+      }
+
+      // ==========================================
+      // الإضافات البرمجية الجديدة لنظام المناديب (الطلبات العامة وطلباتك)
+      // ==========================================
+
+      function switchPlazaTab(tab) {
+          document.getElementById('tab-general').classList.remove('active');
+          document.getElementById('tab-my').classList.remove('active');
+          document.getElementById('general-orders-container').classList.remove('active');
+          document.getElementById('my-orders-container').classList.remove('active');
+
+          if(tab === 'general') {
+              document.getElementById('tab-general').classList.add('active');
+              document.getElementById('general-orders-container').classList.add('active');
+              fetchGeneralOrders();
+          } else {
+              document.getElementById('tab-my').classList.add('active');
+              document.getElementById('my-orders-container').classList.add('active');
+              fetchMyOrders();
+          }
+      }
+
+      async function fetchGeneralOrders() {
+          const container = document.getElementById('general-orders-container');
+          if (!navigator.onLine) {
+              container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--danger); font-weight:bold; margin:0;">لا يوجد إنترنت ❌</p></div>';
+              return;
+          }
+          container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--text-muted); font-weight:bold; margin:0;"><i class="fas fa-spinner fa-spin"></i> جاري تحديث الطلبات...</p></div>';
+          try {
+              // الدالة هاي تجيب الطلبات المفتوحة من السيرفر (تحتاج تضيف getLiveOrders بسكربت جوجل)
+              const response = await fetch(`${GS_URL}?action=getLiveOrders`);
+              const ordersStr = await response.text();
+              let orders = [];
+              try { orders = JSON.parse(ordersStr); } catch(e) { orders = []; }
+              
+              if(orders.length === 0) {
+                  container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--text-muted); font-weight:bold; margin:0;"><i class="fas fa-check-circle" style="color:#10B981; font-size:24px; margin-bottom:10px; display:block;"></i>الساحة نظيفة، لا توجد طلبات جديدة.</p></div>';
+                  return;
+              }
+
+              container.innerHTML = orders.map(order => `
+                  <div class="order-card" id="live-order-${order.vc}">
+                      <div class="order-card-header">
+                          <span class="order-badge">${order.type || 'طلب توصيل'}</span>
+                          <span style="font-size:12px; color:var(--text-muted);">${order.time || 'الآن'}</span>
+                      </div>
+                      <div style="font-size:14px; margin-bottom:5px;"><i class="fas fa-user" style="color:var(--primary); width:20px;"></i> <strong>${order.customerName}</strong></div>
+                      <div style="font-size:14px; margin-bottom:5px;"><i class="fas fa-map-marker-alt" style="color:var(--danger); width:20px;"></i> الدالة: <strong>${order.landmark || 'غير محدد'}</strong></div>
+                      <div style="font-size:14px; margin-bottom:10px; background:var(--bg-color); padding:8px; border-radius:8px;">${order.details}</div>
+                      <button class="book-btn ripple" onclick="claimOrderInApp('${order.vc}', '${order.customerName}', this)"><i class="fas fa-hand-paper"></i> حجز الطلب</button>
+                  </div>
+              `).join('');
+          } catch(e) {
+              container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--danger); font-weight:bold; margin:0;">حدث خطأ أثناء جلب الطلبات.</p></div>';
+          }
+      }
+
+      async function fetchMyOrders() {
+          const container = document.getElementById('my-orders-container');
+          const myPhone = localStorage.getItem('driver_phone');
+          if (!navigator.onLine) return;
+          container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--text-muted); font-weight:bold; margin:0;"><i class="fas fa-spinner fa-spin"></i> جاري تحديث طلباتك...</p></div>';
+          try {
+              // الدالة هاي تجيب الطلبات المحجوزة باسم المندوب (تحتاج تضيف getMyOrders بسكربت جوجل)
+              const response = await fetch(`${GS_URL}?action=getMyOrders&driverPhone=${myPhone}`);
+              const ordersStr = await response.text();
+              let orders = [];
+              try { orders = JSON.parse(ordersStr); } catch(e) { orders = []; }
+              
+              if(orders.length === 0) {
+                  container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--text-muted); font-weight:bold; margin:0;"><i class="fas fa-box-open" style="font-size:24px; margin-bottom:10px; display:block;"></i>لا توجد طلبات في عهدتك حالياً.</p></div>';
+                  return;
+              }
+
+              container.innerHTML = orders.map(order => `
+                  <div class="order-card" style="border-right: 4px solid var(--secondary);">
+                      <div class="order-card-header">
+                          <span class="order-badge" style="background:rgba(245, 158, 11, 0.1); color:#F59E0B;">قيد التوصيل 🛵</span>
+                      </div>
+                      <div style="font-size:14px; margin-bottom:5px;"><i class="fas fa-user" style="color:var(--primary); width:20px;"></i> <strong>${order.customerName}</strong></div>
+                      <div style="font-size:14px; margin-bottom:5px;"><i class="fas fa-phone" style="color:var(--text-muted); width:20px;"></i> <strong>${order.customerPhone}</strong></div>
+                      <div style="font-size:14px; margin-bottom:10px; background:var(--bg-color); padding:8px; border-radius:8px;">${order.details}</div>
+                      <div style="display:flex; gap:10px;">
+                          <button class="location-btn success ripple" style="flex:1; margin:0; padding:10px;" onclick="window.location.href='tel:${order.customerPhone}'"><i class="fas fa-phone"></i> اتصال</button>
+                      </div>
+                  </div>
+              `).join('');
+          } catch(e) {
+              container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--danger); font-weight:bold; margin:0;">حدث خطأ أثناء جلب طلباتك.</p></div>';
+          }
+      }
+
+      async function claimOrderInApp(vc, customerName, btnElement) {
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          const myName = localStorage.getItem('driver_name');
+          const myPhone = localStorage.getItem('driver_phone');
+          
+          const oldText = btnElement.innerHTML;
+          btnElement.innerHTML = '<span class="baly-spinner" style="border-top-color:#000; width:18px; height:18px;"></span>';
+          btnElement.disabled = true;
+
+          try {
+              // إرسال طلب الحجز للسيرفر وتغيير حالة الطلب
+              const response = await fetch(`${GS_URL}?action=claimLiveOrder&code=${vc}&driverName=${encodeURIComponent(myName)}&driverPhone=${myPhone}`);
+              const result = await response.text();
+              
+              if(result.includes("success")) {
+                  showToast("تم حجز الطلب بنجاح! انتقل لخانة 'طلباتك' ✅");
+                  
+                  // إرسال إشعار للقناة مثل النظام القديم لتأكيد الحجز (هذا راح يروح كرسالة بالقناة)
+                  const msg = `✅ تم حجز الطلب\nالزبون: ${customerName}\nالكود: ${vc}\nالمندوب: ${myName}\n📞 هاتف المندوب: ${myPhone}`;
+                  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                      method: "POST", headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg })
+                  });
+
+                  // تحديث القوائم
+                  fetchGeneralOrders();
+                  // تحويل المندوب لخانة طلباتك مباشرة
+                  switchPlazaTab('my');
+              } else {
+                  showToast("عذراً، الطلب انحجز من قبل مندوب ثاني ⚠️");
+                  fetchGeneralOrders(); // تحديث القائمة
+              }
+          } catch(e) {
+              showToast("حدث خطأ بالاتصال ❌");
+              btnElement.innerHTML = oldText;
+              btnElement.disabled = false;
+          }
       }
     </script>
 </body>
