@@ -237,7 +237,8 @@
       .book-btn { background: var(--secondary); color: #000; border: none; padding: 12px; width: 100%; border-radius: var(--radius-md); font-weight: 800; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px;}
       .book-btn:active { transform: scale(0.96); }
     </style>
-</head></head>
+</head>
+</head>
 <body oncontextmenu="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;">
     <div id="map-modal">
         <div class="map-container">
@@ -540,7 +541,8 @@
         </div>
 
         <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">طلب تكتك توصيلة</span></button>
-    </div>    <div id="mediator-screen" class="screen container">
+    </div>
+    <div id="mediator-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> <span id="med-head">خدمة الوسيط</span></h2>
         <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
@@ -999,7 +1001,8 @@
               if(!localStorage.getItem('saved_customer_phone')) showScreen('login-screen');
               else { loadSavedCustomerData(); syncLoyaltyWithServer(); showScreen('home-screen'); }
           }
-      }      document.addEventListener('DOMContentLoaded', () => {
+      }
+      document.addEventListener('DOMContentLoaded', () => {
           checkStatus();
           initAutoLocation(); 
           setTimeout(() => {
