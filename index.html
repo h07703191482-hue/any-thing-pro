@@ -111,7 +111,7 @@
       .lock-icon { font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: scaleIn 0.5s ease; cursor: pointer; }
       .lock-title, .offline-title { font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
       .lock-text, .offline-text { font-size: 16px; font-weight: 600; color: var(--text-muted); line-height: 1.6; }
-      .offline-btn-primary { background: var(--primary); color: white; width: 100%; padding: 18px; border-radius: var(--radius-md); border: none; font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 15px; transition: 0.3s; }
+      .offline-btn-primary { background: var(--primary); color: white; width: 100%; padding: 18px; border-radius: var(--radius-md); border: none; font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: margin-bottom: 15px; transition: 0.3s; }
       .offline-btn-primary:active { transform: scale(0.96); background: var(--primary-hover); }
       .offline-btn-outline { background: transparent; color: var(--primary); width: 100%; padding: 18px; border-radius: var(--radius-md); border: 2px solid var(--primary); font-family: 'Cairo'; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; }
       
@@ -237,7 +237,8 @@
       .book-btn { background: var(--secondary); color: #000; border: none; padding: 12px; width: 100%; border-radius: var(--radius-md); font-weight: 800; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px;}
       .book-btn:active { transform: scale(0.96); }
     </style>
-</head></head>
+</head>
+</head>
 <body oncontextmenu="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;">
     <div id="map-modal">
         <div class="map-container">
@@ -489,7 +490,8 @@
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
       </div>
-    </div>    <div id="tuk-screen" class="screen container">
+                </div>
+                    <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
         <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
@@ -773,11 +775,6 @@
             <small style="display: block; text-align: center; margin-top: 15px; color: var(--text-muted); font-weight:600;">المنافسة مستمرة🏆</small>
         </div>
 
-        <a href="tg://resolve?domain=uumqaser" class="select-card ripple-dark" style="background: #0088cc; color: white; border:none; padding:15px; text-decoration: none; display: flex;">
-            <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color:white; width:50px; height:50px;"><i class="fab fa-telegram-plane" style="font-size:22px;"></i></div>
-            <div class="card-text"><h3 style="margin:0; font-size:16px;">قناة العمل الرسمية</h3><small style="color:rgba(255,255,255,0.8);">انضم لتلقي الإشعارات والعمليات</small></div>
-        </a>
-
         <p id="driver-display-name" style="text-align: center; font-weight: 700; color: var(--text-muted); margin-top:30px;"></p>
         <button class="resign-btn ripple-dark" onclick="resignDriver()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج / استقالة</button>
     </div>
@@ -893,10 +890,11 @@
 
       function startOrderPolling() { if(orderPollInterval) clearInterval(orderPollInterval); checkNewOrdersForSound(); orderPollInterval = setInterval(checkNewOrdersForSound, 10000); }
 
+      // تم تصليح رابط الخريطة هنا
       function initAutoLocation() {
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
-                  (position) => { userCoords = `https://maps.google.com/?q=$${position.coords.latitude},${position.coords.longitude}`; },
+                  (position) => { userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`; },
                   (error) => { console.warn("GPS Denied on load"); }, { enableHighAccuracy: true }
               );
           }
@@ -947,7 +945,6 @@
           }
       }
 
-      // التعديل الجذري هنا: حماية إخفاء الشاشة البنفسجية لضمان عمل التطبيق
       document.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => {
               const splash = document.getElementById('splash-screen');
@@ -957,12 +954,7 @@
               }
           }, 1500);
 
-          try {
-              checkStatus();
-              initAutoLocation(); 
-          } catch(err) {
-              console.error("تم تجاوز خطأ بسيط أثناء التشغيل:", err);
-          }
+          try { checkStatus(); initAutoLocation(); } catch(err) { console.error("Error during init:", err); }
       });
 
       async function setGlobalAppStatus(newStatus) {
@@ -1191,6 +1183,7 @@
           if(!userCoords) {
               showToast("جاري تحديد موقعك الحالي للطلب... 📍");
               if(navigator.geolocation) {
+                  // تم تصليح الرابط هنا
                   navigator.geolocation.getCurrentPosition((pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); }, (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true });
               } else { showToast("جهازك لا يدعم تحديد الموقع ❌"); } return;
           }
@@ -1211,6 +1204,7 @@
           if(!userCoords) {
               showToast("جاري تحديد موقعك الحالي للطلب... 📍");
               if(navigator.geolocation) {
+                  // تم تصليح الرابط هنا
                   navigator.geolocation.getCurrentPosition((pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); }, (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true });
               } return;
           }
@@ -1243,6 +1237,7 @@
           if(!userCoords) {
               showToast("جاري تحديد موقعك الحالي للطلب... 📍");
               if(navigator.geolocation) {
+                  // تم تصليح الرابط هنا
                   navigator.geolocation.getCurrentPosition((pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); }, (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true });
               } return;
           }
@@ -1384,6 +1379,8 @@
           setTimeout(() => { appMap.invalidateSize(); }, 300);
       }
       function closeMapModal() { let mapModal = document.getElementById('map-modal'); if(mapModal) mapModal.style.display = 'none'; }
+      
+      // تم تصليح رابط الخريطة هنا أيضاً
       function confirmMapLocation() {
           const center = appMap.getCenter();
           const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng}`;
@@ -1404,7 +1401,7 @@
                   <div class="order-msg-card" id="live-order-${order.vc}">
                       <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:8px;">
                           <span style="font-weight:800; color:var(--primary);">${order.type || '🔵 طلب مسواك'}</span>
-                          <span class="step-number" style="margin:0;">كود: ${order.vc}</span>
+                          <span class="step-number" style="margin:0; background:rgba(239, 68, 68, 0.1); color:var(--danger);">كود: مخفي 🔒</span>
                       </div>
                       <div class="order-msg-content">
                           👤 الزبون: ${order.customerName}
@@ -1458,17 +1455,50 @@
 
       async function claimOrderInApp(vc, customerName, btnElement) {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
-          const myName = localStorage.getItem('driver_name'); const myPhone = localStorage.getItem('driver_phone');
-          const oldText = btnElement.innerHTML; btnElement.innerHTML = '<span class="baly-spinner" style="border-top-color:#000; width:18px; height:18px;"></span>'; btnElement.disabled = true;
+          const myName = localStorage.getItem('driver_name');
+          const myPhone = localStorage.getItem('driver_phone');
+          
+          const oldText = btnElement.innerHTML;
+          btnElement.innerHTML = '<span class="baly-spinner" style="border-top-color:#000; width:18px; height:18px;"></span>';
+          btnElement.disabled = true;
+
           try {
+              // التعديل الثالث: فحص عدد الطلبات قبل لا ينطيه الموافقة (ما يصير يحجز أكثر من 2)
+              const checkResp = await fetch(`${GS_URL}?action=getMyOrders&driverPhone=${myPhone}`);
+              const myOrdersText = await checkResp.text();
+              let myOrdersArr = [];
+              try { myOrdersArr = JSON.parse(myOrdersText); } catch(e) {}
+              
+              if (myOrdersArr.length >= 2) {
+                  showToast("ما يصير تحجز أكثر من طلبين! دخل كود التسليم وراها كمل شغلك ⚠️");
+                  btnElement.innerHTML = oldText;
+                  btnElement.disabled = false;
+                  return;
+              }
+
               const response = await fetch(`${GS_URL}?action=claimLiveOrder&code=${vc}&driverName=${encodeURIComponent(myName)}&driverPhone=${myPhone}`);
               const result = await response.text();
+              
               if(result.includes("success")) {
                   showToast("تم حجز الطلب بنجاح! ✅");
+                  
                   const msg = `✅ تم حجز الطلب\nالزبون: ${customerName}\nالكود: ${vc}\nالمندوب: ${myName}\n📞 هاتف المندوب: ${myPhone}`;
-                  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg }) });
+                  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                      method: "POST", headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg })
+                  });
+
                   showScreen('my-orders-screen');
-              } else { showToast("عذراً، الطلب انحجز من قبل مندوب ثاني ⚠️"); fetchGeneralOrders(); }
-          } catch(e) { showToast("حدث خطأ بالاتصال ❌"); btnElement.innerHTML = oldText; btnElement.disabled = false; }
+              } else {
+                  showToast("عذراً، الطلب انحجز من قبل مندوب ثاني ⚠️");
+                  fetchGeneralOrders(); 
+              }
+          } catch(e) {
+              showToast("حدث خطأ بالاتصال ❌");
+              btnElement.innerHTML = oldText;
+              btnElement.disabled = false;
+          }
       }
-        </script>
+    </script>
+</body>
+</html>
