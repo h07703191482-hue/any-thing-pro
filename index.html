@@ -433,13 +433,17 @@
 
       <div class="square-slider-container">
           <div class="square-slide ripple" onclick="showScreen('restaurant-screen')">
-              <img src="1000017612.png" alt="مطعم البندر">
+              
+              <img src="1773676676632.png" alt="مطعم البندر" onerror="this.style.display='none'; document.getElementById('fallback-icon').style.display='block';">
+              
+              <div id="fallback-icon" style="display: none; font-size: 40px; position: absolute; top: 20px; z-index: 1; text-shadow: 0 2px 5px rgba(0,0,0,0.2);">🍔</div>
+              
               <div class="square-slide-overlay"></div>
               <div class="square-slide-content">
-                  <h3>مطعم البندر</h3>
+                  <h3 style="margin: 0; font-weight: 800; font-size: 13px; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.9);">مطعم البندر</h3>
               </div>
           </div>
-          </div>
+      </div>
       
       <div class="services-grid">
           <div class="select-card card-full card-cart ripple-dark" onclick="showScreen('order-screen')">
@@ -918,6 +922,9 @@
       let secretCounter = 0; let lockSecretCounter = 0; let appIsActive = true;
       let lastOrderCount = -1; let orderPollInterval = null; let isSoundEnabled = false;
       const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+      
+      // تعريف متغير الخريطة
+      let appMap = null;
 
       function copyText(text, successMsg) {
           navigator.clipboard.writeText(text).then(() => {
@@ -1397,111 +1404,3 @@
               let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0) + 1;
               let loyaltyMsg = (tempLoyalty % 10) === 0 ? "🎁 هذا الطلب مجاني" : `الطلب رقم ${tempLoyalty % 10} من أصل 10`;
               let msgContent = order ? order : "الطلب موضح في الصور المرفقة 📸";
-              let msgWithFile = msgContent + (fileIdToSave ? "||FILEID:" + fileIdToSave : "");
-              await fetch(`${GS_URL}?action=saveOrderCode&name=${encodeURIComponent(name)}&phone=${phone}&code=${vc}&referrer=${localStorage.getItem('referred_by') || ""}&type=🔵 طلب مسواك&details=${encodeURIComponent(msgWithFile)}&land=${encodeURIComponent(land)}&loyalty=${encodeURIComponent(loyaltyMsg)}&location=${encodeURIComponent(userCoords)}`); 
-              localStorage.removeItem('referred_by');
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${msgContent}\n🔢 تسلسل: ${loyaltyMsg}\n📍 الموقع: ${userCoords}`, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } }) });
-              showToast("تم إرسال طلبك بنجاح ✅"); document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = "";
-          } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
-      }
-
-      async function fetchGeneralOrders() {
-          const container = document.getElementById('general-orders-container'); if(!container || !navigator.onLine) return;
-          container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--text-muted); font-weight:bold; margin:0;"><i class="fas fa-spinner fa-spin"></i> جاري التحديث...</p></div>';
-          try {
-              const response = await fetch(`${GS_URL}?action=getLiveOrders`);
-              const orders = JSON.parse(await response.text());
-              if(orders.length === 0) { container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--text-muted); font-weight:bold; margin:0;">لا توجد طلبات</p></div>'; return; }
-              container.innerHTML = orders.map(order => `
-                  <div class="order-msg-card">
-                      <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:8px;">
-                          <span style="font-weight:800; color:var(--primary);">${order.type || '🔵 طلب مسواك'}</span>
-                          <span class="step-number" style="margin:0; background:rgba(239, 68, 68, 0.1); color:var(--danger);">كود: مخفي 🔒</span>
-                      </div>
-                      <div class="order-msg-content">
-                          👤 الزبون: <strong>${order.customerName}</strong><br>
-                          📞 الهاتف: ${order.customerPhone}<br>
-                          📝 الطلب: ${order.details.split("||FILEID:")[0]}
-                      </div>
-                      <button class="book-btn ripple" onclick="claimOrderInApp('${order.vc}', '${order.customerName}', this)"><i class="fas fa-hand-paper"></i> حجز الطلب</button>
-                  </div>
-              `).join('');
-          } catch(e) { container.innerHTML = '<p style="text-align:center; color:var(--danger);">خطأ في جلب البيانات</p>'; }
-      }
-
-      async function fetchMyOrders() {
-          const container = document.getElementById('my-orders-container'); if(!container || !navigator.onLine) return;
-          try {
-              const response = await fetch(`${GS_URL}?action=getMyOrders&driverPhone=${localStorage.getItem('driver_phone')}`);
-              const orders = JSON.parse(await response.text());
-              if(orders.length === 0) { container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--text-muted); font-weight:bold; margin:0;">لا توجد طلبات حالياً</p></div>'; return; }
-              container.innerHTML = orders.map(order => {
-                  let fileId = order.details.includes("||FILEID:") ? order.details.split("||FILEID:")[1] : "";
-                  return `
-                  <div class="order-msg-card" style="border-right: 4px solid var(--secondary);">
-                      <div class="order-msg-content">
-                          👤 الزبون: <strong>${order.customerName}</strong><br>
-                          📞 الهاتف: <span class="copy-span" onclick="copyText('${order.customerPhone}', 'تم النسخ!')"><i class="fas fa-copy"></i> ${order.customerPhone}</span><br>
-                          🔑 كود: <span class="copy-span" onclick="copyText('${order.vc}', 'تم النسخ!')"><i class="fas fa-copy"></i> ${order.vc}</span><br>
-                          📝 الطلب: ${order.details.split("||FILEID:")[0]}<br>
-                          📍 الموقع: <a href="${order.location}" target="_blank" style="color:#0088cc; font-weight:bold;">فتح الخريطة 🗺️</a>
-                      </div>
-                      ${fileId ? `<div style="text-align:center; margin-top:10px;"><img id="tg-img-${order.vc}" src="" style="display:none; width:100%; max-height:400px; object-fit:contain; border-radius:8px; border:1px solid var(--border-color);"></div>` : ''}
-                      <div style="display:flex; gap:10px; margin-top:15px;">
-                          <button class="location-btn success ripple" style="flex:1; margin:0; padding:10px; background:#25D366; color:white; border:none;" onclick="window.open('https://wa.me/964${order.customerPhone.substring(1)}', '_blank')"><i class="fab fa-whatsapp"></i> واتساب</button>
-                          <button class="location-btn success ripple" style="flex:1; margin:0; padding:10px;" onclick="window.location.href='tel:${order.customerPhone}'"><i class="fas fa-phone"></i> اتصال</button>
-                      </div>
-                  </div>
-              `}).join('');
-              orders.forEach(o => { if(o.details.includes("||FILEID:")) loadTelegramImage(o.details.split("||FILEID:")[1], `tg-img-${o.vc}`); });
-          } catch(e) {}
-      }
-
-      async function claimOrderInApp(vc, customerName, btn) {
-          const myPhone = localStorage.getItem('driver_phone');
-          const checkResp = await fetch(`${GS_URL}?action=getMyOrders&driverPhone=${myPhone}`);
-          if (JSON.parse(await checkResp.text()).length >= 2) return showToast("ما يصير تحجز أكثر من طلبين! ⚠️");
-          btn.innerHTML = '<span class="baly-spinner" style="border-top-color:#000;"></span>'; btn.disabled = true;
-          try {
-              const res = await (await fetch(`${GS_URL}?action=claimLiveOrder&code=${vc}&driverName=${encodeURIComponent(localStorage.getItem('driver_name'))}&driverPhone=${myPhone}`)).text();
-              if(res.includes("success")) { showToast("تم حجز الطلب! ✅"); showScreen('my-orders-screen'); }
-              else { showToast("الطلب انحجز قبلك! ⚠️"); fetchGeneralOrders(); }
-          } catch(e) { showToast("خطأ اتصال ❌"); btn.disabled = false; btn.innerText = "حجز الطلب"; }
-      }
-      function loadTelegramImage(fId, imgId) {
-          fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${fId}`).then(r => r.json()).then(d => {
-              if (d.ok) { let img = document.getElementById(imgId); img.src = `https://api.telegram.org/file/bot${BOT_TOKEN}/${d.result.file_path}`; img.style.display = 'block'; }
-          });
-      }
-      function previewImages() {
-          const container = document.getElementById('image-preview-container'); container.innerHTML = '';
-          for (let f of document.getElementById('custImages').files) { container.innerHTML += `<img src="${URL.createObjectURL(f)}" style="width:70px; height:70px; border-radius:10px; object-fit:cover; border:1px solid var(--border-color);">`; }
-          if(document.getElementById('custImages').files.length > 0) container.innerHTML += `<div style="color:var(--danger); font-size:13px; font-weight:bold; cursor:pointer;" onclick="clearImages()">مسح الكل</div>`;
-      }
-      function clearImages() { document.getElementById('custImages').value = ''; document.getElementById('image-preview-container').innerHTML = ''; }
-      function processVerifyCode() { /* دالة التأكيد المعتادة لديك */ }
-      async function refreshLeaderboard() { /* دالة الدوري المعتادة لديك */ }
-      function updateStatsUI() { document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0; }
-      function updateNav(el) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); }
-      function openSidebar() { document.getElementById('appSidebar').classList.add('open'); document.getElementById('sidebarOverlay').style.display = 'block'; setTimeout(() => document.getElementById('sidebarOverlay').classList.add('show'), 10); }
-      function closeSidebar() { document.getElementById('appSidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); setTimeout(() => document.getElementById('sidebarOverlay').style.display = 'none', 300); }
-      function updateLocalLoyaltyUI() { /* دالة الوفاء المعتادة لديك */ }
-      function updateLoyaltyUI() { updateLocalLoyaltyUI(); }
-      function toggleDriverStatus() { /* دالة الحالة المعتادة لديك */ }
-      function initDriverStatus() { /* تهيئة الحالة المعتادة لديك */ }
-      
-      // الدالة الخاصة بفتح الخريطة (تم تعديلها لحل مشكلة عدم الظهور)
-      function openMapModal() { 
-          document.getElementById('map-modal').style.display = 'flex'; 
-          if (!appMap) { 
-              appMap = L.map('map-view', { attributionControl: false }).setView([30.0396, 47.9298], 15); 
-              L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(appMap); 
-          } 
-          // هذا السطر يحل المشكلة، يسوي ريفريش للخريطة بعد ما ينفتح المربع حتى تظهر بشكل كامل
-          setTimeout(() => appMap.invalidateSize(), 300); 
-      }
-      function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
-      function confirmMapLocation() { let center = appMap.getCenter(); document.getElementById('tukDropoffLink').value = `https://maps.google.com/?q=$${center.lat},${center.lng}`; document.getElementById('map-success-msg').style.display = 'block'; closeMapModal(); }
-    </script>
-</body>
-</html>
