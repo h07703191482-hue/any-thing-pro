@@ -86,13 +86,13 @@
       .baly-spinner { width: 26px; height: 26px; border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; display: inline-block; vertical-align: middle; }
       @keyframes spin { to { transform: rotate(360deg); } }
       
-      /* ستايلات سلايدر المربعات الجديد */
+      /* ستايلات سلايدر المربعات (للمطاعم) */
       .square-slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding: 0 20px 20px 20px; margin-top: -50px; position: relative; z-index: 5; }
       .square-slider-container::-webkit-scrollbar { display: none; }
       .square-slide { flex: 0 0 auto; width: 110px; height: 110px; background: var(--surface); border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: var(--shadow-md); cursor: pointer; border: 2px solid var(--primary); scroll-snap-align: center; overflow: hidden; position: relative; transition: transform 0.3s; }
       .square-slide:active { transform: scale(0.95); }
-      .square-slide img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; transition: 0.3s; }
-      .square-slide:hover img { transform: scale(1.05); }
+      .square-slide img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; transition: 0.3s; filter: brightness(0.85); }
+      .square-slide:hover img { transform: scale(1.05); filter: brightness(1); }
       .square-slide-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(transparent, rgba(0,0,0,0.8)); z-index: 2; pointer-events: none; }
       .square-slide-content { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 8px; width: 100%; text-align: center; pointer-events: none; }
       .square-slide-content h3 { margin: 0; font-weight: 800; font-size: 13px; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
@@ -108,7 +108,7 @@
       @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes iconPulse { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.08); filter: brightness(1.2); } 100% { transform: scale(1); filter: brightness(1); } }
       .icon-pulse { animation: iconPulse 2s infinite ease-in-out; }
-      #global-lock-screen, #offline-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 9999999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; box-sizing: border-box; }
+              #global-lock-screen, #offline-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 9999999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; box-sizing: border-box; }
       .lock-icon { font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: scaleIn 0.5s ease; cursor: pointer; }
       .lock-title, .offline-title { font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
       .lock-text, .offline-text { font-size: 16px; font-weight: 600; color: var(--text-muted); line-height: 1.6; }
@@ -164,24 +164,15 @@
       .card-general .icon-wrapper { background: rgba(16, 185, 129, 0.1); color: #10B981; }
       .card-myorders .icon-wrapper { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
 
-      .form-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards; }
       .form-card-title { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
       .form-card-title i { font-size: 18px; color: var(--gold); }
       .screen-header-title { margin: 0 0 20px; font-weight: 800; font-size: 24px; display: flex; align-items: center; gap: 10px; }
-      .form-group { margin-bottom: 16px; position: relative; }
-      .form-group label { display: block; font-size: 13px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; }
-      input, textarea, select { width: 100%; padding: 16px 20px; border: 1.5px solid var(--border-color); border-radius: var(--radius-md); font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-main); background: var(--bg-color); transition: all 0.3s ease; appearance: none; }
       input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 0.7; font-weight: 500;}
       input:focus, textarea:focus, select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 4px rgba(90, 34, 139, 0.1); outline: none; }
-      .location-btn { background: var(--bg-color); color: var(--primary); border: 2px dashed var(--primary); padding: 14px; border-radius: var(--radius-md); width: 100%; font-family: 'Cairo'; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 12px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
       .location-btn:active { transform: scale(0.96); }
       .location-btn.success { background: rgba(16, 185, 129, 0.1); color: #10B981; border-color: #10B981; border-style: solid; }
       .phone-note { color: var(--danger); font-size: 12px; font-weight: 600; margin-top: 6px; display: block; text-align: right; padding-right: 5px; }
-      .send-btn { background: linear-gradient(135deg, var(--primary) 0%, #3B1261 100%); color: white; width: 100%; padding: 18px; border-radius: var(--radius-md); border: none; font-weight: 800; font-size: 18px; letter-spacing: 0.5px; cursor: pointer; box-shadow: 0 8px 20px rgba(90, 34, 139, 0.3); margin-top: 10px; transition: all 0.3s ease; }
-      .send-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(90, 34, 139, 0.2); }
       .send-btn:disabled { background: var(--border-color) !important; color: var(--text-muted) !important; cursor: not-allowed; box-shadow: none !important; transform: none !important; }
-      .back-btn { background: var(--surface); border: 1px solid var(--border-color); font-size: 18px; color: var(--text-main); width: 45px; height: 45px; border-radius: 14px; margin-bottom: 25px; box-shadow: var(--shadow-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-      .back-btn:active { transform: translateX(5px); }
       .resign-btn { background: transparent; color: var(--danger); border: 2px solid rgba(239, 68, 68, 0.2); width: 100%; padding: 14px; border-radius: var(--radius-md); font-family: 'Cairo'; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 30px; }
       .resign-btn:active { background: rgba(239, 68, 68, 0.1); }
       .note { font-size: 13px; color: #854D0E; background: #FEF3C7; padding: 16px; border-radius: var(--radius-md); margin-bottom: 20px; border-right: 4px solid var(--gold); font-weight: 600; display: flex; gap: 10px; align-items: flex-start; line-height: 1.6; }
@@ -229,7 +220,6 @@
       #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--text-main); text-align: center; padding: 20px; }
       
       .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(90, 34, 139, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
-      .location-notice { font-size: 13px; font-weight: 700; color: #10B981; text-align: center; margin-bottom: 15px; display: block; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: var(--radius-md); border: 1px dashed #10B981;}
       
       .order-msg-card { background: var(--surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 15px; box-shadow: var(--shadow-sm); margin-bottom: 15px; text-align: right; }
       .order-msg-content { background: var(--bg-color); padding: 12px; border-radius: 8px; font-size: 14px; line-height: 1.8; margin-bottom: 10px; white-space: pre-line; color: var(--text-main); }
@@ -239,16 +229,6 @@
       .copy-span { cursor: pointer; display: inline-block; padding: 4px 8px; border-radius: 6px; transition: 0.3s; background: rgba(90, 34, 139, 0.05); border: 1px dashed rgba(90, 34, 139, 0.2); font-weight: bold; }
       .copy-span:active { background: rgba(90, 34, 139, 0.15); transform: scale(0.95); }
       .copy-span i { color: var(--primary); margin-left: 5px; font-size: 12px; }
-
-      /* ستايلات المنيو الجديدة لمطعم البندر */
-      .menu-item { display: flex; align-items: center; justify-content: space-between; background: var(--surface); padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 12px; box-shadow: var(--shadow-sm); }
-      .menu-info h4 { margin: 0 0 5px 0; font-size: 16px; font-weight: 800; color: var(--text-main); }
-      .menu-info span { font-size: 14px; color: var(--primary); font-weight: 700; }
-      .menu-controls { display: flex; align-items: center; gap: 15px; background: var(--bg-color); padding: 5px 10px; border-radius: var(--radius-pill); }
-      .menu-btn { background: var(--surface); border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 16px; font-weight: bold; color: var(--primary); cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; transition: 0.2s;}
-      .menu-btn:active { transform: scale(0.9); }
-      .menu-qty { font-size: 16px; font-weight: 800; width: 20px; text-align: center; }
-      .total-bar { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 15px 20px; border-radius: var(--radius-md); margin-top: 20px; font-size: 18px; font-weight: 800; box-shadow: var(--shadow-md); margin-bottom: 20px;}
     </style>
 </head>
 <body oncontextmenu="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;">
@@ -423,6 +403,7 @@
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
+
     <div id="home-screen" class="screen container">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
@@ -432,17 +413,25 @@
       </div>
 
       <div class="square-slider-container">
+          
           <div class="square-slide ripple" onclick="showScreen('restaurant-screen')">
-              
-              <img src="1773676676632.png" alt="مطعم البندر" onerror="this.style.display='none'; document.getElementById('fallback-icon').style.display='block';">
-              
-              <div id="fallback-icon" style="display: none; font-size: 40px; position: absolute; top: 20px; z-index: 1; text-shadow: 0 2px 5px rgba(0,0,0,0.2);">🍔</div>
-              
+              <img src="1773676676632.png" alt="مطعم البندر" onerror="this.style.display='none'; document.getElementById('fallback-bandar').style.display='block';">
+              <div id="fallback-bandar" style="display: none; font-size: 40px; position: absolute; top: 20px; z-index: 1;">🍔</div>
               <div class="square-slide-overlay"></div>
               <div class="square-slide-content">
-                  <h3 style="margin: 0; font-weight: 800; font-size: 13px; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.9);">مطعم البندر</h3>
+                  <h3>مطعم البندر</h3>
               </div>
           </div>
+
+          <div class="square-slide ripple" onclick="showScreen('alisalem-screen')">
+              <img src="Burger.jpg" alt="مطعم علي سالم" onerror="this.style.display='none'; document.getElementById('fallback-ali').style.display='block';">
+              <div id="fallback-ali" style="display: none; font-size: 40px; position: absolute; top: 20px; z-index: 1;">🍔</div>
+              <div class="square-slide-overlay"></div>
+              <div class="square-slide-content">
+                  <h3>علي سالم</h3>
+              </div>
+          </div>
+
       </div>
       
       <div class="services-grid">
@@ -497,7 +486,6 @@
           </div>
       </div>
     </div>
-
     <div id="restaurant-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-hamburger" style="color:var(--primary);"></i> مطعم البندر</h2>
@@ -565,7 +553,7 @@
             <div class="form-group">
                 <label>رقم الموبايل</label>
                 <input type="tel" id="restPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
                 <span class="step-number">خطوة رقم (2)</span>
             </div>
             <div class="form-group">
@@ -574,12 +562,81 @@
                 <span class="step-number">خطوة رقم (3)</span>
             </div>
         </div>
+        <button class="send-btn order-btn-logic ripple" id="restSendBtn" onclick="sendRestaurantOrder()"><i class="fas fa-paper-plane"></i> <span id="rest-final-btn">تأكيد طلب المطعم</span></button>
+    </div>
 
-        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
-            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب. في حال عدم الرد سيتم إلغاء الطلب فوراً!
+    <div id="alisalem-screen" class="screen container">
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-hamburger" style="color:var(--primary);"></i> مطعم علي سالم</h2>
+        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
+        
+        <div class="price-indicator" style="display: block;">
+            <span>أسعار التوصيل:</span>
+            <span class="amount" style="font-size: 20px;">داخل أم قصر: 1,500 د.ع</span>
+            <span class="amount" style="font-size: 20px;">خارج أم قصر: 2,500 د.ع</span>
+            <small style="color: var(--secondary); font-weight: bold;"><i class="fas fa-motorcycle"></i> توصيل حار وسريع</small>
         </div>
 
-        <button class="send-btn order-btn-logic ripple" id="restSendBtn" onclick="sendRestaurantOrder()"><i class="fas fa-paper-plane"></i> <span id="rest-final-btn">تأكيد طلب المطعم</span></button>
+        <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-utensils"></i> قائمة الطعام (المنيو)</div>
+            
+            <div class="menu-item"><div class="menu-info"><h4>همبرگة 🍔</h4><span>1,000 د.ع</span></div>
+                <div class="menu-controls"><button class="menu-btn" onclick="updateMenuQtyAli('burger', -1, 1000)">-</button><span class="menu-qty" id="qty-ali-burger">0</span><button class="menu-btn" onclick="updateMenuQtyAli('burger', 1, 1000)">+</button></div>
+            </div>
+            <div class="menu-item"><div class="menu-info"><h4>همبرگة جبن 🧀🍔</h4><span>1,500 د.ع</span></div>
+                <div class="menu-controls"><button class="menu-btn" onclick="updateMenuQtyAli('cheeseburger', -1, 1500)">-</button><span class="menu-qty" id="qty-ali-cheeseburger">0</span><button class="menu-btn" onclick="updateMenuQtyAli('cheeseburger', 1, 1500)">+</button></div>
+            </div>
+            <div class="menu-item"><div class="menu-info"><h4>ريزو دجاج 🍛</h4><span>3,000 د.ع</span></div>
+                <div class="menu-controls"><button class="menu-btn" onclick="updateMenuQtyAli('rizo', -1, 3000)">-</button><span class="menu-qty" id="qty-ali-rizo">0</span><button class="menu-btn" onclick="updateMenuQtyAli('rizo', 1, 3000)">+</button></div>
+            </div>
+
+            <div class="form-card-title" style="margin-top:20px;"><i class="fas fa-glass-cheers"></i> المشروبات</div>
+            
+            <div class="menu-item"><div class="menu-info"><h4>لبن بطل كبير 🥛</h4><span>2,000 د.ع</span></div>
+                <div class="menu-controls"><button class="menu-btn" onclick="updateMenuQtyAli('laban_large', -1, 2000)">-</button><span class="menu-qty" id="qty-ali-laban_large">0</span><button class="menu-btn" onclick="updateMenuQtyAli('laban_large', 1, 2000)">+</button></div>
+            </div>
+            <div class="menu-item"><div class="menu-info"><h4>لبن بطل صغير 🥛</h4><span>750 د.ع</span></div>
+                <div class="menu-controls"><button class="menu-btn" onclick="updateMenuQtyAli('laban_small', -1, 750)">-</button><span class="menu-qty" id="qty-ali-laban_small">0</span><button class="menu-btn" onclick="updateMenuQtyAli('laban_small', 1, 750)">+</button></div>
+            </div>
+            <div class="menu-item"><div class="menu-info"><h4>عصير گلاص 🧃</h4><span>500 د.ع</span></div>
+                <div class="menu-controls"><button class="menu-btn" onclick="updateMenuQtyAli('juice_glass', -1, 500)">-</button><span class="menu-qty" id="qty-ali-juice_glass">0</span><button class="menu-btn" onclick="updateMenuQtyAli('juice_glass', 1, 500)">+</button></div>
+            </div>
+            <div class="menu-item"><div class="menu-info"><h4>عصير بطل 🧃</h4><span>1,000 د.ع</span></div>
+                <div class="menu-controls"><button class="menu-btn" onclick="updateMenuQtyAli('juice_bottle', -1, 1000)">-</button><span class="menu-qty" id="qty-ali-juice_bottle">0</span><button class="menu-btn" onclick="updateMenuQtyAli('juice_bottle', 1, 1000)">+</button></div>
+            </div>
+            <div class="menu-item"><div class="menu-info"><h4>ببسي 🥤</h4><span>500 د.ع</span></div>
+                <div class="menu-controls"><button class="menu-btn" onclick="updateMenuQtyAli('pepsi', -1, 500)">-</button><span class="menu-qty" id="qty-ali-pepsi">0</span><button class="menu-btn" onclick="updateMenuQtyAli('pepsi', 1, 500)">+</button></div>
+            </div>
+            <div class="menu-item"><div class="menu-info"><h4>ديو 🥤</h4><span>500 د.ع</span></div>
+                <div class="menu-controls"><button class="menu-btn" onclick="updateMenuQtyAli('dew', -1, 500)">-</button><span class="menu-qty" id="qty-ali-dew">0</span><button class="menu-btn" onclick="updateMenuQtyAli('dew', 1, 500)">+</button></div>
+            </div>
+
+            <div class="total-bar">
+                <span>المجموع:</span>
+                <span id="alisalem-total">0 د.ع</span>
+            </div>
+        </div>
+
+        <div class="form-card" id="ali-user-card">
+            <div class="form-card-title"><i class="fas fa-user-circle"></i> بيانات التوصيل</div>
+            <div class="form-group">
+                <label>الاسم الكامل</label>
+                <input type="text" id="aliName" placeholder="اكتب اسمك">
+                <span class="step-number">خطوة رقم (1)</span>
+            </div>
+            <div class="form-group">
+                <label>رقم الموبايل</label>
+                <input type="tel" id="aliPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
+                <span class="step-number">خطوة رقم (2)</span>
+            </div>
+            <div class="form-group">
+                <label>أقرب نقطة دالة</label>
+                <input type="text" id="aliLandmark" placeholder="لتسهيل وصول المندوب">
+                <span class="step-number">خطوة رقم (3)</span>
+            </div>
+        </div>
+        <button class="send-btn order-btn-logic ripple" id="aliSendBtn" onclick="sendAliSalemOrder()"><i class="fas fa-paper-plane"></i> <span id="ali-final-btn">تأكيد طلب علي سالم</span></button>
     </div>
 
     <div id="tuk-screen" class="screen container">
@@ -597,7 +654,7 @@
             <div class="form-group">
                 <label id="lbl-tuk-phone">رقم الموبايل</label>
                 <input type="tel" id="tukPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
                 <span class="step-number">خطوة رقم (2)</span>
             </div>
         </div>
@@ -606,15 +663,9 @@
             <div class="form-card-title"><i class="fas fa-route"></i> <span id="tuk-r-info">تفاصيل العملية</span></div>
             <div class="form-group">
                 <label style="color:var(--danger);" id="lbl-tuk-drop">موقع التحصيل/التسليم (إجباري)</label>
-                
-                <div class="note" style="padding:12px; font-size:13px; margin-bottom:10px; background:rgba(16, 185, 129, 0.1); border-right-color:#10B981; color:var(--text-main);">
-                    💡 هسه تگدر تحدد مكان النزول مباشرة من الخريطة داخل التطبيق! 🗺️
-                </div>
-                
                 <button type="button" class="location-btn ripple-dark" style="border: 2px dashed var(--primary); background: var(--surface); color: var(--primary);" onclick="openMapModal()">
                     <i class="fas fa-map-marked-alt"></i> افتح الخريطة وحدد المكان 📍
                 </button>
-                
                 <input type="hidden" id="tukDropoffLink" value="">
                 <p id="map-success-msg" style="display: none; color: #10B981; font-weight: 800; font-size: 14px; margin-top: 10px; text-align: center;"><i class="fas fa-check-circle"></i> تم تحديد المكان بنجاح!</p>
                 <span class="step-number">خطوة رقم (3)</span>
@@ -625,11 +676,6 @@
                 <span class="step-number">خطوة رقم (4)</span>
             </div>
         </div>
-
-        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
-            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
-        </div>
-
         <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">طلب تكتك توصيلة</span></button>
     </div>
     
@@ -655,7 +701,7 @@
             <div class="form-group">
                 <label>رقم الموبايل</label>
                 <input type="tel" id="medPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
                 <span class="step-number">خطوة رقم (2)</span>
             </div>
             <div class="form-group">
@@ -673,14 +719,9 @@
                 <span class="step-number">خطوة رقم (4)</span>
             </div>
         </div>
-
-        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
-            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
-        </div>
-
         <button class="send-btn order-btn-logic ripple" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
     </div>
-    <div id="order-screen" class="screen container">
+        <div id="order-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-shopping-cart" style="color:var(--primary);"></i> <span id="shop-head">تسوق مسواكك</span></h2>
         <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
@@ -708,7 +749,7 @@
             <div class="form-group">
                 <label>رقم الهاتف</label>
                 <input type="tel" id="custPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); updateLoyaltyUI(); checkPhoneLive(this)" onblur="syncLoyaltyWithServer()">
-                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
                 <span class="step-number">خطوة رقم (2)</span>
             </div>
             <div class="form-group">
@@ -733,11 +774,6 @@
                 <span class="step-number">خطوة رقم (5)</span>
             </div>
         </div>
-
-        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
-            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل شراء المواد. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
-        </div>
-
         <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
 
@@ -755,7 +791,7 @@
             <div class="form-group">
                 <label>رقم الهاتف</label>
                 <input type="tel" id="driverJoinPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
                 <span class="step-number">خطوة رقم (2)</span>
             </div>
             <div class="form-group">
@@ -884,9 +920,6 @@
     </div>
     
     <script>
-      // ==========================================
-      // سكربتات الحماية لمنع أدوات المطورين والسرقة
-      // ==========================================
       document.onkeydown = function(e) {
           if(e.keyCode == 123) { return false; } 
           if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; } 
@@ -923,7 +956,6 @@
       let lastOrderCount = -1; let orderPollInterval = null; let isSoundEnabled = false;
       const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
       
-      // تعريف متغير الخريطة
       let appMap = null;
 
       function copyText(text, successMsg) {
@@ -1070,6 +1102,7 @@
               let mBtn = document.getElementById('medSendBtn'); if(mBtn) mBtn.innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
               let sBtn = document.getElementById('sendBtn'); if(sBtn) sBtn.innerHTML = '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
               let rBtn = document.getElementById('restSendBtn'); if(rBtn) rBtn.innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب المطعم';
+              let aBtn = document.getElementById('aliSendBtn'); if(aBtn) aBtn.innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب علي سالم';
               orderButtons.forEach(btn => btn.disabled = false);
           }
       }
@@ -1172,8 +1205,9 @@
       function loadSavedCustomerData() {
           const name = localStorage.getItem('saved_customer_name'); const phone = localStorage.getItem('saved_customer_phone');
           if (name && phone) {
-              ['custName', 'medName', 'tukName', 'restName'].forEach(id => { let el = document.getElementById(id); if(el) el.value = name; });
-              ['custPhone', 'medPhone', 'tukPhone', 'restPhone'].forEach(id => { let el = document.getElementById(id); if(el) { el.value = phone; checkPhoneLive(el); } });
+              // ضفنا aliName للاسم و aliPhone للرقم حتى يعبيهم تلقائياً
+              ['custName', 'medName', 'tukName', 'restName', 'aliName'].forEach(id => { let el = document.getElementById(id); if(el) el.value = name; });
+              ['custPhone', 'medPhone', 'tukPhone', 'restPhone', 'aliPhone'].forEach(id => { let el = document.getElementById(id); if(el) { el.value = phone; checkPhoneLive(el); } });
           }
       }
 
@@ -1245,7 +1279,7 @@
           
           if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); let dName = document.getElementById('driver-display-name'); if(dName) dName.innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
           if(id === 'log-screen') { renderDriverLog(); } 
-          if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen' || id === 'restaurant-screen') { loadSavedCustomerData(); }
+          if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen' || id === 'restaurant-screen' || id === 'alisalem-screen') { loadSavedCustomerData(); }
           if(id === 'order-screen') updateLoyaltyUI();
           if(id === 'general-orders-screen') { fetchGeneralOrders(); }
           if(id === 'my-orders-screen') { fetchMyOrders(); }
@@ -1254,25 +1288,35 @@
       }
 
       // ------------------------------------------
-      // سكربت المطعم والمنيو
+      // سكربت مطعم علي سالم (الجديد)
       // ------------------------------------------
-      let menuOrder = { burger: 0, rizo: 0, laban: 0 };
-      
-      function updateMenuQty(item, change, price) {
-          menuOrder[item] = Math.max(0, menuOrder[item] + change);
-          document.getElementById('qty-' + item).innerText = menuOrder[item];
+      let menuOrderAli = { burger: 0, cheeseburger: 0, rizo: 0, laban_large: 0, laban_small: 0, juice_glass: 0, juice_bottle: 0, pepsi: 0, dew: 0 };
+
+      function updateMenuQtyAli(item, change, price) {
+          menuOrderAli[item] = Math.max(0, menuOrderAli[item] + change);
+          document.getElementById('qty-ali-' + item).innerText = menuOrderAli[item];
           
-          let total = (menuOrder.burger * 1000) + (menuOrder.rizo * 3000) + (menuOrder.laban * 2000);
-          document.getElementById('restaurant-total').innerText = total + ' د.ع';
+          let total = (menuOrderAli.burger * 1000) + 
+                      (menuOrderAli.cheeseburger * 1500) + 
+                      (menuOrderAli.rizo * 3000) + 
+                      (menuOrderAli.laban_large * 2000) + 
+                      (menuOrderAli.laban_small * 750) + 
+                      (menuOrderAli.juice_glass * 500) + 
+                      (menuOrderAli.juice_bottle * 1000) + 
+                      (menuOrderAli.pepsi * 500) + 
+                      (menuOrderAli.dew * 500);
+
+          document.getElementById('alisalem-total').innerText = total + ' د.ع';
       }
 
-      async function sendRestaurantOrder() {
+      async function sendAliSalemOrder() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           
-          const name = document.getElementById('restName').value.trim(); 
-          const phone = document.getElementById('restPhone').value.trim();
-          const land = document.getElementById('restLandmark').value.trim();
-          let total = (menuOrder.burger * 1000) + (menuOrder.rizo * 3000) + (menuOrder.laban * 2000);
+          const name = document.getElementById('aliName').value.trim(); 
+          const phone = document.getElementById('aliPhone').value.trim();
+          const land = document.getElementById('aliLandmark').value.trim();
+          
+          let total = (menuOrderAli.burger * 1000) + (menuOrderAli.cheeseburger * 1500) + (menuOrderAli.rizo * 3000) + (menuOrderAli.laban_large * 2000) + (menuOrderAli.laban_small * 750) + (menuOrderAli.juice_glass * 500) + (menuOrderAli.juice_bottle * 1000) + (menuOrderAli.pepsi * 500) + (menuOrderAli.dew * 500);
           
           if(!name || !validateIraqiPhone(phone)) return showToast("أكمل البيانات بشكل صحيح 📝");
           if(total === 0) return showToast("الرجاء اختيار وجبة واحدة على الأقل 🍔");
@@ -1282,22 +1326,29 @@
               if(navigator.geolocation) {
                   navigator.geolocation.getCurrentPosition((pos) => { 
                       userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; 
-                      sendRestaurantOrder(); 
+                      sendAliSalemOrder(); 
                   }, (err) => { 
                       showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); 
                   }, { enableHighAccuracy: true });
               } return;
           }
 
-          const btn = document.getElementById('restSendBtn'); 
+          const btn = document.getElementById('aliSendBtn'); 
           const originalText = btn.innerHTML; 
           btn.innerHTML = '<span class="baly-spinner"></span>'; 
           btn.disabled = true;
 
           let orderDetails = [];
-          if(menuOrder.burger > 0) orderDetails.push(`همبرگة (العدد: ${menuOrder.burger})`);
-          if(menuOrder.rizo > 0) orderDetails.push(`ريزو دجاج (العدد: ${menuOrder.rizo})`);
-          if(menuOrder.laban > 0) orderDetails.push(`لبن (العدد: ${menuOrder.laban})`);
+          if(menuOrderAli.burger > 0) orderDetails.push(`همبرگة (العدد: ${menuOrderAli.burger})`);
+          if(menuOrderAli.cheeseburger > 0) orderDetails.push(`همبرگة جبن (العدد: ${menuOrderAli.cheeseburger})`);
+          if(menuOrderAli.rizo > 0) orderDetails.push(`ريزو دجاج (العدد: ${menuOrderAli.rizo})`);
+          if(menuOrderAli.laban_large > 0) orderDetails.push(`لبن كبير (العدد: ${menuOrderAli.laban_large})`);
+          if(menuOrderAli.laban_small > 0) orderDetails.push(`لبن صغير (العدد: ${menuOrderAli.laban_small})`);
+          if(menuOrderAli.juice_glass > 0) orderDetails.push(`عصير گلاص (العدد: ${menuOrderAli.juice_glass})`);
+          if(menuOrderAli.juice_bottle > 0) orderDetails.push(`عصير بطل (العدد: ${menuOrderAli.juice_bottle})`);
+          if(menuOrderAli.pepsi > 0) orderDetails.push(`ببسي (العدد: ${menuOrderAli.pepsi})`);
+          if(menuOrderAli.dew > 0) orderDetails.push(`ديو (العدد: ${menuOrderAli.dew})`);
+
           let finalOrderText = "الطلبات:\n" + orderDetails.join("\n") + "\n\nإجمالي الحساب: " + total + " د.ع";
 
           try {
@@ -1305,21 +1356,21 @@
               const vc = generateSecureVC(); 
               let referrer = localStorage.getItem('referred_by') || "";
               
-              await fetch(`${GS_URL}?action=saveOrderCode&name=${encodeURIComponent(name)}&phone=${phone}&code=${vc}&referrer=${referrer}&type=🍔 مطعم البندر&details=${encodeURIComponent(finalOrderText)}&land=${encodeURIComponent(land)}&location=${encodeURIComponent(userCoords)}`); 
+              await fetch(`${GS_URL}?action=saveOrderCode&name=${encodeURIComponent(name)}&phone=${phone}&code=${vc}&referrer=${referrer}&type=🍔 مطعم علي سالم&details=${encodeURIComponent(finalOrderText)}&land=${encodeURIComponent(land)}&location=${encodeURIComponent(userCoords)}`); 
               
               localStorage.removeItem('referred_by');
-              const msg = `🍔 طلب مطعم البندر\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 ${finalOrderText}\n📍 الموقع: ${userCoords}`;
+              const msg = `🍔 طلب مطعم علي سالم\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 ${finalOrderText}\n📍 الموقع: ${userCoords}`;
               
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } }) });
               
               showToast("تم إرسال طلب المطعم بنجاح ✅"); 
-              document.getElementById('restLandmark').value = ""; 
+              document.getElementById('aliLandmark').value = ""; 
               
-              menuOrder = { burger: 0, rizo: 0, laban: 0 };
-              document.getElementById('qty-burger').innerText = '0';
-              document.getElementById('qty-rizo').innerText = '0';
-              document.getElementById('qty-laban').innerText = '0';
-              document.getElementById('restaurant-total').innerText = '0 د.ع';
+              menuOrderAli = { burger: 0, cheeseburger: 0, rizo: 0, laban_large: 0, laban_small: 0, juice_glass: 0, juice_bottle: 0, pepsi: 0, dew: 0 };
+              ['burger', 'cheeseburger', 'rizo', 'laban_large', 'laban_small', 'juice_glass', 'juice_bottle', 'pepsi', 'dew'].forEach(item => {
+                  document.getElementById('qty-ali-' + item).innerText = '0';
+              });
+              document.getElementById('alisalem-total').innerText = '0 د.ع';
               
               syncLoyaltyWithServer(); 
               loadSavedCustomerData();
@@ -1329,6 +1380,51 @@
               btn.innerHTML = originalText; 
               btn.disabled = false; 
           }
+      }
+
+      // ------------------------------------------
+      // سكربت مطعم البندر (القديم)
+      // ------------------------------------------
+      let menuOrder = { burger: 0, rizo: 0, laban: 0 };
+      
+      function updateMenuQty(item, change, price) {
+          menuOrder[item] = Math.max(0, menuOrder[item] + change);
+          document.getElementById('qty-' + item).innerText = menuOrder[item];
+          let total = (menuOrder.burger * 1000) + (menuOrder.rizo * 3000) + (menuOrder.laban * 2000);
+          document.getElementById('restaurant-total').innerText = total + ' د.ع';
+      }
+
+      async function sendRestaurantOrder() {
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          const name = document.getElementById('restName').value.trim(); const phone = document.getElementById('restPhone').value.trim();
+          const land = document.getElementById('restLandmark').value.trim();
+          let total = (menuOrder.burger * 1000) + (menuOrder.rizo * 3000) + (menuOrder.laban * 2000);
+          
+          if(!name || !validateIraqiPhone(phone)) return showToast("أكمل البيانات بشكل صحيح 📝");
+          if(total === 0) return showToast("الرجاء اختيار وجبة واحدة على الأقل 🍔");
+
+          if(!userCoords) {
+              showToast("جاري تحديد موقعك الحالي للطلب... 📍");
+              if(navigator.geolocation) { navigator.geolocation.getCurrentPosition((pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendRestaurantOrder(); }, (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }); } return;
+          }
+
+          const btn = document.getElementById('restSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
+          let orderDetails = [];
+          if(menuOrder.burger > 0) orderDetails.push(`همبرگة (العدد: ${menuOrder.burger})`);
+          if(menuOrder.rizo > 0) orderDetails.push(`ريزو دجاج (العدد: ${menuOrder.rizo})`);
+          if(menuOrder.laban > 0) orderDetails.push(`لبن (العدد: ${menuOrder.laban})`);
+          let finalOrderText = "الطلبات:\n" + orderDetails.join("\n") + "\n\nإجمالي الحساب: " + total + " د.ع";
+
+          try {
+              saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
+              await fetch(`${GS_URL}?action=saveOrderCode&name=${encodeURIComponent(name)}&phone=${phone}&code=${vc}&referrer=${referrer}&type=🍔 مطعم البندر&details=${encodeURIComponent(finalOrderText)}&land=${encodeURIComponent(land)}&location=${encodeURIComponent(userCoords)}`); 
+              localStorage.removeItem('referred_by');
+              const msg = `🍔 طلب مطعم البندر\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 ${finalOrderText}\n📍 الموقع: ${userCoords}`;
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } }) });
+              showToast("تم إرسال طلب المطعم بنجاح ✅"); document.getElementById('restLandmark').value = ""; 
+              menuOrder = { burger: 0, rizo: 0, laban: 0 }; document.getElementById('qty-burger').innerText = '0'; document.getElementById('qty-rizo').innerText = '0'; document.getElementById('qty-laban').innerText = '0'; document.getElementById('restaurant-total').innerText = '0 د.ع';
+              syncLoyaltyWithServer(); loadSavedCustomerData();
+          } catch (e) { showToast("حدث خطأ بالاتصال ❌"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       async function sendTukOrder() {
@@ -1497,7 +1593,7 @@
       function toggleDriverStatus() { /* دالة الحالة المعتادة لديك */ }
       function initDriverStatus() { /* تهيئة الحالة المعتادة لديك */ }
       
-      // التعديل السحري مال الخريطة (تم زيادة الوقت للـ 500 وإضافة إجبار الحجم والمركز)
+      // كود الخريطة المعدل
       function openMapModal() { 
           document.getElementById('map-modal').style.display = 'flex'; 
           
@@ -1515,4 +1611,4 @@
       function confirmMapLocation() { let center = appMap.getCenter(); document.getElementById('tukDropoffLink').value = `https://maps.google.com/?q=$${center.lat},${center.lng}`; document.getElementById('map-success-msg').style.display = 'block'; closeMapModal(); }
     </script>
 </body>
-</html>
+    </html>
