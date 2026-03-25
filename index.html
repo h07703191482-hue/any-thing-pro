@@ -237,8 +237,7 @@
       .book-btn { background: var(--secondary); color: #000; border: none; padding: 12px; width: 100%; border-radius: var(--radius-md); font-weight: 800; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px;}
       .book-btn:active { transform: scale(0.96); }
     </style>
-</head>
-</head>
+</head></head>
 <body oncontextmenu="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;">
     <div id="map-modal">
         <div class="map-container">
@@ -490,8 +489,8 @@
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
       </div>
-                </div>
-                    <div id="tuk-screen" class="screen container">
+    </div>
+        <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
         <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
@@ -734,24 +733,6 @@
         </div>
 
         <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-map-marker-alt"></i> إشعار وصول للزبون</div>
-            <div class="form-group">
-                <label>رقم هاتف الزبون</label>
-                <input type="tel" id="arrivePhoneInput" placeholder="مثال: 07700000000" style="text-align:center;" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
-                <span class="step-number">خطوة رقم (1)</span>
-            </div>
-            <div style="display: flex; gap: 10px;">
-                <button class="location-btn success ripple" style="flex: 1; margin: 0; background: #25D366; color: white; border: none;" onclick="notifyArriveWhatsApp()">
-                    <i class="fab fa-whatsapp"></i> رسالة واتساب
-                </button>
-                <button class="location-btn ripple" style="flex: 1; margin: 0; background: var(--primary); color: white; border: none;" onclick="notifyArriveCall()">
-                    <i class="fas fa-phone-alt"></i> اتصال سريع
-                </button>
-            </div>
-        </div>
-
-        <div class="form-card">
             <div class="form-card-title"><i class="fas fa-qrcode"></i> تأكيد تسليم/تحصيل جديد</div>
             <div class="form-group">
                 <label>رقم هاتف الزبون</label>
@@ -890,7 +871,6 @@
 
       function startOrderPolling() { if(orderPollInterval) clearInterval(orderPollInterval); checkNewOrdersForSound(); orderPollInterval = setInterval(checkNewOrdersForSound, 10000); }
 
-      // تم تصليح رابط الخريطة هنا
       function initAutoLocation() {
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
@@ -1174,8 +1154,7 @@
 
           if (typeof closeSidebar === 'function') closeSidebar();
       }
-
-      async function sendTukOrder() {
+                  async function sendTukOrder() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const name = document.getElementById('tukName').value.trim(); const phone = document.getElementById('tukPhone').value.trim();
           const land = document.getElementById('tukLandmark').value.trim(); const dropLink = document.getElementById('tukDropoffLink').value.trim(); 
@@ -1190,7 +1169,12 @@
           const btn = document.getElementById('tukSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
               saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
-              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`); localStorage.removeItem('referred_by'); 
+              let msgContent = "طلب تكتك توصيلة: " + dropLink;
+              
+              // التعديل: إرسال الطلب للسيرفر للطلبات العامة
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}&type=🚖 تكتك توصيلة&details=${encodeURIComponent(msgContent)}&land=${encodeURIComponent(land)}&location=${encodeURIComponent(userCoords)}`); 
+              localStorage.removeItem('referred_by'); 
+              
               const msg = `🚖 طلب تكتك توصيلة\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الموقع: ${userCoords}\n📝 تفاصيل: ${dropLink}\nدالة: ${land}`;
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية", callback_data: `claim|${name}|${vc}` }]] } }) });
               showToast("تم الإرسال بنجاح ✅"); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
@@ -1211,7 +1195,11 @@
           const btn = document.getElementById('medSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
               saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
-              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`); localStorage.removeItem('referred_by');
+              
+              // التعديل: إرسال الطلب للسيرفر للطلبات العامة
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}&type=🔵 طلب وسيط&details=${encodeURIComponent(order)}&land=${encodeURIComponent("لتسهيل وصول المندوب")}&location=${encodeURIComponent(userCoords)}`); 
+              localStorage.removeItem('referred_by');
+              
               const msg = `🔵 طلب وسيط\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📝 الغرض: ${order}\n📍 الموقع: ${userCoords}`;
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } }) });
               showToast("تم الإرسال بنجاح ✅"); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
@@ -1243,14 +1231,14 @@
           }
           const btn = document.getElementById('sendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
-              saveCustomerData(name, phone); const vc = generateSecureVC(); let photoMsgs = []; let photoUrlForApp = "";
+              saveCustomerData(name, phone); const vc = generateSecureVC(); let photoMsgs = [];
               if (files.length > 0) {
                   for (let i = 0; i < files.length; i++) {
                       let fd = new FormData(); fd.append('chat_id', "-1003786625443"); fd.append('photo', files[i]); fd.append('caption', `📦 صور طلب رقم: ${vc}\n👤 الزبون: ${name}`);
                       try {
                           let tgResp = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
                           let tgData = await tgResp.json(); 
-                          if (tgData.ok) { photoMsgs.push(tgData.result.message_id); photoUrlForApp = URL.createObjectURL(files[0]); }
+                          if (tgData.ok) { photoMsgs.push(tgData.result.message_id); }
                       } catch(err) {}
                   }
                   clearImages();
@@ -1264,7 +1252,8 @@
               
               const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍 الموقع: ${userCoords}`;
               
-              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&photoMsgs=${photoIdsStr}&referrer=${referrer}&type=مسواك&details=${encodeURIComponent(msgContent)}&land=${encodeURIComponent(land)}&loyalty=${encodeURIComponent(loyaltyMsg)}&location=${encodeURIComponent(userCoords)}`); 
+              // التعديل: إرسال الطلب للسيرفر للطلبات العامة
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&photoMsgs=${photoIdsStr}&referrer=${referrer}&type=🔵 طلب مسواك&details=${encodeURIComponent(msgContent)}&land=${encodeURIComponent(land)}&loyalty=${encodeURIComponent(loyaltyMsg)}&location=${encodeURIComponent(userCoords)}`); 
               localStorage.removeItem('referred_by');
               
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } }) });
@@ -1379,8 +1368,6 @@
           setTimeout(() => { appMap.invalidateSize(); }, 300);
       }
       function closeMapModal() { let mapModal = document.getElementById('map-modal'); if(mapModal) mapModal.style.display = 'none'; }
-      
-      // تم تصليح رابط الخريطة هنا أيضاً
       function confirmMapLocation() {
           const center = appMap.getCenter();
           const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng}`;
@@ -1411,7 +1398,8 @@
                           ${order.loyaltyMsg ? `🔢 تسلسل الطلب: ${order.loyaltyMsg}\n` : ''}
                           📍 الموقع: <a href="${order.location}" target="_blank" style="color:#0088cc;">اضغط لعرض الخريطة</a>
                       </div>
-                      ${order.photoUrl ? `<img src="${order.photoUrl}" class="order-img-preview" style="display:block;">` : ''}
+                      <div style="font-size:12px; color:var(--danger); font-weight:bold; margin-top:5px;">⚠️ (توجد صورة سرية للطلب تظهر بعد الحجز)</div>
+                      
                       <button class="book-btn ripple" style="margin-top:15px;" onclick="claimOrderInApp('${order.vc}', '${order.customerName}', this)"><i class="fas fa-hand-paper"></i> حجز الطلب</button>
                   </div>
               `).join('');
@@ -1443,7 +1431,7 @@
                           ${order.loyaltyMsg ? `🔢 تسلسل الطلب: ${order.loyaltyMsg}\n` : ''}
                           📍 الموقع: <a href="${order.location}" target="_blank" style="color:#0088cc;">اضغط لعرض الخريطة</a>
                       </div>
-                      ${order.photoUrl ? `<img src="${order.photoUrl}" class="order-img-preview" style="display:block;">` : ''}
+                      <div style="color:var(--primary); font-size:13px; font-weight:bold; margin-top:10px;"><i class="fas fa-image"></i> صور الطلب (تصلك في خاص التليجرام الخاص بك).</div>
                       <div style="display:flex; gap:10px; margin-top:15px;">
                           <button class="location-btn success ripple" style="flex:1; margin:0; padding:10px;" onclick="window.location.href='tel:${safePhone}'"><i class="fas fa-phone"></i> اتصال</button>
                           <button class="location-btn success ripple" style="flex:1; margin:0; padding:10px; background:#25D366; color:white; border:none;" onclick="window.open('https://wa.me/${waPhone}', '_blank')"><i class="fab fa-whatsapp"></i> واتساب</button>
@@ -1455,49 +1443,29 @@
 
       async function claimOrderInApp(vc, customerName, btnElement) {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
-          const myName = localStorage.getItem('driver_name');
-          const myPhone = localStorage.getItem('driver_phone');
-          
-          const oldText = btnElement.innerHTML;
-          btnElement.innerHTML = '<span class="baly-spinner" style="border-top-color:#000; width:18px; height:18px;"></span>';
-          btnElement.disabled = true;
-
+          const myName = localStorage.getItem('driver_name'); const myPhone = localStorage.getItem('driver_phone');
+          const oldText = btnElement.innerHTML; btnElement.innerHTML = '<span class="baly-spinner" style="border-top-color:#000; width:18px; height:18px;"></span>'; btnElement.disabled = true;
           try {
-              // التعديل الثالث: فحص عدد الطلبات قبل لا ينطيه الموافقة (ما يصير يحجز أكثر من 2)
+              // حماية الحجز: المندوب ما يقدر يحجز أكثر من طلبين
               const checkResp = await fetch(`${GS_URL}?action=getMyOrders&driverPhone=${myPhone}`);
               const myOrdersText = await checkResp.text();
-              let myOrdersArr = [];
-              try { myOrdersArr = JSON.parse(myOrdersText); } catch(e) {}
+              let myOrdersArr = []; try { myOrdersArr = JSON.parse(myOrdersText); } catch(e) {}
               
               if (myOrdersArr.length >= 2) {
                   showToast("ما يصير تحجز أكثر من طلبين! دخل كود التسليم وراها كمل شغلك ⚠️");
-                  btnElement.innerHTML = oldText;
-                  btnElement.disabled = false;
+                  btnElement.innerHTML = oldText; btnElement.disabled = false;
                   return;
               }
 
               const response = await fetch(`${GS_URL}?action=claimLiveOrder&code=${vc}&driverName=${encodeURIComponent(myName)}&driverPhone=${myPhone}`);
               const result = await response.text();
-              
               if(result.includes("success")) {
                   showToast("تم حجز الطلب بنجاح! ✅");
-                  
                   const msg = `✅ تم حجز الطلب\nالزبون: ${customerName}\nالكود: ${vc}\nالمندوب: ${myName}\n📞 هاتف المندوب: ${myPhone}`;
-                  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                      method: "POST", headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg })
-                  });
-
+                  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg }) });
                   showScreen('my-orders-screen');
-              } else {
-                  showToast("عذراً، الطلب انحجز من قبل مندوب ثاني ⚠️");
-                  fetchGeneralOrders(); 
-              }
-          } catch(e) {
-              showToast("حدث خطأ بالاتصال ❌");
-              btnElement.innerHTML = oldText;
-              btnElement.disabled = false;
-          }
+              } else { showToast("عذراً، الطلب انحجز من قبل مندوب ثاني ⚠️"); fetchGeneralOrders(); }
+          } catch(e) { showToast("حدث خطأ بالاتصال ❌"); btnElement.innerHTML = oldText; btnElement.disabled = false; }
       }
     </script>
 </body>
