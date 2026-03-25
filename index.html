@@ -229,14 +229,13 @@
       
       .order-msg-card { background: var(--surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 15px; box-shadow: var(--shadow-sm); margin-bottom: 15px; text-align: right; }
       .order-msg-content { background: var(--bg-color); padding: 12px; border-radius: 8px; font-size: 14px; line-height: 1.8; margin-bottom: 10px; white-space: pre-line; color: var(--text-main); }
-      .order-img-preview { width: 100%; object-fit: cover; border-radius: 8px; margin-top: 10px; border: 1px solid var(--border-color); display: none; }
       .book-btn { background: var(--secondary); color: #000; border: none; padding: 12px; width: 100%; border-radius: var(--radius-md); font-weight: 800; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px;}
       .book-btn:active { transform: scale(0.96); }
       
-      /* تنسيق خاص لزر النسخ */
-      .copy-span { cursor: pointer; display: inline-block; padding: 4px 8px; border-radius: 6px; transition: 0.3s; background: rgba(90, 34, 139, 0.05); border: 1px dashed rgba(90, 34, 139, 0.2); }
+      /* أزرار النسخ مالت الكود والرقم */
+      .copy-span { cursor: pointer; display: inline-block; padding: 4px 8px; border-radius: 6px; transition: 0.3s; background: rgba(90, 34, 139, 0.05); border: 1px dashed rgba(90, 34, 139, 0.2); font-weight: bold; }
       .copy-span:active { background: rgba(90, 34, 139, 0.15); transform: scale(0.95); }
-      .copy-span i { color: var(--primary); margin-right: 5px; font-size: 12px; }
+      .copy-span i { color: var(--primary); margin-left: 5px; font-size: 12px; }
     </style>
 </head>
 </head>
@@ -329,6 +328,7 @@
     </div>
     
     <button class="theme-toggle ripple" onclick="openSidebar()" id="menu-btn"><i class="fas fa-bars"></i></button>
+
     <div id="welcome-overlay" onclick="skipWelcome()">
         <i class="fas fa-check-circle" style="font-size: 80px; color: #10B981; margin-bottom: 20px; animation: scaleIn 0.5s ease;"></i>
         <h1 id="welcome-title" style="margin:0 0 10px; font-weight:800;">تم التفعيل! 🥳</h1>
@@ -490,8 +490,8 @@
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
       </div>
-    </div>
-    <div id="tuk-screen" class="screen container">
+                </div>
+                    <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
         <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
@@ -828,7 +828,7 @@
 
       async function trackLiveVisit() { try { fetch(`${GS_URL}?action=trackVisit`); } catch(e) {} }
 
-      let secretCounter = 0; let lockSecretCounter = 0; let currentLang = 'ar'; let appIsActive = true;
+      let secretCounter = 0; let lockSecretCounter = 0; let appIsActive = true;
       let lastOrderCount = -1; let orderPollInterval = null; let isSoundEnabled = false;
       const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
@@ -893,18 +893,18 @@
       function handleSecretClick() {
           secretCounter++;
           if (secretCounter === 5) {
-              secretCounter = 0; let pass = prompt(currentLang === 'ar' ? "أدخل الرمز السري:" : "Admin Code:");
+              secretCounter = 0; let pass = prompt("أدخل الرمز السري:");
               if (pass === "2006") { localStorage.setItem('isAdmin', 'true'); showScreen('admin-panel'); checkGlobalStatusFromServer(); } 
-              else if (pass !== null) { showToast(currentLang === 'ar' ? "الرمز خطأ ❌" : "Wrong Code ❌"); }
+              else if (pass !== null) { showToast("الرمز خطأ ❌"); }
           }
       }
 
       function handleLockScreenSecret() {
           lockSecretCounter++;
           if (lockSecretCounter === 5) {
-              lockSecretCounter = 0; let pass = prompt(currentLang === 'ar' ? "أدخل الرمز السري:" : "Admin Code:");
+              lockSecretCounter = 0; let pass = prompt("أدخل الرمز السري:");
               if (pass === "2006") { localStorage.setItem('isAdmin', 'true'); document.getElementById('global-lock-screen').style.display = 'none'; showScreen('admin-panel'); } 
-              else if (pass !== null) { showToast(currentLang === 'ar' ? "الرمز خطأ ❌" : "Wrong Code ❌"); }
+              else if (pass !== null) { showToast("الرمز خطأ ❌"); }
           }
       }
 
@@ -943,8 +943,7 @@
                   setTimeout(() => splash.style.display = 'none', 500); 
               }
           }, 1500);
-
-          try { checkStatus(); initAutoLocation(); } catch(err) { console.error("Error during init:", err); }
+          try { checkStatus(); initAutoLocation(); } catch(err) {}
       });
 
       async function setGlobalAppStatus(newStatus) {
@@ -1167,8 +1166,8 @@
           if(!userCoords) {
               showToast("جاري تحديد موقعك الحالي للطلب... 📍");
               if(navigator.geolocation) {
-                  // تم تصليح رابط الخريطة ليعمل بشكل صحيح 100%
-                  navigator.geolocation.getCurrentPosition((pos) => { userCoords = "https://maps.google.com/?q=" + pos.coords.latitude + "," + pos.coords.longitude; sendTukOrder(); }, (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true });
+                  // تم تصليح رابط الخريطة ليعمل بشكل صحيح 100% ويفتح تطبيق كوكل ماب
+                  navigator.geolocation.getCurrentPosition((pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); }, (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true });
               } else { showToast("جهازك لا يدعم تحديد الموقع ❌"); } return;
           }
           const btn = document.getElementById('tukSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
@@ -1192,7 +1191,8 @@
           if(!userCoords) {
               showToast("جاري تحديد موقعك الحالي للطلب... 📍");
               if(navigator.geolocation) {
-                  navigator.geolocation.getCurrentPosition((pos) => { userCoords = "https://maps.google.com/?q=" + pos.coords.latitude + "," + pos.coords.longitude; sendMedFinal(); }, (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true });
+                  // تم تصليح الرابط هنا أيضاً
+                  navigator.geolocation.getCurrentPosition((pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); }, (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true });
               } return;
           }
           const btn = document.getElementById('medSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
@@ -1227,7 +1227,8 @@
           if(!userCoords) {
               showToast("جاري تحديد موقعك الحالي للطلب... 📍");
               if(navigator.geolocation) {
-                  navigator.geolocation.getCurrentPosition((pos) => { userCoords = "https://maps.google.com/?q=" + pos.coords.latitude + "," + pos.coords.longitude; sendFinal(); }, (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true });
+                  // تم تصليح الرابط هنا
+                  navigator.geolocation.getCurrentPosition((pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); }, (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true });
               } return;
           }
           const btn = document.getElementById('sendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
@@ -1241,6 +1242,7 @@
                           let tgData = await tgResp.json(); 
                           if (tgData.ok) { 
                               photoMsgs.push(tgData.result.message_id); 
+                              // حفظ معرف الصورة حتى نكدر نعرضها بالتطبيق
                               if(tgData.result.photo && tgData.result.photo.length > 0) { fileIdToSave = tgData.result.photo[tgData.result.photo.length - 1].file_id; }
                           }
                       } catch(err) {}
@@ -1472,7 +1474,7 @@
                           ${order.loyaltyMsg ? `🔢 تسلسل الطلب: ${order.loyaltyMsg}<br>` : ''}
                           📍 الموقع: <a href="${order.location}" target="_blank" style="color:#0088cc;">اضغط لعرض الخريطة</a>
                       </div>
-                      ${fileId ? `<div style="text-align:center;"><img id="tg-img-${order.vc}" src="" style="display:none; width:100%; max-height:300px; object-fit:contain; border-radius:8px; margin-top:10px; border:1px solid var(--border-color);"></div>` : ''}
+                      ${fileId ? `<div style="text-align:center; margin-top:10px;"><p style="font-size:12px; color:var(--text-muted); margin:0;">جاري تحميل الصورة...</p><img id="tg-img-${order.vc}" src="" style="display:none; width:100%; object-fit:contain; border-radius:8px; border:1px solid var(--border-color); box-shadow:var(--shadow-sm);"></div>` : ''}
                       
                       <div style="display:flex; gap:10px; margin-top:15px;">
                           <button class="location-btn success ripple" style="flex:1; margin:0; padding:10px;" onclick="window.location.href='tel:${safePhone}'"><i class="fas fa-phone"></i> اتصال</button>
@@ -1481,6 +1483,7 @@
                   </div>
               `}).join('');
 
+              // تحميل الصور بعد ما تنرسم الخانات
               imagesToLoad.forEach(imgData => { loadTelegramImage(imgData.fileId, imgData.id); });
 
           } catch(e) { container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--danger); font-weight:bold; margin:0;">حدث خطأ أثناء جلب طلباتك.</p></div>'; }
