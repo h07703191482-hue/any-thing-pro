@@ -29,8 +29,8 @@
     <meta name="apple-mobile-web-app-title" content="البندر">
     <meta name="application-name" content="البندر">
     
-    <meta name="description" content="تطبيق البندر هو أسرع تطبيق لتوصيل المسواك، التحصيل، والخدمات اللوجستية في أم قصر. اطلب الآن نصلك أينما كنت.">
-    <meta name="keywords" content="البندر, تطبيق البندر, توصيل البندر, تحصيل، أم قصر، تكتك، مسواك، طلبات، البصرة، مندوب">
+    <meta name="description" content="تطبيق البندر هو أسرع تطبيق للتوصيل، التحصيل، والخدمات اللوجستية في أم قصر. اطلب الآن نصلك أينما كنت.">
+    <meta name="keywords" content="البندر, تطبيق البندر, توصيل البندر, تحصيل، أم قصر، مطعم البندر، طلبات، البصرة، مندوب">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -152,9 +152,8 @@
       .card-half h3 { margin: 0; font-size: 16px; font-weight: 800; }
       .card-half small { color: var(--text-muted); font-size: 12px; font-weight: 600; line-height: 1.4; display: block; }
       .card-half .arrow-icon { display: none; }
-      .card-cart .icon-wrapper { background: rgba(90, 34, 139, 0.1); color: var(--primary); }
+      .card-restaurant .icon-wrapper { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
       .card-med .icon-wrapper { background: rgba(249, 115, 22, 0.1); color: #F97316; }
-      .card-tuk .icon-wrapper { background: rgba(255, 193, 7, 0.15); color: #D97706; }
       .card-join .icon-wrapper { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
       .card-plaza .icon-wrapper { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
       
@@ -187,7 +186,7 @@
       body.dark-mode .price-indicator { border-color: rgba(255,255,255,0.05); }
       .price-indicator span { font-size: 14px; color: var(--text-muted); font-weight: 600; display: block; }
       .price-indicator .amount { font-size: 32px; font-weight: 800; color: var(--primary); display: block; margin: 5px 0; }
-      .bottom-nav { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 400px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); display: flex; justify-content: space-around; align-items: center; padding: 8px 12px; border-radius: var(--radius-pill); box-shadow: var(--shadow-floating); z-index: 9998; border: 1px solid rgba(255,255,255,0.4); }
+              .bottom-nav { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 400px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); display: flex; justify-content: space-around; align-items: center; padding: 8px 12px; border-radius: var(--radius-pill); box-shadow: var(--shadow-floating); z-index: 9998; border: 1px solid rgba(255,255,255,0.4); }
       body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.9); border-color: rgba(255,255,255,0.05); }
       .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 15px; color: var(--text-muted); text-decoration: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; border-radius: var(--radius-pill); position: relative; }
       .nav-item i { font-size: 20px; transition: transform 0.3s; }
@@ -236,8 +235,17 @@
       .copy-span { cursor: pointer; display: inline-block; padding: 4px 8px; border-radius: 6px; transition: 0.3s; background: rgba(90, 34, 139, 0.05); border: 1px dashed rgba(90, 34, 139, 0.2); font-weight: bold; }
       .copy-span:active { background: rgba(90, 34, 139, 0.15); transform: scale(0.95); }
       .copy-span i { color: var(--primary); margin-left: 5px; font-size: 12px; }
+
+      /* ستايلات المنيو الجديدة لمطعم البندر */
+      .menu-item { display: flex; align-items: center; justify-content: space-between; background: var(--surface); padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 12px; box-shadow: var(--shadow-sm); }
+      .menu-info h4 { margin: 0 0 5px 0; font-size: 16px; font-weight: 800; color: var(--text-main); }
+      .menu-info span { font-size: 14px; color: var(--primary); font-weight: 700; }
+      .menu-controls { display: flex; align-items: center; gap: 15px; background: var(--bg-color); padding: 5px 10px; border-radius: var(--radius-pill); }
+      .menu-btn { background: var(--surface); border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 16px; font-weight: bold; color: var(--primary); cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+      .menu-btn:active { transform: scale(0.9); }
+      .menu-qty { font-size: 16px; font-weight: 800; width: 20px; text-align: center; }
+      .total-bar { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 15px 20px; border-radius: var(--radius-md); margin-top: 20px; font-size: 18px; font-weight: 800; box-shadow: var(--shadow-md); margin-bottom: 20px;}
     </style>
-</head>
 </head>
 <body oncontextmenu="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;">
     <div id="map-modal">
@@ -420,21 +428,12 @@
         <p id="main-sub">ماذا تحتاج اليوم؟</p>
       </div>
 
-      <div class="baly-slider-container">
-          <div class="baly-slider">
-              <div class="baly-slide ripple" style="background: linear-gradient(135deg, var(--primary) 0%, #8B5CF6 100%);" onclick="showScreen('order-screen')">
-                  <div class="slide-text">
-                      <h3>🎁 الطلب العاشر مجاني!</h3>
-                      <p>اجمع 9 طلبات ومسواكك العاشر علينا.</p>
-                  </div>
-                  <i class="fas fa-shopping-basket slide-icon"></i>
-              </div>
-              <div class="baly-slide ripple" style="background: linear-gradient(135deg, var(--secondary) 0%, #F59E0B 100%); color: #111;" onclick="showScreen('tuk-screen')">
-                  <div class="slide-text">
-                      <h3>🚖 تحصيل سريع وآمن</h3>
-                      <p>نوصل أغراضك ونحصل أموالك بسرعة.</p>
-                  </div>
-                  <i class="fas fa-money-bill-wave slide-icon" style="color: #111;"></i>
+      <div style="padding: 0 20px; margin-top: -40px; margin-bottom: 25px; position: relative; z-index: 5;">
+          <div class="ripple" style="background: var(--surface); border-radius: var(--radius-lg); padding: 15px 20px; display: flex; align-items: center; justify-content: center; gap: 15px; box-shadow: var(--shadow-sm); cursor: pointer; border: 1px solid var(--border-color);" onclick="showScreen('restaurant-screen')">
+              <div style="font-size: 35px; animation: bouncePin 2s infinite alternate;">🍔</div>
+              <div style="text-align: right;">
+                  <h3 style="margin: 0; font-weight: 800; font-size: 18px; color: var(--primary);">مطعم البندر</h3>
+                  <p style="margin: 0; font-size: 13px; color: var(--text-muted); font-weight: 600;">همبرگة، ريزو، لبن.. اطلب هسه!</p>
               </div>
           </div>
       </div>
@@ -491,6 +490,90 @@
           </div>
       </div>
     </div>
+    <div id="restaurant-screen" class="screen container">
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-hamburger" style="color:var(--primary);"></i> مطعم البندر</h2>
+        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
+        
+        <div class="price-indicator" style="display: block;">
+            <span>أسعار التوصيل:</span>
+            <span class="amount" style="font-size: 20px;">داخل أم قصر: 1,500 د.ع</span>
+            <span class="amount" style="font-size: 20px;">خارج أم قصر: 2,500 د.ع</span>
+            <small style="color: var(--secondary); font-weight: bold;"><i class="fas fa-motorcycle"></i> توصيل حار وسريع</small>
+        </div>
+
+        <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-utensils"></i> قائمة الطعام (المنيو)</div>
+            
+            <div class="menu-item">
+                <div class="menu-info">
+                    <h4>همبرگة 🍔</h4>
+                    <span>1,000 د.ع</span>
+                </div>
+                <div class="menu-controls">
+                    <button class="menu-btn" onclick="updateMenuQty('burger', -1, 1000)">-</button>
+                    <span class="menu-qty" id="qty-burger">0</span>
+                    <button class="menu-btn" onclick="updateMenuQty('burger', 1, 1000)">+</button>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <div class="menu-info">
+                    <h4>ريزو دجاج 🍛</h4>
+                    <span>3,000 د.ع</span>
+                </div>
+                <div class="menu-controls">
+                    <button class="menu-btn" onclick="updateMenuQty('rizo', -1, 3000)">-</button>
+                    <span class="menu-qty" id="qty-rizo">0</span>
+                    <button class="menu-btn" onclick="updateMenuQty('rizo', 1, 3000)">+</button>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <div class="menu-info">
+                    <h4>لبن 🥛</h4>
+                    <span>2,000 د.ع</span>
+                </div>
+                <div class="menu-controls">
+                    <button class="menu-btn" onclick="updateMenuQty('laban', -1, 2000)">-</button>
+                    <span class="menu-qty" id="qty-laban">0</span>
+                    <button class="menu-btn" onclick="updateMenuQty('laban', 1, 2000)">+</button>
+                </div>
+            </div>
+
+            <div class="total-bar">
+                <span>المجموع:</span>
+                <span id="restaurant-total">0 د.ع</span>
+            </div>
+        </div>
+
+        <div class="form-card" id="rest-user-card">
+            <div class="form-card-title"><i class="fas fa-user-circle"></i> بيانات التوصيل</div>
+            <div class="form-group">
+                <label>الاسم الكامل</label>
+                <input type="text" id="restName" placeholder="اكتب اسمك">
+                <span class="step-number">خطوة رقم (1)</span>
+            </div>
+            <div class="form-group">
+                <label>رقم الموبايل</label>
+                <input type="tel" id="restPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                <span class="step-number">خطوة رقم (2)</span>
+            </div>
+            <div class="form-group">
+                <label>أقرب نقطة دالة</label>
+                <input type="text" id="restLandmark" placeholder="لتسهيل وصول المندوب">
+                <span class="step-number">خطوة رقم (3)</span>
+            </div>
+        </div>
+
+        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب. في حال عدم الرد سيتم إلغاء الطلب فوراً!
+        </div>
+
+        <button class="send-btn order-btn-logic ripple" id="restSendBtn" onclick="sendRestaurantOrder()"><i class="fas fa-paper-plane"></i> <span id="rest-final-btn">تأكيد طلب المطعم</span></button>
+    </div>
+
     <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
@@ -650,8 +733,7 @@
 
         <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
-    
-    <div id="join-screen" class="screen container">
+        <div id="join-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> انضم ككابتن</h2>
         
@@ -703,9 +785,9 @@
 
         <div class="price-indicator" style="display: block; margin-bottom: 20px;">
             <span>أجور التوصيل المعتمدة:</span>
-            <span class="amount" style="font-size: 20px;">داخل أم قصر: 1,500 د.ع</span>
+            <span class="amount" style="font-size: 20px;">داخل أم قصر: 2,000 د.ع</span>
             <span class="amount" style="font-size: 20px;">خارج أم قصر (الميناء أو الهدامة): 2,500 د.ع</span>
-            <small style="color: var(--danger); font-weight: bold; display: block; margin-top: 10px; font-size: 14px;">لصاحب التطبيق 500 دينار على كل طلب</small>
+            <small style="color: var(--danger); font-weight: bold; display: block; margin-top: 10px; font-size: 14px;">لصاحب التطبيق 500 دينار والكابتن 1500 دينار على كل طلب داخل أم قصر</small>
         </div>
 
         <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 14px; font-weight: 800; margin-bottom: 20px;">
@@ -792,6 +874,7 @@
             </div>
         </div>
     </div>
+    
     <script>
       // ==========================================
       // سكربتات الحماية لمنع أدوات المطورين والسرقة
@@ -976,6 +1059,7 @@
               let tBtn = document.getElementById('tukSendBtn'); if(tBtn) tBtn.innerHTML = '<i class="fas fa-paper-plane"></i> طلب تكتك توصيلة';
               let mBtn = document.getElementById('medSendBtn'); if(mBtn) mBtn.innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
               let sBtn = document.getElementById('sendBtn'); if(sBtn) sBtn.innerHTML = '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
+              let rBtn = document.getElementById('restSendBtn'); if(rBtn) rBtn.innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب المطعم';
               orderButtons.forEach(btn => btn.disabled = false);
           }
       }
@@ -1078,8 +1162,8 @@
       function loadSavedCustomerData() {
           const name = localStorage.getItem('saved_customer_name'); const phone = localStorage.getItem('saved_customer_phone');
           if (name && phone) {
-              ['custName', 'medName', 'tukName'].forEach(id => { let el = document.getElementById(id); if(el) el.value = name; });
-              ['custPhone', 'medPhone', 'tukPhone'].forEach(id => { let el = document.getElementById(id); if(el) { el.value = phone; checkPhoneLive(el); } });
+              ['custName', 'medName', 'tukName', 'restName'].forEach(id => { let el = document.getElementById(id); if(el) el.value = name; });
+              ['custPhone', 'medPhone', 'tukPhone', 'restPhone'].forEach(id => { let el = document.getElementById(id); if(el) { el.value = phone; checkPhoneLive(el); } });
           }
       }
 
@@ -1151,14 +1235,93 @@
           
           if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); let dName = document.getElementById('driver-display-name'); if(dName) dName.innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
           if(id === 'log-screen') { renderDriverLog(); } 
-          if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') { loadSavedCustomerData(); }
+          if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen' || id === 'restaurant-screen') { loadSavedCustomerData(); }
           if(id === 'order-screen') updateLoyaltyUI();
           if(id === 'general-orders-screen') { fetchGeneralOrders(); }
           if(id === 'my-orders-screen') { fetchMyOrders(); }
 
           if (typeof closeSidebar === 'function') closeSidebar();
       }
-      // القسم الثاني والأخير من الجزء الرابع - معدل لإظهار اسم الزبون الصريح
+
+      // ------------------------------------------
+      // سكربت المطعم الجديد والمنيو
+      // ------------------------------------------
+      let menuOrder = { burger: 0, rizo: 0, laban: 0 };
+      
+      function updateMenuQty(item, change, price) {
+          menuOrder[item] = Math.max(0, menuOrder[item] + change);
+          document.getElementById('qty-' + item).innerText = menuOrder[item];
+          
+          let total = (menuOrder.burger * 1000) + (menuOrder.rizo * 3000) + (menuOrder.laban * 2000);
+          document.getElementById('restaurant-total').innerText = total + ' د.ع';
+      }
+
+      async function sendRestaurantOrder() {
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          
+          const name = document.getElementById('restName').value.trim(); 
+          const phone = document.getElementById('restPhone').value.trim();
+          const land = document.getElementById('restLandmark').value.trim();
+          let total = (menuOrder.burger * 1000) + (menuOrder.rizo * 3000) + (menuOrder.laban * 2000);
+          
+          if(!name || !validateIraqiPhone(phone)) return showToast("أكمل البيانات بشكل صحيح 📝");
+          if(total === 0) return showToast("الرجاء اختيار وجبة واحدة على الأقل 🍔");
+
+          if(!userCoords) {
+              showToast("جاري تحديد موقعك الحالي للطلب... 📍");
+              if(navigator.geolocation) {
+                  navigator.geolocation.getCurrentPosition((pos) => { 
+                      userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; 
+                      sendRestaurantOrder(); 
+                  }, (err) => { 
+                      showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); 
+                  }, { enableHighAccuracy: true });
+              } return;
+          }
+
+          const btn = document.getElementById('restSendBtn'); 
+          const originalText = btn.innerHTML; 
+          btn.innerHTML = '<span class="baly-spinner"></span>'; 
+          btn.disabled = true;
+
+          let orderDetails = [];
+          if(menuOrder.burger > 0) orderDetails.push(`همبرگة (العدد: ${menuOrder.burger})`);
+          if(menuOrder.rizo > 0) orderDetails.push(`ريزو دجاج (العدد: ${menuOrder.rizo})`);
+          if(menuOrder.laban > 0) orderDetails.push(`لبن (العدد: ${menuOrder.laban})`);
+          let finalOrderText = "الطلبات:\n" + orderDetails.join("\n") + "\n\nإجمالي الحساب: " + total + " د.ع";
+
+          try {
+              saveCustomerData(name, phone); 
+              const vc = generateSecureVC(); 
+              let referrer = localStorage.getItem('referred_by') || "";
+              
+              await fetch(`${GS_URL}?action=saveOrderCode&name=${encodeURIComponent(name)}&phone=${phone}&code=${vc}&referrer=${referrer}&type=🍔 مطعم البندر&details=${encodeURIComponent(finalOrderText)}&land=${encodeURIComponent(land)}&location=${encodeURIComponent(userCoords)}`); 
+              
+              localStorage.removeItem('referred_by');
+              const msg = `🍔 طلب مطعم البندر\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 ${finalOrderText}\n📍 الموقع: ${userCoords}`;
+              
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } }) });
+              
+              showToast("تم إرسال طلب المطعم بنجاح ✅"); 
+              document.getElementById('restLandmark').value = ""; 
+              
+              // تصفير المنيو بعد الإرسال
+              menuOrder = { burger: 0, rizo: 0, laban: 0 };
+              document.getElementById('qty-burger').innerText = '0';
+              document.getElementById('qty-rizo').innerText = '0';
+              document.getElementById('qty-laban').innerText = '0';
+              document.getElementById('restaurant-total').innerText = '0 د.ع';
+              
+              syncLoyaltyWithServer(); 
+              loadSavedCustomerData();
+          } catch (e) {
+              showToast("حدث خطأ بالاتصال ❌");
+          } finally { 
+              btn.innerHTML = originalText; 
+              btn.disabled = false; 
+          }
+      }
+
       async function sendTukOrder() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const name = document.getElementById('tukName').value.trim(); const phone = document.getElementById('tukPhone').value.trim();
@@ -1329,4 +1492,4 @@
       function confirmMapLocation() { let center = appMap.getCenter(); document.getElementById('tukDropoffLink').value = `https://maps.google.com/?q=$${center.lat},${center.lng}`; document.getElementById('map-success-msg').style.display = 'block'; closeMapModal(); }
     </script>
 </body>
-</html>
+            </html>
