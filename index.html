@@ -57,6 +57,19 @@
       .map-footer { padding: 15px; text-align: center; background: var(--surface); }
       @keyframes bouncePin { from { transform: translate(-50%, -100%); } to { transform: translate(-50%, -110%); } }
 
+      /* ستايل نافذة أسعار التوصيل الجديدة */
+      #prices-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100005; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;}
+      .prices-container { width: 100%; max-width: 400px; background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-floating); display: flex; flex-direction: column; animation: scaleIn 0.3s ease-out;}
+      .prices-header { padding: 18px; background: var(--primary); background: linear-gradient(135deg, var(--primary) 0%, #3B1261 100%); color: white; text-align: center; font-weight: 800; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
+      .close-prices-btn { background: transparent; border: none; color: white; font-size: 22px; cursor: pointer; padding: 0; transition: 0.3s; }
+      .close-prices-btn:active { transform: scale(0.8); }
+      .prices-content { padding: 10px 20px 20px; max-height: 60vh; overflow-y: auto; }
+      .price-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border-color); font-weight: 700; font-size: 15px; color: var(--text-main);}
+      .price-item:last-child { border-bottom: none; }
+      .price-item i { color: var(--gold); margin-left: 8px; width: 20px; text-align: center;}
+      .price-val { color: var(--primary); font-weight: 900; background: rgba(90, 34, 139, 0.1); padding: 4px 12px; border-radius: var(--radius-pill); font-size: 14px;}
+      body.dark-mode .price-val { background: rgba(255, 255, 255, 0.1); color: var(--gold); }
+
       :root { 
           --primary: #5A228B; --primary-hover: #4A1A75; --secondary: #FFC107; --gold: #FFC107; 
           --danger: #EF4444; --bg-color: #F4F6F9; --surface: #FFFFFF; --text-main: #111827; 
@@ -91,6 +104,7 @@
       
       .container { max-width: 480px; margin: auto; padding: 20px; padding-bottom: 120px; }
       @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
       @keyframes iconPulse { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.08); filter: brightness(1.2); } 100% { transform: scale(1); filter: brightness(1); } }
       .icon-pulse { animation: iconPulse 2s infinite ease-in-out; }
       
@@ -252,6 +266,30 @@
                 <button class="send-btn ripple" style="margin-top: 0; background: #10B981;" onclick="confirmMapLocation()">
                     تأكيد الموقع <i class="fas fa-check"></i>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="prices-modal">
+        <div class="prices-container">
+            <div class="prices-header">
+                <span>أسعار التوصيل 🛵</span>
+                <button class="close-prices-btn" onclick="closePricesModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="prices-content">
+                <div class="price-item"><span>شوارع</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span>صناعه</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span>جاهزه</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span>فاروق</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span>حي لمعلمين</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span>لمخازن</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span>مشروع</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span>هندسة</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span>شعبي</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span>الهدامه</span><span class="price-val">2,500 د.ع</span></div>
+                <div class="price-item"><span>القاعده</span><span class="price-val">2,500 د.ع</span></div>
+                <div class="price-item"><span>المجمع الكويتي</span><span class="price-val">2,500 د.ع</span></div>
+                <div class="price-item" style="border-bottom: none;"><span>الميناء</span><span class="price-val" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">4,000 د.ع</span></div>
             </div>
         </div>
     </div>
@@ -441,6 +479,19 @@
           </div>
       </div>
       
+      <div style="padding: 0 5px 15px; position: relative; z-index: 5;">
+          <div class="select-card ripple-dark" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--primary);" onclick="openPricesModal()">
+              <div style="display: flex; align-items: center; gap: 15px;">
+                  <div style="width: 45px; height: 45px; background: rgba(90, 34, 139, 0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 20px;"><i class="fas fa-map-signs"></i></div>
+                  <div>
+                      <h4 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--text-main);">أسعار التوصيل</h4>
+                      <small style="color: var(--text-muted); font-weight: 600;">تعرف على أسعار كل مناطق أم قصر</small>
+                  </div>
+              </div>
+              <i class="fas fa-chevron-left" style="color: var(--border-color); font-size: 14px;"></i>
+          </div>
+      </div>
+
       <div class="services-grid">
           <div class="select-card card-full card-cart ripple-dark" onclick="showScreen('order-screen')">
             <div class="icon-wrapper icon-pulse"><i class="fas fa-shopping-cart"></i></div>
@@ -481,7 +532,6 @@
           </div>
       </div>
     </div>
-
     <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> <span id="restaurant-name-header">اسم المطعم</span></h2>
@@ -1104,7 +1154,7 @@
       /* ========================================= */
 
       /* =========================================
-         منظومة المطاعم المحدثة (تدعم أكثر من مطعم)
+         منظومة المطاعم المحدثة
       ========================================= */
       const menus = {
           'ali_salem': {
@@ -1224,6 +1274,7 @@
           showToast("تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
       }
       /* ========================================= */
+
       function checkStatus() {
           trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
           const urlParams = new URLSearchParams(window.location.search);
@@ -1536,7 +1587,7 @@
                   }).catch(e => console.log("خطأ في إرسال طلب المطعم"));
               }
 
-              // 3. إرسال الطلب لمطعم ابو حمودي إذا كان الطلب من المنيو مالته (التحديث الجديد)
+              // 3. إرسال الطلب لمطعم ابو حمودي إذا كان الطلب من المنيو مالته
               let isAboHmodeOrder = order.includes("مطعم بركر ابو حمودي");
               if (isAboHmodeOrder) {
                   const hmodeMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
@@ -1673,6 +1724,14 @@
           document.getElementById('tukDropoffLink').value = googleMapsLink;
           document.getElementById('map-success-msg').style.display = 'block';
           closeMapModal();
+      }
+
+      // دوال نافذة أسعار التوصيل الجديدة
+      function openPricesModal() {
+          document.getElementById('prices-modal').style.display = 'flex';
+      }
+      function closePricesModal() {
+          document.getElementById('prices-modal').style.display = 'none';
       }
     </script>
 </body>
