@@ -820,6 +820,11 @@
       // التوكنات الخاصة ببوتات المطاعم
       const ALI_SALEM_BOT_TOKEN = "8735092732:AAE9lBE3i6AJRkKe3LLlAAodFXuAv7VXpys";
       const ABO_HMODE_BOT_TOKEN = "8695832371:AAHosUvA37U9U1qhiZJlbDKxJPZFgDHbJAk"; 
+      
+      // === المعرفات المنفصلة للمطاعم ===
+      const ALI_SALEM_CHAT_ID = "399195479";
+      const ABO_HMODE_CHAT_ID = "651243067";
+      // ==============================================
 
       let userCoords = ""; 
       const CURRENT_VERSION = "2.0.15"; 
@@ -1182,6 +1187,43 @@
               ]
           }
       };
+
+      // === إضافة دالة سحب السلع وحذفها من السيرفر ===
+      async function fetchDynamicMenus() {
+          try {
+              const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
+              const data = await resp.json();
+              
+              if (data && typeof data === 'object' && !Array.isArray(data)) {
+                  // إضافة السلع الجديدة
+                  if (data.added && data.added.length > 0) {
+                      data.added.forEach(newItem => {
+                          if(menus[newItem.restId]) {
+                              const exists = menus[newItem.restId].items.find(i => i.name === newItem.name);
+                              if(!exists) menus[newItem.restId].items.push(newItem);
+                          }
+                      });
+                  }
+                  // حذف السلع اللي طلب المطعم حذفها
+                  if (data.deleted && data.deleted.length > 0) {
+                      data.deleted.forEach(delItem => {
+                          if(menus[delItem.restId]) {
+                              menus[delItem.restId].items = menus[delItem.restId].items.filter(i => i.name !== delItem.name);
+                          }
+                      });
+                  }
+              } else if (Array.isArray(data) && data.length > 0) {
+                  // للتوافق وي النسخة القديمة إذا السيرفر رجع بس مصفوفة
+                  data.forEach(newItem => {
+                      if(menus[newItem.restId]) {
+                          const exists = menus[newItem.restId].items.find(i => i.name === newItem.name);
+                          if(!exists) menus[newItem.restId].items.push(newItem);
+                      }
+                  });
+              }
+          } catch(e) { console.log("لا توجد تحديثات للسلع حالياً"); }
+      }
+      // =======================================
       
       let currentCart = {};
       let currentRestaurantId = '';
@@ -1263,9 +1305,9 @@
           showToast("تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
       }
       /* ========================================= */
-
       function checkStatus() {
           trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
+          fetchDynamicMenus(); // <== تم إضافة استدعاء السلع الجديدة هنا
           const urlParams = new URLSearchParams(window.location.search);
           const ref = urlParams.get('ref');
           const myPhone = localStorage.getItem('saved_customer_phone');
@@ -1566,25 +1608,27 @@
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
 
-              // 2. إرسال الطلب لمطعم علي سالم إذا كان الطلب من المنيو مالته
+              // === التعديل هنا: توجيه الطلبات للمعرفات المنفصلة ===
+              // 2. إرسال الطلب لمطعم علي سالم
               let isAliSalemOrder = order.includes("مطعم برجر علي سالم");
               if (isAliSalemOrder) {
                   const restMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                   await fetch(`https://api.telegram.org/bot${ALI_SALEM_BOT_TOKEN}/sendMessage`, {
                       method: "POST", headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: restMsg })
+                      body: JSON.stringify({ chat_id: ALI_SALEM_CHAT_ID, text: restMsg }) // <== استخدام المعرف الخاص
                   }).catch(e => console.log("خطأ في إرسال طلب المطعم"));
               }
 
-              // 3. إرسال الطلب لمطعم ابو حمودي إذا كان الطلب من المنيو مالته
+              // 3. إرسال الطلب لمطعم ابو حمودي
               let isAboHmodeOrder = order.includes("مطعم بركر ابو حمودي");
               if (isAboHmodeOrder) {
                   const hmodeMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                   await fetch(`https://api.telegram.org/bot${ABO_HMODE_BOT_TOKEN}/sendMessage`, {
                       method: "POST", headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: hmodeMsg })
+                      body: JSON.stringify({ chat_id: ABO_HMODE_CHAT_ID, text: hmodeMsg }) // <== استخدام المعرف الخاص
                   }).catch(e => console.log("خطأ في إرسال طلب مطعم ابو حمودي"));
               }
+              // ====================================================
 
               showToast("تم إرسال طلبك بنجاح ✅"); 
               document.getElementById('custOrder').value = ""; 
