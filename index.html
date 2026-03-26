@@ -248,6 +248,33 @@
       .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); padding: 15px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 10000; border-top-left-radius: 20px; border-top-right-radius: 20px; border-top: 1px solid var(--border-color); animation: fadeSlideUp 0.3s ease-out; }
       body.dark-mode .cart-bar { box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
       .cart-bar-total { font-size: 20px; font-weight: 800; color: var(--primary); display: block; }
+      
+      /* الميزة الجديدة: ستايل الشبكة (الجريد) للمطاعم اللي بيها اكثر من 10 وجبات */
+      .menu-grid-view {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
+          background: transparent !important;
+          border: none !important;
+          padding: 15px;
+      }
+      .menu-grid-view .menu-item {
+          flex-direction: column;
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-md);
+          box-shadow: var(--shadow-sm);
+          padding: 15px 10px;
+          text-align: center;
+      }
+      .menu-grid-view .menu-item:last-child {
+          border-bottom: 1px solid var(--border-color);
+      }
+      .menu-grid-view .menu-item-info {
+          margin-bottom: 12px;
+      }
+      .menu-grid-view .qty-controls {
+          justify-content: center;
+      }
     </style>
 </head>
 <body>
@@ -277,19 +304,7 @@
                 <button class="close-prices-btn" onclick="closePricesModal()"><i class="fas fa-times"></i></button>
             </div>
             <div class="prices-content">
-                <div class="price-item"><span>شوارع</span><span class="price-val">1,500 د.ع</span></div>
-                <div class="price-item"><span>صناعه</span><span class="price-val">1,500 د.ع</span></div>
-                <div class="price-item"><span>جاهزه</span><span class="price-val">1,500 د.ع</span></div>
-                <div class="price-item"><span>فاروق</span><span class="price-val">1,500 د.ع</span></div>
-                <div class="price-item"><span>حي لمعلمين</span><span class="price-val">1,500 د.ع</span></div>
-                <div class="price-item"><span>لمخازن</span><span class="price-val">1,500 د.ع</span></div>
-                <div class="price-item"><span>مشروع</span><span class="price-val">1,500 د.ع</span></div>
-                <div class="price-item"><span>هندسة</span><span class="price-val">1,500 د.ع</span></div>
-                <div class="price-item"><span>شعبي</span><span class="price-val">1,500 د.ع</span></div>
-                <div class="price-item"><span>الهدامه</span><span class="price-val">2,500 د.ع</span></div>
-                <div class="price-item"><span>القاعده</span><span class="price-val">2,500 د.ع</span></div>
-                <div class="price-item"><span>المجمع الكويتي</span><span class="price-val">2,500 د.ع</span></div>
-                <div class="price-item" style="border-bottom: none;"><span>الميناء</span><span class="price-val" style="background: rgba(239, 68, 68, 0.1); color: var(--danger);">4,000 د.ع</span></div>
+                <div class="price-item" style="border-bottom: none;"><span>جميع مناطق أم قصر</span><span class="price-val">2,000 د.ع</span></div>
             </div>
         </div>
     </div>
@@ -446,7 +461,6 @@
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
-
     <div id="home-screen" class="screen container active-screen">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
@@ -1188,14 +1202,12 @@
           }
       };
 
-      // === إضافة دالة سحب السلع وحذفها من السيرفر ===
       async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
               const data = await resp.json();
               
               if (data && typeof data === 'object' && !Array.isArray(data)) {
-                  // إضافة السلع الجديدة
                   if (data.added && data.added.length > 0) {
                       data.added.forEach(newItem => {
                           if(menus[newItem.restId]) {
@@ -1204,7 +1216,6 @@
                           }
                       });
                   }
-                  // حذف السلع اللي طلب المطعم حذفها
                   if (data.deleted && data.deleted.length > 0) {
                       data.deleted.forEach(delItem => {
                           if(menus[delItem.restId]) {
@@ -1213,7 +1224,6 @@
                       });
                   }
               } else if (Array.isArray(data) && data.length > 0) {
-                  // للتوافق وي النسخة القديمة إذا السيرفر رجع بس مصفوفة
                   data.forEach(newItem => {
                       if(menus[newItem.restId]) {
                           const exists = menus[newItem.restId].items.find(i => i.name === newItem.name);
@@ -1223,7 +1233,6 @@
               }
           } catch(e) { console.log("لا توجد تحديثات للسلع حالياً"); }
       }
-      // =======================================
       
       let currentCart = {};
       let currentRestaurantId = '';
@@ -1237,9 +1246,17 @@
           updateCartTotal();
       }
 
+      // === التعديل هنا: فحص عدد الوجبات وتطبيق الستايل الشبكي تلقائياً ===
       function renderMenu() {
           const container = document.getElementById('menu-items-container');
           const items = menus[currentRestaurantId].items;
+          
+          if (items.length > 10) {
+              container.classList.add('menu-grid-view');
+          } else {
+              container.classList.remove('menu-grid-view');
+          }
+
           container.innerHTML = items.map(item => {
               currentCart[item.id] = currentCart[item.id] || 0;
               return `
@@ -1256,6 +1273,7 @@
               </div>`;
           }).join('');
       }
+      // =========================================================
 
       function updateQty(id, change) {
           if (currentCart[id] + change >= 0) {
@@ -1307,7 +1325,7 @@
       /* ========================================= */
       function checkStatus() {
           trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
-          fetchDynamicMenus(); // <== تم إضافة استدعاء السلع الجديدة هنا
+          fetchDynamicMenus(); 
           const urlParams = new URLSearchParams(window.location.search);
           const ref = urlParams.get('ref');
           const myPhone = localStorage.getItem('saved_customer_phone');
