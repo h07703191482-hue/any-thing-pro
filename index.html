@@ -211,8 +211,31 @@
       
       .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(90, 34, 139, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
       .location-notice { font-size: 13px; font-weight: 700; color: #10B981; text-align: center; margin-bottom: 15px; display: block; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: var(--radius-md); border: 1px dashed #10B981;}
+
+      /* تصميم سلايدر المطاعم الجديد */
+      .rest-slider { display: flex; overflow-x: auto; gap: 15px; padding: 0 20px 20px; scroll-snap-type: x mandatory; }
+      .rest-slider::-webkit-scrollbar { display: none; }
+      .rest-card { flex: 0 0 120px; scroll-snap-align: start; background: var(--surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 12px; text-align: center; box-shadow: var(--shadow-sm); cursor: pointer; transition: 0.3s; }
+      .rest-card img { width: 100%; height: 90px; border-radius: 15px; object-fit: cover; margin-bottom: 8px; }
+      .rest-card h4 { margin: 0; font-size: 14px; font-weight: 800; color: var(--primary); line-height: 1.3; }
+      .rest-card small { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+      /* تصميم قائمة الطعام (المنيو) */
+      .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--surface); border-bottom: 1px solid var(--border-color); }
+      .menu-item:last-child { border-bottom: none; }
+      .menu-item-info h4 { margin: 0 0 5px 0; font-size: 16px; font-weight: 800; color: var(--text-main); }
+      .menu-item-info span { color: #10B981; font-weight: 800; font-size: 14px; display: inline-block; background: rgba(16, 185, 129, 0.1); padding: 2px 8px; border-radius: 8px;}
+      .qty-controls { display: flex; align-items: center; gap: 10px; background: var(--bg-color); border-radius: var(--radius-pill); padding: 5px; border: 1px solid var(--border-color); }
+      .qty-btn { width: 32px; height: 32px; border-radius: 50%; border: none; background: white; color: var(--primary); font-weight: bold; font-size: 18px; box-shadow: var(--shadow-sm); cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
+      .qty-btn:active { transform: scale(0.9); background: var(--primary); color: white; }
+      .qty-val { font-weight: 800; font-size: 16px; min-width: 20px; text-align: center; color: var(--text-main); }
+      
+      /* شريط المجموع الكلي الثابت بالأسفل */
+      .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); padding: 15px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 10000; border-top-left-radius: 20px; border-top-right-radius: 20px; border-top: 1px solid var(--border-color); animation: fadeSlideUp 0.3s ease-out; }
+      body.dark-mode .cart-bar { box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
+      .cart-bar-total { font-size: 20px; font-weight: 800; color: var(--primary); display: block; }
     </style>
-    </head>
+</head>
 <body>
     <div id="map-modal">
         <div class="map-container">
@@ -269,7 +292,7 @@
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
             </div>
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">البندر</h3>
-            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.11</p>
+            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.12</p>
         </div>
         <div class="sidebar-item ripple-dark" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
             <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
@@ -322,6 +345,7 @@
       <div class="road-realistic"><div class="road-lines"></div></div>
       <div class="bike-box"><i class="fas fa-motorcycle"></i><div class="exhaust"><div class="smoke"></div><div class="smoke"></div><div class="smoke"></div></div></div>
     </div>
+
     <div id="login-screen" class="screen container">
         <div style="text-align: center; margin-bottom: 30px;">
             <div style="width:100px; height:100px; background:rgba(90, 34, 139, 0.1); border-radius:30px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: var(--shadow-sm);">
@@ -385,26 +409,36 @@
         </div>
     </div>
 
-    <div id="home-screen" class="screen container">
+    <div id="home-screen" class="screen container active-screen">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
         <div id="driver-status-badge" class="driver-status-bar">أنت الآن في وضع العمل النشط 🟢</div>
         <h1 id="main-title" onclick="handleSecretClick()">البندر</h1>
-        <p id="main-sub">ماذا تحتاج اليوم؟</p>
+        <p id="main-sub">شنو مشتهين اليوم؟</p>
       </div>
 
-      <div style="padding: 0 20px 20px 20px; margin-top: -40px; position: relative; z-index: 5;">
-          <div class="select-card ripple" style="flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: var(--surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);" onclick="showToast('قريباً - قائمة برجر علي سالم')">
-              <img src="Burger.jpg.jpg" alt="برجر علي سالم" style="width: 90px; height: 90px; border-radius: 20px; object-fit: cover; margin-bottom: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.15);">
-              <h3 style="margin: 0; font-size: 20px; font-weight: 800; color: var(--primary);">برجر علي سالم</h3>
-              <small style="color: var(--text-muted); font-size: 14px; font-weight: 600; margin-top: 5px;">أطيب برجر بأم قصر</small>
+      <div style="margin-top: -45px; position: relative; z-index: 5;">
+          <div class="rest-slider">
+              <div class="rest-card ripple" onclick="openMenu()">
+                  <img src="Burger.jpg.jpg" alt="برجر علي سالم">
+                  <h4>برجر علي سالم</h4>
+                  <small>أطيب برجر بأم قصر</small>
+              </div>
+              
+              <div class="rest-card" style="opacity: 0.6; cursor: default;">
+                  <div style="width: 100%; height: 90px; border-radius: 15px; background: var(--border-color); display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                      <i class="fas fa-utensils" style="font-size: 30px; color: var(--text-muted);"></i>
+                  </div>
+                  <h4>مطعم جديد</h4>
+                  <small>قريباً...</small>
+              </div>
           </div>
       </div>
       
       <div class="services-grid">
           <div class="select-card card-full card-cart ripple-dark" onclick="showScreen('order-screen')">
             <div class="icon-wrapper icon-pulse"><i class="fas fa-shopping-cart"></i></div>
-            <div class="card-text"><h3 id="srv-shop-title">تسوق مسواكك</h3><small id="srv-shop-sub">مطاعم، سوبر ماركت، صيدليات والمزيد</small></div>
+            <div class="card-text"><h3 id="srv-shop-title">تسوق مسواكك</h3><small id="srv-shop-sub">أطلب أي شي ونوصله الك</small></div>
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
           
@@ -442,6 +476,22 @@
       </div>
     </div>
 
+    <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> برجر علي سالم</h2>
+        <p style="color: var(--text-muted); font-size: 14px; font-weight: 600; margin-bottom: 20px;">اختار طلبك وحدد الكمية، وراح نحسبلك المجموع مباشرة.</p>
+        
+        <div class="form-card" style="padding: 0; overflow: hidden;" id="menu-items-container">
+            </div>
+        
+        <div class="cart-bar" id="cartBar" style="display: none;">
+            <div>
+                <span style="font-size: 13px; color: var(--text-muted); font-weight: bold;">المجموع الكلي للطلب:</span>
+                <span class="cart-bar-total" id="cartTotal">0 د.ع</span>
+            </div>
+            <button class="send-btn ripple" style="width: auto; margin: 0; padding: 12px 25px; font-size: 16px; box-shadow: none;" onclick="checkoutRestaurant()">استمرار <i class="fas fa-arrow-left"></i></button>
+        </div>
+    </div>
     <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
@@ -539,6 +589,7 @@
 
         <button class="send-btn order-btn-logic ripple" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
     </div>
+
     <div id="order-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-shopping-cart" style="color:var(--primary);"></i> <span id="shop-head">تسوق مسواكك</span></h2>
@@ -598,7 +649,7 @@
 
         <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
-    
+
     <div id="join-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> انضم ككابتن</h2>
@@ -1041,6 +1092,93 @@
       }
       /* ========================================= */
 
+      /* =========================================
+         منظومة المطاعم وقائمة الطعام (منيو علي سالم)
+      ========================================= */
+      const restaurantMenu = [
+          { id: 'm1', name: 'برجر', price: 1000 },
+          { id: 'm2', name: 'برجر جبن', price: 1500 },
+          { id: 'm3', name: 'ريزو دجاج', price: 3000 },
+          { id: 'm4', name: 'لبن بطل صغير', price: 750 },
+          { id: 'm5', name: 'لبن بطل كبير', price: 2000 },
+          { id: 'm6', name: 'بيبسي', price: 500 },
+          { id: 'm7', name: 'ديو', price: 500 }
+      ];
+      
+      let currentCart = {};
+
+      function openMenu() {
+          currentCart = {}; // تصفير السلة عند فتح المنيو
+          showScreen('restaurant-menu-screen');
+          renderMenu();
+          updateCartTotal();
+      }
+
+      function renderMenu() {
+          const container = document.getElementById('menu-items-container');
+          container.innerHTML = restaurantMenu.map(item => {
+              currentCart[item.id] = currentCart[item.id] || 0;
+              return `
+              <div class="menu-item">
+                  <div class="menu-item-info">
+                      <h4>${item.name}</h4>
+                      <span>${item.price.toLocaleString()} د.ع</span>
+                  </div>
+                  <div class="qty-controls">
+                      <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
+                      <span class="qty-val" id="qty-${item.id}">${currentCart[item.id]}</span>
+                      <button class="qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
+                  </div>
+              </div>`;
+          }).join('');
+      }
+
+      function updateQty(id, change) {
+          if (currentCart[id] + change >= 0) {
+              currentCart[id] += change;
+              document.getElementById(`qty-${id}`).innerText = currentCart[id];
+              updateCartTotal();
+          }
+      }
+
+      function updateCartTotal() {
+          let total = 0;
+          let totalItems = 0;
+          
+          restaurantMenu.forEach(item => {
+              total += currentCart[item.id] * item.price;
+              totalItems += currentCart[item.id];
+          });
+          
+          const cartBar = document.getElementById('cartBar');
+          if (totalItems > 0) {
+              cartBar.style.display = 'flex';
+              document.getElementById('cartTotal').innerText = total.toLocaleString() + ' د.ع';
+          } else {
+              cartBar.style.display = 'none';
+          }
+      }
+
+      function checkoutRestaurant() {
+          let orderDetails = "طلب من مطعم برجر علي سالم:\n\n";
+          let total = 0;
+          
+          restaurantMenu.forEach(item => {
+              if (currentCart[item.id] > 0) {
+                  let lineTotal = currentCart[item.id] * item.price;
+                  orderDetails += `🔸 ${currentCart[item.id]}x ${item.name} = ${lineTotal.toLocaleString()} د.ع\n`;
+                  total += lineTotal;
+              }
+          });
+          
+          orderDetails += `\n💵 المجموع الكلي: ${total.toLocaleString()} د.ع (بدون أجرة التوصيل)`;
+          
+          document.getElementById('custOrder').value = orderDetails;
+          showScreen('order-screen'); // تحويل الزبون لخانة الطلب لملء العنوان
+          showToast("تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
+      }
+      /* ========================================= */
+
       function checkStatus() {
           trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
           const urlParams = new URLSearchParams(window.location.search);
@@ -1194,7 +1332,8 @@
           
           window.scrollTo(0, 0);
           const bottomNav = document.getElementById('bottomNavigation');
-          if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel') ? 'none' : 'flex';
+          // إخفاء الـ Nav bar لو جنا بصفحة المنيو أو الدخول
+          if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id === 'restaurant-menu-screen') ? 'none' : 'flex';
           
           if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
           if(id === 'log-screen') { renderDriverLog(); } 
