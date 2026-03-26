@@ -419,12 +419,18 @@
 
       <div style="margin-top: -45px; position: relative; z-index: 5;">
           <div class="rest-slider">
-              <div class="rest-card ripple" onclick="openMenu()">
+              <div class="rest-card ripple" onclick="openMenu('ali_salem')">
                   <img src="Burger.jpg.jpg" alt="برجر علي سالم">
                   <h4>برجر علي سالم</h4>
                   <small>أطيب برجر بأم قصر</small>
               </div>
               
+              <div class="rest-card ripple" onclick="openMenu('abo_hmode')">
+                  <img src="Hmode.jpg.jpg" alt="بركر ابو حمودي">
+                  <h4>بركر ابو حمودي</h4>
+                  <small>الطعم الأصلي</small>
+              </div>
+
               <div class="rest-card" style="opacity: 0.6; cursor: default;">
                   <div style="width: 100%; height: 90px; border-radius: 15px; background: var(--border-color); display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
                       <i class="fas fa-utensils" style="font-size: 30px; color: var(--text-muted);"></i>
@@ -478,7 +484,7 @@
 
     <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> برجر علي سالم</h2>
+        <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> <span id="restaurant-name-header">اسم المطعم</span></h2>
         <p style="color: var(--text-muted); font-size: 14px; font-weight: 600; margin-bottom: 20px;">اختار طلبك وحدد الكمية، وراح نحسبلك المجموع مباشرة.</p>
         
         <div class="form-card" style="padding: 0; overflow: hidden;" id="menu-items-container">
@@ -771,6 +777,11 @@
 
       const NEW_BOT_TOKEN = "8757179280:AAHEgp3YTaVv6qZNr32ZA7fgk4fT8v-cqCk";
       const NEW_BOT_USER = "CodAlbanderbot";
+      
+      // التوكنات الخاصة ببوتات المطاعم
+      const ALI_SALEM_BOT_TOKEN = "8735092732:AAE9lBE3i6AJRkKe3LLlAAodFXuAv7VXpys";
+      const ABO_HMODE_BOT_TOKEN = "8695832371:AAHosUvA37U9U1qhiZJlbDKxJPZFgDHbJAk"; 
+
       let userCoords = ""; 
       const CURRENT_VERSION = "2.0.15"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
@@ -1006,7 +1017,7 @@
       function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
 
       /* =========================================
-         منظومة تسجيل الدخول الجديدة عبر تليكرام (تحديث البندر)
+         منظومة تسجيل الدخول الجديدة عبر تليكرام
       ========================================= */
       let loginPollInterval = null;
       let currentLoginSession = "";
@@ -1093,22 +1104,53 @@
       /* ========================================= */
 
       /* =========================================
-         منظومة المطاعم وقائمة الطعام (منيو علي سالم)
+         منظومة المطاعم المحدثة (تدعم أكثر من مطعم)
       ========================================= */
-      const restaurantMenu = [
-          { id: 'm1', name: 'برجر', price: 1000 },
-          { id: 'm2', name: 'برجر جبن', price: 1500 },
-          { id: 'm3', name: 'ريزو دجاج', price: 3000 },
-          { id: 'm4', name: 'لبن بطل صغير', price: 750 },
-          { id: 'm5', name: 'لبن بطل كبير', price: 2000 },
-          { id: 'm6', name: 'بيبسي', price: 500 },
-          { id: 'm7', name: 'ديو', price: 500 }
-      ];
+      const menus = {
+          'ali_salem': {
+              name: 'مطعم برجر علي سالم',
+              items: [
+                  { id: 'm1', name: 'برجر', price: 1000 },
+                  { id: 'm2', name: 'برجر جبن', price: 1500 },
+                  { id: 'm3', name: 'ريزو دجاج', price: 3000 },
+                  { id: 'm4', name: 'لبن بطل صغير', price: 750 },
+                  { id: 'm5', name: 'لبن بطل كبير', price: 2000 },
+                  { id: 'm6', name: 'بيبسي', price: 500 },
+                  { id: 'm7', name: 'ديو', price: 500 }
+              ]
+          },
+          'abo_hmode': {
+              name: 'مطعم بركر ابو حمودي',
+              items: [
+                  { id: 'h1', name: 'بركر كلاسيك', price: 1000 },
+                  { id: 'h2', name: 'بركر جبن', price: 1250 },
+                  { id: 'h3', name: 'بركر مكسيكي', price: 1500 },
+                  { id: 'h4', name: 'بركر كرانشي', price: 3000 },
+                  { id: 'h5', name: 'بركر دبل لحم دبل جبن', price: 2500 },
+                  { id: 'h6', name: 'ريزو كلاسيك', price: 3000 },
+                  { id: 'h7', name: 'ريزو ابو حمودي', price: 5000 },
+                  { id: 'h8', name: 'اجنحه فحم نص', price: 8000 },
+                  { id: 'h9', name: 'تكه دجاج نص', price: 8000 },
+                  { id: 'h10', name: 'فروج ابو حمودي', price: 8000 },
+                  { id: 'h11', name: 'عصير كلاص', price: 1000 },
+                  { id: 'h12', name: 'عصير بطل', price: 1500 },
+                  { id: 'h13', name: 'لبن بطل صغير', price: 750 },
+                  { id: 'h14', name: 'لبن بطل جبير', price: 2000 },
+                  { id: 'h15', name: 'ببسي', price: 500 },
+                  { id: 'h16', name: 'ديو', price: 500 },
+                  { id: 'h17', name: 'سبرايت', price: 500 },
+                  { id: 'h18', name: 'كولا', price: 500 }
+              ]
+          }
+      };
       
       let currentCart = {};
+      let currentRestaurantId = '';
 
-      function openMenu() {
+      function openMenu(restId) {
+          currentRestaurantId = restId;
           currentCart = {}; // تصفير السلة عند فتح المنيو
+          document.getElementById('restaurant-name-header').innerText = menus[restId].name;
           showScreen('restaurant-menu-screen');
           renderMenu();
           updateCartTotal();
@@ -1116,7 +1158,8 @@
 
       function renderMenu() {
           const container = document.getElementById('menu-items-container');
-          container.innerHTML = restaurantMenu.map(item => {
+          const items = menus[currentRestaurantId].items;
+          container.innerHTML = items.map(item => {
               currentCart[item.id] = currentCart[item.id] || 0;
               return `
               <div class="menu-item">
@@ -1144,8 +1187,9 @@
       function updateCartTotal() {
           let total = 0;
           let totalItems = 0;
+          const items = menus[currentRestaurantId].items;
           
-          restaurantMenu.forEach(item => {
+          items.forEach(item => {
               total += currentCart[item.id] * item.price;
               totalItems += currentCart[item.id];
           });
@@ -1160,10 +1204,12 @@
       }
 
       function checkoutRestaurant() {
-          let orderDetails = "طلب من مطعم برجر علي سالم:\n\n";
+          let restaurantName = menus[currentRestaurantId].name;
+          let orderDetails = `طلب من ${restaurantName}:\n\n`;
           let total = 0;
+          const items = menus[currentRestaurantId].items;
           
-          restaurantMenu.forEach(item => {
+          items.forEach(item => {
               if (currentCart[item.id] > 0) {
                   let lineTotal = currentCart[item.id] * item.price;
                   orderDetails += `🔸 ${currentCart[item.id]}x ${item.name} = ${lineTotal.toLocaleString()} د.ع\n`;
@@ -1178,7 +1224,6 @@
           showToast("تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
       }
       /* ========================================= */
-
       function checkStatus() {
           trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
           const urlParams = new URLSearchParams(window.location.search);
@@ -1481,17 +1526,24 @@
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
 
-              // 2. النظام الجديد: إرسال الطلب لمطعم علي سالم إذا كان الطلب جاي من المنيو مالته
+              // 2. إرسال الطلب لمطعم علي سالم إذا كان الطلب من المنيو مالته
               let isAliSalemOrder = order.includes("مطعم برجر علي سالم");
               if (isAliSalemOrder) {
-                  const ALI_SALEM_BOT_TOKEN = "8735092732:AAE9lBE3i6AJRkKe3LLlAAodFXuAv7VXpys";
-                  const ALI_SALEM_CHAT_ID = "7479342799"; 
                   const restMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
-                  
                   await fetch(`https://api.telegram.org/bot${ALI_SALEM_BOT_TOKEN}/sendMessage`, {
                       method: "POST", headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ chat_id: ALI_SALEM_CHAT_ID, text: restMsg })
+                      body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: restMsg })
                   }).catch(e => console.log("خطأ في إرسال طلب المطعم"));
+              }
+
+              // 3. إرسال الطلب لمطعم ابو حمودي إذا كان الطلب من المنيو مالته (التحديث الجديد)
+              let isAboHmodeOrder = order.includes("مطعم بركر ابو حمودي");
+              if (isAboHmodeOrder) {
+                  const hmodeMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
+                  await fetch(`https://api.telegram.org/bot${ABO_HMODE_BOT_TOKEN}/sendMessage`, {
+                      method: "POST", headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: hmodeMsg })
+                  }).catch(e => console.log("خطأ في إرسال طلب مطعم ابو حمودي"));
               }
 
               showToast("تم إرسال طلبك بنجاح ✅"); 
