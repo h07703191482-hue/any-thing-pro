@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -7,9 +8,6 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'none';">
     
     <meta name="google-site-verification" content="62BLEW3ojjyy5ymvZcQuB2D6rVkft8WSTDU6aKj6e20" />
 
@@ -29,8 +27,8 @@
     <meta name="apple-mobile-web-app-title" content="البندر">
     <meta name="application-name" content="البندر">
     
-    <meta name="description" content="تطبيق البندر هو أسرع تطبيق للتوصيل، التحصيل، والخدمات اللوجستية في أم قصر. اطلب الآن نصلك أينما كنت.">
-    <meta name="keywords" content="البندر, تطبيق البندر, توصيل البندر, تحصيل، أم قصر، مطعم البندر، طلبات، البصرة، مندوب">
+    <meta name="description" content="تطبيق البندر هو أسرع تطبيق لتوصيل المسواك، التحصيل، والخدمات اللوجستية في أم قصر. اطلب الآن نصلك أينما كنت.">
+    <meta name="keywords" content="البندر, تطبيق البندر, توصيل البندر, تحصيل، أم قصر، تكتك، مسواك، طلبات، البصرة، مندوب">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -52,10 +50,10 @@
     </script>
     <style>
       #map-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100005; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-      .map-container { width: 90%; max-width: 400px; aspect-ratio: 1 / 1; height: auto; background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; position: relative; box-shadow: var(--shadow-floating); display: flex; flex-direction: column; }
+      .map-container { width: 95%; max-width: 450px; background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; position: relative; box-shadow: var(--shadow-floating); display: flex; flex-direction: column; }
       .map-header { padding: 15px; background: var(--primary); color: white; text-align: center; font-weight: 800; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
       .close-map-btn { background: transparent; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0; }
-      #map-view { width: 100%; height: 100%; z-index: 1; background: #e5e3df; }
+      #map-view { width: 100%; height: 350px; z-index: 1; }
       .map-center-marker { position: absolute; top: calc(50% + 20px); left: 50%; transform: translate(-50%, -100%); z-index: 1000; font-size: 45px; color: var(--danger); text-shadow: 0 4px 10px rgba(0,0,0,0.4); pointer-events: none; animation: bouncePin 0.5s ease infinite alternate; }
       .map-footer { padding: 15px; text-align: center; background: var(--surface); }
       @keyframes bouncePin { from { transform: translate(-50%, -100%); } to { transform: translate(-50%, -110%); } }
@@ -73,8 +71,7 @@
           --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.4); --shadow-floating: 0 20px 40px rgba(0, 0, 0, 0.5);
       }
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-      
-      body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; color: var(--text-main); min-height: 100vh; line-height: 1.6; overflow-x: hidden; transition: background-color 0.4s ease, color 0.4s ease; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+      body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; color: var(--text-main); min-height: 100vh; line-height: 1.6; overflow-x: hidden; transition: background-color 0.4s ease, color 0.4s ease; }
       body::before { content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(90, 34, 139, 0.03) 0%, transparent 50%); z-index: -1; pointer-events: none; }
       body.dark-mode::before { background: radial-gradient(circle at 50% 0%, rgba(122, 59, 186, 0.08) 0%, transparent 50%); }
       
@@ -85,20 +82,17 @@
 
       .baly-spinner { width: 26px; height: 26px; border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; display: inline-block; vertical-align: middle; }
       @keyframes spin { to { transform: rotate(360deg); } }
-      
-      /* ستايلات سلايدر المربعات الجديد */
-      .square-slider-container { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding: 0 20px 20px 20px; margin-top: -50px; position: relative; z-index: 5; }
-      .square-slider-container::-webkit-scrollbar { display: none; }
-      .square-slide { flex: 0 0 auto; width: 110px; height: 110px; background: var(--surface); border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: var(--shadow-md); cursor: pointer; border: 2px solid var(--primary); scroll-snap-align: center; overflow: hidden; position: relative; transition: transform 0.3s; }
-      .square-slide:active { transform: scale(0.95); }
-      .square-slide img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; transition: 0.3s; }
-      .square-slide:hover img { transform: scale(1.05); }
-      .square-slide-overlay { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background: linear-gradient(transparent, rgba(0,0,0,0.8)); z-index: 2; pointer-events: none; }
-      .square-slide-content { position: relative; z-index: 3; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 8px; width: 100%; text-align: center; pointer-events: none; }
-      .square-slide-content h3 { margin: 0; font-weight: 800; font-size: 13px; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
+              .baly-slider-container { width: 100%; overflow: hidden; margin-top: -45px; margin-bottom: 25px; position: relative; z-index: 5; }
+      .baly-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 15px; padding: 0 20px 10px 20px; }
+      .baly-slider::-webkit-scrollbar { display: none; }
+      .baly-slide { flex: 0 0 85%; scroll-snap-align: center; border-radius: var(--radius-lg); padding: 25px 20px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); cursor: pointer; }
+      .slide-text h3 { margin: 0; font-weight: 800; font-size: 18px; line-height: 1.3; }
+      .slide-text p { margin: 5px 0 0; font-size: 13px; font-weight: 600; opacity: 0.9; }
+      .slide-icon { font-size: 45px; opacity: 0.8; }
 
       .theme-toggle { position: fixed; top: 20px; left: 20px; z-index: 10001; background: var(--surface); color: var(--primary); border: 1px solid var(--border-color); width: 48px; height: 48px; border-radius: var(--radius-pill); cursor: pointer; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-size: 20px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
       .theme-toggle:active { transform: scale(0.9); }
+      .lang-toggle { position: fixed; top: 20px; left: 80px; z-index: 10001; background: var(--surface); color: var(--primary); border: 1px solid var(--border-color); padding: 0 15px; height: 48px; border-radius: var(--radius-pill); cursor: pointer; box-shadow: var(--shadow-sm); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; transition: 0.3s; }
       
       .screen { display: none; width: 100%; min-height: 100vh; position: relative; z-index: 1; animation: fadeSlideUp 0.4s ease-out forwards; }
       .active-screen { display: block !important; z-index: 10; }
@@ -108,6 +102,7 @@
       @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
       @keyframes iconPulse { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.08); filter: brightness(1.2); } 100% { transform: scale(1); filter: brightness(1); } }
       .icon-pulse { animation: iconPulse 2s infinite ease-in-out; }
+      
       #global-lock-screen, #offline-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 9999999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; box-sizing: border-box; }
       .lock-icon { font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: scaleIn 0.5s ease; cursor: pointer; }
       .lock-title, .offline-title { font-size: 26px; font-weight: 800; color: var(--text-main); margin-bottom: 10px; }
@@ -155,15 +150,11 @@
       .card-half h3 { margin: 0; font-size: 16px; font-weight: 800; }
       .card-half small { color: var(--text-muted); font-size: 12px; font-weight: 600; line-height: 1.4; display: block; }
       .card-half .arrow-icon { display: none; }
-      
       .card-cart .icon-wrapper { background: rgba(90, 34, 139, 0.1); color: var(--primary); }
       .card-med .icon-wrapper { background: rgba(249, 115, 22, 0.1); color: #F97316; }
       .card-tuk .icon-wrapper { background: rgba(255, 193, 7, 0.15); color: #D97706; }
       .card-join .icon-wrapper { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
       .card-plaza .icon-wrapper { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
-      .card-general .icon-wrapper { background: rgba(16, 185, 129, 0.1); color: #10B981; }
-      .card-myorders .icon-wrapper { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
-
       .form-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards; }
       .form-card-title { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
       .form-card-title i { font-size: 18px; color: var(--gold); }
@@ -190,7 +181,6 @@
       body.dark-mode .price-indicator { border-color: rgba(255,255,255,0.05); }
       .price-indicator span { font-size: 14px; color: var(--text-muted); font-weight: 600; display: block; }
       .price-indicator .amount { font-size: 32px; font-weight: 800; color: var(--primary); display: block; margin: 5px 0; }
-      
       .bottom-nav { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 400px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); display: flex; justify-content: space-around; align-items: center; padding: 8px 12px; border-radius: var(--radius-pill); box-shadow: var(--shadow-floating); z-index: 9998; border: 1px solid rgba(255,255,255,0.4); }
       body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.9); border-color: rgba(255,255,255,0.05); }
       .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 15px; color: var(--text-muted); text-decoration: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; border-radius: var(--radius-pill); position: relative; }
@@ -230,35 +220,16 @@
       
       .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(90, 34, 139, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
       .location-notice { font-size: 13px; font-weight: 700; color: #10B981; text-align: center; margin-bottom: 15px; display: block; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: var(--radius-md); border: 1px dashed #10B981;}
-      
-      .order-msg-card { background: var(--surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 15px; box-shadow: var(--shadow-sm); margin-bottom: 15px; text-align: right; }
-      .order-msg-content { background: var(--bg-color); padding: 12px; border-radius: 8px; font-size: 14px; line-height: 1.8; margin-bottom: 10px; white-space: pre-line; color: var(--text-main); }
-      .book-btn { background: var(--secondary); color: #000; border: none; padding: 12px; width: 100%; border-radius: var(--radius-md); font-weight: 800; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px;}
-      .book-btn:active { transform: scale(0.96); }
-      
-      .copy-span { cursor: pointer; display: inline-block; padding: 4px 8px; border-radius: 6px; transition: 0.3s; background: rgba(90, 34, 139, 0.05); border: 1px dashed rgba(90, 34, 139, 0.2); font-weight: bold; }
-      .copy-span:active { background: rgba(90, 34, 139, 0.15); transform: scale(0.95); }
-      .copy-span i { color: var(--primary); margin-left: 5px; font-size: 12px; }
-
-      /* ستايلات المنيو الجديدة لمطعم البندر */
-      .menu-item { display: flex; align-items: center; justify-content: space-between; background: var(--surface); padding: 15px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 12px; box-shadow: var(--shadow-sm); }
-      .menu-info h4 { margin: 0 0 5px 0; font-size: 16px; font-weight: 800; color: var(--text-main); }
-      .menu-info span { font-size: 14px; color: var(--primary); font-weight: 700; }
-      .menu-controls { display: flex; align-items: center; gap: 15px; background: var(--bg-color); padding: 5px 10px; border-radius: var(--radius-pill); }
-      .menu-btn { background: var(--surface); border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 16px; font-weight: bold; color: var(--primary); cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; transition: 0.2s;}
-      .menu-btn:active { transform: scale(0.9); }
-      .menu-qty { font-size: 16px; font-weight: 800; width: 20px; text-align: center; }
-      .total-bar { display: flex; justify-content: space-between; align-items: center; background: var(--primary); color: white; padding: 15px 20px; border-radius: var(--radius-md); margin-top: 20px; font-size: 18px; font-weight: 800; box-shadow: var(--shadow-md); margin-bottom: 20px;}
     </style>
 </head>
-<body oncontextmenu="return false;" oncopy="return false;" oncut="return false;" onpaste="return false;">
+<body>
     <div id="map-modal">
         <div class="map-container">
             <div class="map-header">
                 <span>تحديد موقع النزول 📍</span>
                 <button class="close-map-btn" onclick="closeMapModal()"><i class="fas fa-times"></i></button>
             </div>
-            <div style="position: relative; width: 100%; aspect-ratio: 1/1;">
+            <div style="position: relative;">
                 <div id="map-view"></div>
                 <i class="fas fa-map-marker-alt map-center-marker"></i>
             </div>
@@ -307,7 +278,7 @@
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
             </div>
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">البندر</h3>
-            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.15</p>
+            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.11</p>
         </div>
         <div class="sidebar-item ripple-dark" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
             <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
@@ -338,8 +309,9 @@
             <i id="nav-acc-icon" class="fas fa-user-circle"></i><span id="nav-acc-text">حسابي</span>
         </div>
     </div>
-    
+
     <button class="theme-toggle ripple" onclick="openSidebar()" id="menu-btn"><i class="fas fa-bars"></i></button>
+    <button class="lang-toggle ripple" onclick="toggleLanguage()" id="langBtn">English</button>
 
     <div id="welcome-overlay" onclick="skipWelcome()">
         <i class="fas fa-check-circle" style="font-size: 80px; color: #10B981; margin-bottom: 20px; animation: scaleIn 0.5s ease;"></i>
@@ -360,7 +332,6 @@
       <div class="road-realistic"><div class="road-lines"></div></div>
       <div class="bike-box"><i class="fas fa-motorcycle"></i><div class="exhaust"><div class="smoke"></div><div class="smoke"></div><div class="smoke"></div></div></div>
     </div>
-    
     <div id="login-screen" class="screen container">
         <div style="text-align: center; margin-bottom: 30px;">
             <div style="width:100px; height:100px; background:rgba(90, 34, 139, 0.1); border-radius:30px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: var(--shadow-sm);">
@@ -431,16 +402,21 @@
         <p id="main-sub">ماذا تحتاج اليوم؟</p>
       </div>
 
-      <div class="square-slider-container">
-          <div class="square-slide ripple" onclick="showScreen('restaurant-screen')">
-              
-              <img src="1773676676632.png" alt="مطعم البندر" onerror="this.style.display='none'; document.getElementById('fallback-icon').style.display='block';">
-              
-              <div id="fallback-icon" style="display: none; font-size: 40px; position: absolute; top: 20px; z-index: 1; text-shadow: 0 2px 5px rgba(0,0,0,0.2);">🍔</div>
-              
-              <div class="square-slide-overlay"></div>
-              <div class="square-slide-content">
-                  <h3 style="margin: 0; font-weight: 800; font-size: 13px; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.9);">مطعم البندر</h3>
+      <div class="baly-slider-container">
+          <div class="baly-slider">
+              <div class="baly-slide ripple" style="background: linear-gradient(135deg, var(--primary) 0%, #8B5CF6 100%);" onclick="showScreen('order-screen')">
+                  <div class="slide-text">
+                      <h3>🎁 الطلب العاشر مجاني!</h3>
+                      <p>اجمع 9 طلبات ومسواكك العاشر علينا.</p>
+                  </div>
+                  <i class="fas fa-shopping-basket slide-icon"></i>
+              </div>
+              <div class="baly-slide ripple" style="background: linear-gradient(135deg, var(--secondary) 0%, #F59E0B 100%); color: #111;" onclick="showScreen('tuk-screen')">
+                  <div class="slide-text">
+                      <h3>🚖 تحصيل سريع وآمن</h3>
+                      <p>نوصل أغراضك ونحصل أموالك بسرعة.</p>
+                  </div>
+                  <i class="fas fa-money-bill-wave slide-icon" style="color: #111;"></i>
               </div>
           </div>
       </div>
@@ -483,105 +459,8 @@
             <div class="card-text"><h3 id="srv-plaza-title">لوحة الكابتن</h3><small id="srv-plaza-sub">تسليم الطلبات والإحصائيات</small></div>
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
-
-          <div id="general-orders-card" class="select-card card-full card-general ripple-dark" style="display: none;" onclick="showScreen('general-orders-screen')">
-            <div class="icon-wrapper"><i class="fas fa-globe"></i></div>
-            <div class="card-text"><h3 id="srv-general-title">الطلبات العامة</h3><small id="srv-general-sub">طلبات الزبائن الجديدة بالساحة</small></div>
-            <i class="fas fa-chevron-left arrow-icon"></i>
-          </div>
-
-          <div id="my-orders-card" class="select-card card-full card-myorders ripple-dark" style="display: none;" onclick="showScreen('my-orders-screen')">
-            <div class="icon-wrapper"><i class="fas fa-box-open"></i></div>
-            <div class="card-text"><h3 id="srv-myorders-title">طلباتك</h3><small id="srv-myorders-sub">الطلبات اللي حجزتها وبعهدتك</small></div>
-            <i class="fas fa-chevron-left arrow-icon"></i>
-          </div>
       </div>
     </div>
-
-    <div id="restaurant-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-hamburger" style="color:var(--primary);"></i> مطعم البندر</h2>
-        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
-        
-        <div class="price-indicator" style="display: block;">
-            <span>أسعار التوصيل:</span>
-            <span class="amount" style="font-size: 20px;">داخل أم قصر: 1,500 د.ع</span>
-            <span class="amount" style="font-size: 20px;">خارج أم قصر: 2,500 د.ع</span>
-            <small style="color: var(--secondary); font-weight: bold;"><i class="fas fa-motorcycle"></i> توصيل حار وسريع</small>
-        </div>
-
-        <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-utensils"></i> قائمة الطعام (المنيو)</div>
-            
-            <div class="menu-item">
-                <div class="menu-info">
-                    <h4>همبرگة 🍔</h4>
-                    <span>1,000 د.ع</span>
-                </div>
-                <div class="menu-controls">
-                    <button class="menu-btn" onclick="updateMenuQty('burger', -1, 1000)">-</button>
-                    <span class="menu-qty" id="qty-burger">0</span>
-                    <button class="menu-btn" onclick="updateMenuQty('burger', 1, 1000)">+</button>
-                </div>
-            </div>
-
-            <div class="menu-item">
-                <div class="menu-info">
-                    <h4>ريزو دجاج 🍛</h4>
-                    <span>3,000 د.ع</span>
-                </div>
-                <div class="menu-controls">
-                    <button class="menu-btn" onclick="updateMenuQty('rizo', -1, 3000)">-</button>
-                    <span class="menu-qty" id="qty-rizo">0</span>
-                    <button class="menu-btn" onclick="updateMenuQty('rizo', 1, 3000)">+</button>
-                </div>
-            </div>
-
-            <div class="menu-item">
-                <div class="menu-info">
-                    <h4>لبن 🥛</h4>
-                    <span>2,000 د.ع</span>
-                </div>
-                <div class="menu-controls">
-                    <button class="menu-btn" onclick="updateMenuQty('laban', -1, 2000)">-</button>
-                    <span class="menu-qty" id="qty-laban">0</span>
-                    <button class="menu-btn" onclick="updateMenuQty('laban', 1, 2000)">+</button>
-                </div>
-            </div>
-
-            <div class="total-bar">
-                <span>المجموع:</span>
-                <span id="restaurant-total">0 د.ع</span>
-            </div>
-        </div>
-
-        <div class="form-card" id="rest-user-card">
-            <div class="form-card-title"><i class="fas fa-user-circle"></i> بيانات التوصيل</div>
-            <div class="form-group">
-                <label>الاسم الكامل</label>
-                <input type="text" id="restName" placeholder="اكتب اسمك">
-                <span class="step-number">خطوة رقم (1)</span>
-            </div>
-            <div class="form-group">
-                <label>رقم الموبايل</label>
-                <input type="tel" id="restPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-                <span class="step-number">خطوة رقم (2)</span>
-            </div>
-            <div class="form-group">
-                <label>أقرب نقطة دالة</label>
-                <input type="text" id="restLandmark" placeholder="لتسهيل وصول المندوب">
-                <span class="step-number">خطوة رقم (3)</span>
-            </div>
-        </div>
-
-        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
-            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب. في حال عدم الرد سيتم إلغاء الطلب فوراً!
-        </div>
-
-        <button class="send-btn order-btn-logic ripple" id="restSendBtn" onclick="sendRestaurantOrder()"><i class="fas fa-paper-plane"></i> <span id="rest-final-btn">تأكيد طلب المطعم</span></button>
-    </div>
-
     <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
@@ -608,7 +487,7 @@
                 <label style="color:var(--danger);" id="lbl-tuk-drop">موقع التحصيل/التسليم (إجباري)</label>
                 
                 <div class="note" style="padding:12px; font-size:13px; margin-bottom:10px; background:rgba(16, 185, 129, 0.1); border-right-color:#10B981; color:var(--text-main);">
-                    💡 هسه تگدر تحدد مكان النزول مباشرة من الخريطة داخل التطبيق! 🗺️
+                    💡 هسه تگدر تحدد مكان النزول مباشرة من الخريطة داخل التطبيق بدون ما تطلع وتنسخ روابط! 🗺️
                 </div>
                 
                 <button type="button" class="location-btn ripple-dark" style="border: 2px dashed var(--primary); background: var(--surface); color: var(--primary);" onclick="openMapModal()">
@@ -639,9 +518,8 @@
         <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
         
         <div class="price-indicator" style="display: block;">
-            <span>أسعار خدمة الوسيط:</span>
-            <span class="amount" style="font-size: 20px;">داخل أم قصر: 1,500 د.ع</span>
-            <span class="amount" style="font-size: 20px;">خارج أم قصر (الميناء أو الهدامة): 2,500 د.ع</span>
+            <span>سعر خدمة الوسيط لكافة مناطق أم قصر:</span>
+            <span class="amount">2,500 د.ع</span>
             <small style="color: var(--secondary); font-weight: bold;"><i class="fas fa-bolt"></i> نوصل أغراضك بسرعة وأمان</small>
         </div>
         
@@ -680,6 +558,7 @@
 
         <button class="send-btn order-btn-logic ripple" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
     </div>
+
     <div id="order-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-shopping-cart" style="color:var(--primary);"></i> <span id="shop-head">تسوق مسواكك</span></h2>
@@ -692,9 +571,8 @@
         </div>
 
         <div class="price-indicator" style="display: block;">
-            <span>أسعار التوصيل:</span>
-            <span class="amount" style="font-size: 20px;">داخل أم قصر: 2,000 د.ع</span>
-            <span class="amount" style="font-size: 20px;">خارج أم قصر (الميناء أو الهدامة): 2,500 د.ع</span>
+            <span>سعر التوصيل لكافة مناطق أم قصر:</span>
+            <span class="amount">2,500 د.ع</span>
             <small style="color: var(--secondary); font-weight: bold;"><i class="fas fa-motorcycle"></i> خدمة توصيل سريعة ومضمونة</small>
         </div>
 
@@ -740,7 +618,6 @@
 
         <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
-
     <div id="join-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> انضم ككابتن</h2>
@@ -786,17 +663,9 @@
             <button class="resign-btn ripple-dark" onclick="cancelJoinRequest()" style="margin-top:15px;">إلغاء الطلب</button>
         </div>
     </div>
-    
     <div id="plaza-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-briefcase" style="color:#8B5CF6;"></i> لوحة الكابتن</h2>
-
-        <div class="price-indicator" style="display: block; margin-bottom: 20px;">
-            <span>أجور التوصيل المعتمدة:</span>
-            <span class="amount" style="font-size: 20px;">داخل أم قصر: 2,000 د.ع</span>
-            <span class="amount" style="font-size: 20px;">خارج أم قصر (الميناء أو الهدامة): 2,500 د.ع</span>
-            <small style="color: var(--danger); font-weight: bold; display: block; margin-top: 10px; font-size: 14px;">لصاحب التطبيق 500 دينار والكابتن 1500 دينار على كل طلب داخل أم قصر</small>
-        </div>
 
         <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 14px; font-weight: 800; margin-bottom: 20px;">
             <i class="fas fa-exclamation-circle" style="font-size: 20px;"></i> 
@@ -824,6 +693,24 @@
         </div>
 
         <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-map-marker-alt"></i> إشعار وصول للزبون</div>
+            <div class="form-group">
+                <label>رقم هاتف الزبون</label>
+                <input type="tel" id="arrivePhoneInput" placeholder="مثال: 07700000000" style="text-align:center;" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
+                <span class="step-number">خطوة رقم (1)</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="location-btn success ripple" style="flex: 1; margin: 0; background: #25D366; color: white; border: none;" onclick="notifyArriveWhatsApp()">
+                    <i class="fab fa-whatsapp"></i> رسالة واتساب
+                </button>
+                <button class="location-btn ripple" style="flex: 1; margin: 0; background: var(--primary); color: white; border: none;" onclick="notifyArriveCall()">
+                    <i class="fas fa-phone-alt"></i> اتصال سريع
+                </button>
+            </div>
+        </div>
+
+        <div class="form-card">
             <div class="form-card-title"><i class="fas fa-qrcode"></i> تأكيد تسليم/تحصيل جديد</div>
             <div class="form-group">
                 <label>رقم هاتف الزبون</label>
@@ -847,6 +734,11 @@
             <small style="display: block; text-align: center; margin-top: 15px; color: var(--text-muted); font-weight:600;">المنافسة مستمرة🏆</small>
         </div>
 
+        <a href="tg://resolve?domain=uumqaser" class="select-card ripple-dark" style="background: #0088cc; color: white; border:none; padding:15px; text-decoration: none; display: flex;">
+            <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color:white; width:50px; height:50px;"><i class="fab fa-telegram-plane" style="font-size:22px;"></i></div>
+            <div class="card-text"><h3 style="margin:0; font-size:16px;">قناة العمل الرسمية</h3><small style="color:rgba(255,255,255,0.8);">انضم لتلقي الإشعارات والعمليات</small></div>
+        </a>
+
         <p id="driver-display-name" style="text-align: center; font-weight: 700; color: var(--text-muted); margin-top:30px;"></p>
         <button class="resign-btn ripple-dark" onclick="resignDriver()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج / استقالة</button>
     </div>
@@ -856,60 +748,15 @@
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
     </div>
-
-    <div id="general-orders-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-globe" style="color:#10B981;"></i> الطلبات العامة</h2>
-        <div class="note" style="background: rgba(16, 185, 129, 0.1); border-right-color: #10B981; color: var(--text-main); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
-            <i class="fas fa-info-circle"></i> هنا تنزل الطلبات الجديدة. من تحجز الطلب راح يختفي من هنا ويروح لخانة "طلباتك".
-        </div>
-        <div id="general-orders-container">
-            <div class="form-card" style="text-align:center; padding: 20px;">
-                <p style="color:var(--text-muted); font-weight:bold; margin:0;"><i class="fas fa-spinner fa-spin"></i> جاري جلب الطلبات...</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="my-orders-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-box-open" style="color:#F59E0B;"></i> طلباتك</h2>
-        <div class="note" style="background: rgba(245, 158, 11, 0.1); border-right-color: #F59E0B; color: var(--text-main); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
-            <i class="fas fa-motorcycle"></i> هاي الطلبات اللي بعهدتك هسه وحجزتها.
-        </div>
-        <div id="my-orders-container">
-            <div class="form-card" style="text-align:center; padding: 20px;">
-                <p style="color:var(--text-muted); font-weight:bold; margin:0;"><i class="fas fa-box-open"></i> لا توجد طلبات في عهدتك حالياً</p>
-            </div>
-        </div>
-    </div>
     
     <script>
-      // ==========================================
-      // سكربتات الحماية لمنع أدوات المطورين والسرقة
-      // ==========================================
-      document.onkeydown = function(e) {
-          if(e.keyCode == 123) { return false; } 
-          if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; } 
-          if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; } 
-          if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; } 
-          if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; } 
-      };
-
-      if (window.top !== window.self) { window.top.location = window.self.location; }
-      document.addEventListener('dragstart', function(e) { e.preventDefault(); });
-
-      setInterval(function() {
-          console.clear();
-          console.log("%cتوقف! هذه المنطقة محمية وتخص تطبيق البندر.", "color: red; font-size: 20px; font-weight: bold;");
-      }, 1000);
-
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
+
       const NEW_BOT_TOKEN = "8757179280:AAHEgp3YTaVv6qZNr32ZA7fgk4fT8v-cqCk";
       const NEW_BOT_USER = "CodAlbanderbot";
-      
       let userCoords = ""; 
       const CURRENT_VERSION = "2.0.15"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
@@ -917,40 +764,51 @@
           window.location.reload(true); 
       }
 
-      async function trackLiveVisit() { try { fetch(`${GS_URL}?action=trackVisit`); } catch(e) {} }
-
-      let secretCounter = 0; let lockSecretCounter = 0; let appIsActive = true;
-      let lastOrderCount = -1; let orderPollInterval = null; let isSoundEnabled = false;
-      const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-      
-      // تعريف متغير الخريطة
-      let appMap = null;
-
-      function copyText(text, successMsg) {
-          navigator.clipboard.writeText(text).then(() => {
-              showToast(successMsg);
-          }).catch(err => {
-              showToast("حدث خطأ بالنسخ ❌");
-          });
+      async function trackLiveVisit() {
+          try { fetch(`${GS_URL}?action=trackVisit`); } catch(e) {}
       }
+
+      let secretCounter = 0;
+      let lockSecretCounter = 0;
+      let currentLang = 'ar';
+      let appIsActive = true;
+
+      let lastOrderCount = -1;
+      let orderPollInterval = null;
+      let isSoundEnabled = false;
+      const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
       function checkPhoneLive(input) {
           let errorSpan = input.parentNode.querySelector('.phone-error');
           if (!errorSpan) return;
-          if (input.value.length === 0) { errorSpan.style.display = 'none'; input.style.borderColor = ''; } 
-          else if (!/^07[0-9]{9}$/.test(input.value)) { errorSpan.style.display = 'block'; input.style.borderColor = 'var(--danger)'; } 
-          else { errorSpan.style.display = 'none'; input.style.borderColor = '#10B981'; }
+          if (input.value.length === 0) {
+              errorSpan.style.display = 'none';
+              input.style.borderColor = '';
+          } else if (!/^07[0-9]{9}$/.test(input.value)) {
+              errorSpan.style.display = 'block';
+              input.style.borderColor = 'var(--danger)';
+          } else {
+              errorSpan.style.display = 'none';
+              input.style.borderColor = '#10B981'; 
+          }
       }
 
       function toggleOrderSound() {
           isSoundEnabled = !isSoundEnabled;
           const btn = document.getElementById('soundToggleBtn');
           if (isSoundEnabled) {
-              btn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل'; btn.style.background = '#F59E0B'; btn.style.color = 'white';
-              newOrderAudio.play().catch(e => {}); startOrderPolling(); showToast("🔔 تم تفعيل جرس تنبيه الطلبات!");
+              btn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل';
+              btn.style.background = '#F59E0B'; 
+              btn.style.color = 'white';
+              newOrderAudio.play().catch(e => {}); 
+              startOrderPolling();
+              showToast("🔔 تم تفعيل جرس تنبيه الطلبات!");
           } else {
-              btn.innerHTML = '<i class="fas fa-bell-slash"></i> جرس الطلبات: معطل'; btn.style.background = 'var(--text-muted)'; btn.style.color = 'white';
-              clearInterval(orderPollInterval); showToast("تم إيقاف الجرس 🔕");
+              btn.innerHTML = '<i class="fas fa-bell-slash"></i> جرس الطلبات: معطل';
+              btn.style.background = 'var(--text-muted)';
+              btn.style.color = 'white';
+              clearInterval(orderPollInterval);
+              showToast("تم إيقاف الجرس 🔕");
           }
       }
 
@@ -964,21 +822,25 @@
                       newOrderAudio.play().catch(e=>{});
                       showToast("🔔 طلب جديد نزل بالساحة!");
                       if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                      let genScreen = document.getElementById('general-orders-screen');
-                      if(genScreen && genScreen.classList.contains('active-screen')) { fetchGeneralOrders(); }
                   }
                   lastOrderCount = currentCount;
               }
           } catch(e) {}
       }
 
-      function startOrderPolling() { if(orderPollInterval) clearInterval(orderPollInterval); checkNewOrdersForSound(); orderPollInterval = setInterval(checkNewOrdersForSound, 10000); }
-
+      function startOrderPolling() {
+          if(orderPollInterval) clearInterval(orderPollInterval);
+          checkNewOrdersForSound(); 
+          orderPollInterval = setInterval(checkNewOrdersForSound, 10000); 
+      }
       function initAutoLocation() {
           if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(
-                  (position) => { userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`; },
-                  (error) => { console.warn("GPS Denied on load"); }, { enableHighAccuracy: true }
+                  (position) => {
+                      userCoords = `https://maps.google.com/?q=$${position.coords.latitude},${position.coords.longitude}`;
+                  },
+                  (error) => { console.warn("GPS Denied on load"); },
+                  { enableHighAccuracy: true }
               );
           }
       }
@@ -986,20 +848,239 @@
       function handleSecretClick() {
           secretCounter++;
           if (secretCounter === 5) {
-              secretCounter = 0; let pass = prompt("أدخل الرمز السري:");
-              if (pass === "2006") { localStorage.setItem('isAdmin', 'true'); showScreen('admin-panel'); checkGlobalStatusFromServer(); } 
-              else if (pass !== null) { showToast("الرمز خطأ ❌"); }
+              secretCounter = 0;
+              let pass = prompt(currentLang === 'ar' ? "أدخل الرمز السري:" : "Admin Code:");
+              if (pass === "2006") {
+                  localStorage.setItem('isAdmin', 'true'); 
+                  showScreen('admin-panel');
+                  checkGlobalStatusFromServer(); 
+              } else if (pass !== null) {
+                  showToast(currentLang === 'ar' ? "الرمز خطأ ❌" : "Wrong Code ❌");
+              }
           }
       }
 
       function handleLockScreenSecret() {
           lockSecretCounter++;
           if (lockSecretCounter === 5) {
-              lockSecretCounter = 0; let pass = prompt("أدخل الرمز السري:");
-              if (pass === "2006") { localStorage.setItem('isAdmin', 'true'); document.getElementById('global-lock-screen').style.display = 'none'; showScreen('admin-panel'); } 
-              else if (pass !== null) { showToast("الرمز خطأ ❌"); }
+              lockSecretCounter = 0;
+              let pass = prompt(currentLang === 'ar' ? "أدخل الرمز السري:" : "Admin Code:");
+              if (pass === "2006") {
+                  localStorage.setItem('isAdmin', 'true'); 
+                  document.getElementById('global-lock-screen').style.display = 'none';
+                  showScreen('admin-panel');
+              } else if (pass !== null) {
+                  showToast(currentLang === 'ar' ? "الرمز خطأ ❌" : "Wrong Code ❌");
+              }
           }
       }
+      async function setGlobalAppStatus(newStatus) {
+          const btnOpen = document.getElementById('btn-open-app');
+          const btnClose = document.getElementById('btn-close-app');
+          if(newStatus === 'online') { btnOpen.innerHTML = '<span class="baly-spinner"></span>'; } 
+          else { btnClose.innerHTML = '<span class="baly-spinner"></span>'; }
+          btnOpen.disabled = true; btnClose.disabled = true;
+          try {
+              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}`);
+              showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
+              checkGlobalStatusFromServer();
+          } catch(e) { showToast("حدث خطأ بالاتصال بالسيرفر ⚠️"); } 
+          finally { 
+              btnOpen.innerHTML = '<i class="fas fa-unlock"></i> فتح التطبيق';
+              btnClose.innerHTML = '<i class="fas fa-lock"></i> إغلاق التطبيق';
+              btnOpen.disabled = false; btnClose.disabled = false;
+          }
+      }
+
+      async function checkGlobalStatusFromServer() {
+          try {
+              const resp = await fetch(`${GS_URL}?action=getAppStatus`);
+              const status = await resp.text();
+              const lockScreen = document.getElementById('global-lock-screen');
+              const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
+              if (status === "offline") {
+                  appIsActive = false;
+                  if(lockScreen && !isAdmin) lockScreen.style.display = 'flex'; 
+                  else if(lockScreen && isAdmin) lockScreen.style.display = 'none';
+              } else {
+                  appIsActive = true;
+                  if(lockScreen) lockScreen.style.display = 'none'; 
+              }
+              applyGlobalStatus();
+          } catch(e) {}
+      }
+
+      function applyGlobalStatus() {
+          const badge = document.getElementById('admin-status-badge');
+          const orderButtons = document.querySelectorAll('.order-btn-logic');
+          const isAdmin = localStorage.getItem('isAdmin') === 'true';
+          if (!appIsActive) {
+              badge.style.display = 'block'; 
+              if (!isAdmin) {
+                  orderButtons.forEach(btn => {
+                      btn.disabled = true;
+                      btn.innerHTML = '<i class="fas fa-lock"></i> مغلق حالياً';
+                  });
+              } else { orderButtons.forEach(btn => btn.disabled = false); }
+          } else {
+              badge.style.display = 'none';
+              document.getElementById('tukSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> طلب تكتك توصيلة';
+              document.getElementById('medSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
+              document.getElementById('sendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
+              orderButtons.forEach(btn => btn.disabled = false);
+          }
+      }
+
+      function toggleLanguage() {
+          currentLang = currentLang === 'ar' ? 'en' : 'ar';
+          document.getElementById('langBtn').innerText = currentLang === 'ar' ? 'English' : 'عربي';
+          document.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+      }
+
+      function userLogout() {
+          if (confirm("هل أنت متأكد من تسجيل الخروج من التطبيق؟")) {
+              localStorage.clear();
+              window.location.replace(window.location.href.split('?')[0]);
+          }
+      }
+      async function syncLoyaltyWithServer() {
+          const phoneInput = document.getElementById('custPhone');
+          const phone = (phoneInput && phoneInput.value.trim() !== "") ? phoneInput.value.trim() : localStorage.getItem('saved_customer_phone');
+          if (!phone || !validateIraqiPhone(phone)) return;
+          try {
+              const resp = await fetch(`${GS_URL}?action=getCustomerOrders&phone=${phone}`);
+              const countText = await resp.text();
+              const count = parseInt(countText);
+              if (!isNaN(count)) {
+                  loyaltyCount = count;
+                  localStorage.setItem('my_loyalty_orders', loyaltyCount);
+                  updateLocalLoyaltyUI();
+              }
+          } catch(e) {}
+      }
+
+      function checkConnection() {
+          document.getElementById('offline-screen').style.display = navigator.onLine ? 'none' : 'flex';
+      }
+      window.addEventListener('offline', checkConnection);
+      window.addEventListener('online', checkConnection);
+      function openWiFiSettings() { window.location.href = "intent:#Intent;action=android.settings.WIFI_SETTINGS;end"; }
+      function openDataSettings() { window.location.href = "intent:#Intent;action=android.settings.WIRELESS_SETTINGS;end"; }
+
+      window.originalAlert = window.alert;
+      window.alert = function(message) { showToast(message); };
+
+      function showToast(msg) {
+          const container = document.getElementById('toast-container');
+          const toast = document.createElement('div');
+          toast.className = 'toast';
+          toast.innerHTML = `<i class="fas fa-bell" style="color: var(--secondary);"></i> <span>${msg}</span>`;
+          container.appendChild(toast);
+          setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 3000);
+      }
+
+      function toggleTheme() {
+          document.body.classList.toggle('dark-mode');
+          localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+      }
+
+      function applyAutoTheme() {
+          const hour = new Date().getHours();
+          const isNight = hour >= 18 || hour < 6; 
+          const savedTheme = localStorage.getItem('theme');
+          if (!savedTheme && isNight) document.body.classList.add('dark-mode');
+          else if (savedTheme === 'dark') document.body.classList.add('dark-mode');
+      }
+
+      function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
+      function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
+
+      /* =========================================
+         منظومة تسجيل الدخول الجديدة عبر تليكرام (تحديث البندر)
+      ========================================= */
+      let loginPollInterval = null;
+      let currentLoginSession = "";
+
+      function goToLoginStep2() {
+          const nameInput = document.getElementById('loginNameInput').value.trim();
+          if(!nameInput) return showToast("يرجى كتابة اسمك أولاً ⚠️");
+          document.getElementById('login-step-1').style.display = 'none';
+          document.getElementById('login-step-2').style.display = 'block';
+      }
+
+      function backToLoginStep1() {
+          document.getElementById('login-step-2').style.display = 'none';
+          document.getElementById('login-step-1').style.display = 'block';
+      }
+
+      function startTelegramLogin() {
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          
+          currentLoginSession = Math.floor(10000000 + Math.random() * 90000000).toString();
+          
+          const btn = document.getElementById('tg-login-btn');
+          btn.innerHTML = '<span class="baly-spinner"></span> جاري انتظار تليكرام...';
+          btn.disabled = true;
+          document.getElementById('cancel-login-area').style.display = 'block';
+
+          window.open(`https://t.me/${NEW_BOT_USER}?start=login_${currentLoginSession}`, '_blank');
+          loginPollInterval = setInterval(checkTelegramLoginStatus, 3000);
+      }
+
+      async function checkTelegramLoginStatus() {
+          if (!currentLoginSession) return;
+          try {
+              const resp = await fetch(`${GS_URL}?action=checkTelegramLogin&session=${currentLoginSession}`);
+              const data = await resp.json();
+              
+              if (data.status === 'success') {
+                  clearInterval(loginPollInterval);
+                  
+                  if (navigator.onLine) {
+                      fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => console.log("Stats error"));
+                  }
+
+                  const userName = document.getElementById('loginNameInput').value.trim();
+                  const userPhone = data.phone;
+
+                  saveCustomerData(userName, userPhone); 
+                  loadSavedCustomerData(); 
+                  syncLoyaltyWithServer();
+                  
+                  const msg = `👤 تسجيل دخول جديد\nالاسم: ${userName}\nالرقم: ${userPhone}`;
+                  fetch(`https://api.telegram.org/bot${NEW_BOT_TOKEN}/sendMessage`, {
+                      method: "POST", 
+                      headers: { "Content-Type": "application/json" }, 
+                      body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+                  }).catch(e => {});
+
+                  showScreen('home-screen'); 
+                  showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
+
+                  currentLoginSession = "";
+                  resetLoginUI();
+              }
+          } catch(e) {}
+      }
+
+      function cancelTelegramLogin() {
+          if (loginPollInterval) clearInterval(loginPollInterval);
+          currentLoginSession = "";
+          resetLoginUI();
+          showToast("تم إلغاء عملية تسجيل الدخول ❌");
+      }
+
+      function resetLoginUI() {
+          const btn = document.getElementById('tg-login-btn');
+          btn.innerHTML = '<i class="fab fa-telegram-plane"></i> شارك رقمك عبر تليكرام';
+          btn.disabled = false;
+          document.getElementById('cancel-login-area').style.display = 'none';
+          
+          document.getElementById('login-step-2').style.display = 'none';
+          document.getElementById('login-step-1').style.display = 'block';
+          document.getElementById('loginNameInput').value = '';
+      }
+      /* ========================================= */
 
       function checkStatus() {
           trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
@@ -1008,17 +1089,14 @@
           const myPhone = localStorage.getItem('saved_customer_phone');
           if (ref && ref !== myPhone) { localStorage.setItem('referred_by', ref); }
           if (localStorage.getItem('isVerifiedDriver') === 'true') {
-              let joinCard = document.getElementById('join-driver-card'); if(joinCard) joinCard.style.display = 'none';
-              let plazaCard = document.getElementById('driver-plaza-card'); if(plazaCard) plazaCard.style.display = 'flex';
-              let genCard = document.getElementById('general-orders-card'); if(genCard) genCard.style.display = 'flex';
-              let myOrdCard = document.getElementById('my-orders-card'); if(myOrdCard) myOrdCard.style.display = 'flex';
-              let statusBadge = document.getElementById('driver-status-badge'); if(statusBadge) statusBadge.style.display = 'block';
-              
+              document.getElementById('join-driver-card').style.display = 'none';
+              document.getElementById('driver-plaza-card').style.display = 'flex';
+              document.getElementById('driver-status-badge').style.display = 'block';
               const accBtn = document.getElementById('nav-account-btn');
               if(accBtn) {
                   accBtn.setAttribute('onclick', "showScreen('plaza-screen'); updateNav(this)");
-                  let accIcon = document.getElementById('nav-acc-icon'); if(accIcon) accIcon.className = 'fas fa-briefcase';
-                  let accText = document.getElementById('nav-acc-text'); if(accText) accText.innerText = 'المندوبين';
+                  document.getElementById('nav-acc-icon').className = 'fas fa-briefcase';
+                  document.getElementById('nav-acc-text').innerText = 'المندوبين';
               }
               initDriverStatus(); setInterval(checkRemoteReset, 15000); setInterval(refreshLeaderboard, 30000);
               showScreen('home-screen');
@@ -1029,155 +1107,41 @@
       }
 
       document.addEventListener('DOMContentLoaded', () => {
+          checkStatus();
+          initAutoLocation(); 
           setTimeout(() => {
               const splash = document.getElementById('splash-screen');
-              if(splash) { 
-                  splash.style.opacity = '0'; 
-                  setTimeout(() => splash.style.display = 'none', 500); 
-              }
+              if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 500); }
           }, 1500);
-          try { checkStatus(); initAutoLocation(); } catch(err) {}
       });
-
-      async function setGlobalAppStatus(newStatus) {
-          const btnOpen = document.getElementById('btn-open-app'); const btnClose = document.getElementById('btn-close-app');
-          if(newStatus === 'online') { btnOpen.innerHTML = '<span class="baly-spinner"></span>'; } else { btnClose.innerHTML = '<span class="baly-spinner"></span>'; }
-          btnOpen.disabled = true; btnClose.disabled = true;
-          try {
-              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}`); showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴"); checkGlobalStatusFromServer();
-          } catch(e) { showToast("حدث خطأ بالاتصال بالسيرفر ⚠️"); } finally { btnOpen.innerHTML = '<i class="fas fa-unlock"></i> فتح التطبيق'; btnClose.innerHTML = '<i class="fas fa-lock"></i> إغلاق التطبيق'; btnOpen.disabled = false; btnClose.disabled = false; }
-      }
-
-      async function checkGlobalStatusFromServer() {
-          try {
-              const resp = await fetch(`${GS_URL}?action=getAppStatus`); const status = await resp.text();
-              const lockScreen = document.getElementById('global-lock-screen'); const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
-              if (status === "offline") { appIsActive = false; if(lockScreen && !isAdmin) lockScreen.style.display = 'flex'; else if(lockScreen && isAdmin) lockScreen.style.display = 'none'; } 
-              else { appIsActive = true; if(lockScreen) lockScreen.style.display = 'none'; }
-              applyGlobalStatus();
-          } catch(e) {}
-      }
-
-      function applyGlobalStatus() {
-          const badge = document.getElementById('admin-status-badge'); const orderButtons = document.querySelectorAll('.order-btn-logic'); const isAdmin = localStorage.getItem('isAdmin') === 'true';
-          if (!appIsActive) {
-              if(badge) badge.style.display = 'block'; 
-              if (!isAdmin) { orderButtons.forEach(btn => { btn.disabled = true; btn.innerHTML = '<i class="fas fa-lock"></i> مغلق حالياً'; }); } 
-              else { orderButtons.forEach(btn => btn.disabled = false); }
-          } else {
-              if(badge) badge.style.display = 'none';
-              let tBtn = document.getElementById('tukSendBtn'); if(tBtn) tBtn.innerHTML = '<i class="fas fa-paper-plane"></i> طلب تكتك توصيلة';
-              let mBtn = document.getElementById('medSendBtn'); if(mBtn) mBtn.innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
-              let sBtn = document.getElementById('sendBtn'); if(sBtn) sBtn.innerHTML = '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
-              let rBtn = document.getElementById('restSendBtn'); if(rBtn) rBtn.innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب المطعم';
-              orderButtons.forEach(btn => btn.disabled = false);
-          }
-      }
-
-      function userLogout() { if (confirm("هل أنت متأكد من تسجيل الخروج من التطبيق؟")) { localStorage.clear(); window.location.replace(window.location.href.split('?')[0]); } }
-      
-      async function syncLoyaltyWithServer() {
-          const phoneInput = document.getElementById('custPhone');
-          const phone = (phoneInput && phoneInput.value.trim() !== "") ? phoneInput.value.trim() : localStorage.getItem('saved_customer_phone');
-          if (!phone || !validateIraqiPhone(phone)) return;
-          try {
-              const resp = await fetch(`${GS_URL}?action=getCustomerOrders&phone=${phone}`);
-              const countText = await resp.text(); const count = parseInt(countText);
-              if (!isNaN(count)) { loyaltyCount = count; localStorage.setItem('my_loyalty_orders', loyaltyCount); updateLocalLoyaltyUI(); }
-          } catch(e) {}
-      }
-
-      function checkConnection() { let offScreen = document.getElementById('offline-screen'); if(offScreen) offScreen.style.display = navigator.onLine ? 'none' : 'flex'; }
-      window.addEventListener('offline', checkConnection); window.addEventListener('online', checkConnection);
-      function openWiFiSettings() { window.location.href = "intent:#Intent;action=android.settings.WIFI_SETTINGS;end"; }
-      function openDataSettings() { window.location.href = "intent:#Intent;action=android.settings.WIRELESS_SETTINGS;end"; }
-
-      window.originalAlert = window.alert; window.alert = function(message) { showToast(message); };
-
-      function showToast(msg) {
-          const container = document.getElementById('toast-container');
-          if(!container) return;
-          const toast = document.createElement('div'); toast.className = 'toast';
-          toast.innerHTML = `<i class="fas fa-bell" style="color: var(--secondary);"></i> <span>${msg}</span>`;
-          container.appendChild(toast);
-          setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 3000);
-      }
-
-      function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); }
-
-      function applyAutoTheme() {
-          const hour = new Date().getHours(); const isNight = hour >= 18 || hour < 6; const savedTheme = localStorage.getItem('theme');
-          if (!savedTheme && isNight) document.body.classList.add('dark-mode'); else if (savedTheme === 'dark') document.body.classList.add('dark-mode');
-      }
-
-      function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
-      function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
-
-      let loginPollInterval = null; let currentLoginSession = "";
-
-      function goToLoginStep2() {
-          const nameInput = document.getElementById('loginNameInput').value.trim();
-          if(!nameInput) return showToast("يرجى كتابة اسمك أولاً ⚠️");
-          document.getElementById('login-step-1').style.display = 'none'; document.getElementById('login-step-2').style.display = 'block';
-      }
-      function backToLoginStep1() { document.getElementById('login-step-2').style.display = 'none'; document.getElementById('login-step-1').style.display = 'block'; }
-
-      function startTelegramLogin() {
-          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
-          currentLoginSession = Math.floor(10000000 + Math.random() * 90000000).toString();
-          const btn = document.getElementById('tg-login-btn');
-          btn.innerHTML = '<span class="baly-spinner"></span> جاري انتظار تليكرام...'; btn.disabled = true;
-          document.getElementById('cancel-login-area').style.display = 'block';
-          window.open(`https://t.me/${NEW_BOT_USER}?start=login_${currentLoginSession}`, '_blank');
-          loginPollInterval = setInterval(checkTelegramLoginStatus, 3000);
-      }
-
-      async function checkTelegramLoginStatus() {
-          if (!currentLoginSession) return;
-          try {
-              const resp = await fetch(`${GS_URL}?action=checkTelegramLogin&session=${currentLoginSession}`);
-              const data = await resp.json();
-              if (data.status === 'success') {
-                  clearInterval(loginPollInterval);
-                  if (navigator.onLine) { fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => console.log("Stats error")); }
-                  const userName = document.getElementById('loginNameInput').value.trim(); const userPhone = data.phone;
-                  saveCustomerData(userName, userPhone); loadSavedCustomerData(); syncLoyaltyWithServer();
-                  const msg = `👤 تسجيل دخول جديد\nالاسم: ${userName}\nالرقم: ${userPhone}`;
-                  fetch(`https://api.telegram.org/bot${NEW_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) }).catch(e => {});
-                  showScreen('home-screen'); showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
-                  currentLoginSession = ""; resetLoginUI();
-              }
-          } catch(e) {}
-      }
-
-      function cancelTelegramLogin() { if (loginPollInterval) clearInterval(loginPollInterval); currentLoginSession = ""; resetLoginUI(); showToast("تم إلغاء عملية تسجيل الدخول ❌"); }
-
-      function resetLoginUI() {
-          const btn = document.getElementById('tg-login-btn');
-          btn.innerHTML = '<i class="fab fa-telegram-plane"></i> شارك رقمك عبر تليكرام'; btn.disabled = false;
-          document.getElementById('cancel-login-area').style.display = 'none';
-          document.getElementById('login-step-2').style.display = 'none'; document.getElementById('login-step-1').style.display = 'block';
-          document.getElementById('loginNameInput').value = '';
-      }
 
       function shareApp() {
           let myPhone = localStorage.getItem('saved_customer_phone');
           if (!myPhone) return showToast("لازم تسجل رقمك أولاً! ⚠️");
           let link = window.location.href.split('?')[0] + "?ref=" + myPhone;
-          if (navigator.share) { navigator.share({ title: 'البندر', text: 'نزل التطبيق واطلب وهذا كود الدعوة مالتي! 🎁', url: link }).catch(console.error); } 
-          else { showToast("تم نسخ الرابط! دزه لأصدقائك 🔗"); }
+          if (navigator.share) {
+              navigator.share({ title: 'البندر', text: 'نزل التطبيق واطلب وهذا كود الدعوة مالتي! 🎁', url: link }).catch(console.error);
+          } else { showToast("تم نسخ الرابط! دزه لأصدقائك 🔗"); }
       }
 
       function saveCustomerData(name, phone) { localStorage.setItem('saved_customer_name', name); localStorage.setItem('saved_customer_phone', phone); }
+      
       function loadSavedCustomerData() {
-          const name = localStorage.getItem('saved_customer_name'); const phone = localStorage.getItem('saved_customer_phone');
+          const name = localStorage.getItem('saved_customer_name'); 
+          const phone = localStorage.getItem('saved_customer_phone');
           if (name && phone) {
-              ['custName', 'medName', 'tukName', 'restName'].forEach(id => { let el = document.getElementById(id); if(el) el.value = name; });
-              ['custPhone', 'medPhone', 'tukPhone', 'restPhone'].forEach(id => { let el = document.getElementById(id); if(el) { el.value = phone; checkPhoneLive(el); } });
+              ['custName', 'medName', 'tukName'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = name; });
+              ['custPhone', 'medPhone', 'tukPhone'].forEach(id => { 
+                  let el = document.getElementById(id);
+                  if(el) { el.value = phone; checkPhoneLive(el); }
+              });
           }
       }
 
-      function skipWelcome() { const welcome = document.getElementById('welcome-overlay'); if (welcome && welcome.style.display !== 'none') { welcome.style.display = 'none'; location.reload(); } }
+      function skipWelcome() {
+          const welcome = document.getElementById('welcome-overlay');
+          if (welcome && welcome.style.display !== 'none') { welcome.style.display = 'none'; location.reload(); }
+      }
 
       async function checkRemoteReset() {
           try {
@@ -1186,24 +1150,36 @@
               const response = await fetch(`${GS_URL}?action=checkReset&phone=${myPhone}`);
               const result = await response.text();
               if (result === "reset_now") { 
-                  localStorage.setItem('d_count', 0); localStorage.setItem('league_count', 0); localStorage.removeItem('driver_logs'); 
-                  updateStatsUI(); let logScr = document.getElementById('log-screen'); if(logScr && logScr.classList.contains('active-screen')) { renderDriverLog(); }
-              } else if (result.includes("reset_league")) { localStorage.setItem('league_count', 0); updateStatsUI(); }
+                  localStorage.setItem('d_count', 0); 
+                  localStorage.setItem('league_count', 0); 
+                  localStorage.removeItem('driver_logs'); 
+                  updateStatsUI(); 
+                  if(document.getElementById('log-screen').classList.contains('active-screen')) { renderDriverLog(); }
+              } 
+              else if (result.includes("reset_league")) { localStorage.setItem('league_count', 0); updateStatsUI(); }
           } catch(e) {}
       }
 
-      function openJoinScreen() { if(localStorage.getItem('pending_join') === 'true') showScreen('activation-screen'); else showScreen('join-screen'); }
+      function openJoinScreen() {
+          if(localStorage.getItem('pending_join') === 'true') showScreen('activation-screen');
+          else showScreen('join-screen');
+      }
 
       async function submitJoinRequest() {
-          const name = document.getElementById('driverJoinName').value.trim(); const phone = document.getElementById('driverJoinPhone').value.trim(); const bike = document.getElementById('bikeType').value;
+          const name = document.getElementById('driverJoinName').value.trim();
+          const phone = document.getElementById('driverJoinPhone').value.trim();
+          const bike = document.getElementById('bikeType').value;
           if(!name || !validateIraqiPhone(phone) || !bike) return showToast("أكمل البيانات بشكل صحيح 📝");
-          const btn = document.getElementById('joinSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
+          const btn = document.getElementById('joinSendBtn');
+          const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
               localStorage.setItem('temp_name', name); localStorage.setItem('temp_phone', phone);
               const randomCode = Math.floor(100000 + Math.random() * 900000);
               localStorage.setItem('temp_activation', randomCode); localStorage.setItem('pending_join', 'true');
               const msg = `📥 طلب انضمام جديد\n👤 الاسم: ${name}\n📞 الهاتف: ${phone}\n🏍️ المركبة: ${bike}\n🔑 الكود: ${randomCode}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) });
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+              });
               showScreen('activation-screen');
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
@@ -1211,13 +1187,20 @@
       async function verifyActivationCode() {
           const input = document.getElementById('activationCodeInput').value.trim();
           if(input === localStorage.getItem('temp_activation')) {
-              const dName = localStorage.getItem('temp_name'); const dPhone = localStorage.getItem('temp_phone');
-              localStorage.setItem('isVerifiedDriver', 'true'); localStorage.setItem('driver_name', dName); localStorage.setItem('driver_phone', dPhone); localStorage.removeItem('pending_join');
+              const dName = localStorage.getItem('temp_name');
+              const dPhone = localStorage.getItem('temp_phone');
+              localStorage.setItem('isVerifiedDriver', 'true');
+              localStorage.setItem('driver_name', dName);
+              localStorage.setItem('driver_phone', dPhone);
+              localStorage.removeItem('pending_join');
               try {
                   const msg = `✅ تم تفعيل كابتن جديد بنجاح:\n👤 الاسم: ${dName}\n📞 الهاتف: ${dPhone}`;
-                  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) });
+                  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+                  });
               } catch(e) {}
-              document.getElementById('welcome-overlay').style.display = 'flex'; confetti({ particleCount: 200, spread: 90, origin: { y: 0.5 } });
+              document.getElementById('welcome-overlay').style.display = 'flex';
+              confetti({ particleCount: 200, spread: 90, origin: { y: 0.5 } });
               setTimeout(() => { location.reload(); }, 3500);
           } else { showToast("رمز التفعيل غير صحيح ❌"); }
       }
@@ -1226,130 +1209,70 @@
       
       async function resignDriver() { 
           if (confirm("هل أنت متأكد من تسجيل الخروج والاستقالة؟")) { 
-              const dName = localStorage.getItem('driver_name') || "غير معروف"; const dPhone = localStorage.getItem('driver_phone') || "غير معروف";
-              const btn = document.querySelector('.resign-btn'); if(btn) btn.innerHTML = '<span class="baly-spinner" style="border-top-color:var(--danger);"></span> جاري الخروج...';
+              const dName = localStorage.getItem('driver_name') || "غير معروف";
+              const dPhone = localStorage.getItem('driver_phone') || "غير معروف";
+              const btn = document.querySelector('.resign-btn');
+              if(btn) btn.innerHTML = '<span class="baly-spinner" style="border-top-color:var(--danger);"></span> جاري الخروج...';
               try {
                   const msg = `❌ استقالة / تسجيل خروج كابتن:\n👤 الاسم: ${dName}\n📞 الهاتف: ${dPhone}`;
-                  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) });
+                  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+                  });
               } catch(e) {}
               localStorage.clear(); location.reload(); 
           } 
       }
 
       function showScreen(id) {
-          document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active-screen'); });
-          const target = document.getElementById(id); if (target) { target.classList.add('active-screen'); }
+          document.querySelectorAll('.screen').forEach(s => {
+              s.classList.remove('active-screen');
+          });
+          
+          const target = document.getElementById(id);
+          if (target) {
+              target.classList.add('active-screen');
+          }
+          
           window.scrollTo(0, 0);
           const bottomNav = document.getElementById('bottomNavigation');
           if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel') ? 'none' : 'flex';
           
-          if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); let dName = document.getElementById('driver-display-name'); if(dName) dName.innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
+          if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
           if(id === 'log-screen') { renderDriverLog(); } 
-          if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen' || id === 'restaurant-screen') { loadSavedCustomerData(); }
+          if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') { loadSavedCustomerData(); }
           if(id === 'order-screen') updateLoyaltyUI();
-          if(id === 'general-orders-screen') { fetchGeneralOrders(); }
-          if(id === 'my-orders-screen') { fetchMyOrders(); }
-
+          
           if (typeof closeSidebar === 'function') closeSidebar();
-      }
-
-      // ------------------------------------------
-      // سكربت المطعم والمنيو
-      // ------------------------------------------
-      let menuOrder = { burger: 0, rizo: 0, laban: 0 };
-      
-      function updateMenuQty(item, change, price) {
-          menuOrder[item] = Math.max(0, menuOrder[item] + change);
-          document.getElementById('qty-' + item).innerText = menuOrder[item];
-          
-          let total = (menuOrder.burger * 1000) + (menuOrder.rizo * 3000) + (menuOrder.laban * 2000);
-          document.getElementById('restaurant-total').innerText = total + ' د.ع';
-      }
-
-      async function sendRestaurantOrder() {
-          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
-          
-          const name = document.getElementById('restName').value.trim(); 
-          const phone = document.getElementById('restPhone').value.trim();
-          const land = document.getElementById('restLandmark').value.trim();
-          let total = (menuOrder.burger * 1000) + (menuOrder.rizo * 3000) + (menuOrder.laban * 2000);
-          
-          if(!name || !validateIraqiPhone(phone)) return showToast("أكمل البيانات بشكل صحيح 📝");
-          if(total === 0) return showToast("الرجاء اختيار وجبة واحدة على الأقل 🍔");
-
-          if(!userCoords) {
-              showToast("جاري تحديد موقعك الحالي للطلب... 📍");
-              if(navigator.geolocation) {
-                  navigator.geolocation.getCurrentPosition((pos) => { 
-                      userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; 
-                      sendRestaurantOrder(); 
-                  }, (err) => { 
-                      showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); 
-                  }, { enableHighAccuracy: true });
-              } return;
-          }
-
-          const btn = document.getElementById('restSendBtn'); 
-          const originalText = btn.innerHTML; 
-          btn.innerHTML = '<span class="baly-spinner"></span>'; 
-          btn.disabled = true;
-
-          let orderDetails = [];
-          if(menuOrder.burger > 0) orderDetails.push(`همبرگة (العدد: ${menuOrder.burger})`);
-          if(menuOrder.rizo > 0) orderDetails.push(`ريزو دجاج (العدد: ${menuOrder.rizo})`);
-          if(menuOrder.laban > 0) orderDetails.push(`لبن (العدد: ${menuOrder.laban})`);
-          let finalOrderText = "الطلبات:\n" + orderDetails.join("\n") + "\n\nإجمالي الحساب: " + total + " د.ع";
-
-          try {
-              saveCustomerData(name, phone); 
-              const vc = generateSecureVC(); 
-              let referrer = localStorage.getItem('referred_by') || "";
-              
-              await fetch(`${GS_URL}?action=saveOrderCode&name=${encodeURIComponent(name)}&phone=${phone}&code=${vc}&referrer=${referrer}&type=🍔 مطعم البندر&details=${encodeURIComponent(finalOrderText)}&land=${encodeURIComponent(land)}&location=${encodeURIComponent(userCoords)}`); 
-              
-              localStorage.removeItem('referred_by');
-              const msg = `🍔 طلب مطعم البندر\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 ${finalOrderText}\n📍 الموقع: ${userCoords}`;
-              
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } }) });
-              
-              showToast("تم إرسال طلب المطعم بنجاح ✅"); 
-              document.getElementById('restLandmark').value = ""; 
-              
-              menuOrder = { burger: 0, rizo: 0, laban: 0 };
-              document.getElementById('qty-burger').innerText = '0';
-              document.getElementById('qty-rizo').innerText = '0';
-              document.getElementById('qty-laban').innerText = '0';
-              document.getElementById('restaurant-total').innerText = '0 د.ع';
-              
-              syncLoyaltyWithServer(); 
-              loadSavedCustomerData();
-          } catch (e) {
-              showToast("حدث خطأ بالاتصال ❌");
-          } finally { 
-              btn.innerHTML = originalText; 
-              btn.disabled = false; 
-          }
       }
 
       async function sendTukOrder() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
-          const name = document.getElementById('tukName').value.trim(); const phone = document.getElementById('tukPhone').value.trim();
-          const land = document.getElementById('tukLandmark').value.trim(); const dropLink = document.getElementById('tukDropoffLink').value.trim(); 
+          const name = document.getElementById('tukName').value.trim();
+          const phone = document.getElementById('tukPhone').value.trim();
+          const land = document.getElementById('tukLandmark').value.trim();
+          const dropLink = document.getElementById('tukDropoffLink').value.trim(); 
           if(!name || !validateIraqiPhone(phone) || !dropLink) return showToast("أكمل البيانات وحدد موقع النزول 📍");
           if(!userCoords) {
               showToast("جاري تحديد موقعك الحالي للطلب... 📍");
               if(navigator.geolocation) {
-                  navigator.geolocation.getCurrentPosition((pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); }, (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true });
-              } else { showToast("جهازك لا يدعم تحديد الموقع ❌"); } return;
+                  navigator.geolocation.getCurrentPosition(
+                      (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
+                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); },
+                      { enableHighAccuracy: true }
+                  );
+              } else { showToast("جهازك لا يدعم تحديد الموقع ❌"); }
+              return;
           }
           const btn = document.getElementById('tukSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
               saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
-              let msgContent = "طلب تكتك توصيلة: " + dropLink;
-              await fetch(`${GS_URL}?action=saveOrderCode&name=${encodeURIComponent(name)}&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}&type=🚖 تكتك توصيلة&details=${encodeURIComponent(msgContent)}&land=${encodeURIComponent(land)}&location=${encodeURIComponent(userCoords)}`); 
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`);
               localStorage.removeItem('referred_by'); 
               const msg = `🚖 طلب تكتك توصيلة\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الموقع: ${userCoords}\n📝 تفاصيل: ${dropLink}\nدالة: ${land}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية", callback_data: `claim|${name}|${vc}` }]] } }) });
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                  method: "POST", headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية", callback_data: `claim|${name}|${vc}` }]] } })
+              });
               showToast("تم الإرسال بنجاح ✅"); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
@@ -1361,19 +1284,35 @@
           if(!userCoords) {
               showToast("جاري تحديد موقعك الحالي للطلب... 📍");
               if(navigator.geolocation) {
-                  navigator.geolocation.getCurrentPosition((pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); }, (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true });
-              } return;
+                  navigator.geolocation.getCurrentPosition(
+                      (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
+                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); },
+                      { enableHighAccuracy: true }
+                  );
+              }
+              return;
           }
           const btn = document.getElementById('medSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
               saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
-              await fetch(`${GS_URL}?action=saveOrderCode&name=${encodeURIComponent(name)}&phone=${phone}&code=${vc}&referrer=${referrer}&type=🔵 طلب وسيط&details=${encodeURIComponent(order)}&land=${encodeURIComponent("لتسهيل وصول المندوب")}&location=${encodeURIComponent(userCoords)}`); 
-              localStorage.removeItem('referred_by');
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`); localStorage.removeItem('referred_by');
               const msg = `🔵 طلب وسيط\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📝 الغرض: ${order}\n📍 الموقع: ${userCoords}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } }) });
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
+              });
               showToast("تم الإرسال بنجاح ✅"); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
+
+      function previewImages() {
+          const input = document.getElementById('custImages'); const container = document.getElementById('image-preview-container'); container.innerHTML = '';
+          for (let i = 0; i < input.files.length; i++) {
+              const url = URL.createObjectURL(input.files[i]);
+              container.innerHTML += `<img src="${url}" style="width:70px; height:70px; border-radius:10px; object-fit:cover; border:1px solid var(--border-color);">`;
+          }
+          if(input.files.length > 0) container.innerHTML += `<div style="display:flex; align-items:center; color:var(--danger); font-size:13px; font-weight:bold; cursor:pointer; padding:5px; width: 100%;" onclick="clearImages()"><i class="fas fa-trash-alt" style="margin-left:5px;"></i> مسح الصور</div>`;
+      }
+      function clearImages() { document.getElementById('custImages').value = ''; document.getElementById('image-preview-container').innerHTML = ''; }
 
       async function sendFinal() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
@@ -1384,135 +1323,169 @@
           if(!userCoords) {
               showToast("جاري تحديد موقعك الحالي للطلب... 📍");
               if(navigator.geolocation) {
-                  navigator.geolocation.getCurrentPosition((pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); }, (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true });
-              } return;
+                  navigator.geolocation.getCurrentPosition(
+                      (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
+                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); },
+                      { enableHighAccuracy: true }
+                  );
+              }
+              return;
           }
           const btn = document.getElementById('sendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
-              saveCustomerData(name, phone); const vc = generateSecureVC(); let photoMsgs = []; let fileIdToSave = "";
+              saveCustomerData(name, phone); const vc = generateSecureVC(); let photoMsgs = [];
               if (files.length > 0) {
                   for (let i = 0; i < files.length; i++) {
                       let fd = new FormData(); fd.append('chat_id', "-1003786625443"); fd.append('photo', files[i]); fd.append('caption', `📦 صور طلب رقم: ${vc}\n👤 الزبون: ${name}`);
                       try {
                           let tgResp = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
-                          let tgData = await tgResp.json(); 
-                          if (tgData.ok && tgData.result.photo) { fileIdToSave = tgData.result.photo[tgData.result.photo.length - 1].file_id; }
+                          let tgData = await tgResp.json(); if (tgData.ok) photoMsgs.push(tgData.result.message_id);
                       } catch(err) {}
                   }
                   clearImages();
               }
-              let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0) + 1;
-              let loyaltyMsg = (tempLoyalty % 10) === 0 ? "🎁 هذا الطلب مجاني" : `الطلب رقم ${tempLoyalty % 10} من أصل 10`;
+              let photoIdsStr = photoMsgs.join(','); let referrer = localStorage.getItem('referred_by') || "";
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&photoMsgs=${photoIdsStr}&referrer=${referrer}`); localStorage.removeItem('referred_by');
+              
+              let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0); 
+              tempLoyalty++; 
+              localStorage.setItem('my_loyalty_orders', tempLoyalty);
+              updateLocalLoyaltyUI();
+
+              let orderNum = (tempLoyalty % 10); 
+              let loyaltyMsg = (tempLoyalty % 10) === 0 ? "🎁 هذا الطلب مجاني (الطلب العاشر)" : `الطلب رقم ${tempLoyalty % 10} من أصل 10`;
               let msgContent = order ? order : "الطلب موضح في الصور المرفقة 📸";
-              let msgWithFile = msgContent + (fileIdToSave ? "||FILEID:" + fileIdToSave : "");
-              await fetch(`${GS_URL}?action=saveOrderCode&name=${encodeURIComponent(name)}&phone=${phone}&code=${vc}&referrer=${localStorage.getItem('referred_by') || ""}&type=🔵 طلب مسواك&details=${encodeURIComponent(msgWithFile)}&land=${encodeURIComponent(land)}&loyalty=${encodeURIComponent(loyaltyMsg)}&location=${encodeURIComponent(userCoords)}`); 
-              localStorage.removeItem('referred_by');
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${msgContent}\n🔢 تسلسل: ${loyaltyMsg}\n📍 الموقع: ${userCoords}`, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } }) });
-              showToast("تم إرسال طلبك بنجاح ✅"); document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = "";
+              let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص)**" : "";
+              const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍 الموقع: ${userCoords}`;
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                  method: "POST", headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
+              });
+              showToast("تم إرسال طلبك بنجاح ✅"); document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = ""; loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
-      async function fetchGeneralOrders() {
-          const container = document.getElementById('general-orders-container'); if(!container || !navigator.onLine) return;
-          container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--text-muted); font-weight:bold; margin:0;"><i class="fas fa-spinner fa-spin"></i> جاري التحديث...</p></div>';
+      async function processVerifyCode() {
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          const code = document.getElementById('driverVerifyInput').value.trim(); const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
+          if(!validateIraqiPhone(custPhone) || !code) return showToast("أدخل بيانات صحيحة ⚠️");
+          const btn = document.querySelector('#plaza-screen .send-btn'); const oldText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
-              const response = await fetch(`${GS_URL}?action=getLiveOrders`);
-              const orders = JSON.parse(await response.text());
-              if(orders.length === 0) { container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--text-muted); font-weight:bold; margin:0;">لا توجد طلبات</p></div>'; return; }
-              container.innerHTML = orders.map(order => `
-                  <div class="order-msg-card">
-                      <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:8px;">
-                          <span style="font-weight:800; color:var(--primary);">${order.type || '🔵 طلب مسواك'}</span>
-                          <span class="step-number" style="margin:0; background:rgba(239, 68, 68, 0.1); color:var(--danger);">كود: مخفي 🔒</span>
-                      </div>
-                      <div class="order-msg-content">
-                          👤 الزبون: <strong>${order.customerName}</strong><br>
-                          📞 الهاتف: ${order.customerPhone}<br>
-                          📝 الطلب: ${order.details.split("||FILEID:")[0]}
-                      </div>
-                      <button class="book-btn ripple" onclick="claimOrderInApp('${order.vc}', '${order.customerName}', this)"><i class="fas fa-hand-paper"></i> حجز الطلب</button>
-                  </div>
-              `).join('');
-          } catch(e) { container.innerHTML = '<p style="text-align:center; color:var(--danger);">خطأ في جلب البيانات</p>'; }
+              const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
+              const checkResult = await checkResp.text();
+              if (checkResult.startsWith("valid")) {
+                  try { const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); cashAudio.play(); confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } }); } catch(e) {}
+                  let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
+                  logs.unshift({ date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }), phone: custPhone, price: "2,500 د.ع" });
+                  localStorage.setItem('driver_logs', JSON.stringify(logs));
+                  localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
+                  localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
+                  updateStatsUI();
+                  let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
+                  fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
+                  syncLoyaltyWithServer(); 
+                  showToast(`تم تأكيد العملية بنجاح! عاشت ايدك 👏`); refreshLeaderboard();
+                  document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
+              } else { showToast("الكود غير صحيح ❌"); }
+          } catch(e) {} finally { btn.innerHTML = oldText; btn.disabled = false; }
       }
 
-      async function fetchMyOrders() {
-          const container = document.getElementById('my-orders-container'); if(!container || !navigator.onLine) return;
-          try {
-              const response = await fetch(`${GS_URL}?action=getMyOrders&driverPhone=${localStorage.getItem('driver_phone')}`);
-              const orders = JSON.parse(await response.text());
-              if(orders.length === 0) { container.innerHTML = '<div class="form-card" style="text-align:center; padding: 20px;"><p style="color:var(--text-muted); font-weight:bold; margin:0;">لا توجد طلبات حالياً</p></div>'; return; }
-              container.innerHTML = orders.map(order => {
-                  let fileId = order.details.includes("||FILEID:") ? order.details.split("||FILEID:")[1] : "";
-                  return `
-                  <div class="order-msg-card" style="border-right: 4px solid var(--secondary);">
-                      <div class="order-msg-content">
-                          👤 الزبون: <strong>${order.customerName}</strong><br>
-                          📞 الهاتف: <span class="copy-span" onclick="copyText('${order.customerPhone}', 'تم النسخ!')"><i class="fas fa-copy"></i> ${order.customerPhone}</span><br>
-                          🔑 كود: <span class="copy-span" onclick="copyText('${order.vc}', 'تم النسخ!')"><i class="fas fa-copy"></i> ${order.vc}</span><br>
-                          📝 الطلب: ${order.details.split("||FILEID:")[0]}<br>
-                          📍 الموقع: <a href="${order.location}" target="_blank" style="color:#0088cc; font-weight:bold;">فتح الخريطة 🗺️</a>
-                      </div>
-                      ${fileId ? `<div style="text-align:center; margin-top:10px;"><img id="tg-img-${order.vc}" src="" style="display:none; width:100%; max-height:400px; object-fit:contain; border-radius:8px; border:1px solid var(--border-color);"></div>` : ''}
-                      <div style="display:flex; gap:10px; margin-top:15px;">
-                          <button class="location-btn success ripple" style="flex:1; margin:0; padding:10px; background:#25D366; color:white; border:none;" onclick="window.open('https://wa.me/964${order.customerPhone.substring(1)}', '_blank')"><i class="fab fa-whatsapp"></i> واتساب</button>
-                          <button class="location-btn success ripple" style="flex:1; margin:0; padding:10px;" onclick="window.location.href='tel:${order.customerPhone}'"><i class="fas fa-phone"></i> اتصال</button>
-                      </div>
+      function renderDriverLog() {
+          const container = document.getElementById('driver-log-container');
+          if(!container) return;
+          let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
+          if(logs.length === 0) {
+              container.innerHTML = '<div class="form-card" style="text-align:center;"><i class="fas fa-box-open" style="font-size:40px; color:var(--border-color); margin-bottom:10px;"></i><p style="color:var(--text-muted); font-weight:bold; margin:0;">السجل فارغ حالياً.</p></div>';
+              return;
+          }
+          container.innerHTML = logs.map((log, i) => `
+              <div class="form-card" style="border-right: 4px solid var(--primary); padding: 15px;">
+                  <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:8px;">
+                      <span style="font-weight:800; color:var(--primary);">الطلب #${logs.length - i}</span>
+                      <span style="font-size:12px; color:var(--text-muted);" dir="ltr">${log.date}</span>
                   </div>
-              `}).join('');
-              orders.forEach(o => { if(o.details.includes("||FILEID:")) loadTelegramImage(o.details.split("||FILEID:")[1], `tg-img-${o.vc}`); });
-          } catch(e) {}
+                  <div style="font-size:14px; margin-bottom:5px;"><i class="fas fa-phone-alt" style="color:var(--text-muted); width:20px;"></i> هاتف الزبون: <strong>${log.phone}</strong></div>
+                  <div style="font-size:14px; margin-bottom:5px;"><i class="fas fa-map-marker-alt" style="color:var(--danger); width:20px;"></i> الموقع: <strong>أم قصر</strong></div>
+                  <div style="font-size:14px;"><i class="fas fa-money-bill-wave" style="color:var(--gold); width:20px;"></i> أجرة التوصيل: <strong>${log.price}</strong></div>
+              </div>
+          `).join('');
       }
 
-      async function claimOrderInApp(vc, customerName, btn) {
-          const myPhone = localStorage.getItem('driver_phone');
-          const checkResp = await fetch(`${GS_URL}?action=getMyOrders&driverPhone=${myPhone}`);
-          if (JSON.parse(await checkResp.text()).length >= 2) return showToast("ما يصير تحجز أكثر من طلبين! ⚠️");
-          btn.innerHTML = '<span class="baly-spinner" style="border-top-color:#000;"></span>'; btn.disabled = true;
+      function updateStatsUI() { if(document.getElementById('stat-count')) document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0; }
+
+      async function refreshLeaderboard() {
+          if (!navigator.onLine) return;
+          const listDiv = document.getElementById('leaderboard-list');
           try {
-              const res = await (await fetch(`${GS_URL}?action=claimLiveOrder&code=${vc}&driverName=${encodeURIComponent(localStorage.getItem('driver_name'))}&driverPhone=${myPhone}`)).text();
-              if(res.includes("success")) { showToast("تم حجز الطلب! ✅"); showScreen('my-orders-screen'); }
-              else { showToast("الطلب انحجز قبلك! ⚠️"); fetchGeneralOrders(); }
-          } catch(e) { showToast("خطأ اتصال ❌"); btn.disabled = false; btn.innerText = "حجز الطلب"; }
+              const response = await fetch(`${GS_URL}?action=getAllDriverStats`); const drivers = await response.json();
+              drivers.sort((a, b) => (parseInt(b.leagueCount) || 0) - (parseInt(a.leagueCount) || 0));
+              listDiv.innerHTML = "";
+              if(drivers.length === 0) { listDiv.innerHTML = '<p style="text-align: center; color: var(--text-muted);">لا يوجد كباتن حالياً</p>'; return; }
+              drivers.forEach((d, index) => {
+                  let medal = (index === 0) ? "🥇" : (index === 1) ? "🥈" : (index === 2) ? "🥉" : `<span style="font-size:16px; color:var(--text-muted);">${index + 1}</span>`;
+                  let isMe = d.phone === localStorage.getItem('driver_phone') ? " (أنت)" : "";
+                  let bgColor = isMe ? "background: var(--bg-color); border: 1px solid var(--primary);" : "";
+                  const div = document.createElement('div'); div.className = "driver-rank"; div.style = bgColor;
+                  div.innerHTML = `<div class="rank-info"><span class="rank-medal">${medal}</span> <span>${d.name}${isMe}</span></div><span class="rank-score">${d.leagueCount || 0}</span>`;
+                  listDiv.appendChild(div);
+              });
+          } catch (e) { listDiv.innerHTML = '<p style="text-align: center; color: var(--danger);">فشل التحميل</p>'; }
       }
-      function loadTelegramImage(fId, imgId) {
-          fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getFile?file_id=${fId}`).then(r => r.json()).then(d => {
-              if (d.ok) { let img = document.getElementById(imgId); img.src = `https://api.telegram.org/file/bot${BOT_TOKEN}/${d.result.file_path}`; img.style.display = 'block'; }
-          });
+
+      function updateNav(element) { document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); element.classList.add('active'); }
+      function openSidebar() { document.getElementById('appSidebar').classList.add('open'); const overlay = document.getElementById('sidebarOverlay'); overlay.style.display = 'block'; setTimeout(() => overlay.classList.add('show'), 10); }
+      function closeSidebar() { document.getElementById('appSidebar').classList.remove('open'); const overlay = document.getElementById('sidebarOverlay'); overlay.classList.remove('show'); setTimeout(() => overlay.style.display = 'none', 300); }
+
+      let loyaltyCount = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
+      function updateLocalLoyaltyUI() {
+          const displayCount = document.getElementById('current-order-count'); const progressBar = document.getElementById('loyalty-bar'); const giftMsg = document.getElementById('loyalty-gift-msg');
+          let currentCount = parseInt(loyaltyCount % 10); 
+          if(displayCount) displayCount.innerText = currentCount;
+          if(progressBar) progressBar.style.width = (currentCount / 10 * 100) + "%";
+          if(currentCount === 9) { if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i> اطلب الآن! هذا طلبك المجاني 🎁"; giftMsg.style.color = "var(--secondary)"; } if(progressBar) progressBar.style.background = "var(--secondary)"; } 
+          else { if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i> أوصل للطلب 10 وكروتك مجانية"; giftMsg.style.color = "var(--primary)"; } if(progressBar) progressBar.style.background = "var(--gold)"; }
       }
-      function previewImages() {
-          const container = document.getElementById('image-preview-container'); container.innerHTML = '';
-          for (let f of document.getElementById('custImages').files) { container.innerHTML += `<img src="${URL.createObjectURL(f)}" style="width:70px; height:70px; border-radius:10px; object-fit:cover; border:1px solid var(--border-color);">`; }
-          if(document.getElementById('custImages').files.length > 0) container.innerHTML += `<div style="color:var(--danger); font-size:13px; font-weight:bold; cursor:pointer;" onclick="clearImages()">مسح الكل</div>`;
+      function updateLoyaltyUI() { updateLocalLoyaltyUI(); } updateLocalLoyaltyUI();
+
+      function toggleDriverStatus() {
+          const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
+          let current = localStorage.getItem('driver_status') || 'available';
+          if(current === 'available') {
+              localStorage.setItem('driver_status', 'busy'); btn.style.background = 'var(--danger)'; btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً';
+              if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; }
+          } else {
+              localStorage.setItem('driver_status', 'available'); btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل';
+              if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; }
+          }
       }
-      function clearImages() { document.getElementById('custImages').value = ''; document.getElementById('image-preview-container').innerHTML = ''; }
-      function processVerifyCode() { /* دالة التأكيد المعتادة لديك */ }
-      async function refreshLeaderboard() { /* دالة الدوري المعتادة لديك */ }
-      function updateStatsUI() { document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0; }
-      function updateNav(el) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); }
-      function openSidebar() { document.getElementById('appSidebar').classList.add('open'); document.getElementById('sidebarOverlay').style.display = 'block'; setTimeout(() => document.getElementById('sidebarOverlay').classList.add('show'), 10); }
-      function closeSidebar() { document.getElementById('appSidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); setTimeout(() => document.getElementById('sidebarOverlay').style.display = 'none', 300); }
-      function updateLocalLoyaltyUI() { /* دالة الوفاء المعتادة لديك */ }
-      function updateLoyaltyUI() { updateLocalLoyaltyUI(); }
-      function toggleDriverStatus() { /* دالة الحالة المعتادة لديك */ }
-      function initDriverStatus() { /* تهيئة الحالة المعتادة لديك */ }
+
+      function initDriverStatus() {
+          let current = localStorage.getItem('driver_status') || 'available';
+          const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
+          if(current === 'busy') { if(btn) { btn.style.background = 'var(--danger)'; btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً'; } if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; } } 
+          else { if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; } if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; } }
+      }
+
+      function notifyArriveWhatsApp() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); let formattedPhone = phone.startsWith('0') ? '964' + phone.substring(1) : phone; let msg = encodeURIComponent("السلام عليكم، كابتن تطبيق (البندر) بالباب، يرجى استلام الطلب/الأموال 🛵"); window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank'); }
+      function notifyArriveCall() { const phone = document.getElementById('arrivePhoneInput').value.trim(); if(!validateIraqiPhone(phone)) return showToast("أدخل رقم زبون صحيح ⚠️"); window.location.href = `tel:${phone}`; }
       
-      // التعديل السحري مال الخريطة (تم زيادة الوقت للـ 500 وإضافة إجبار الحجم والمركز)
-      function openMapModal() { 
-          document.getElementById('map-modal').style.display = 'flex'; 
-          
-          setTimeout(() => {
-              if (!appMap) { 
-                  appMap = L.map('map-view', { attributionControl: false }).setView([30.0396, 47.9298], 15); 
-                  L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(appMap); 
-              } 
-              appMap.invalidateSize(); 
-              appMap.setView([30.0396, 47.9298], 15);
-          }, 500); 
+      let appMap = null;
+      function openMapModal() {
+          document.getElementById('map-modal').style.display = 'flex';
+          if (!appMap) {
+              appMap = L.map('map-view', { attributionControl: false }).setView([30.0396, 47.9298], 15);
+              L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(appMap);
+          }
+          setTimeout(() => { appMap.invalidateSize(); }, 300);
       }
-
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
-      function confirmMapLocation() { let center = appMap.getCenter(); document.getElementById('tukDropoffLink').value = `https://maps.google.com/?q=$${center.lat},${center.lng}`; document.getElementById('map-success-msg').style.display = 'block'; closeMapModal(); }
+      function confirmMapLocation() {
+          const center = appMap.getCenter();
+          const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng}`;
+          document.getElementById('tukDropoffLink').value = googleMapsLink;
+          document.getElementById('map-success-msg').style.display = 'block';
+          closeMapModal();
+      }
     </script>
 </body>
-</html>
+        </html>
