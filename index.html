@@ -1332,7 +1332,6 @@
           
           window.scrollTo(0, 0);
           const bottomNav = document.getElementById('bottomNavigation');
-          // إخفاء الـ Nav bar لو جنا بصفحة المنيو أو الدخول
           if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id === 'restaurant-menu-screen') ? 'none' : 'flex';
           
           if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
@@ -1414,10 +1413,15 @@
 
       async function sendFinal() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
-          const name = document.getElementById('custName').value.trim(); const phone = document.getElementById('custPhone').value.trim();
-          const order = document.getElementById('custOrder').value.trim(); const land = document.getElementById('custLandmark').value.trim();
+          
+          const name = document.getElementById('custName').value.trim(); 
+          const phone = document.getElementById('custPhone').value.trim();
+          const order = document.getElementById('custOrder').value.trim(); 
+          const land = document.getElementById('custLandmark').value.trim();
           const files = document.getElementById('custImages').files;
+          
           if(!name || !validateIraqiPhone(phone) || (!order && files.length === 0)) return showToast("أكمل البيانات من فضلك 📝📸");
+          
           if(!userCoords) {
               showToast("جاري تحديد موقعك الحالي للطلب... 📍");
               if(navigator.geolocation) {
@@ -1429,21 +1433,36 @@
               }
               return;
           }
-          const btn = document.getElementById('sendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
+          
+          const btn = document.getElementById('sendBtn'); 
+          const originalText = btn.innerHTML; 
+          btn.innerHTML = '<span class="baly-spinner"></span>'; 
+          btn.disabled = true;
+          
           try {
-              saveCustomerData(name, phone); const vc = generateSecureVC(); let photoMsgs = [];
+              saveCustomerData(name, phone); 
+              const vc = generateSecureVC(); 
+              let photoMsgs = [];
+              
               if (files.length > 0) {
                   for (let i = 0; i < files.length; i++) {
-                      let fd = new FormData(); fd.append('chat_id', "-1003786625443"); fd.append('photo', files[i]); fd.append('caption', `📦 صور طلب رقم: ${vc}\n👤 الزبون: ${name}`);
+                      let fd = new FormData(); 
+                      fd.append('chat_id', "-1003786625443"); 
+                      fd.append('photo', files[i]); 
+                      fd.append('caption', `📦 صور طلب رقم: ${vc}\n👤 الزبون: ${name}`);
                       try {
                           let tgResp = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
-                          let tgData = await tgResp.json(); if (tgData.ok) photoMsgs.push(tgData.result.message_id);
+                          let tgData = await tgResp.json(); 
+                          if (tgData.ok) photoMsgs.push(tgData.result.message_id);
                       } catch(err) {}
                   }
                   clearImages();
               }
-              let photoIdsStr = photoMsgs.join(','); let referrer = localStorage.getItem('referred_by') || "";
-              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&photoMsgs=${photoIdsStr}&referrer=${referrer}`); localStorage.removeItem('referred_by');
+              
+              let photoIdsStr = photoMsgs.join(','); 
+              let referrer = localStorage.getItem('referred_by') || "";
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&photoMsgs=${photoIdsStr}&referrer=${referrer}`); 
+              localStorage.removeItem('referred_by');
               
               let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0); 
               tempLoyalty++; 
@@ -1455,12 +1474,34 @@
               let msgContent = order ? order : "الطلب موضح في الصور المرفقة 📸";
               let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص)**" : "";
               const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍 الموقع: ${userCoords}`;
+              
+              // 1. إرسال الطلب لقناة المندوبين العامة للحجز
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
-              showToast("تم إرسال طلبك بنجاح ✅"); document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = ""; loadSavedCustomerData();
-          } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
+
+              // 2. النظام الجديد: إرسال الطلب لمطعم علي سالم إذا كان الطلب جاي من المنيو مالته
+              let isAliSalemOrder = order.includes("مطعم برجر علي سالم");
+              if (isAliSalemOrder) {
+                  const ALI_SALEM_BOT_TOKEN = "8735092732:AAE9lBE3i6AJRkKe3LLlAAodFXuAv7VXpys";
+                  const ALI_SALEM_CHAT_ID = "7479342799"; 
+                  const restMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
+                  
+                  await fetch(`https://api.telegram.org/bot${ALI_SALEM_BOT_TOKEN}/sendMessage`, {
+                      method: "POST", headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ chat_id: ALI_SALEM_CHAT_ID, text: restMsg })
+                  }).catch(e => console.log("خطأ في إرسال طلب المطعم"));
+              }
+
+              showToast("تم إرسال طلبك بنجاح ✅"); 
+              document.getElementById('custOrder').value = ""; 
+              document.getElementById('custLandmark').value = ""; 
+              loadSavedCustomerData();
+          } catch (e) {} finally { 
+              btn.innerHTML = originalText; 
+              btn.disabled = false; 
+          }
       }
 
       async function processVerifyCode() {
