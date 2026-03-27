@@ -524,6 +524,12 @@
                   <small>بركر وسندويجات</small>
               </div>
 
+              <div class="rest-card ripple" onclick="openMenu('klashe')">
+                  <img src="klashe.jpg" alt="كلاشي">
+                  <h4>كلاشي</h4>
+                  <small>عصائر ومشروبات</small>
+              </div>
+
               <div class="rest-card" style="opacity: 0.6; cursor: default;">
                   <div style="width: 100%; height: 90px; border-radius: 15px; background: var(--border-color); display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
                       <i class="fas fa-utensils" style="font-size: 30px; color: var(--text-muted);"></i>
@@ -884,7 +890,7 @@
       // ==============================================
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.15"; 
+      const CURRENT_VERSION = "2.0.16"; // تحديث رقم الإصدار
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -1320,9 +1326,58 @@
                   { id: 'v61', name: 'حلقات بصل', price: 3000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
                   { id: 'v62', name: 'فرايز دجاج مقرمش', price: 4000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' }
               ]
+          },
+          'klashe': {
+              name: 'كلاشي',
+              items: [
+                  // قسم العصائر
+                  { id: 'k1', name: 'عصير برتقال', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k2', name: 'عصير ليمون', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k3', name: 'عصير بطيخ بالحليب', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k4', name: 'عصير موز بالكاكاو', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k5', name: 'عصير تين', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k6', name: 'عصير خوخ', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k7', name: 'عصير كوكتيل', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k8', name: 'عصير فراولة', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k9', name: 'عصير ككرزات حليب', price: 1500, category: 'قسم العصائر', desc: '' },
+                  // قسم الموهيتو
+                  { id: 'k10', name: 'سكنجبيل', price: 1000, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k11', name: 'موهيتو فراولة', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k12', name: 'موهيتو علج بوبي', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k13', name: 'موهيتو بلو بيري', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k14', name: 'موهيتو روز بيري', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k15', name: 'موهيتو ليمون', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k16', name: 'موهيتو رمان', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k17', name: 'موهيتو مانجو', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  // قسم السموذي
+                  { id: 'k18', name: 'سموذي مانجو', price: 3000, category: 'قسم السموذي', desc: '' },
+                  { id: 'k19', name: 'سموذي فراولة', price: 3000, category: 'قسم السموذي', desc: '' },
+                  { id: 'k20', name: 'سموذي توت ازرق', price: 3000, category: 'قسم السموذي', desc: '' },
+                  // قسم القهوة الباردة
+                  { id: 'k21', name: 'ايس لاتيه', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
+                  { id: 'k22', name: 'ايس أمريكانو', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
+                  { id: 'k23', name: 'ايس اسبانيش', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
+                  { id: 'k24', name: 'ايس اسبانيش بلو', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
+                  { id: 'k25', name: 'ايس روز لاتيه', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
+                  // قسم المشروبات الساخنة
+                  { id: 'k26', name: 'شاي مهيل', price: 500, category: 'قسم المشروبات الساخنة', desc: '' },
+                  { id: 'k27', name: 'شاي كرك', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
+                  { id: 'k28', name: 'شاي توت', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
+                  { id: 'k29', name: 'شاي ليمون', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
+                  { id: 'k30', name: 'شاي رمان', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
+                  // قسم القهوة
+                  { id: 'k31', name: 'قهوة تركية ساده', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k32', name: 'قهوة وسط', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k33', name: 'قهوة جكليتية', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k34', name: 'قهوة عثمانية', price: 2000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k35', name: 'قهوة أسبريسو', price: 2000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k36', name: 'حليب فقط', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k37', name: 'مشروب الكاكاو', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k38', name: 'كابتشينو', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k39', name: 'كابتشينو مكسرات', price: 1000, category: 'قسم القهوة', desc: '' }
+              ]
           }
       };
-
       async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
@@ -1499,7 +1554,7 @@
           showScreen('order-screen'); 
           showToast("تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
       }
-      /* ========================================= */
+
       function checkStatus() {
           trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
           fetchDynamicMenus(); 
@@ -1832,7 +1887,9 @@
                       body: JSON.stringify({ chat_id: VICTORIA_CHAT_ID, text: vicMsg })
                   }).catch(e => console.log("خطأ في إرسال طلب مطعم فيكتوريا"));
               }
-              // ====================================================
+
+              // 5. طلبات كلاشي (تذهب للقناة العامة حالياً لتجهيزها من قبل المندوب)
+              // ملاحظة: إذا سويت بوت لكلاشي مستقبلاً، تقدر تضيف الكود مالته هنا بنفس الطريقة.
 
               showToast("تم إرسال طلبك بنجاح ✅"); 
               document.getElementById('custOrder').value = ""; 
