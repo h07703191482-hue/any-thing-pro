@@ -875,10 +875,12 @@
       // التوكنات الخاصة ببوتات المطاعم
       const ALI_SALEM_BOT_TOKEN = "8735092732:AAE9lBE3i6AJRkKe3LLlAAodFXuAv7VXpys";
       const ABO_HMODE_BOT_TOKEN = "8695832371:AAHosUvA37U9U1qhiZJlbDKxJPZFgDHbJAk"; 
+      const VICTORIA_BOT_TOKEN = "8769449664:AAErwMuaA893BKDvbKcOk4sFgFPXUIxlnmc"; // توكن مطعم فيكتوريا
       
       // === المعرفات المنفصلة للمطاعم ===
       const ALI_SALEM_CHAT_ID = "399195479";
       const ABO_HMODE_CHAT_ID = "651243067";
+      const VICTORIA_CHAT_ID = "7479342799"; // ايدي مطعم فيكتوريا
       // ==============================================
 
       let userCoords = ""; 
@@ -1819,6 +1821,16 @@
                       method: "POST", headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ chat_id: ABO_HMODE_CHAT_ID, text: hmodeMsg })
                   }).catch(e => console.log("خطأ في إرسال طلب مطعم ابو حمودي"));
+              }
+
+              // 4. إرسال الطلب لمطعم فيكتوريا
+              let isVictoriaOrder = order.includes("مطعم فيكتوريا");
+              if (isVictoriaOrder) {
+                  const vicMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
+                  await fetch(`https://api.telegram.org/bot${VICTORIA_BOT_TOKEN}/sendMessage`, {
+                      method: "POST", headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ chat_id: VICTORIA_CHAT_ID, text: vicMsg })
+                  }).catch(e => console.log("خطأ في إرسال طلب مطعم فيكتوريا"));
               }
               // ====================================================
 
