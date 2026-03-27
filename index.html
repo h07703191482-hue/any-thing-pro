@@ -275,6 +275,38 @@
       .menu-grid-view .qty-controls {
           justify-content: center;
       }
+
+      /* تنسيقات الأقسام الجديدة (Accordion) للمطاعم اللي بيها اقسام */
+      .category-section {
+          margin-bottom: 10px;
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-md);
+          overflow: hidden;
+      }
+      .category-header {
+          background: var(--surface);
+          padding: 15px;
+          font-weight: 800;
+          font-size: 16px;
+          color: var(--primary);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          cursor: pointer;
+          transition: background 0.3s;
+      }
+      .category-items {
+          background: var(--bg-color);
+          padding: 10px;
+          display: none;
+      }
+      .category-items .menu-item {
+          background: var(--surface);
+          margin-bottom: 8px;
+          border-radius: 10px;
+          border: none;
+          box-shadow: var(--shadow-sm);
+      }
     </style>
 </head>
 <body>
@@ -461,6 +493,7 @@
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
+    
     <div id="home-screen" class="screen container active-screen">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
@@ -481,6 +514,12 @@
                   <img src="Hmode.jpg.jpg" alt="بركر ابو حمودي">
                   <h4>بركر ابو حمودي</h4>
                   <small>الطعم الأصلي</small>
+              </div>
+
+              <div class="rest-card ripple" onclick="openMenu('victoria')">
+                  <img src="fktorea.jpg" alt="مطعم فيكتوريا">
+                  <h4>مطعم فيكتوريا</h4>
+                  <small>بركر وسندويجات</small>
               </div>
 
               <div class="rest-card" style="opacity: 0.6; cursor: default;">
@@ -546,12 +585,13 @@
           </div>
       </div>
     </div>
+    
     <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> <span id="restaurant-name-header">اسم المطعم</span></h2>
         <p style="color: var(--text-muted); font-size: 14px; font-weight: 600; margin-bottom: 20px;">اختار طلبك وحدد الكمية، وراح نحسبلك المجموع مباشرة.</p>
         
-        <div class="form-card" style="padding: 0; overflow: hidden;" id="menu-items-container">
+        <div class="form-card" style="padding: 0; overflow: hidden; background: transparent; border: none; box-shadow: none;" id="menu-items-container">
             </div>
         
         <div class="cart-bar" id="cartBar" style="display: none;">
@@ -562,7 +602,6 @@
             <button class="send-btn ripple" style="width: auto; margin: 0; padding: 12px 25px; font-size: 16px; box-shadow: none;" onclick="checkoutRestaurant()">استمرار <i class="fas fa-arrow-left"></i></button>
         </div>
     </div>
-    
     <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
@@ -857,7 +896,6 @@
 
       let lastOrderCount = -1;
       let orderPollInterval = null;
-      // === التعديل هنا: قراءة حالة الجرس من الذاكرة ===
       let isSoundEnabled = localStorage.getItem('sound_enabled') === 'true';
       const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
@@ -876,10 +914,9 @@
           }
       }
 
-      // === التعديل هنا: حفظ حالة الجرس بالذاكرة عند تغييره ===
       function toggleOrderSound() {
           isSoundEnabled = !isSoundEnabled;
-          localStorage.setItem('sound_enabled', isSoundEnabled); // حفظ الحالة
+          localStorage.setItem('sound_enabled', isSoundEnabled); 
           const btn = document.getElementById('soundToggleBtn');
           if (isSoundEnabled) {
               btn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل';
@@ -1165,7 +1202,7 @@
       /* ========================================= */
 
       /* =========================================
-         منظومة المطاعم المحدثة
+         منظومة المطاعم المحدثة مع الأقسام
       ========================================= */
       const menus = {
           'ali_salem': {
@@ -1201,6 +1238,83 @@
                   { id: 'h16', name: 'ديو', price: 500 },
                   { id: 'h17', name: 'سبرايت', price: 500 },
                   { id: 'h18', name: 'كولا', price: 500 }
+              ]
+          },
+          'victoria': {
+              name: 'مطعم فيكتوريا',
+              items: [
+                  // قسم البرجر
+                  { id: 'v1', name: 'برجر كلاسيك', price: 2500, category: 'قسم البرجر' },
+                  { id: 'v2', name: 'برجر جبن', price: 3000, category: 'قسم البرجر' },
+                  { id: 'v3', name: 'برجر مشروم', price: 3500, category: 'قسم البرجر' },
+                  { id: 'v4', name: 'برجر دبل', price: 5000, category: 'قسم البرجر' },
+                  { id: 'v5', name: 'برجر فيكتوريا', price: 6000, category: 'قسم البرجر' },
+                  { id: 'v6', name: 'برجر دجاج', price: 2500, category: 'قسم البرجر' },
+                  { id: 'v7', name: 'برجر دجاج دبل', price: 4000, category: 'قسم البرجر' },
+                  // قسم السندويجات
+                  { id: 'v8', name: 'سندويش زنجر', price: 2500, category: 'قسم السندويجات' },
+                  { id: 'v9', name: 'سندويش زنجر جيز', price: 3000, category: 'قسم السندويجات' },
+                  { id: 'v10', name: 'سندويش كرسبي', price: 2500, category: 'قسم السندويجات' },
+                  { id: 'v11', name: 'سندويش كرسبي جيز', price: 3000, category: 'قسم السندويجات' },
+                  { id: 'v12', name: 'تويستر راب', price: 3500, category: 'قسم السندويجات' },
+                  { id: 'v13', name: 'سندويش فاهيته', price: 3500, category: 'قسم السندويجات' },
+                  { id: 'v14', name: 'سندويش فلادلفيه', price: 4000, category: 'قسم السندويجات' },
+                  { id: 'v15', name: 'سندويش سكالوب', price: 3500, category: 'قسم السندويجات' },
+                  { id: 'v16', name: 'سندويش الشيف', price: 4000, category: 'قسم السندويجات' },
+                  // قسم المقبلات
+                  { id: 'v17', name: 'مقبلات حجم صغير', price: 2000, category: 'قسم المقبلات' },
+                  { id: 'v18', name: 'مقبلات حجم كبير', price: 4000, category: 'قسم المقبلات' },
+                  // قسم الكنتاكي والكرسبي
+                  { id: 'v19', name: 'كنتاكي 3 قطع', price: 6000, category: 'قسم الكنتاكي والكرسبي' },
+                  { id: 'v20', name: 'كنتاكي 5 قطع', price: 10000, category: 'قسم الكنتاكي والكرسبي' },
+                  { id: 'v21', name: 'كنتاكي 10 قطع', price: 18000, category: 'قسم الكنتاكي والكرسبي' },
+                  { id: 'v22', name: 'كرسبي 5 قطع', price: 6000, category: 'قسم الكنتاكي والكرسبي' },
+                  { id: 'v23', name: 'كرسبي 10 قطع', price: 12000, category: 'قسم الكنتاكي والكرسبي' },
+                  // قسم السبايسي (الحار)
+                  { id: 'v24', name: 'كنتاكي سبايسي 3 قطع', price: 6500, category: 'قسم السبايسي' },
+                  { id: 'v25', name: 'كنتاكي سبايسي 5 قطع', price: 10500, category: 'قسم السبايسي' },
+                  { id: 'v26', name: 'كنتاكي سبايسي 10 قطع', price: 18500, category: 'قسم السبايسي' },
+                  { id: 'v27', name: 'كرسبي سبايسي 5 قطع', price: 6500, category: 'قسم السبايسي' },
+                  { id: 'v28', name: 'كرسبي سبايسي 10 قطع', price: 10500, category: 'قسم السبايسي' },
+                  // قسم البيتزا
+                  { id: 'v29', name: 'بيتزا لحم صغير', price: 6000, category: 'قسم البيتزا' },
+                  { id: 'v30', name: 'بيتزا لحم وسط', price: 8000, category: 'قسم البيتزا' },
+                  { id: 'v31', name: 'بيتزا لحم كبير', price: 14000, category: 'قسم البيتزا' },
+                  { id: 'v32', name: 'بيتزا دجاج صغير', price: 5000, category: 'قسم البيتزا' },
+                  { id: 'v33', name: 'بيتزا دجاج وسط', price: 7000, category: 'قسم البيتزا' },
+                  { id: 'v34', name: 'بيتزا دجاج كبير', price: 13000, category: 'قسم البيتزا' },
+                  { id: 'v35', name: 'بيتزا خضار صغير', price: 5000, category: 'قسم البيتزا' },
+                  { id: 'v36', name: 'بيتزا خضار وسط', price: 7000, category: 'قسم البيتزا' },
+                  { id: 'v37', name: 'بيتزا خضار كبير', price: 12000, category: 'قسم البيتزا' },
+                  { id: 'v38', name: 'بيتزا مرغريتا صغير', price: 5000, category: 'قسم البيتزا' },
+                  { id: 'v39', name: 'بيتزا مرغريتا وسط', price: 7000, category: 'قسم البيتزا' },
+                  { id: 'v40', name: 'بيتزا مرغريتا كبير', price: 10000, category: 'قسم البيتزا' },
+                  { id: 'v41', name: 'بيتزا الشيف وسط', price: 10000, category: 'قسم البيتزا' },
+                  { id: 'v42', name: 'بيتزا الشيف كبير', price: 15000, category: 'قسم البيتزا' },
+                  // الصاج الإيطالي
+                  { id: 'v43', name: 'صاج إيطالي لحم', price: 6000, category: 'الصاج الإيطالي' },
+                  { id: 'v44', name: 'صاج إيطالي دجاج', price: 5000, category: 'الصاج الإيطالي' },
+                  // قسم الريزو
+                  { id: 'v45', name: 'ريزو كلاسيك', price: 4500, category: 'قسم الريزو' },
+                  { id: 'v46', name: 'ريزو مدخن', price: 5000, category: 'قسم الريزو' },
+                  { id: 'v47', name: 'ريزو باربيكيو', price: 5000, category: 'قسم الريزو' },
+                  { id: 'v48', name: 'ريزو فيكتوريا', price: 6000, category: 'قسم الريزو' },
+                  { id: 'v49', name: 'ريزو شاورما دجاج', price: 5000, category: 'قسم الريزو' },
+                  { id: 'v50', name: 'ريزو شاورما لحم', price: 5500, category: 'قسم الريزو' },
+                  { id: 'v51', name: 'ريزو ميكس', price: 5000, category: 'قسم الريزو' },
+                  // قسم الصاج
+                  { id: 'v52', name: 'صاج لحم صغير', price: 3000, category: 'قسم الصاج' },
+                  { id: 'v53', name: 'صاج لحم كبير', price: 4000, category: 'قسم الصاج' },
+                  { id: 'v54', name: 'صاج دجاج صغير', price: 2000, category: 'قسم الصاج' },
+                  { id: 'v55', name: 'صاج دجاج كبير', price: 3000, category: 'قسم الصاج' },
+                  { id: 'v56', name: 'صاج فلافل صغير', price: 1500, category: 'قسم الصاج' },
+                  { id: 'v57', name: 'صاج فلافل كبير', price: 2000, category: 'قسم الصاج' },
+                  // قسم الفنكر
+                  { id: 'v58', name: 'فنكر صغير', price: 1000, category: 'قسم الفنكر والمقبلات الساخنة' },
+                  { id: 'v59', name: 'فنكر صوص كبير', price: 2000, category: 'قسم الفنكر والمقبلات الساخنة' },
+                  { id: 'v60', name: 'فنكر بالجبن', price: 2500, category: 'قسم الفنكر والمقبلات الساخنة' },
+                  { id: 'v61', name: 'حلقات بصل', price: 3000, category: 'قسم الفنكر والمقبلات الساخنة' },
+                  { id: 'v62', name: 'فرايز دجاج مقرمش', price: 4000, category: 'قسم الفنكر والمقبلات الساخنة' }
               ]
           }
       };
@@ -1242,38 +1356,94 @@
 
       function openMenu(restId) {
           currentRestaurantId = restId;
-          currentCart = {}; // تصفير السلة عند فتح المنيو
+          currentCart = {}; 
           document.getElementById('restaurant-name-header').innerText = menus[restId].name;
           showScreen('restaurant-menu-screen');
           renderMenu();
           updateCartTotal();
       }
 
+      function toggleCategory(catId) {
+          const content = document.getElementById(catId);
+          const icon = document.getElementById('icon-' + catId);
+          if (content.style.display === 'block') {
+              content.style.display = 'none';
+              icon.className = 'fas fa-chevron-down';
+          } else {
+              content.style.display = 'block';
+              icon.className = 'fas fa-chevron-up';
+          }
+      }
+
       function renderMenu() {
           const container = document.getElementById('menu-items-container');
           const items = menus[currentRestaurantId].items;
           
-          if (items.length > 10) {
-              container.classList.add('menu-grid-view');
-          } else {
-              container.classList.remove('menu-grid-view');
-          }
+          const hasCategories = items.some(item => item.category);
 
-          container.innerHTML = items.map(item => {
-              currentCart[item.id] = currentCart[item.id] || 0;
-              return `
-              <div class="menu-item">
-                  <div class="menu-item-info">
-                      <h4>${item.name}</h4>
-                      <span>${item.price.toLocaleString()} د.ع</span>
-                  </div>
-                  <div class="qty-controls">
-                      <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
-                      <span class="qty-val" id="qty-${item.id}">${currentCart[item.id]}</span>
-                      <button class="qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
-                  </div>
-              </div>`;
-          }).join('');
+          if (hasCategories) {
+              container.classList.remove('menu-grid-view');
+              
+              const grouped = {};
+              items.forEach(item => {
+                  const cat = item.category || 'أخرى';
+                  if (!grouped[cat]) grouped[cat] = [];
+                  grouped[cat].push(item);
+              });
+
+              let html = '';
+              let catIndex = 0;
+              for (const cat in grouped) {
+                  html += `
+                  <div class="category-section">
+                      <div class="category-header ripple" onclick="toggleCategory('cat-${catIndex}')">
+                          <span>${cat}</span>
+                          <i class="fas fa-chevron-down" id="icon-cat-${catIndex}"></i>
+                      </div>
+                      <div class="category-items" id="cat-${catIndex}">
+                          ${grouped[cat].map(item => {
+                              currentCart[item.id] = currentCart[item.id] || 0;
+                              return `
+                              <div class="menu-item">
+                                  <div class="menu-item-info">
+                                      <h4>${item.name}</h4>
+                                      <span>${item.price.toLocaleString()} د.ع</span>
+                                  </div>
+                                  <div class="qty-controls">
+                                      <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
+                                      <span class="qty-val" id="qty-${item.id}">${currentCart[item.id]}</span>
+                                      <button class="qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
+                                  </div>
+                              </div>`;
+                          }).join('')}
+                      </div>
+                  </div>`;
+                  catIndex++;
+              }
+              container.innerHTML = html;
+          } else {
+              if (items.length > 10) {
+                  container.classList.add('menu-grid-view');
+              } else {
+                  container.classList.remove('menu-grid-view');
+              }
+
+              container.innerHTML = items.map(item => {
+                  currentCart[item.id] = currentCart[item.id] || 0;
+                  return `
+                  <div class="menu-item">
+                      <div class="menu-item-info">
+                          <h4>${item.name}</h4>
+                          <span>${item.price.toLocaleString()} د.ع</span>
+                      </div>
+                      <div class="qty-controls">
+                          <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
+                          <span class="qty-val" id="qty-${item.id}">${currentCart[item.id]}</span>
+                          <button class="qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
+                      </div>
+                  </div>`;
+              }).join('');
+          }
       }
 
       function updateQty(id, change) {
@@ -1320,7 +1490,7 @@
           orderDetails += `\n💵 المجموع الكلي: ${total.toLocaleString()} د.ع (بدون أجرة التوصيل)`;
           
           document.getElementById('custOrder').value = orderDetails;
-          showScreen('order-screen'); // تحويل الزبون لخانة الطلب لملء العنوان
+          showScreen('order-screen'); 
           showToast("تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
       }
       /* ========================================= */
@@ -1627,14 +1797,13 @@
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
 
-              // === التعديل هنا: توجيه الطلبات للمعرفات المنفصلة ===
               // 2. إرسال الطلب لمطعم علي سالم
               let isAliSalemOrder = order.includes("مطعم برجر علي سالم");
               if (isAliSalemOrder) {
                   const restMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                   await fetch(`https://api.telegram.org/bot${ALI_SALEM_BOT_TOKEN}/sendMessage`, {
                       method: "POST", headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ chat_id: ALI_SALEM_CHAT_ID, text: restMsg }) // <== استخدام المعرف الخاص
+                      body: JSON.stringify({ chat_id: ALI_SALEM_CHAT_ID, text: restMsg })
                   }).catch(e => console.log("خطأ في إرسال طلب المطعم"));
               }
 
@@ -1644,7 +1813,7 @@
                   const hmodeMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                   await fetch(`https://api.telegram.org/bot${ABO_HMODE_BOT_TOKEN}/sendMessage`, {
                       method: "POST", headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ chat_id: ABO_HMODE_CHAT_ID, text: hmodeMsg }) // <== استخدام المعرف الخاص
+                      body: JSON.stringify({ chat_id: ABO_HMODE_CHAT_ID, text: hmodeMsg })
                   }).catch(e => console.log("خطأ في إرسال طلب مطعم ابو حمودي"));
               }
               // ====================================================
@@ -1753,7 +1922,6 @@
           }
       }
 
-      // === التعديل هنا: قراءة حالة الجرس وتحديث الزر عند فتح التطبيق ===
       function initDriverStatus() {
           let current = localStorage.getItem('driver_status') || 'available';
           const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
@@ -1789,7 +1957,6 @@
           closeMapModal();
       }
 
-      // دوال نافذة أسعار التوصيل الجديدة
       function openPricesModal() {
           document.getElementById('prices-modal').style.display = 'flex';
       }
