@@ -1202,7 +1202,7 @@
       /* ========================================= */
 
       /* =========================================
-         منظومة المطاعم المحدثة مع الأقسام
+         منظومة المطاعم المحدثة مع الأقسام والتفاصيل
       ========================================= */
       const menus = {
           'ali_salem': {
@@ -1244,77 +1244,77 @@
               name: 'مطعم فيكتوريا',
               items: [
                   // قسم البرجر
-                  { id: 'v1', name: 'برجر كلاسيك', price: 2500, category: 'قسم البرجر' },
-                  { id: 'v2', name: 'برجر جبن', price: 3000, category: 'قسم البرجر' },
-                  { id: 'v3', name: 'برجر مشروم', price: 3500, category: 'قسم البرجر' },
-                  { id: 'v4', name: 'برجر دبل', price: 5000, category: 'قسم البرجر' },
-                  { id: 'v5', name: 'برجر فيكتوريا', price: 6000, category: 'قسم البرجر' },
-                  { id: 'v6', name: 'برجر دجاج', price: 2500, category: 'قسم البرجر' },
-                  { id: 'v7', name: 'برجر دجاج دبل', price: 4000, category: 'قسم البرجر' },
+                  { id: 'v1', name: 'برجر كلاسيك', price: 2500, category: 'قسم البرجر', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو' },
+                  { id: 'v2', name: 'برجر جبن', price: 3000, category: 'قسم البرجر', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو + صوص الجبن' },
+                  { id: 'v3', name: 'برجر مشروم', price: 3500, category: 'قسم البرجر', desc: 'كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل' },
+                  { id: 'v4', name: 'برجر دبل', price: 5000, category: 'قسم البرجر', desc: 'كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
+                  { id: 'v5', name: 'برجر فيكتوريا', price: 6000, category: 'قسم البرجر', desc: 'تندر مقرمش 2 قطعة + صوص مدخن + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
+                  { id: 'v6', name: 'برجر دجاج', price: 2500, category: 'قسم البرجر', desc: '' },
+                  { id: 'v7', name: 'برجر دجاج دبل', price: 4000, category: 'قسم البرجر', desc: '' },
                   // قسم السندويجات
-                  { id: 'v8', name: 'سندويش زنجر', price: 2500, category: 'قسم السندويجات' },
-                  { id: 'v9', name: 'سندويش زنجر جيز', price: 3000, category: 'قسم السندويجات' },
-                  { id: 'v10', name: 'سندويش كرسبي', price: 2500, category: 'قسم السندويجات' },
-                  { id: 'v11', name: 'سندويش كرسبي جيز', price: 3000, category: 'قسم السندويجات' },
-                  { id: 'v12', name: 'تويستر راب', price: 3500, category: 'قسم السندويجات' },
-                  { id: 'v13', name: 'سندويش فاهيته', price: 3500, category: 'قسم السندويجات' },
-                  { id: 'v14', name: 'سندويش فلادلفيه', price: 4000, category: 'قسم السندويجات' },
-                  { id: 'v15', name: 'سندويش سكالوب', price: 3500, category: 'قسم السندويجات' },
-                  { id: 'v16', name: 'سندويش الشيف', price: 4000, category: 'قسم السندويجات' },
+                  { id: 'v8', name: 'سندويش زنجر', price: 2500, category: 'قسم السندويجات', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو' },
+                  { id: 'v9', name: 'سندويش زنجر جيز', price: 3000, category: 'قسم السندويجات', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو + صوص الجبن' },
+                  { id: 'v10', name: 'سندويش كرسبي', price: 2500, category: 'قسم السندويجات', desc: 'كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل' },
+                  { id: 'v11', name: 'سندويش كرسبي جيز', price: 3000, category: 'قسم السندويجات', desc: 'كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
+                  { id: 'v12', name: 'تويستر راب', price: 3500, category: 'قسم السندويجات', desc: 'تندر مقرمش 2 قطعة + صوص مدخن + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
+                  { id: 'v13', name: 'سندويش فاهيته', price: 3500, category: 'قسم السندويجات', desc: 'قطع الدجاج + خضار مشوي + جبن موزريلا + صوص افوكادو' },
+                  { id: 'v14', name: 'سندويش فلادلفيه', price: 4000, category: 'قسم السندويجات', desc: 'قطع حبل الظهر + خضار مشوي + جبن موزريلا + صوص مدخن' },
+                  { id: 'v15', name: 'سندويش سكالوب', price: 3500, category: 'قسم السندويجات', desc: 'قطع سكالوب + صوص افوكادو + مخلل + كولسلو' },
+                  { id: 'v16', name: 'سندويش الشيف', price: 4000, category: 'قسم السندويجات', desc: 'قطع التندر مقرمش + صوص الطبخ + مخلل + كولسلو' },
                   // قسم المقبلات
-                  { id: 'v17', name: 'مقبلات حجم صغير', price: 2000, category: 'قسم المقبلات' },
-                  { id: 'v18', name: 'مقبلات حجم كبير', price: 4000, category: 'قسم المقبلات' },
+                  { id: 'v17', name: 'مقبلات حجم صغير', price: 2000, category: 'قسم المقبلات', desc: 'رمانية - حمص بطحينة - كولسلو - جاجيك - فتة دجاج - فتة بتنجان - اناناس - فراوله - بيتنجانية - مسبحة - جزر' },
+                  { id: 'v18', name: 'مقبلات حجم كبير', price: 4000, category: 'قسم المقبلات', desc: 'رمانية - حمص بطحينة - كولسلو - جاجيك - فتة دجاج - فتة بتنجان - اناناس - فراوله - بيتنجانية - مسبحة - جزر' },
                   // قسم الكنتاكي والكرسبي
-                  { id: 'v19', name: 'كنتاكي 3 قطع', price: 6000, category: 'قسم الكنتاكي والكرسبي' },
-                  { id: 'v20', name: 'كنتاكي 5 قطع', price: 10000, category: 'قسم الكنتاكي والكرسبي' },
-                  { id: 'v21', name: 'كنتاكي 10 قطع', price: 18000, category: 'قسم الكنتاكي والكرسبي' },
-                  { id: 'v22', name: 'كرسبي 5 قطع', price: 6000, category: 'قسم الكنتاكي والكرسبي' },
-                  { id: 'v23', name: 'كرسبي 10 قطع', price: 12000, category: 'قسم الكنتاكي والكرسبي' },
+                  { id: 'v19', name: 'كنتاكي 3 قطع', price: 6000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 3 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v20', name: 'كنتاكي 5 قطع', price: 10000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 5 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v21', name: 'كنتاكي 10 قطع', price: 18000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 10 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v22', name: 'كرسبي 5 قطع', price: 6000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 5 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v23', name: 'كرسبي 10 قطع', price: 12000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 10 قطع + ثوميه + كولسلو + بيبسي' },
                   // قسم السبايسي (الحار)
-                  { id: 'v24', name: 'كنتاكي سبايسي 3 قطع', price: 6500, category: 'قسم السبايسي' },
-                  { id: 'v25', name: 'كنتاكي سبايسي 5 قطع', price: 10500, category: 'قسم السبايسي' },
-                  { id: 'v26', name: 'كنتاكي سبايسي 10 قطع', price: 18500, category: 'قسم السبايسي' },
-                  { id: 'v27', name: 'كرسبي سبايسي 5 قطع', price: 6500, category: 'قسم السبايسي' },
-                  { id: 'v28', name: 'كرسبي سبايسي 10 قطع', price: 10500, category: 'قسم السبايسي' },
+                  { id: 'v24', name: 'كنتاكي سبايسي 3 قطع', price: 6500, category: 'قسم السبايسي', desc: 'صمون 3 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v25', name: 'كنتاكي سبايسي 5 قطع', price: 10500, category: 'قسم السبايسي', desc: 'صمون 5 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v26', name: 'كنتاكي سبايسي 10 قطع', price: 18500, category: 'قسم السبايسي', desc: 'صمون 10 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v27', name: 'كرسبي سبايسي 5 قطع', price: 6500, category: 'قسم السبايسي', desc: 'صمون 5 قطع + ثوميه + صوص كوكتيل' },
+                  { id: 'v28', name: 'كرسبي سبايسي 10 قطع', price: 10500, category: 'قسم السبايسي', desc: 'صمون 10 قطع + ثوميه + صوص كوكتيل' },
                   // قسم البيتزا
-                  { id: 'v29', name: 'بيتزا لحم صغير', price: 6000, category: 'قسم البيتزا' },
-                  { id: 'v30', name: 'بيتزا لحم وسط', price: 8000, category: 'قسم البيتزا' },
-                  { id: 'v31', name: 'بيتزا لحم كبير', price: 14000, category: 'قسم البيتزا' },
-                  { id: 'v32', name: 'بيتزا دجاج صغير', price: 5000, category: 'قسم البيتزا' },
-                  { id: 'v33', name: 'بيتزا دجاج وسط', price: 7000, category: 'قسم البيتزا' },
-                  { id: 'v34', name: 'بيتزا دجاج كبير', price: 13000, category: 'قسم البيتزا' },
-                  { id: 'v35', name: 'بيتزا خضار صغير', price: 5000, category: 'قسم البيتزا' },
-                  { id: 'v36', name: 'بيتزا خضار وسط', price: 7000, category: 'قسم البيتزا' },
-                  { id: 'v37', name: 'بيتزا خضار كبير', price: 12000, category: 'قسم البيتزا' },
-                  { id: 'v38', name: 'بيتزا مرغريتا صغير', price: 5000, category: 'قسم البيتزا' },
-                  { id: 'v39', name: 'بيتزا مرغريتا وسط', price: 7000, category: 'قسم البيتزا' },
-                  { id: 'v40', name: 'بيتزا مرغريتا كبير', price: 10000, category: 'قسم البيتزا' },
-                  { id: 'v41', name: 'بيتزا الشيف وسط', price: 10000, category: 'قسم البيتزا' },
-                  { id: 'v42', name: 'بيتزا الشيف كبير', price: 15000, category: 'قسم البيتزا' },
+                  { id: 'v29', name: 'بيتزا لحم صغير', price: 6000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v30', name: 'بيتزا لحم وسط', price: 8000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v31', name: 'بيتزا لحم كبير', price: 14000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v32', name: 'بيتزا دجاج صغير', price: 5000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v33', name: 'بيتزا دجاج وسط', price: 7000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v34', name: 'بيتزا دجاج كبير', price: 13000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v35', name: 'بيتزا خضار صغير', price: 5000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v36', name: 'بيتزا خضار وسط', price: 7000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v37', name: 'بيتزا خضار كبير', price: 12000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v38', name: 'بيتزا مرغريتا صغير', price: 5000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v39', name: 'بيتزا مرغريتا وسط', price: 7000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v40', name: 'بيتزا مرغريتا كبير', price: 10000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v41', name: 'بيتزا الشيف وسط', price: 10000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v42', name: 'بيتزا الشيف كبير', price: 15000, category: 'قسم البيتزا', desc: '' },
                   // الصاج الإيطالي
-                  { id: 'v43', name: 'صاج إيطالي لحم', price: 6000, category: 'الصاج الإيطالي' },
-                  { id: 'v44', name: 'صاج إيطالي دجاج', price: 5000, category: 'الصاج الإيطالي' },
+                  { id: 'v43', name: 'صاج إيطالي لحم', price: 6000, category: 'الصاج الإيطالي', desc: '' },
+                  { id: 'v44', name: 'صاج إيطالي دجاج', price: 5000, category: 'الصاج الإيطالي', desc: '' },
                   // قسم الريزو
-                  { id: 'v45', name: 'ريزو كلاسيك', price: 4500, category: 'قسم الريزو' },
-                  { id: 'v46', name: 'ريزو مدخن', price: 5000, category: 'قسم الريزو' },
-                  { id: 'v47', name: 'ريزو باربيكيو', price: 5000, category: 'قسم الريزو' },
-                  { id: 'v48', name: 'ريزو فيكتوريا', price: 6000, category: 'قسم الريزو' },
-                  { id: 'v49', name: 'ريزو شاورما دجاج', price: 5000, category: 'قسم الريزو' },
-                  { id: 'v50', name: 'ريزو شاورما لحم', price: 5500, category: 'قسم الريزو' },
-                  { id: 'v51', name: 'ريزو ميكس', price: 5000, category: 'قسم الريزو' },
+                  { id: 'v45', name: 'ريزو كلاسيك', price: 4500, category: 'قسم الريزو', desc: 'قطع دجاج + صوص كوكتيل' },
+                  { id: 'v46', name: 'ريزو مدخن', price: 5000, category: 'قسم الريزو', desc: 'قطع دجاج + صوص مدخن' },
+                  { id: 'v47', name: 'ريزو باربيكيو', price: 5000, category: 'قسم الريزو', desc: 'قطع دجاج + صوص الباربيكيو' },
+                  { id: 'v48', name: 'ريزو فيكتوريا', price: 6000, category: 'قسم الريزو', desc: 'قطع دجاج + شاورمه لحم + شاورمه دجاج + صوص ميكس' },
+                  { id: 'v49', name: 'ريزو شاورمه دجاج', price: 5000, category: 'قسم الريزو', desc: 'شاورمه دجاج + صوص كوكتيل' },
+                  { id: 'v50', name: 'ريزو شاورمه لحم', price: 5500, category: 'قسم الريزو', desc: 'شاورمه لحم + صوص مدخن' },
+                  { id: 'v51', name: 'ريزو ميكس', price: 5000, category: 'قسم الريزو', desc: '' },
                   // قسم الصاج
-                  { id: 'v52', name: 'صاج لحم صغير', price: 3000, category: 'قسم الصاج' },
-                  { id: 'v53', name: 'صاج لحم كبير', price: 4000, category: 'قسم الصاج' },
-                  { id: 'v54', name: 'صاج دجاج صغير', price: 2000, category: 'قسم الصاج' },
-                  { id: 'v55', name: 'صاج دجاج كبير', price: 3000, category: 'قسم الصاج' },
-                  { id: 'v56', name: 'صاج فلافل صغير', price: 1500, category: 'قسم الصاج' },
-                  { id: 'v57', name: 'صاج فلافل كبير', price: 2000, category: 'قسم الصاج' },
+                  { id: 'v52', name: 'صاج لحم صغير', price: 3000, category: 'قسم الصاج', desc: '' },
+                  { id: 'v53', name: 'صاج لحم كبير', price: 4000, category: 'قسم الصاج', desc: '' },
+                  { id: 'v54', name: 'صاج دجاج صغير', price: 2000, category: 'قسم الصاج', desc: '' },
+                  { id: 'v55', name: 'صاج دجاج كبير', price: 3000, category: 'قسم الصاج', desc: '' },
+                  { id: 'v56', name: 'صاج فلافل صغير', price: 1500, category: 'قسم الصاج', desc: '' },
+                  { id: 'v57', name: 'صاج فلافل كبير', price: 2000, category: 'قسم الصاج', desc: '' },
                   // قسم الفنكر
-                  { id: 'v58', name: 'فنكر صغير', price: 1000, category: 'قسم الفنكر والمقبلات الساخنة' },
-                  { id: 'v59', name: 'فنكر صوص كبير', price: 2000, category: 'قسم الفنكر والمقبلات الساخنة' },
-                  { id: 'v60', name: 'فنكر بالجبن', price: 2500, category: 'قسم الفنكر والمقبلات الساخنة' },
-                  { id: 'v61', name: 'حلقات بصل', price: 3000, category: 'قسم الفنكر والمقبلات الساخنة' },
-                  { id: 'v62', name: 'فرايز دجاج مقرمش', price: 4000, category: 'قسم الفنكر والمقبلات الساخنة' }
+                  { id: 'v58', name: 'فنكر صغير', price: 1000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
+                  { id: 'v59', name: 'فنكر صوص كبير', price: 2000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
+                  { id: 'v60', name: 'فنكر بالجبن', price: 2500, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
+                  { id: 'v61', name: 'حلقات بصل', price: 3000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
+                  { id: 'v62', name: 'فرايز دجاج مقرمش', price: 4000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' }
               ]
           }
       };
@@ -1404,12 +1404,13 @@
                           ${grouped[cat].map(item => {
                               currentCart[item.id] = currentCart[item.id] || 0;
                               return `
-                              <div class="menu-item">
-                                  <div class="menu-item-info">
+                              <div class="menu-item" style="display: flex; flex-direction: row;">
+                                  <div class="menu-item-info" style="flex: 1; text-align: right;">
                                       <h4>${item.name}</h4>
                                       <span>${item.price.toLocaleString()} د.ع</span>
+                                      ${item.desc ? `<p style="font-size: 11px; color: var(--text-muted); margin: 5px 0 0 0; line-height: 1.4;">${item.desc}</p>` : ''}
                                   </div>
-                                  <div class="qty-controls">
+                                  <div class="qty-controls" style="flex-shrink: 0;">
                                       <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
                                       <span class="qty-val" id="qty-${item.id}">${currentCart[item.id]}</span>
                                       <button class="qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
@@ -1435,6 +1436,7 @@
                       <div class="menu-item-info">
                           <h4>${item.name}</h4>
                           <span>${item.price.toLocaleString()} د.ع</span>
+                          ${item.desc ? `<p style="font-size: 11px; color: var(--text-muted); margin: 5px 0 0 0; line-height: 1.4;">${item.desc}</p>` : ''}
                       </div>
                       <div class="qty-controls">
                           <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
