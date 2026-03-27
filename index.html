@@ -38,15 +38,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-    <script>
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-      OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.init({
-          appId: "d1addf49-f17a-47b3-89ec-8444e997ac1a", 
-        });
-      });
-    </script>
     <style>
       #map-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100005; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
       .map-container { width: 95%; max-width: 450px; background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; position: relative; box-shadow: var(--shadow-floating); display: flex; flex-direction: column; }
@@ -57,7 +48,6 @@
       .map-footer { padding: 15px; text-align: center; background: var(--surface); }
       @keyframes bouncePin { from { transform: translate(-50%, -100%); } to { transform: translate(-50%, -110%); } }
 
-      /* ستايل نافذة أسعار التوصيل الجديدة */
       #prices-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100005; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;}
       .prices-container { width: 100%; max-width: 400px; background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-floating); display: flex; flex-direction: column; animation: scaleIn 0.3s ease-out;}
       .prices-header { padding: 18px; background: var(--primary); background: linear-gradient(135deg, var(--primary) 0%, #3B1261 100%); color: white; text-align: center; font-weight: 800; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
@@ -593,7 +583,6 @@
           </div>
       </div>
     </div>
-    
     <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> <span id="restaurant-name-header">اسم المطعم</span></h2>
@@ -869,515 +858,7 @@
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
     </div>
-    <script>
-      const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
-      const PUBLIC_CHANNEL = "@uumqaser";
-      const ADMIN_CHAT_ID = "7479342799"; 
-      const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
-
-      const NEW_BOT_TOKEN = "8757179280:AAHEgp3YTaVv6qZNr32ZA7fgk4fT8v-cqCk";
-      const NEW_BOT_USER = "CodAlbanderbot";
-      
-      // التوكنات الخاصة ببوتات المطاعم
-      const ALI_SALEM_BOT_TOKEN = "8735092732:AAE9lBE3i6AJRkKe3LLlAAodFXuAv7VXpys";
-      const ABO_HMODE_BOT_TOKEN = "8695832371:AAHosUvA37U9U1qhiZJlbDKxJPZFgDHbJAk"; 
-      const VICTORIA_BOT_TOKEN = "8769449664:AAErwMuaA893BKDvbKcOk4sFgFPXUIxlnmc"; // توكن مطعم فيكتوريا
-      
-      // === المعرفات المنفصلة للمطاعم ===
-      const ALI_SALEM_CHAT_ID = "399195479";
-      const ABO_HMODE_CHAT_ID = "651243067";
-      const VICTORIA_CHAT_ID = "7479342799"; // ايدي مطعم فيكتوريا
-      // ==============================================
-
-      let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.16"; // تحديث رقم الإصدار
-      if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
-          localStorage.setItem('app_version', CURRENT_VERSION);
-          window.location.reload(true); 
-      }
-
-      async function trackLiveVisit() {
-          try { fetch(`${GS_URL}?action=trackVisit`); } catch(e) {}
-      }
-
-      let secretCounter = 0;
-      let lockSecretCounter = 0;
-      let appIsActive = true;
-
-      let lastOrderCount = -1;
-      let orderPollInterval = null;
-      let isSoundEnabled = localStorage.getItem('sound_enabled') === 'true';
-      const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-
-      function checkPhoneLive(input) {
-          let errorSpan = input.parentNode.querySelector('.phone-error');
-          if (!errorSpan) return;
-          if (input.value.length === 0) {
-              errorSpan.style.display = 'none';
-              input.style.borderColor = '';
-          } else if (!/^07[0-9]{9}$/.test(input.value)) {
-              errorSpan.style.display = 'block';
-              input.style.borderColor = 'var(--danger)';
-          } else {
-              errorSpan.style.display = 'none';
-              input.style.borderColor = '#10B981'; 
-          }
-      }
-
-      function toggleOrderSound() {
-          isSoundEnabled = !isSoundEnabled;
-          localStorage.setItem('sound_enabled', isSoundEnabled); 
-          const btn = document.getElementById('soundToggleBtn');
-          if (isSoundEnabled) {
-              btn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل';
-              btn.style.background = '#F59E0B'; 
-              btn.style.color = 'white';
-              newOrderAudio.play().catch(e => {}); 
-              startOrderPolling();
-              showToast("🔔 تم تفعيل جرس تنبيه الطلبات!");
-          } else {
-              btn.innerHTML = '<i class="fas fa-bell-slash"></i> جرس الطلبات: معطل';
-              btn.style.background = 'var(--text-muted)';
-              btn.style.color = 'white';
-              clearInterval(orderPollInterval);
-              showToast("تم إيقاف الجرس 🔕");
-          }
-      }
-
-      async function checkNewOrdersForSound() {
-          if(!isSoundEnabled || !navigator.onLine) return;
-          try {
-              const resp = await fetch(`${GS_URL}?action=checkNewOrders`);
-              const currentCount = parseInt(await resp.text());
-              if(!isNaN(currentCount)) {
-                  if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
-                      newOrderAudio.play().catch(e=>{});
-                      showToast("🔔 طلب جديد نزل بالساحة!");
-                      if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                  }
-                  lastOrderCount = currentCount;
-              }
-          } catch(e) {}
-      }
-
-      function startOrderPolling() {
-          if(orderPollInterval) clearInterval(orderPollInterval);
-          checkNewOrdersForSound(); 
-          orderPollInterval = setInterval(checkNewOrdersForSound, 10000); 
-      }
-      
-      function initAutoLocation() {
-          if (navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition(
-                  (position) => {
-                      userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
-                  },
-                  (error) => { console.warn("GPS Denied on load"); },
-                  { enableHighAccuracy: true }
-              );
-          }
-      }
-
-      function handleSecretClick() {
-          secretCounter++;
-          if (secretCounter === 5) {
-              secretCounter = 0;
-              let pass = prompt("أدخل الرمز السري:");
-              if (pass === "2006") {
-                  localStorage.setItem('isAdmin', 'true'); 
-                  showScreen('admin-panel');
-                  checkGlobalStatusFromServer(); 
-              } else if (pass !== null) {
-                  showToast("الرمز خطأ ❌");
-              }
-          }
-      }
-
-      function handleLockScreenSecret() {
-          lockSecretCounter++;
-          if (lockSecretCounter === 5) {
-              lockSecretCounter = 0;
-              let pass = prompt("أدخل الرمز السري:");
-              if (pass === "2006") {
-                  localStorage.setItem('isAdmin', 'true'); 
-                  document.getElementById('global-lock-screen').style.display = 'none';
-                  showScreen('admin-panel');
-              } else if (pass !== null) {
-                  showToast("الرمز خطأ ❌");
-              }
-          }
-      }
-      
-      async function setGlobalAppStatus(newStatus) {
-          const btnOpen = document.getElementById('btn-open-app');
-          const btnClose = document.getElementById('btn-close-app');
-          if(newStatus === 'online') { btnOpen.innerHTML = '<span class="baly-spinner"></span>'; } 
-          else { btnClose.innerHTML = '<span class="baly-spinner"></span>'; }
-          btnOpen.disabled = true; btnClose.disabled = true;
-          try {
-              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}`);
-              showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
-              checkGlobalStatusFromServer();
-          } catch(e) { showToast("حدث خطأ بالاتصال بالسيرفر ⚠️"); } 
-          finally { 
-              btnOpen.innerHTML = '<i class="fas fa-unlock"></i> فتح التطبيق';
-              btnClose.innerHTML = '<i class="fas fa-lock"></i> إغلاق التطبيق';
-              btnOpen.disabled = false; btnClose.disabled = false;
-          }
-      }
-
-      async function checkGlobalStatusFromServer() {
-          try {
-              const resp = await fetch(`${GS_URL}?action=getAppStatus`);
-              const status = await resp.text();
-              const lockScreen = document.getElementById('global-lock-screen');
-              const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
-              if (status === "offline") {
-                  appIsActive = false;
-                  if(lockScreen && !isAdmin) lockScreen.style.display = 'flex'; 
-                  else if(lockScreen && isAdmin) lockScreen.style.display = 'none';
-              } else {
-                  appIsActive = true;
-                  if(lockScreen) lockScreen.style.display = 'none'; 
-              }
-              applyGlobalStatus();
-          } catch(e) {}
-      }
-
-      function applyGlobalStatus() {
-          const badge = document.getElementById('admin-status-badge');
-          const orderButtons = document.querySelectorAll('.order-btn-logic');
-          const isAdmin = localStorage.getItem('isAdmin') === 'true';
-          if (!appIsActive) {
-              badge.style.display = 'block'; 
-              if (!isAdmin) {
-                  orderButtons.forEach(btn => {
-                      btn.disabled = true;
-                      btn.innerHTML = '<i class="fas fa-lock"></i> مغلق حالياً';
-                  });
-              } else { orderButtons.forEach(btn => btn.disabled = false); }
-          } else {
-              badge.style.display = 'none';
-              document.getElementById('tukSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> طلب تكتك توصيلة';
-              document.getElementById('medSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
-              document.getElementById('sendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
-              orderButtons.forEach(btn => btn.disabled = false);
-          }
-      }
-
-      function userLogout() {
-          if (confirm("هل أنت متأكد من تسجيل الخروج من التطبيق؟")) {
-              localStorage.clear();
-              window.location.replace(window.location.href.split('?')[0]);
-          }
-      }
-      
-      async function syncLoyaltyWithServer() {
-          const phoneInput = document.getElementById('custPhone');
-          const phone = (phoneInput && phoneInput.value.trim() !== "") ? phoneInput.value.trim() : localStorage.getItem('saved_customer_phone');
-          if (!phone || !validateIraqiPhone(phone)) return;
-          try {
-              const resp = await fetch(`${GS_URL}?action=getCustomerOrders&phone=${phone}`);
-              const countText = await resp.text();
-              const count = parseInt(countText);
-              if (!isNaN(count)) {
-                  loyaltyCount = count;
-                  localStorage.setItem('my_loyalty_orders', loyaltyCount);
-                  updateLocalLoyaltyUI();
-              }
-          } catch(e) {}
-      }
-
-      function checkConnection() {
-          document.getElementById('offline-screen').style.display = navigator.onLine ? 'none' : 'flex';
-      }
-      window.addEventListener('offline', checkConnection);
-      window.addEventListener('online', checkConnection);
-      function openWiFiSettings() { window.location.href = "intent:#Intent;action=android.settings.WIFI_SETTINGS;end"; }
-      function openDataSettings() { window.location.href = "intent:#Intent;action=android.settings.WIRELESS_SETTINGS;end"; }
-
-      window.originalAlert = window.alert;
-      window.alert = function(message) { showToast(message); };
-
-      function showToast(msg) {
-          const container = document.getElementById('toast-container');
-          const toast = document.createElement('div');
-          toast.className = 'toast';
-          toast.innerHTML = `<i class="fas fa-bell" style="color: var(--secondary);"></i> <span>${msg}</span>`;
-          container.appendChild(toast);
-          setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 3000);
-      }
-
-      function toggleTheme() {
-          document.body.classList.toggle('dark-mode');
-          localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-      }
-
-      function applyAutoTheme() {
-          const hour = new Date().getHours();
-          const isNight = hour >= 18 || hour < 6; 
-          const savedTheme = localStorage.getItem('theme');
-          if (!savedTheme && isNight) document.body.classList.add('dark-mode');
-          else if (savedTheme === 'dark') document.body.classList.add('dark-mode');
-      }
-
-      function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
-      function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
-
-      /* =========================================
-         منظومة تسجيل الدخول الجديدة عبر تليكرام
-      ========================================= */
-      let loginPollInterval = null;
-      let currentLoginSession = "";
-
-      function goToLoginStep2() {
-          const nameInput = document.getElementById('loginNameInput').value.trim();
-          if(!nameInput) return showToast("يرجى كتابة اسمك أولاً ⚠️");
-          document.getElementById('login-step-1').style.display = 'none';
-          document.getElementById('login-step-2').style.display = 'block';
-      }
-
-      function backToLoginStep1() {
-          document.getElementById('login-step-2').style.display = 'none';
-          document.getElementById('login-step-1').style.display = 'block';
-      }
-
-      function startTelegramLogin() {
-          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
-          
-          currentLoginSession = Math.floor(10000000 + Math.random() * 90000000).toString();
-          
-          const btn = document.getElementById('tg-login-btn');
-          btn.innerHTML = '<span class="baly-spinner"></span> جاري انتظار تليكرام...';
-          btn.disabled = true;
-          document.getElementById('cancel-login-area').style.display = 'block';
-
-          window.open(`https://t.me/${NEW_BOT_USER}?start=login_${currentLoginSession}`, '_blank');
-          loginPollInterval = setInterval(checkTelegramLoginStatus, 3000);
-      }
-
-      async function checkTelegramLoginStatus() {
-          if (!currentLoginSession) return;
-          try {
-              const resp = await fetch(`${GS_URL}?action=checkTelegramLogin&session=${currentLoginSession}`);
-              const data = await resp.json();
-              
-              if (data.status === 'success') {
-                  clearInterval(loginPollInterval);
-                  
-                  if (navigator.onLine) {
-                      fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => console.log("Stats error"));
-                  }
-
-                  const userName = document.getElementById('loginNameInput').value.trim();
-                  const userPhone = data.phone;
-
-                  saveCustomerData(userName, userPhone); 
-                  loadSavedCustomerData(); 
-                  syncLoyaltyWithServer();
-                  
-                  const msg = `👤 تسجيل دخول جديد\nالاسم: ${userName}\nالرقم: ${userPhone}`;
-                  fetch(`https://api.telegram.org/bot${NEW_BOT_TOKEN}/sendMessage`, {
-                      method: "POST", 
-                      headers: { "Content-Type": "application/json" }, 
-                      body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
-                  }).catch(e => {});
-
-                  showScreen('home-screen'); 
-                  showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
-
-                  currentLoginSession = "";
-                  resetLoginUI();
-              }
-          } catch(e) {}
-      }
-
-      function cancelTelegramLogin() {
-          if (loginPollInterval) clearInterval(loginPollInterval);
-          currentLoginSession = "";
-          resetLoginUI();
-          showToast("تم إلغاء عملية تسجيل الدخول ❌");
-      }
-
-      function resetLoginUI() {
-          const btn = document.getElementById('tg-login-btn');
-          btn.innerHTML = '<i class="fab fa-telegram-plane"></i> شارك رقمك عبر تليكرام';
-          btn.disabled = false;
-          document.getElementById('cancel-login-area').style.display = 'none';
-          
-          document.getElementById('login-step-2').style.display = 'none';
-          document.getElementById('login-step-1').style.display = 'block';
-          document.getElementById('loginNameInput').value = '';
-      }
-      /* ========================================= */
-
-      /* =========================================
-         منظومة المطاعم المحدثة مع الأقسام والتفاصيل
-      ========================================= */
-      const menus = {
-          'ali_salem': {
-              name: 'مطعم برجر علي سالم',
-              items: [
-                  { id: 'm1', name: 'برجر', price: 1000 },
-                  { id: 'm2', name: 'برجر جبن', price: 1500 },
-                  { id: 'm3', name: 'ريزو دجاج', price: 3000 },
-                  { id: 'm4', name: 'لبن بطل صغير', price: 750 },
-                  { id: 'm5', name: 'لبن بطل كبير', price: 2000 },
-                  { id: 'm6', name: 'بيبسي', price: 500 },
-                  { id: 'm7', name: 'ديو', price: 500 }
-              ]
-          },
-          'abo_hmode': {
-              name: 'مطعم بركر ابو حمودي',
-              items: [
-                  { id: 'h1', name: 'بركر كلاسيك', price: 1000 },
-                  { id: 'h2', name: 'بركر جبن', price: 1250 },
-                  { id: 'h3', name: 'بركر مكسيكي', price: 1500 },
-                  { id: 'h4', name: 'بركر كرانشي', price: 3000 },
-                  { id: 'h5', name: 'بركر دبل لحم دبل جبن', price: 2500 },
-                  { id: 'h6', name: 'ريزو كلاسيك', price: 3000 },
-                  { id: 'h7', name: 'ريزو ابو حمودي', price: 5000 },
-                  { id: 'h8', name: 'اجنحه فحم نص', price: 8000 },
-                  { id: 'h9', name: 'تكه دجاج نص', price: 8000 },
-                  { id: 'h10', name: 'فروج ابو حمودي', price: 8000 },
-                  { id: 'h11', name: 'عصير كلاص', price: 1000 },
-                  { id: 'h12', name: 'عصير بطل', price: 1500 },
-                  { id: 'h13', name: 'لبن بطل صغير', price: 750 },
-                  { id: 'h14', name: 'لبن بطل جبير', price: 2000 },
-                  { id: 'h15', name: 'ببسي', price: 500 },
-                  { id: 'h16', name: 'ديو', price: 500 },
-                  { id: 'h17', name: 'سبرايت', price: 500 },
-                  { id: 'h18', name: 'كولا', price: 500 }
-              ]
-          },
-          'victoria': {
-              name: 'مطعم فيكتوريا',
-              items: [
-                  // قسم البرجر
-                  { id: 'v1', name: 'برجر كلاسيك', price: 2500, category: 'قسم البرجر', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو' },
-                  { id: 'v2', name: 'برجر جبن', price: 3000, category: 'قسم البرجر', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو + صوص الجبن' },
-                  { id: 'v3', name: 'برجر مشروم', price: 3500, category: 'قسم البرجر', desc: 'كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل' },
-                  { id: 'v4', name: 'برجر دبل', price: 5000, category: 'قسم البرجر', desc: 'كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
-                  { id: 'v5', name: 'برجر فيكتوريا', price: 6000, category: 'قسم البرجر', desc: 'تندر مقرمش 2 قطعة + صوص مدخن + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
-                  { id: 'v6', name: 'برجر دجاج', price: 2500, category: 'قسم البرجر', desc: '' },
-                  { id: 'v7', name: 'برجر دجاج دبل', price: 4000, category: 'قسم البرجر', desc: '' },
-                  // قسم السندويجات
-                  { id: 'v8', name: 'سندويش زنجر', price: 2500, category: 'قسم السندويجات', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو' },
-                  { id: 'v9', name: 'سندويش زنجر جيز', price: 3000, category: 'قسم السندويجات', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو + صوص الجبن' },
-                  { id: 'v10', name: 'سندويش كرسبي', price: 2500, category: 'قسم السندويجات', desc: 'كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل' },
-                  { id: 'v11', name: 'سندويش كرسبي جيز', price: 3000, category: 'قسم السندويجات', desc: 'كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
-                  { id: 'v12', name: 'تويستر راب', price: 3500, category: 'قسم السندويجات', desc: 'تندر مقرمش 2 قطعة + صوص مدخن + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
-                  { id: 'v13', name: 'سندويش فاهيته', price: 3500, category: 'قسم السندويجات', desc: 'قطع الدجاج + خضار مشوي + جبن موزريلا + صوص افوكادو' },
-                  { id: 'v14', name: 'سندويش فلادلفيه', price: 4000, category: 'قسم السندويجات', desc: 'قطع حبل الظهر + خضار مشوي + جبن موزريلا + صوص مدخن' },
-                  { id: 'v15', name: 'سندويش سكالوب', price: 3500, category: 'قسم السندويجات', desc: 'قطع سكالوب + صوص افوكادو + مخلل + كولسلو' },
-                  { id: 'v16', name: 'سندويش الشيف', price: 4000, category: 'قسم السندويجات', desc: 'قطع التندر مقرمش + صوص الطبخ + مخلل + كولسلو' },
-                  // قسم المقبلات
-                  { id: 'v17', name: 'مقبلات حجم صغير', price: 2000, category: 'قسم المقبلات', desc: 'رمانية - حمص بطحينة - كولسلو - جاجيك - فتة دجاج - فتة بتنجان - اناناس - فراوله - بيتنجانية - مسبحة - جزر' },
-                  { id: 'v18', name: 'مقبلات حجم كبير', price: 4000, category: 'قسم المقبلات', desc: 'رمانية - حمص بطحينة - كولسلو - جاجيك - فتة دجاج - فتة بتنجان - اناناس - فراوله - بيتنجانية - مسبحة - جزر' },
-                  // قسم الكنتاكي والكرسبي
-                  { id: 'v19', name: 'كنتاكي 3 قطع', price: 6000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 3 قطع + ثوميه + كولسلو + بيبسي' },
-                  { id: 'v20', name: 'كنتاكي 5 قطع', price: 10000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 5 قطع + ثوميه + كولسلو + بيبسي' },
-                  { id: 'v21', name: 'كنتاكي 10 قطع', price: 18000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 10 قطع + ثوميه + كولسلو + بيبسي' },
-                  { id: 'v22', name: 'كرسبي 5 قطع', price: 6000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 5 قطع + ثوميه + كولسلو + بيبسي' },
-                  { id: 'v23', name: 'كرسبي 10 قطع', price: 12000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 10 قطع + ثوميه + كولسلو + بيبسي' },
-                  // قسم السبايسي (الحار)
-                  { id: 'v24', name: 'كنتاكي سبايسي 3 قطع', price: 6500, category: 'قسم السبايسي', desc: 'صمون 3 قطع + ثوميه + كولسلو + بيبسي' },
-                  { id: 'v25', name: 'كنتاكي سبايسي 5 قطع', price: 10500, category: 'قسم السبايسي', desc: 'صمون 5 قطع + ثوميه + كولسلو + بيبسي' },
-                  { id: 'v26', name: 'كنتاكي سبايسي 10 قطع', price: 18500, category: 'قسم السبايسي', desc: 'صمون 10 قطع + ثوميه + كولسلو + بيبسي' },
-                  { id: 'v27', name: 'كرسبي سبايسي 5 قطع', price: 6500, category: 'قسم السبايسي', desc: 'صمون 5 قطع + ثوميه + صوص كوكتيل' },
-                  { id: 'v28', name: 'كرسبي سبايسي 10 قطع', price: 10500, category: 'قسم السبايسي', desc: 'صمون 10 قطع + ثوميه + صوص كوكتيل' },
-                  // قسم البيتزا
-                  { id: 'v29', name: 'بيتزا لحم صغير', price: 6000, category: 'قسم البيتزا', desc: '' },
-                  { id: 'v30', name: 'بيتزا لحم وسط', price: 8000, category: 'قسم البيتزا', desc: '' },
-                  { id: 'v31', name: 'بيتزا لحم كبير', price: 14000, category: 'قسم البيتزا', desc: '' },
-                  { id: 'v32', name: 'بيتزا دجاج صغير', price: 5000, category: 'قسم البيتزا', desc: '' },
-                  { id: 'v33', name: 'بيتزا دجاج وسط', price: 7000, category: 'قسم البيتزا', desc: '' },
-                  { id: 'v34', name: 'بيتزا دجاج كبير', price: 13000, category: 'قسم البيتزا', desc: '' },
-                  { id: 'v35', name: 'بيتزا خضار صغير', price: 5000, category: 'قسم البيتزا', desc: '' },
-                  { id: 'v36', name: 'بيتزا خضار وسط', price: 7000, category: 'قسم البيتزا', desc: '' },
-                  { id: 'v37', name: 'بيتزا خضار كبير', price: 12000, category: 'قسم البيتزا', desc: '' },
-                  { id: 'v38', name: 'بيتزا مرغريتا صغير', price: 5000, category: 'قسم البيتزا', desc: '' },
-                  { id: 'v39', name: 'بيتزا مرغريتا وسط', price: 7000, category: 'قسم البيتزا', desc: '' },
-                  { id: 'v40', name: 'بيتزا مرغريتا كبير', price: 10000, category: 'قسم البيتزا', desc: '' },
-                  { id: 'v41', name: 'بيتزا الشيف وسط', price: 10000, category: 'قسم البيتزا', desc: '' },
-                  { id: 'v42', name: 'بيتزا الشيف كبير', price: 15000, category: 'قسم البيتزا', desc: '' },
-                  // الصاج الإيطالي
-                  { id: 'v43', name: 'صاج إيطالي لحم', price: 6000, category: 'الصاج الإيطالي', desc: '' },
-                  { id: 'v44', name: 'صاج إيطالي دجاج', price: 5000, category: 'الصاج الإيطالي', desc: '' },
-                  // قسم الريزو
-                  { id: 'v45', name: 'ريزو كلاسيك', price: 4500, category: 'قسم الريزو', desc: 'قطع دجاج + صوص كوكتيل' },
-                  { id: 'v46', name: 'ريزو مدخن', price: 5000, category: 'قسم الريزو', desc: 'قطع دجاج + صوص مدخن' },
-                  { id: 'v47', name: 'ريزو باربيكيو', price: 5000, category: 'قسم الريزو', desc: 'قطع دجاج + صوص الباربيكيو' },
-                  { id: 'v48', name: 'ريزو فيكتوريا', price: 6000, category: 'قسم الريزو', desc: 'قطع دجاج + شاورمه لحم + شاورمه دجاج + صوص ميكس' },
-                  { id: 'v49', name: 'ريزو شاورمه دجاج', price: 5000, category: 'قسم الريزو', desc: 'شاورمه دجاج + صوص كوكتيل' },
-                  { id: 'v50', name: 'ريزو شاورمه لحم', price: 5500, category: 'قسم الريزو', desc: 'شاورمه لحم + صوص مدخن' },
-                  { id: 'v51', name: 'ريزو ميكس', price: 5000, category: 'قسم الريزو', desc: '' },
-                  // قسم الصاج
-                  { id: 'v52', name: 'صاج لحم صغير', price: 3000, category: 'قسم الصاج', desc: '' },
-                  { id: 'v53', name: 'صاج لحم كبير', price: 4000, category: 'قسم الصاج', desc: '' },
-                  { id: 'v54', name: 'صاج دجاج صغير', price: 2000, category: 'قسم الصاج', desc: '' },
-                  { id: 'v55', name: 'صاج دجاج كبير', price: 3000, category: 'قسم الصاج', desc: '' },
-                  { id: 'v56', name: 'صاج فلافل صغير', price: 1500, category: 'قسم الصاج', desc: '' },
-                  { id: 'v57', name: 'صاج فلافل كبير', price: 2000, category: 'قسم الصاج', desc: '' },
-                  // قسم الفنكر
-                  { id: 'v58', name: 'فنكر صغير', price: 1000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
-                  { id: 'v59', name: 'فنكر صوص كبير', price: 2000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
-                  { id: 'v60', name: 'فنكر بالجبن', price: 2500, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
-                  { id: 'v61', name: 'حلقات بصل', price: 3000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
-                  { id: 'v62', name: 'فرايز دجاج مقرمش', price: 4000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' }
-              ]
-          },
-          'klashe': {
-              name: 'كلاشي',
-              items: [
-                  // قسم العصائر
-                  { id: 'k1', name: 'عصير برتقال', price: 1000, category: 'قسم العصائر', desc: '' },
-                  { id: 'k2', name: 'عصير ليمون', price: 1000, category: 'قسم العصائر', desc: '' },
-                  { id: 'k3', name: 'عصير بطيخ بالحليب', price: 1000, category: 'قسم العصائر', desc: '' },
-                  { id: 'k4', name: 'عصير موز بالكاكاو', price: 1000, category: 'قسم العصائر', desc: '' },
-                  { id: 'k5', name: 'عصير تين', price: 1000, category: 'قسم العصائر', desc: '' },
-                  { id: 'k6', name: 'عصير خوخ', price: 1000, category: 'قسم العصائر', desc: '' },
-                  { id: 'k7', name: 'عصير كوكتيل', price: 1000, category: 'قسم العصائر', desc: '' },
-                  { id: 'k8', name: 'عصير فراولة', price: 1000, category: 'قسم العصائر', desc: '' },
-                  { id: 'k9', name: 'عصير ككرزات حليب', price: 1500, category: 'قسم العصائر', desc: '' },
-                  // قسم الموهيتو
-                  { id: 'k10', name: 'سكنجبيل', price: 1000, category: 'قسم الموهيتو', desc: '' },
-                  { id: 'k11', name: 'موهيتو فراولة', price: 1500, category: 'قسم الموهيتو', desc: '' },
-                  { id: 'k12', name: 'موهيتو علج بوبي', price: 1500, category: 'قسم الموهيتو', desc: '' },
-                  { id: 'k13', name: 'موهيتو بلو بيري', price: 1500, category: 'قسم الموهيتو', desc: '' },
-                  { id: 'k14', name: 'موهيتو روز بيري', price: 1500, category: 'قسم الموهيتو', desc: '' },
-                  { id: 'k15', name: 'موهيتو ليمون', price: 1500, category: 'قسم الموهيتو', desc: '' },
-                  { id: 'k16', name: 'موهيتو رمان', price: 1500, category: 'قسم الموهيتو', desc: '' },
-                  { id: 'k17', name: 'موهيتو مانجو', price: 1500, category: 'قسم الموهيتو', desc: '' },
-                  // قسم السموذي
-                  { id: 'k18', name: 'سموذي مانجو', price: 3000, category: 'قسم السموذي', desc: '' },
-                  { id: 'k19', name: 'سموذي فراولة', price: 3000, category: 'قسم السموذي', desc: '' },
-                  { id: 'k20', name: 'سموذي توت ازرق', price: 3000, category: 'قسم السموذي', desc: '' },
-                  // قسم القهوة الباردة
-                  { id: 'k21', name: 'ايس لاتيه', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
-                  { id: 'k22', name: 'ايس أمريكانو', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
-                  { id: 'k23', name: 'ايس اسبانيش', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
-                  { id: 'k24', name: 'ايس اسبانيش بلو', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
-                  { id: 'k25', name: 'ايس روز لاتيه', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
-                  // قسم المشروبات الساخنة
-                  { id: 'k26', name: 'شاي مهيل', price: 500, category: 'قسم المشروبات الساخنة', desc: '' },
-                  { id: 'k27', name: 'شاي كرك', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
-                  { id: 'k28', name: 'شاي توت', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
-                  { id: 'k29', name: 'شاي ليمون', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
-                  { id: 'k30', name: 'شاي رمان', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
-                  // قسم القهوة
-                  { id: 'k31', name: 'قهوة تركية ساده', price: 1000, category: 'قسم القهوة', desc: '' },
-                  { id: 'k32', name: 'قهوة وسط', price: 1000, category: 'قسم القهوة', desc: '' },
-                  { id: 'k33', name: 'قهوة جكليتية', price: 1000, category: 'قسم القهوة', desc: '' },
-                  { id: 'k34', name: 'قهوة عثمانية', price: 2000, category: 'قسم القهوة', desc: '' },
-                  { id: 'k35', name: 'قهوة أسبريسو', price: 2000, category: 'قسم القهوة', desc: '' },
-                  { id: 'k36', name: 'حليب فقط', price: 1000, category: 'قسم القهوة', desc: '' },
-                  { id: 'k37', name: 'مشروب الكاكاو', price: 1000, category: 'قسم القهوة', desc: '' },
-                  { id: 'k38', name: 'كابتشينو', price: 1000, category: 'قسم القهوة', desc: '' },
-                  { id: 'k39', name: 'كابتشينو مكسرات', price: 1000, category: 'قسم القهوة', desc: '' }
-              ]
-          }
-      };
+    
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
@@ -1398,7 +879,7 @@
       const KLASHE_CHAT_ID = "7479342799"; 
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.18"; // تم تحديث الإصدار لتفريغ الكاش القديم
+      const CURRENT_VERSION = "2.0.19"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -1451,7 +932,6 @@
               showToast("تم إيقاف الجرس 🔕");
           }
       }
-
       async function checkNewOrdersForSound() {
           if(!isSoundEnabled || !navigator.onLine) return;
           try {
@@ -1669,10 +1149,7 @@
               
               if (data.status === 'success') {
                   clearInterval(loginPollInterval);
-                  
-                  if (navigator.onLine) {
-                      fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => console.log("Stats error"));
-                  }
+                  if (navigator.onLine) fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => {});
 
                   const userName = document.getElementById('loginNameInput').value.trim();
                   const userPhone = data.phone;
@@ -1683,35 +1160,27 @@
                   
                   const msg = `👤 تسجيل دخول جديد\nالاسم: ${userName}\nالرقم: ${userPhone}`;
                   fetch(`https://api.telegram.org/bot${NEW_BOT_TOKEN}/sendMessage`, {
-                      method: "POST", 
-                      headers: { "Content-Type": "application/json" }, 
-                      body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+                      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
                   }).catch(e => {});
 
                   showScreen('home-screen'); 
                   showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
-
-                  currentLoginSession = "";
-                  resetLoginUI();
+                  currentLoginSession = ""; resetLoginUI();
               }
           } catch(e) {}
       }
 
       function cancelTelegramLogin() {
           if (loginPollInterval) clearInterval(loginPollInterval);
-          currentLoginSession = "";
-          resetLoginUI();
+          currentLoginSession = ""; resetLoginUI();
           showToast("تم إلغاء عملية تسجيل الدخول ❌");
       }
 
       function resetLoginUI() {
           const btn = document.getElementById('tg-login-btn');
-          btn.innerHTML = '<i class="fab fa-telegram-plane"></i> شارك رقمك عبر تليكرام';
-          btn.disabled = false;
+          btn.innerHTML = '<i class="fab fa-telegram-plane"></i> شارك رقمك عبر تليكرام'; btn.disabled = false;
           document.getElementById('cancel-login-area').style.display = 'none';
-          
-          document.getElementById('login-step-2').style.display = 'none';
-          document.getElementById('login-step-1').style.display = 'block';
+          document.getElementById('login-step-2').style.display = 'none'; document.getElementById('login-step-1').style.display = 'block';
           document.getElementById('loginNameInput').value = '';
       }
 
@@ -1719,36 +1188,19 @@
           'ali_salem': {
               name: 'مطعم برجر علي سالم',
               items: [
-                  { id: 'm1', name: 'برجر', price: 1000 },
-                  { id: 'm2', name: 'برجر جبن', price: 1500 },
-                  { id: 'm3', name: 'ريزو دجاج', price: 3000 },
-                  { id: 'm4', name: 'لبن بطل صغير', price: 750 },
-                  { id: 'm5', name: 'لبن بطل كبير', price: 2000 },
-                  { id: 'm6', name: 'بيبسي', price: 500 },
-                  { id: 'm7', name: 'ديو', price: 500 }
+                  { id: 'm1', name: 'برجر', price: 1000 }, { id: 'm2', name: 'برجر جبن', price: 1500 }, { id: 'm3', name: 'ريزو دجاج', price: 3000 },
+                  { id: 'm4', name: 'لبن بطل صغير', price: 750 }, { id: 'm5', name: 'لبن بطل كبير', price: 2000 }, { id: 'm6', name: 'بيبسي', price: 500 }, { id: 'm7', name: 'ديو', price: 500 }
               ]
           },
           'abo_hmode': {
               name: 'مطعم بركر ابو حمودي',
               items: [
-                  { id: 'h1', name: 'بركر كلاسيك', price: 1000 },
-                  { id: 'h2', name: 'بركر جبن', price: 1250 },
-                  { id: 'h3', name: 'بركر مكسيكي', price: 1500 },
-                  { id: 'h4', name: 'بركر كرانشي', price: 3000 },
-                  { id: 'h5', name: 'بركر دبل لحم دبل جبن', price: 2500 },
-                  { id: 'h6', name: 'ريزو كلاسيك', price: 3000 },
-                  { id: 'h7', name: 'ريزو ابو حمودي', price: 5000 },
-                  { id: 'h8', name: 'اجنحه فحم نص', price: 8000 },
-                  { id: 'h9', name: 'تكه دجاج نص', price: 8000 },
-                  { id: 'h10', name: 'فروج ابو حمودي', price: 8000 },
-                  { id: 'h11', name: 'عصير كلاص', price: 1000 },
-                  { id: 'h12', name: 'عصير بطل', price: 1500 },
-                  { id: 'h13', name: 'لبن بطل صغير', price: 750 },
-                  { id: 'h14', name: 'لبن بطل جبير', price: 2000 },
-                  { id: 'h15', name: 'ببسي', price: 500 },
-                  { id: 'h16', name: 'ديو', price: 500 },
-                  { id: 'h17', name: 'سبرايت', price: 500 },
-                  { id: 'h18', name: 'كولا', price: 500 }
+                  { id: 'h1', name: 'بركر كلاسيك', price: 1000 }, { id: 'h2', name: 'بركر جبن', price: 1250 }, { id: 'h3', name: 'بركر مكسيكي', price: 1500 },
+                  { id: 'h4', name: 'بركر كرانشي', price: 3000 }, { id: 'h5', name: 'بركر دبل لحم دبل جبن', price: 2500 }, { id: 'h6', name: 'ريزو كلاسيك', price: 3000 },
+                  { id: 'h7', name: 'ريزو ابو حمودي', price: 5000 }, { id: 'h8', name: 'اجنحه فحم نص', price: 8000 }, { id: 'h9', name: 'تكه دجاج نص', price: 8000 },
+                  { id: 'h10', name: 'فروج ابو حمودي', price: 8000 }, { id: 'h11', name: 'عصير كلاص', price: 1000 }, { id: 'h12', name: 'عصير بطل', price: 1500 },
+                  { id: 'h13', name: 'لبن بطل صغير', price: 750 }, { id: 'h14', name: 'لبن بطل جبير', price: 2000 }, { id: 'h15', name: 'ببسي', price: 500 },
+                  { id: 'h16', name: 'ديو', price: 500 }, { id: 'h17', name: 'سبرايت', price: 500 }, { id: 'h18', name: 'كولا', price: 500 }
               ]
           },
           'victoria': {
@@ -2470,3 +1922,5 @@
       function openPricesModal() { document.getElementById('prices-modal').style.display = 'flex'; }
       function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
     </script>
+</body>
+</html>
