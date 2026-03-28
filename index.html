@@ -1502,6 +1502,15 @@
       document.addEventListener('DOMContentLoaded', () => {
           checkStatus();
           initAutoLocation(); 
+          
+          setInterval(checkGlobalStatusFromServer, 10000);
+          
+          document.addEventListener("visibilitychange", function() {
+              if (document.visibilityState === 'visible') {
+                  checkGlobalStatusFromServer();
+              }
+          });
+
           setTimeout(() => {
               const splash = document.getElementById('splash-screen');
               if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 500); }
