@@ -858,7 +858,6 @@
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
     </div>
-    
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
@@ -1003,10 +1002,13 @@
           else { btnClose.innerHTML = '<span class="baly-spinner"></span>'; }
           btnOpen.disabled = true; btnClose.disabled = true;
           try {
-              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}`);
+              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}`, { mode: 'no-cors' });
               showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
-              checkGlobalStatusFromServer();
-          } catch(e) { showToast("حدث خطأ بالاتصال بالسيرفر ⚠️"); } 
+              setTimeout(() => { checkGlobalStatusFromServer(); }, 1500);
+          } catch(e) { 
+              showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
+              setTimeout(() => { checkGlobalStatusFromServer(); }, 1500);
+          } 
           finally { 
               btnOpen.innerHTML = '<i class="fas fa-unlock"></i> فتح التطبيق';
               btnClose.innerHTML = '<i class="fas fa-lock"></i> إغلاق التطبيق';
@@ -1183,7 +1185,6 @@
           document.getElementById('login-step-2').style.display = 'none'; document.getElementById('login-step-1').style.display = 'block';
           document.getElementById('loginNameInput').value = '';
       }
-
       const menus = {
           'ali_salem': {
               name: 'مطعم برجر علي سالم',
