@@ -297,24 +297,10 @@
           border: none;
           box-shadow: var(--shadow-sm);
       }
-
-      /* --- إضافات التبويبات والخريطة لحالة الطلب --- */
-      .service-tabs { display: flex; background: var(--surface); border-radius: var(--radius-lg); margin-bottom: 20px; padding: 5px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
-      .service-tab-btn { flex: 1; padding: 12px; border: none; background: transparent; color: var(--text-muted); font-family: 'Cairo'; font-size: 14px; font-weight: 800; border-radius: var(--radius-md); cursor: pointer; transition: 0.3s; }
-      .service-tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(90, 34, 139, 0.2); }
-      .service-tab-content { display: none; animation: fadeSlideUp 0.3s ease; }
-      .service-tab-content.active { display: block; }
-      .no-order-state { text-align: center; padding: 50px 20px; background: var(--surface); border-radius: var(--radius-lg); border: 2px dashed var(--border-color); }
-      .no-order-state i { font-size: 50px; color: var(--text-muted); opacity: 0.5; margin-bottom: 15px; }
-      .no-order-state p { margin: 0; font-weight: 800; color: var(--text-main); font-size: 18px; }
-      .mini-map-container { width: 100%; height: 350px; border-radius: var(--radius-lg); border: 2px solid var(--primary); overflow: hidden; position: relative; display: none; box-shadow: var(--shadow-md); z-index: 1;}
-      .mini-map-container.active { display: block; }
-      .driver-info-float { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); padding: 10px 20px; border-radius: var(--radius-pill); font-weight: 800; font-size: 13px; color: var(--primary); box-shadow: var(--shadow-floating); z-index: 1000; display: flex; align-items: center; gap: 8px; white-space: nowrap; border: 1px solid var(--border-color);}
-      body.dark-mode .driver-info-float { background: rgba(30,30,30,0.95); color: var(--gold); border-color: rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
-        <div id="map-modal">
+    <div id="map-modal">
         <div class="map-container">
             <div class="map-header">
                 <span>تحديد موقع النزول 📍</span>
@@ -621,226 +607,161 @@
     <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
+        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
         
-        <div class="service-tabs">
-            <button id="tab-btn-tuk-main" class="service-tab-btn active" onclick="switchServiceTab('tuk', 'main')">الطلب الاعتيادي</button>
-            <button id="tab-btn-tuk-track" class="service-tab-btn" onclick="switchServiceTab('tuk', 'track')">حالة الطلب <i class="fas fa-map-marker-alt"></i></button>
+        <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+            ⚠️ تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
+        </div>
+        
+        <div class="form-card" id="tuk-user-card">
+            <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="tuk-p-info">بيانات العميل</span></div>
+            <div class="form-group">
+                <label id="lbl-tuk-name">الاسم الكامل</label>
+                <input type="text" id="tukName" placeholder="اكتب اسمك هنا">
+                <span class="step-number">خطوة رقم (1)</span>
+            </div>
+            <div class="form-group">
+                <label id="lbl-tuk-phone">رقم الموبايل</label>
+                <input type="tel" id="tukPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                <span class="step-number">خطوة رقم (2)</span>
+            </div>
         </div>
 
-        <div id="tuk-tab-main" class="service-tab-content active">
-            <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
-            
-            <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
-                ⚠️ تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
-            </div>
-            
-            <div class="form-card" id="tuk-user-card">
-                <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="tuk-p-info">بيانات العميل</span></div>
-                <div class="form-group">
-                    <label id="lbl-tuk-name">الاسم الكامل</label>
-                    <input type="text" id="tukName" placeholder="اكتب اسمك هنا">
-                    <span class="step-number">خطوة رقم (1)</span>
+        <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-route"></i> <span id="tuk-r-info">تفاصيل العملية</span></div>
+            <div class="form-group">
+                <label style="color:var(--danger);" id="lbl-tuk-drop">موقع التحصيل/التسليم (إجباري)</label>
+                
+                <div class="note" style="padding:12px; font-size:13px; margin-bottom:10px; background:rgba(16, 185, 129, 0.1); border-right-color:#10B981; color:var(--text-main);">
+                    💡 هسه تگدر تحدد مكان النزول مباشرة من الخريطة داخل التطبيق بدون ما تطلع وتنسخ روابط! 🗺️
                 </div>
-                <div class="form-group">
-                    <label id="lbl-tuk-phone">رقم الموبايل</label>
-                    <input type="tel" id="tukPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-                    <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-                    <span class="step-number">خطوة رقم (2)</span>
-                </div>
+                
+                <button type="button" class="location-btn ripple-dark" style="border: 2px dashed var(--primary); background: var(--surface); color: var(--primary);" onclick="openMapModal()">
+                    <i class="fas fa-map-marked-alt"></i> افتح الخريطة وحدد المكان 📍
+                </button>
+                
+                <input type="hidden" id="tukDropoffLink" value="">
+                <p id="map-success-msg" style="display: none; color: #10B981; font-weight: 800; font-size: 14px; margin-top: 10px; text-align: center;"><i class="fas fa-check-circle"></i> تم تحديد المكان بنجاح!</p>
+                <span class="step-number">خطوة رقم (3)</span>
             </div>
-
-            <div class="form-card">
-                <div class="form-card-title"><i class="fas fa-route"></i> <span id="tuk-r-info">تفاصيل العملية</span></div>
-                <div class="form-group">
-                    <label style="color:var(--danger);" id="lbl-tuk-drop">موقع التحصيل/التسليم (إجباري)</label>
-                    
-                    <div class="note" style="padding:12px; font-size:13px; margin-bottom:10px; background:rgba(16, 185, 129, 0.1); border-right-color:#10B981; color:var(--text-main);">
-                        💡 هسه تگدر تحدد مكان النزول مباشرة من الخريطة داخل التطبيق بدون ما تطلع وتنسخ روابط! 🗺️
-                    </div>
-                    
-                    <button type="button" class="location-btn ripple-dark" style="border: 2px dashed var(--primary); background: var(--surface); color: var(--primary);" onclick="openMapModal()">
-                        <i class="fas fa-map-marked-alt"></i> افتح الخريطة وحدد المكان 📍
-                    </button>
-                    
-                    <input type="hidden" id="tukDropoffLink" value="">
-                    <p id="map-success-msg" style="display: none; color: #10B981; font-weight: 800; font-size: 14px; margin-top: 10px; text-align: center;"><i class="fas fa-check-circle"></i> تم تحديد المكان بنجاح!</p>
-                    <span class="step-number">خطوة رقم (3)</span>
-                </div>
-                <div class="form-group">
-                    <label>أقرب نقطة دالة (اختياري)</label>
-                    <input type="text" id="tukLandmark" placeholder="مدرسة، جامع، أو تقاطع...">
-                    <span class="step-number">خطوة رقم (4)</span>
-                </div>
+            <div class="form-group">
+                <label>أقرب نقطة دالة (اختياري)</label>
+                <input type="text" id="tukLandmark" placeholder="مدرسة، جامع، أو تقاطع...">
+                <span class="step-number">خطوة رقم (4)</span>
             </div>
-
-            <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
-                <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
-            </div>
-
-            <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">طلب تكتك توصيلة</span></button>
         </div>
 
-        <div id="tuk-tab-track" class="service-tab-content">
-            <div id="tuk-state-no-order" class="no-order-state active">
-                <i class="fas fa-motorcycle"></i>
-                <p>لا يوجد طلب توصيلة حالياً</p>
-                <small style="color:var(--text-muted); display:block; margin-top:5px;">اطلب من "الطلب الاعتيادي" وتابع المندوب هنا</small>
-            </div>
-            <div id="tuk-state-map" class="mini-map-container">
-                <div id="tuk-live-map" style="width: 100%; height: 100%;"></div>
-                <div id="tuk-driver-label" class="driver-info-float">
-                    <i class="fas fa-sync fa-spin"></i> جاري ربط الموقع المباشر...
-                </div>
-            </div>
+        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
         </div>
+
+        <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">طلب تكتك توصيلة</span></button>
     </div>
     
     <div id="mediator-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> <span id="med-head">خدمة الوسيط</span></h2>
+        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
         
-        <div class="service-tabs">
-            <button id="tab-btn-med-main" class="service-tab-btn active" onclick="switchServiceTab('med', 'main')">الطلب الاعتيادي</button>
-            <button id="tab-btn-med-track" class="service-tab-btn" onclick="switchServiceTab('med', 'track')">حالة الطلب <i class="fas fa-map-marker-alt"></i></button>
+        <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+            ⚠️ تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
+        </div>
+        
+        <div class="form-card" id="med-user-card">
+            <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="med-p-info">بيانات المرسل</span></div>
+            <div class="form-group">
+                <label>الاسم الكامل</label>
+                <input type="text" id="medName" placeholder="اكتب اسمك">
+                <span class="step-number">خطوة رقم (1)</span>
+            </div>
+            <div class="form-group">
+                <label>رقم الموبايل</label>
+                <input type="tel" id="medPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                <span class="step-number">خطوة رقم (2)</span>
+            </div>
+            <div class="form-group">
+                <label>أقرب نقطة دالة لمكانك</label>
+                <input type="text" id="medLandmark" placeholder="لتسهيل وصول المندوب">
+                <span class="step-number">خطوة رقم (3)</span>
+            </div>
         </div>
 
-        <div id="med-tab-main" class="service-tab-content active">
-            <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
-            
-            <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
-                ⚠️ تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
-            </div>
-            
-            <div class="form-card" id="med-user-card">
-                <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="med-p-info">بيانات المرسل</span></div>
-                <div class="form-group">
-                    <label>الاسم الكامل</label>
-                    <input type="text" id="medName" placeholder="اكتب اسمك">
-                    <span class="step-number">خطوة رقم (1)</span>
-                </div>
-                <div class="form-group">
-                    <label>رقم الموبايل</label>
-                    <input type="tel" id="medPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-                    <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-                    <span class="step-number">خطوة رقم (2)</span>
-                </div>
-                <div class="form-group">
-                    <label>أقرب نقطة دالة لمكانك</label>
-                    <input type="text" id="medLandmark" placeholder="لتسهيل وصول المندوب">
-                    <span class="step-number">خطوة رقم (3)</span>
-                </div>
-            </div>
-
-            <div class="form-card">
-                <div class="form-card-title"><i class="fas fa-box-open"></i> <span id="med-o-info">تفاصيل الطلب</span></div>
-                <div class="form-group">
-                    <label>ما هو الغرض؟ وإلى أين؟</label>
-                    <textarea id="medOrder" rows="4" placeholder="مثال: أريد توصيل مفاتيح من تقاطع الميناء إلى حي المهندسين..."></textarea>
-                    <span class="step-number">خطوة رقم (4)</span>
-                </div>
-            </div>
-
-            <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
-                <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
-            </div>
-
-            <button class="send-btn order-btn-logic ripple" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
-        </div>
-
-        <div id="med-tab-track" class="service-tab-content">
-            <div id="med-state-no-order" class="no-order-state active">
-                <i class="fas fa-handshake"></i>
-                <p>لا يوجد طلب وسيط حالياً</p>
-                <small style="color:var(--text-muted); display:block; margin-top:5px;">اطلب من "الطلب الاعتيادي" وتابع المندوب هنا</small>
-            </div>
-            <div id="med-state-map" class="mini-map-container">
-                <div id="med-live-map" style="width: 100%; height: 100%;"></div>
-                <div id="med-driver-label" class="driver-info-float">
-                    <i class="fas fa-sync fa-spin"></i> جاري ربط الموقع المباشر...
-                </div>
+        <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-box-open"></i> <span id="med-o-info">تفاصيل الطلب</span></div>
+            <div class="form-group">
+                <label>ما هو الغرض؟ وإلى أين؟</label>
+                <textarea id="medOrder" rows="4" placeholder="مثال: أريد توصيل مفاتيح من تقاطع الميناء إلى حي المهندسين..."></textarea>
+                <span class="step-number">خطوة رقم (4)</span>
             </div>
         </div>
+
+        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
+        </div>
+
+        <button class="send-btn order-btn-logic ripple" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
     </div>
 
     <div id="order-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-shopping-cart" style="color:var(--primary);"></i> <span id="shop-head">تسوق مسواكك</span></h2>
+        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
         
-        <div class="service-tabs">
-            <button id="tab-btn-shop-main" class="service-tab-btn active" onclick="switchServiceTab('shop', 'main')">الطلب الاعتيادي</button>
-            <button id="tab-btn-shop-track" class="service-tab-btn" onclick="switchServiceTab('shop', 'track')">حالة الطلب <i class="fas fa-map-marker-alt"></i></button>
+        <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+            ⚠️ تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
+        </div>
+        
+        <div id="loyalty-info" class="loyalty-card">
+            <div class="loyalty-text"><span id="loy-txt">طلبك رقم</span> <span id="current-order-count" style="color:var(--primary); font-size:22px;">0</span> / 10</div>
+            <div class="loyalty-progress"><div id="loyalty-bar" class="loyalty-bar"></div></div>
+            <span class="gift-note" id="loyalty-gift-msg"><i class="fas fa-gift"></i> أوصل للطلب 10 وكروتك مجانية</span>
         </div>
 
-        <div id="shop-tab-main" class="service-tab-content active">
-            <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
-            
-            <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
-                ⚠️ تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
+        <div class="form-card" id="shop-user-card">
+            <div class="form-card-title"><i class="fas fa-address-card"></i> <span id="shop-p-info">بيانات التوصيل</span></div>
+            <div class="form-group">
+                <label>الاسم</label>
+                <input type="text" id="custName" placeholder="اسمك">
+                <span class="step-number">خطوة رقم (1)</span>
             </div>
-            
-            <div id="loyalty-info" class="loyalty-card">
-                <div class="loyalty-text"><span id="loy-txt">طلبك رقم</span> <span id="current-order-count" style="color:var(--primary); font-size:22px;">0</span> / 10</div>
-                <div class="loyalty-progress"><div id="loyalty-bar" class="loyalty-bar"></div></div>
-                <span class="gift-note" id="loyalty-gift-msg"><i class="fas fa-gift"></i> أوصل للطلب 10 وكروتك مجانية</span>
+            <div class="form-group">
+                <label>رقم الهاتف</label>
+                <input type="tel" id="custPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); updateLoyaltyUI(); checkPhoneLive(this)" onblur="syncLoyaltyWithServer()">
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                <span class="step-number">خطوة رقم (2)</span>
             </div>
-
-            <div class="form-card" id="shop-user-card">
-                <div class="form-card-title"><i class="fas fa-address-card"></i> <span id="shop-p-info">بيانات التوصيل</span></div>
-                <div class="form-group">
-                    <label>الاسم</label>
-                    <input type="text" id="custName" placeholder="اسمك">
-                    <span class="step-number">خطوة رقم (1)</span>
-                </div>
-                <div class="form-group">
-                    <label>رقم الهاتف</label>
-                    <input type="tel" id="custPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); updateLoyaltyUI(); checkPhoneLive(this)" onblur="syncLoyaltyWithServer()">
-                    <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-                    <span class="step-number">خطوة رقم (2)</span>
-                </div>
-                <div class="form-group">
-                    <label>نقطة دالة</label>
-                    <input type="text" id="custLandmark" placeholder="وصف سريع لمكانك">
-                    <span class="step-number">خطوة رقم (3)</span>
-                </div>
-            </div>
-
-            <div class="form-card">
-                <div class="form-card-title"><i class="fas fa-list-ul"></i> <span id="shop-o-info">ماذا تريد أن نشتري لك؟</span></div>
-                <div class="form-group">
-                    <textarea id="custOrder" rows="5" placeholder="اكتب طلباتك هنا بالتفصيل (أكل، مسواك، صيدلية)..."></textarea>
-                    <span class="step-number">خطوة رقم (4)</span>
-                </div>
-                <div class="form-group" style="margin-top: 10px;">
-                    <input type="file" id="custImages" accept="image/*" multiple style="display:none;" onchange="previewImages()">
-                    <button type="button" class="location-btn ripple-dark" style="border: 2px dashed var(--primary); background: var(--bg-color); color: var(--text-main); margin-bottom: 0;" onclick="document.getElementById('custImages').click()">
-                        <i class="fas fa-camera" style="color: var(--primary);"></i> <span id="shop-img-btn">إضافة صور للطلبات (اختياري)</span>
-                    </button>
-                    <div id="image-preview-container" style="display:flex; gap:10px; overflow-x:auto; margin-top:10px; padding-bottom:5px; flex-wrap: wrap;"></div>
-                    <span class="step-number">خطوة رقم (5)</span>
-                </div>
-            </div>
-
-            <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
-                <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل شراء المواد. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
-            </div>
-
-            <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
-        </div>
-
-        <div id="shop-tab-track" class="service-tab-content">
-            <div id="shop-state-no-order" class="no-order-state active">
-                <i class="fas fa-shopping-basket"></i>
-                <p>لا يوجد طلب مسواك حالياً</p>
-                <small style="color:var(--text-muted); display:block; margin-top:5px;">اطلب من "الطلب الاعتيادي" وتابع المندوب هنا</small>
-            </div>
-            <div id="shop-state-map" class="mini-map-container">
-                <div id="shop-live-map" style="width: 100%; height: 100%;"></div>
-                <div id="shop-driver-label" class="driver-info-float">
-                    <i class="fas fa-sync fa-spin"></i> جاري ربط الموقع المباشر...
-                </div>
+            <div class="form-group">
+                <label>نقطة دالة</label>
+                <input type="text" id="custLandmark" placeholder="وصف سريع لمكانك">
+                <span class="step-number">خطوة رقم (3)</span>
             </div>
         </div>
+
+        <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-list-ul"></i> <span id="shop-o-info">ماذا تريد أن نشتري لك؟</span></div>
+            <div class="form-group">
+                <textarea id="custOrder" rows="5" placeholder="اكتب طلباتك هنا بالتفصيل (أكل، مسواك، صيدلية)..."></textarea>
+                <span class="step-number">خطوة رقم (4)</span>
+            </div>
+            <div class="form-group" style="margin-top: 10px;">
+                <input type="file" id="custImages" accept="image/*" multiple style="display:none;" onchange="previewImages()">
+                <button type="button" class="location-btn ripple-dark" style="border: 2px dashed var(--primary); background: var(--bg-color); color: var(--text-main); margin-bottom: 0;" onclick="document.getElementById('custImages').click()">
+                    <i class="fas fa-camera" style="color: var(--primary);"></i> <span id="shop-img-btn">إضافة صور للطلبات (اختياري)</span>
+                </button>
+                <div id="image-preview-container" style="display:flex; gap:10px; overflow-x:auto; margin-top:10px; padding-bottom:5px; flex-wrap: wrap;"></div>
+                <span class="step-number">خطوة رقم (5)</span>
+            </div>
+        </div>
+
+        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل شراء المواد. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
+        </div>
+
+        <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
+
     <div id="join-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> انضم ككابتن</h2>
@@ -1129,6 +1050,7 @@
               applyGlobalStatus();
           } catch(e) {
           } finally {
+              // إخفاء شاشة البداية فقط بعد ما يجي الرد من السيرفر وتقفل الشاشة اذا جانت مسدودة
               const splash = document.getElementById('splash-screen');
               if(splash && splash.style.display !== 'none') { 
                   splash.style.opacity = '0'; 
@@ -1288,6 +1210,7 @@
           document.getElementById('login-step-2').style.display = 'none'; document.getElementById('login-step-1').style.display = 'block';
           document.getElementById('loginNameInput').value = '';
       }
+
       const menus = {
           'ali_salem': {
               name: 'مطعم برجر علي سالم',
@@ -1317,23 +1240,105 @@
                   { id: 'v5', name: 'برجر فيكتوريا', price: 6000, category: 'قسم البرجر', desc: 'تندر مقرمش 2 قطعة + صوص مدخن + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
                   { id: 'v6', name: 'برجر دجاج', price: 2500, category: 'قسم البرجر', desc: '' },
                   { id: 'v7', name: 'برجر دجاج دبل', price: 4000, category: 'قسم البرجر', desc: '' },
+                  { id: 'v8', name: 'سندويش زنجر', price: 2500, category: 'قسم السندويجات', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو' },
+                  { id: 'v9', name: 'سندويش زنجر جيز', price: 3000, category: 'قسم السندويجات', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو + صوص الجبن' },
+                  { id: 'v10', name: 'سندويش كرسبي', price: 2500, category: 'قسم السندويجات', desc: 'كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل' },
+                  { id: 'v11', name: 'سندويش كرسبي جيز', price: 3000, category: 'قسم السندويجات', desc: 'كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
+                  { id: 'v12', name: 'تويستر راب', price: 3500, category: 'قسم السندويجات', desc: 'تندر مقرمش 2 قطعة + صوص مدخن + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
+                  { id: 'v13', name: 'سندويش فاهيته', price: 3500, category: 'قسم السندويجات', desc: 'قطع الدجاج + خضار مشوي + جبن موزريلا + صوص افوكادو' },
+                  { id: 'v14', name: 'سندويش فلادلفيه', price: 4000, category: 'قسم السندويجات', desc: 'قطع حبل الظهر + خضار مشوي + جبن موزريلا + صوص مدخن' },
+                  { id: 'v15', name: 'سندويش سكالوب', price: 3500, category: 'قسم السندويجات', desc: 'قطع سكالوب + صوص افوكادو + مخلل + كولسلو' },
+                  { id: 'v16', name: 'سندويش الشيف', price: 4000, category: 'قسم السندويجات', desc: 'قطع التندر مقرمش + صوص الطبخ + مخلل + كولسلو' },
+                  { id: 'v17', name: 'مقبلات حجم صغير', price: 2000, category: 'قسم المقبلات', desc: 'رمانية - حمص بطحينة - كولسلو - جاجيك - فتة دجاج - فتة بتنجان - اناناس - فراوله - بيتنجانية - مسبحة - جزر' },
+                  { id: 'v18', name: 'مقبلات حجم كبير', price: 4000, category: 'قسم المقبلات', desc: 'رمانية - حمص بطحينة - كولسلو - جاجيك - فتة دجاج - فتة بتنجان - اناناس - فراوله - بيتنجانية - مسبحة - جزر' },
                   { id: 'v19', name: 'كنتاكي 3 قطع', price: 6000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 3 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v20', name: 'كنتاكي 5 قطع', price: 10000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 5 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v21', name: 'كنتاكي 10 قطع', price: 18000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 10 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v22', name: 'كرسبي 5 قطع', price: 6000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 5 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v23', name: 'كرسبي 10 قطع', price: 12000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 10 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v24', name: 'كنتاكي سبايسي 3 قطع', price: 6500, category: 'قسم السبايسي', desc: 'صمون 3 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v25', name: 'كنتاكي سبايسي 5 قطع', price: 10500, category: 'قسم السبايسي', desc: 'صمون 5 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v26', name: 'كنتاكي سبايسي 10 قطع', price: 18500, category: 'قسم السبايسي', desc: 'صمون 10 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v27', name: 'كرسبي سبايسي 5 قطع', price: 6500, category: 'قسم السبايسي', desc: 'صمون 5 قطع + ثوميه + صوص كوكتيل' },
+                  { id: 'v28', name: 'كرسبي سبايسي 10 قطع', price: 10500, category: 'قسم السبايسي', desc: 'صمون 10 قطع + ثوميه + صوص كوكتيل' },
+                  { id: 'v29', name: 'بيتزا لحم صغير', price: 6000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v30', name: 'بيتزا لحم وسط', price: 8000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v31', name: 'بيتزا لحم كبير', price: 14000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v32', name: 'بيتزا دجاج صغير', price: 5000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v33', name: 'بيتزا دجاج وسط', price: 7000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v34', name: 'بيتزا دجاج كبير', price: 13000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v35', name: 'بيتزا خضار صغير', price: 5000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v36', name: 'بيتزا خضار وسط', price: 7000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v37', name: 'بيتزا خضار كبير', price: 12000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v38', name: 'بيتزا مرغريتا صغير', price: 5000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v39', name: 'بيتزا مرغريتا وسط', price: 7000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v40', name: 'بيتزا مرغريتا كبير', price: 10000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v41', name: 'بيتزا الشيف وسط', price: 10000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v42', name: 'بيتزا الشيف كبير', price: 15000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v43', name: 'صاج إيطالي لحم', price: 6000, category: 'الصاج الإيطالي', desc: '' },
+                  { id: 'v44', name: 'صاج إيطالي دجاج', price: 5000, category: 'الصاج الإيطالي', desc: '' },
                   { id: 'v45', name: 'ريزو كلاسيك', price: 4500, category: 'قسم الريزو', desc: 'قطع دجاج + صوص كوكتيل' },
+                  { id: 'v46', name: 'ريزو مدخن', price: 5000, category: 'قسم الريزو', desc: 'قطع دجاج + صوص مدخن' },
+                  { id: 'v47', name: 'ريزو باربيكيو', price: 5000, category: 'قسم الريزو', desc: 'قطع دجاج + صوص الباربيكيو' },
+                  { id: 'v48', name: 'ريزو فيكتوريا', price: 6000, category: 'قسم الريزو', desc: 'قطع دجاج + شاورمه لحم + شاورمه دجاج + صوص ميكس' },
+                  { id: 'v49', name: 'ريزو شاورمه دجاج', price: 5000, category: 'قسم الريزو', desc: 'شاورمه دجاج + صوص كوكتيل' },
+                  { id: 'v50', name: 'ريزو شاورمه لحم', price: 5500, category: 'قسم الريزو', desc: 'شاورمه لحم + صوص مدخن' },
+                  { id: 'v51', name: 'ريزو ميكس', price: 5000, category: 'قسم الريزو', desc: '' },
                   { id: 'v52', name: 'صاج لحم صغير', price: 3000, category: 'قسم الصاج', desc: '' },
-                  { id: 'v58', name: 'فنكر صغير', price: 1000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' }
-                  // تم تقصير القائمة هنا لسهولة النسخ (كودك الأصلي موجود وما متغير)
+                  { id: 'v53', name: 'صاج لحم كبير', price: 4000, category: 'قسم الصاج', desc: '' },
+                  { id: 'v54', name: 'صاج دجاج صغير', price: 2000, category: 'قسم الصاج', desc: '' },
+                  { id: 'v55', name: 'صاج دجاج كبير', price: 3000, category: 'قسم الصاج', desc: '' },
+                  { id: 'v56', name: 'صاج فلافل صغير', price: 1500, category: 'قسم الصاج', desc: '' },
+                  { id: 'v57', name: 'صاج فلافل كبير', price: 2000, category: 'قسم الصاج', desc: '' },
+                  { id: 'v58', name: 'فنكر صغير', price: 1000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
+                  { id: 'v59', name: 'فنكر صوص كبير', price: 2000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
+                  { id: 'v60', name: 'فنكر بالجبن', price: 2500, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
+                  { id: 'v61', name: 'حلقات بصل', price: 3000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
+                  { id: 'v62', name: 'فرايز دجاج مقرمش', price: 4000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' }
               ]
           },
           'klashe': {
               name: 'كلاشي',
               items: [
                   { id: 'k1', name: 'عصير برتقال', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k2', name: 'عصير ليمون', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k3', name: 'عصير بطيخ بالحليب', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k4', name: 'عصير موز بالكاكاو', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k5', name: 'عصير تين', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k6', name: 'عصير خوخ', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k7', name: 'عصير كوكتيل', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k8', name: 'عصير فراولة', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k9', name: 'عصير ككرزات حليب', price: 1500, category: 'قسم العصائر', desc: '' },
                   { id: 'k10', name: 'سكنجبيل', price: 1000, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k11', name: 'موهيتو فراولة', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k12', name: 'موهيتو علج بوبي', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k13', name: 'موهيتو بلو بيري', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k14', name: 'موهيتو روز بيري', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k15', name: 'موهيتو ليمون', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k16', name: 'موهيتو رمان', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k17', name: 'موهيتو مانجو', price: 1500, category: 'قسم الموهيتو', desc: '' },
                   { id: 'k18', name: 'سموذي مانجو', price: 3000, category: 'قسم السموذي', desc: '' },
+                  { id: 'k19', name: 'سموذي فراولة', price: 3000, category: 'قسم السموذي', desc: '' },
+                  { id: 'k20', name: 'سموذي توت ازرق', price: 3000, category: 'قسم السموذي', desc: '' },
                   { id: 'k21', name: 'ايس لاتيه', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
+                  { id: 'k22', name: 'ايس أمريكانو', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
+                  { id: 'k23', name: 'ايس اسبانيش', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
+                  { id: 'k24', name: 'ايس اسبانيش بلو', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
+                  { id: 'k25', name: 'ايس روز لاتيه', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
                   { id: 'k26', name: 'شاي مهيل', price: 500, category: 'قسم المشروبات الساخنة', desc: '' },
-                  { id: 'k31', name: 'قهوة تركية ساده', price: 1000, category: 'قسم القهوة', desc: '' }
-                  // تم تقصير القائمة هنا لسهولة النسخ
+                  { id: 'k27', name: 'شاي كرك', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
+                  { id: 'k28', name: 'شاي توت', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
+                  { id: 'k29', name: 'شاي ليمون', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
+                  { id: 'k30', name: 'شاي رمان', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
+                  { id: 'k31', name: 'قهوة تركية ساده', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k32', name: 'قهوة وسط', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k33', name: 'قهوة جكليتية', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k34', name: 'قهوة عثمانية', price: 2000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k35', name: 'قهوة أسبريسو', price: 2000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k36', name: 'حليب فقط', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k37', name: 'مشروب الكاكاو', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k38', name: 'كابتشينو', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k39', name: 'كابتشينو مكسرات', price: 1000, category: 'قسم القهوة', desc: '' }
               ]
           }
       };
@@ -1495,92 +1500,6 @@
           showToast("تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
       }
 
-      // --- دوال التتبع والخرائط المصغرة الجديدة ---
-      let miniMaps = {};
-      let driverMarkers = {};
-      let trackIntervals = {};
-
-      function switchServiceTab(service, tab) {
-          // تغيير شكل الأزرار
-          document.getElementById(`tab-btn-${service}-main`).classList.remove('active');
-          document.getElementById(`tab-btn-${service}-track`).classList.remove('active');
-          document.getElementById(`tab-btn-${service}-${tab}`).classList.add('active');
-          
-          // تغيير المحتوى
-          document.getElementById(`${service}-tab-main`).classList.remove('active');
-          document.getElementById(`${service}-tab-track`).classList.remove('active');
-          document.getElementById(`${service}-tab-${tab}`).classList.add('active');
-
-          // إذا تم فتح تبويب التتبع، نتحقق إذا اكو طلب فعال ونشغل الخريطة
-          if (tab === 'track') {
-              let activeOrderCode = localStorage.getItem(`active_order_${service}`);
-              if (activeOrderCode) {
-                  startLiveTracking(service, activeOrderCode);
-              } else {
-                  document.getElementById(`${service}-state-no-order`).classList.add('active');
-                  document.getElementById(`${service}-state-map`).classList.remove('active');
-              }
-          }
-      }
-
-      function initMiniMap(service) {
-          const mapId = `${service}-live-map`;
-          if (!miniMaps[service]) {
-              miniMaps[service] = L.map(mapId, { attributionControl: false, zoomControl: false }).setView([30.0396, 47.9298], 15);
-              L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(miniMaps[service]);
-              
-              const iconHtml = service === 'tuk' ? '<i class="fas fa-motorcycle"></i>' : (service === 'shop' ? '<i class="fas fa-shopping-cart"></i>' : '<i class="fas fa-handshake"></i>');
-              const icon = L.divIcon({
-                  html: `<div style="background:var(--primary); color:white; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(0,0,0,0.4); border:2px solid white; font-size:16px;">${iconHtml}</div>`,
-                  className: '', iconSize: [35, 35], iconAnchor: [17, 17]
-              });
-              driverMarkers[service] = L.marker([30.0396, 47.9298], {icon: icon}).addTo(miniMaps[service]);
-          }
-          setTimeout(() => { miniMaps[service].invalidateSize(); }, 300);
-      }
-
-      function startLiveTracking(service, vcCode) {
-          document.getElementById(`${service}-state-no-order`).classList.remove('active');
-          document.getElementById(`${service}-state-map`).classList.add('active');
-          initMiniMap(service);
-          
-          if (trackIntervals[service]) clearInterval(trackIntervals[service]);
-          
-          // وظيفة وهمية/فعلية لسحب موقع المندوب من البوت (عن طريق سيرفر GAS)
-          async function fetchLocation() {
-              try {
-                  // هذا الكود يتصل بـ GAS للتحقق من حالة الطلب وإحداثيات البث المباشر
-                  let resp = await fetch(`${GS_URL}?action=trackDriver&code=${vcCode}&t=${new Date().getTime()}`);
-                  let data = await resp.json();
-                  
-                  if (data.status === 'completed') {
-                      stopLiveTracking(service);
-                      showToast(`تم استكمال طلب ${service === 'tuk'?'التكتك':(service === 'shop'?'المسواك':'الوسيط')} بنجاح! شكراً لاستخدامك البندر.`);
-                  } else if (data.lat && data.lng) {
-                      let latlng = [parseFloat(data.lat), parseFloat(data.lng)];
-                      driverMarkers[service].setLatLng(latlng);
-                      miniMaps[service].panTo(latlng);
-                      document.getElementById(`${service}-driver-label`).innerHTML = `<i class="fas fa-motorcycle"></i> المندوب يتحرك نحوك...`;
-                  }
-              } catch(e) {
-                  // في حال عدم وجود الباك-إند الحقيقي بعد، الخريطة راح تبقى تظهر الدبوس بالمركز كشكل توضيحي
-                  document.getElementById(`${service}-driver-label`).innerHTML = `<i class="fas fa-spinner fa-spin"></i> ننتظر مشاركة موقع المندوب...`;
-              }
-          }
-          
-          fetchLocation();
-          trackIntervals[service] = setInterval(fetchLocation, 5000); // تحديث كل 5 ثواني
-      }
-
-      function stopLiveTracking(service) {
-          if (trackIntervals[service]) clearInterval(trackIntervals[service]);
-          localStorage.removeItem(`active_order_${service}`);
-          document.getElementById(`${service}-state-map`).classList.remove('active');
-          document.getElementById(`${service}-state-no-order`).classList.add('active');
-      }
-
-      // ------------------------------------------------------------------
-
       function checkStatus() {
           trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
           fetchDynamicMenus(); 
@@ -1604,13 +1523,6 @@
               if(!localStorage.getItem('saved_customer_phone')) showScreen('login-screen');
               else { loadSavedCustomerData(); syncLoyaltyWithServer(); showScreen('home-screen'); }
           }
-          
-          // تشغيل التتبع إذا كان اكو طلبات مخزونة من فتحة سابقة
-          ['tuk', 'med', 'shop'].forEach(srv => {
-              if (localStorage.getItem(`active_order_${srv}`)) {
-                  // الخريطة تبدأ تشتغل بصمت بالخلفية للتبويب الجانبي
-              }
-          });
       }
 
       document.addEventListener('DOMContentLoaded', () => {
@@ -1762,13 +1674,7 @@
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية", callback_data: `claim|${name}|${vc}` }]] } })
               });
-              
-              // تفعيل الخريطة وحفظ الطلب
-              localStorage.setItem('active_order_tuk', vc);
-              switchServiceTab('tuk', 'track');
-              showToast("تم الإرسال بنجاح ✅ جاري تحويلك للمتابعة");
-              
-              document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+              showToast("تم الإرسال بنجاح ✅"); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1794,13 +1700,7 @@
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
               });
-              
-              // تفعيل الخريطة وحفظ الطلب
-              localStorage.setItem('active_order_med', vc);
-              switchServiceTab('med', 'track');
-              showToast("تم الإرسال بنجاح ✅ جاري تحويلك للمتابعة");
-              
-              document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+              showToast("تم الإرسال بنجاح ✅"); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1877,18 +1777,48 @@
               let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص)**" : "";
               const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍 الموقع: ${userCoords}`;
               
+              // 1. إرسال الطلب لقناة المندوبين
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
 
-              // تفعيل الخريطة وحفظ الطلب
-              localStorage.setItem('active_order_shop', vc);
-              switchServiceTab('shop', 'track');
-              showToast("تم إرسال طلبك بنجاح ✅ جاري تحويلك للمتابعة");
-               
-              document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = ""; loadSavedCustomerData();
-          } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
+              // 2. مطعم علي سالم
+              let isAliSalemOrder = order.includes("مطعم برجر علي سالم");
+              if (isAliSalemOrder) {
+                  const restMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
+                  await fetch(`https://api.telegram.org/bot${ALI_SALEM_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ALI_SALEM_CHAT_ID, text: restMsg }) }).catch(e => {});
+              }
+
+              // 3. مطعم ابو حمودي
+              let isAboHmodeOrder = order.includes("مطعم بركر ابو حمودي");
+              if (isAboHmodeOrder) {
+                  const hmodeMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
+                  await fetch(`https://api.telegram.org/bot${ABO_HMODE_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ABO_HMODE_CHAT_ID, text: hmodeMsg }) }).catch(e => {});
+              }
+
+              // 4. مطعم فيكتوريا
+              let isVictoriaOrder = order.includes("مطعم فيكتوريا");
+              if (isVictoriaOrder) {
+                  const vicMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
+                  await fetch(`https://api.telegram.org/bot${VICTORIA_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: VICTORIA_CHAT_ID, text: vicMsg }) }).catch(e => {});
+              }
+
+              // 5. كلاشي
+              let isKlasheOrder = order.includes("كلاشي");
+              if (isKlasheOrder) {
+                  const klasheMsg = `🥤 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
+                  await fetch(`https://api.telegram.org/bot${KLASHE_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: KLASHE_CHAT_ID, text: klasheMsg }) }).catch(e => {});
+              }
+
+              showToast("تم إرسال طلبك بنجاح ✅"); 
+              document.getElementById('custOrder').value = ""; 
+              document.getElementById('custLandmark').value = ""; 
+              loadSavedCustomerData();
+          } catch (e) {} finally { 
+              btn.innerHTML = originalText; 
+              btn.disabled = false; 
+          }
       }
 
       async function processVerifyCode() {
@@ -1899,11 +1829,8 @@
           try {
               const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
               const checkResult = await checkResp.text();
-              
               if (checkResult.startsWith("valid")) {
                   try { const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); cashAudio.play(); confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } }); } catch(e) {}
-                  
-                  // تحديث السجل والنقاط
                   let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
                   logs.unshift({ date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }), phone: custPhone, price: "2,000 د.ع" });
                   localStorage.setItem('driver_logs', JSON.stringify(logs));
@@ -1911,12 +1838,9 @@
                   localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
                   updateStatsUI();
                   let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
-                  
-                  // إرسال البيانات للسيرفر (السيرفر راح ينهي الطلب ويسجله Completed حتى تتصفر الخريطة يم الزبون)
-                  fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}&orderCode=${code}&actionType=complete`);
-                  
+                  fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
                   syncLoyaltyWithServer(); 
-                  showToast(`تم تأكيد العملية بنجاح! عاشت ايدك 👏 والخريطة تصفرت يم الزبون`); refreshLeaderboard();
+                  showToast(`تم تأكيد العملية بنجاح! عاشت ايدك 👏`); refreshLeaderboard();
                   document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
               } else { showToast("الكود غير صحيح ❌"); }
           } catch(e) {} finally { btn.innerHTML = oldText; btn.disabled = false; }
