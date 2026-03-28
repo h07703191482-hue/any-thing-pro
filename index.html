@@ -1031,7 +1031,15 @@
                   if(lockScreen) lockScreen.style.display = 'none'; 
               }
               applyGlobalStatus();
-          } catch(e) {}
+          } catch(e) {
+          } finally {
+              // إخفاء شاشة البداية فقط بعد ما يجي الرد من السيرفر وتقفل الشاشة اذا جانت مسدودة
+              const splash = document.getElementById('splash-screen');
+              if(splash && splash.style.display !== 'none') { 
+                  splash.style.opacity = '0'; 
+                  setTimeout(() => splash.style.display = 'none', 500); 
+              }
+          }
       }
 
       function applyGlobalStatus() {
@@ -1185,6 +1193,7 @@
           document.getElementById('login-step-2').style.display = 'none'; document.getElementById('login-step-1').style.display = 'block';
           document.getElementById('loginNameInput').value = '';
       }
+
       const menus = {
           'ali_salem': {
               name: 'مطعم برجر علي سالم',
@@ -1510,11 +1519,6 @@
                   checkGlobalStatusFromServer();
               }
           });
-
-          setTimeout(() => {
-              const splash = document.getElementById('splash-screen');
-              if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 500); }
-          }, 1500);
       });
 
       function shareApp() {
