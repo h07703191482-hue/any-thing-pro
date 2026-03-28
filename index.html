@@ -1003,7 +1003,7 @@
       const KLASHE_CHAT_ID = "7479342799"; 
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.23"; 
+      const CURRENT_VERSION = "2.0.24"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -1013,10 +1013,7 @@
           try { fetch(`${GS_URL}?action=trackVisit&t=${new Date().getTime()}`); } catch(e) {}
       }
 
-      let secretCounter = 0;
-      let lockSecretCounter = 0;
       let appIsActive = true;
-
       let lastOrderCount = -1;
       let orderPollInterval = null;
       let isSoundEnabled = localStorage.getItem('sound_enabled') === 'true';
@@ -1024,6 +1021,7 @@
 
       // --- متغيرات التتبع المباشر ---
       let activeTrackingInterval = null;
+      let driverLocationInterval = null;
       let currentTrackingService = null;
       let currentTrackingCode = null;
 
@@ -1061,6 +1059,7 @@
               showToast("تم إيقاف الجرس 🔕");
           }
       }
+
       async function checkNewOrdersForSound() {
           if(!isSoundEnabled || !navigator.onLine) return;
           try {
@@ -1095,6 +1094,7 @@
           }
       }
 
+      let secretCounter = 0;
       function handleSecretClick() {
           secretCounter++;
           if (secretCounter === 5) {
@@ -1110,6 +1110,7 @@
           }
       }
 
+      let lockSecretCounter = 0;
       function handleLockScreenSecret() {
           lockSecretCounter++;
           if (lockSecretCounter === 5) {
@@ -1136,7 +1137,6 @@
               showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
               setTimeout(() => { checkGlobalStatusFromServer(); }, 1500);
           } catch(e) { 
-              showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
               setTimeout(() => { checkGlobalStatusFromServer(); }, 1500);
           } 
           finally { 
@@ -1387,17 +1387,15 @@
           document.getElementById('custOrder').value = orderDetails; showScreen('order-screen'); showToast("تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
       }
 
-      // --- استرجاع التتبع الدائم ---
+      // --- استرجاع التتبع الدائم المباشر ---
       function restoreTrackingState() {
           let service = localStorage.getItem('tracking_service');
           let codeStr = localStorage.getItem('tracking_code');
           if (!service || !codeStr) return;
 
-          // إظهار زر التبويب
           let tabBtn = document.getElementById(`tab-btn-${service}-track`);
           if(tabBtn) tabBtn.style.display = 'block';
           
-          // تحديد الشاشة المناسبة للخدمة
           let screenId = service === 'tuk' ? 'tuk-screen' : (service === 'med' ? 'mediator-screen' : 'order-screen');
           showScreen(screenId);
           switchOrderTab(service, 'track');
@@ -1405,6 +1403,7 @@
           currentTrackingService = service;
           currentTrackingCode = codeStr;
           
+          // فحص حالة تسليم الطلب كل 3 ثواني
           if(activeTrackingInterval) clearInterval(activeTrackingInterval);
           activeTrackingInterval = setInterval(() => {
               let localCompleted = localStorage.getItem('completed_order_signal');
@@ -1412,6 +1411,25 @@
                   orderCompletedSuccessfully(service);
               }
           }, 3000);
+      }
+
+      // --- سحب احداثيات المندوب من السيرفر (التليكرام) ---
+      async function pollDriverLiveLocation() {
+          if(!currentTrackingCode || !trackingMaps[currentTrackingService]) return;
+          try {
+              // نطلب من السيرفر مالتك (Google Apps Script) انه يجيب موقع المندوب المرتبط بهالطلب
+              const resp = await fetch(`${GS_URL}?action=getDriverLiveLocation&code=${currentTrackingCode}`);
+              const data = await resp.json();
+              
+              if(data && data.status === 'success' && data.lat && data.lng) {
+                  let map = trackingMaps[currentTrackingService];
+                  // تحريك الدبوس مال مندوب لمكانه الحقيقي اللي انطاه التليكرام
+                  if(map.driverMarker) {
+                      map.driverMarker.setLatLng([data.lat, data.lng]);
+                      map.setView([data.lat, data.lng]); // تخلي الشاشة تلحق المندوب
+                  }
+              }
+          } catch(e) { }
       }
 
       function checkStatus() {
@@ -1429,7 +1447,6 @@
                   loadSavedCustomerData(); 
                   syncLoyaltyWithServer(); 
                   
-                  // فحص التتبع مباشرة لكي لا يذهب للواجهة الرئيسية وتختفي الخريطة
                   let savedService = localStorage.getItem('tracking_service');
                   let savedCode = localStorage.getItem('tracking_code');
                   if(savedService && savedCode) {
@@ -1441,7 +1458,7 @@
           }
       }
 
-      // --- الدالة الأساسية اللي تتنفذ من يفتح التطبيق أو يتحدث ---
+      // --- الدالة الأساسية ---
       document.addEventListener('DOMContentLoaded', () => { 
           checkStatus(); 
           initAutoLocation(); 
@@ -1525,8 +1542,6 @@
           if (typeof closeSidebar === 'function') closeSidebar();
       }
 
-      let trackingMaps = { tuk: null, med: null, shop: null };
-
       function switchOrderTab(service, tabName) {
           document.getElementById(`tab-btn-${service}-main`).classList.remove('active');
           document.getElementById(`tab-btn-${service}-track`).classList.remove('active');
@@ -1539,24 +1554,20 @@
           if (tabName === 'track') { initTrackingMap(service); }
       }
 
-      // دالة استشعار وبدء الطلب 
       function startOrderTracking(service, codeStr) {
-          // حفظ الحالة بالذاكرة الدائمة حتى ما تنمسح من نحدث التطبيق
           localStorage.setItem('tracking_service', service);
           localStorage.setItem('tracking_code', codeStr);
 
           document.getElementById(`tab-btn-${service}-track`).style.display = 'block';
           
-          // نقل الزبون مباشرة للصفحة الخاصة بالطلب مالته
           let screenId = service === 'tuk' ? 'tuk-screen' : (service === 'med' ? 'mediator-screen' : 'order-screen');
           showScreen(screenId);
-
           switchOrderTab(service, 'track');
+          
           currentTrackingService = service;
           currentTrackingCode = codeStr;
           
           if(activeTrackingInterval) clearInterval(activeTrackingInterval);
-          
           activeTrackingInterval = setInterval(() => {
               let localCompleted = localStorage.getItem('completed_order_signal');
               if(localCompleted === currentTrackingCode) {
@@ -1564,16 +1575,21 @@
               }
           }, 3000);
 
+          // استشعار موقع المندوب من السيرفر (التليكرام) كل 5 ثواني
+          if(driverLocationInterval) clearInterval(driverLocationInterval);
+          driverLocationInterval = setInterval(pollDriverLiveLocation, 5000);
+
           setTimeout(() => {
               if(document.getElementById(`tab-${service}-track`).classList.contains('active-tab')) {
                   orderCompletedSuccessfully(service);
               }
-          }, 600000); // 10 دقائق كحد أقصى للحماية
+          }, 600000); 
       }
 
       function orderCompletedSuccessfully(service) {
           clearInterval(activeTrackingInterval);
-          // مسح إشارات التتبع من الذاكرة حتى يرجع التطبيق طبيعي
+          if(driverLocationInterval) clearInterval(driverLocationInterval);
+          
           localStorage.removeItem('completed_order_signal');
           localStorage.removeItem('tracking_service');
           localStorage.removeItem('tracking_code');
@@ -1608,17 +1624,8 @@
                       });
                       L.marker([lat, lng], {icon: userIcon}).addTo(trackingMaps[service]).bindPopup("موقعك");
                       
-                      let driverLat = lat - 0.015; 
-                      let driverLng = lng - 0.015;
-                      let driverMarker = L.marker([driverLat, driverLng], {icon: deliveryIcon}).addTo(trackingMaps[service]);
-                      
-                      setInterval(() => {
-                          if(document.getElementById(`tab-${service}-track`).classList.contains('active-tab')) {
-                              driverLat += (lat - driverLat) * 0.05; 
-                              driverLng += (lng - driverLng) * 0.05;
-                              driverMarker.setLatLng([driverLat, driverLng]);
-                          }
-                      }, 2000);
+                      // تثبيت أيقونة المندوب مبدئياً قرب الزبون لحد ما تجي إحداثياته الحقيقية من السيرفر
+                      trackingMaps[service].driverMarker = L.marker([lat - 0.005, lng - 0.005], {icon: deliveryIcon}).addTo(trackingMaps[service]);
                   });
               }
           }
@@ -1643,7 +1650,7 @@
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`);
               localStorage.removeItem('referred_by'); 
               const msg = `🚖 طلب تكتك توصيلة\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الموقع: ${userCoords}\n📝 تفاصيل: ${dropLink}\nدالة: ${land}\n🔑 كود الزبون: ${vc}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية", callback_data: `claim|${name}|${vc}` }]] } }) });
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية (بث الموقع إجباري)", callback_data: `claim|${name}|${vc}` }]] } }) });
               showToast("تم الإرسال بنجاح ✅"); 
               document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; loadSavedCustomerData();
               
@@ -1667,7 +1674,7 @@
               saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`); localStorage.removeItem('referred_by');
               const msg = `🔵 طلب وسيط\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📝 الغرض: ${order}\n📍 الموقع: ${userCoords}\n🔑 كود الزبون: ${vc}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } }) });
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب (بث الموقع إجباري)", callback_data: `claimMed|${name}|${vc}` }]] } }) });
               showToast("تم الإرسال بنجاح ✅"); 
               document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; loadSavedCustomerData();
               
@@ -1716,7 +1723,7 @@
               let msgContent = order ? order : "الطلب موضح في الصور المرفقة 📸"; let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص)**" : "";
               const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍 الموقع: ${userCoords}\n🔑 كود الزبون: ${vc}`;
               
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } }) });
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب (بث الموقع إجباري)", callback_data: `claim|${name}|${vc}` }]] } }) });
 
               let isAliSalemOrder = order.includes("مطعم برجر علي سالم"); if (isAliSalemOrder) fetch(`https://api.telegram.org/bot${ALI_SALEM_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ALI_SALEM_CHAT_ID, text: `🍔 طلب جديد!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}` }) }).catch(e => {});
               let isAboHmodeOrder = order.includes("مطعم بركر ابو حمودي"); if (isAboHmodeOrder) fetch(`https://api.telegram.org/bot${ABO_HMODE_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ABO_HMODE_CHAT_ID, text: `🍔 طلب جديد!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}` }) }).catch(e => {});
@@ -1741,7 +1748,6 @@
               if (checkResult.startsWith("valid")) {
                   try { const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); cashAudio.play(); confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } }); } catch(e) {}
                   
-                  // إرسال إشارة محلية لإخفاء الخريطة عند الزبون
                   localStorage.setItem('completed_order_signal', code);
 
                   let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]'); logs.unshift({ date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }), phone: custPhone, price: "2,000 د.ع" });
