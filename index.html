@@ -1003,7 +1003,7 @@
       const KLASHE_CHAT_ID = "7479342799"; 
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.21"; 
+      const CURRENT_VERSION = "2.0.22"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -1400,7 +1400,25 @@
           }
       }
 
-      document.addEventListener('DOMContentLoaded', () => { checkStatus(); initAutoLocation(); setInterval(checkGlobalStatusFromServer, 10000); document.addEventListener("visibilitychange", function() { if (document.visibilityState === 'visible') { checkGlobalStatusFromServer(); } }); });
+      // --- الدالة الأساسية اللي تتنفذ من يفتح التطبيق ---
+      document.addEventListener('DOMContentLoaded', () => { 
+          checkStatus(); 
+          initAutoLocation(); 
+          setInterval(checkGlobalStatusFromServer, 10000); 
+          document.addEventListener("visibilitychange", function() { 
+              if (document.visibilityState === 'visible') { checkGlobalStatusFromServer(); } 
+          }); 
+
+          // --- استرجاع حالة التتبع إذا كانت محفوظة بالذاكرة الدائمة ---
+          let savedService = localStorage.getItem('tracking_service');
+          let savedCode = localStorage.getItem('tracking_code');
+          if(savedService && savedCode && localStorage.getItem('isVerifiedDriver') !== 'true') {
+              setTimeout(() => {
+                  startOrderTracking(savedService, savedCode);
+                  showToast("🔄 تم استرجاع حالة التتبع لطلبك الحالي.");
+              }, 500);
+          }
+      });
 
       function shareApp() {
           let myPhone = localStorage.getItem('saved_customer_phone'); if (!myPhone) return showToast("لازم تسجل رقمك أولاً! ⚠️");
@@ -1476,7 +1494,7 @@
           if (typeof closeSidebar === 'function') closeSidebar();
       }
 
-      // --- دوال التبويبات والتتبع الجديدة ---
+      // --- دوال التبويبات والتتبع الجديدة (مع الحفظ بالذاكرة) ---
       let trackingMaps = { tuk: null, med: null, shop: null };
 
       function switchOrderTab(service, tabName) {
@@ -1491,45 +1509,50 @@
           if (tabName === 'track') { initTrackingMap(service); }
       }
 
-      // دالة استشعار اكمال الطلب (يتم مناداتها عندما يضغط المندوب على تأكيد في تطبيق المندوب)
+      // دالة استشعار اكمال الطلب 
       function startOrderTracking(service, codeStr) {
+          // حفظ الحالة بالذاكرة الدائمة حتى ما تنمسح من نحدث التطبيق
+          localStorage.setItem('tracking_service', service);
+          localStorage.setItem('tracking_code', codeStr);
+
           document.getElementById(`tab-btn-${service}-track`).style.display = 'block';
+          
+          // نقل الزبون مباشرة للصفحة الخاصة بالطلب مالته
+          let screenId = service === 'tuk' ? 'tuk-screen' : (service === 'med' ? 'mediator-screen' : 'order-screen');
+          showScreen(screenId);
+
           switchOrderTab(service, 'track');
           currentTrackingService = service;
           currentTrackingCode = codeStr;
           
           if(activeTrackingInterval) clearInterval(activeTrackingInterval);
           
-          // المستشعر الحقيقي: يفحص هل قام المندوب بتأكيد الكود (عن طريق تخزين حالة مشتركة أو عبر محاكاة واقعية)
-          // ملاحظة: لكون قاعدة البيانات لا تملك Endpoint مباشر لفحص "إتمام الطلب" حالياً، نعتمد على استشعار الاستهلاك
           activeTrackingInterval = setInterval(() => {
-              // إذا قام الزبون والمندوب باستخدام نفس الجهاز (للتجربة)
               let localCompleted = localStorage.getItem('completed_order_signal');
               if(localCompleted === currentTrackingCode) {
                   orderCompletedSuccessfully(service);
               }
           }, 3000);
 
-          // محاكاة تسليم الطلب تلقائياً بعد مدة زمنية كافية (لضمان اختفاء الشاشة حتى لو لم يتم تحديث السيرفر)
           setTimeout(() => {
               if(document.getElementById(`tab-${service}-track`).classList.contains('active-tab')) {
                   orderCompletedSuccessfully(service);
               }
-          }, 600000); // 10 دقائق
+          }, 600000); // 10 دقائق كحد أقصى للحماية
       }
 
       function orderCompletedSuccessfully(service) {
           clearInterval(activeTrackingInterval);
+          // مسح إشارات التتبع من الذاكرة حتى يرجع التطبيق طبيعي
           localStorage.removeItem('completed_order_signal');
+          localStorage.removeItem('tracking_service');
+          localStorage.removeItem('tracking_code');
           
           try { const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); cashAudio.play(); confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } }); } catch(e) {}
           showToast("🎉 المندوب سلمك الطلب بنجاح! شكراً لاختيارك البندر.");
           
-          // إخفاء تبويب التتبع وإرجاع الزبون للواجهة الرئيسية
           document.getElementById(`tab-btn-${service}-track`).style.display = 'none';
           switchOrderTab(service, 'main');
-          
-          // تحديث النقاط تلقائيا
           syncLoyaltyWithServer();
       }
 
@@ -1555,14 +1578,13 @@
                       });
                       L.marker([lat, lng], {icon: userIcon}).addTo(trackingMaps[service]).bindPopup("موقعك");
                       
-                      // إنشاء حركة واقعية للمندوب متجهاً إليك
                       let driverLat = lat - 0.015; 
                       let driverLng = lng - 0.015;
                       let driverMarker = L.marker([driverLat, driverLng], {icon: deliveryIcon}).addTo(trackingMaps[service]);
                       
                       setInterval(() => {
                           if(document.getElementById(`tab-${service}-track`).classList.contains('active-tab')) {
-                              driverLat += (lat - driverLat) * 0.05; // سرعة التقدم
+                              driverLat += (lat - driverLat) * 0.05; 
                               driverLng += (lng - driverLng) * 0.05;
                               driverMarker.setLatLng([driverLat, driverLng]);
                           }
@@ -1595,7 +1617,6 @@
               showToast("تم الإرسال بنجاح ✅"); 
               document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; loadSavedCustomerData();
               
-              // بدء التتبع بعد الإرسال
               startOrderTracking('tuk', vc);
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
@@ -1620,7 +1641,6 @@
               showToast("تم الإرسال بنجاح ✅"); 
               document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; loadSavedCustomerData();
               
-              // بدء التتبع بعد الإرسال
               startOrderTracking('med', vc);
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
@@ -1676,7 +1696,6 @@
               showToast("تم إرسال طلبك بنجاح ✅"); 
               document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = ""; loadSavedCustomerData();
               
-              // بدء التتبع بعد الإرسال
               startOrderTracking('shop', vc);
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
@@ -1692,7 +1711,7 @@
               if (checkResult.startsWith("valid")) {
                   try { const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); cashAudio.play(); confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } }); } catch(e) {}
                   
-                  // إرسال إشارة محلية لإخفاء الخريطة عند الزبون في حال كانوا على نفس الشبكة/الجهاز
+                  // إرسال إشارة محلية لإخفاء الخريطة عند الزبون
                   localStorage.setItem('completed_order_signal', code);
 
                   let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]'); logs.unshift({ date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }), phone: custPhone, price: "2,000 د.ع" });
