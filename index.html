@@ -983,7 +983,7 @@
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
     </div>
-        <script>
+    <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
@@ -1003,7 +1003,7 @@
       const KLASHE_CHAT_ID = "7479342799"; 
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.22"; 
+      const CURRENT_VERSION = "2.0.23"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -1387,6 +1387,33 @@
           document.getElementById('custOrder').value = orderDetails; showScreen('order-screen'); showToast("تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
       }
 
+      // --- استرجاع التتبع الدائم ---
+      function restoreTrackingState() {
+          let service = localStorage.getItem('tracking_service');
+          let codeStr = localStorage.getItem('tracking_code');
+          if (!service || !codeStr) return;
+
+          // إظهار زر التبويب
+          let tabBtn = document.getElementById(`tab-btn-${service}-track`);
+          if(tabBtn) tabBtn.style.display = 'block';
+          
+          // تحديد الشاشة المناسبة للخدمة
+          let screenId = service === 'tuk' ? 'tuk-screen' : (service === 'med' ? 'mediator-screen' : 'order-screen');
+          showScreen(screenId);
+          switchOrderTab(service, 'track');
+          
+          currentTrackingService = service;
+          currentTrackingCode = codeStr;
+          
+          if(activeTrackingInterval) clearInterval(activeTrackingInterval);
+          activeTrackingInterval = setInterval(() => {
+              let localCompleted = localStorage.getItem('completed_order_signal');
+              if(localCompleted === currentTrackingCode) {
+                  orderCompletedSuccessfully(service);
+              }
+          }, 3000);
+      }
+
       function checkStatus() {
           trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); fetchDynamicMenus(); 
           const urlParams = new URLSearchParams(window.location.search); const ref = urlParams.get('ref'); const myPhone = localStorage.getItem('saved_customer_phone');
@@ -1396,11 +1423,25 @@
               const accBtn = document.getElementById('nav-account-btn'); if(accBtn) { accBtn.setAttribute('onclick', "showScreen('plaza-screen'); updateNav(this)"); document.getElementById('nav-acc-icon').className = 'fas fa-briefcase'; document.getElementById('nav-acc-text').innerText = 'المندوبين'; }
               initDriverStatus(); setInterval(checkRemoteReset, 15000); setInterval(refreshLeaderboard, 30000); showScreen('home-screen');
           } else {
-              if(!localStorage.getItem('saved_customer_phone')) showScreen('login-screen'); else { loadSavedCustomerData(); syncLoyaltyWithServer(); showScreen('home-screen'); }
+              if(!localStorage.getItem('saved_customer_phone')) {
+                  showScreen('login-screen'); 
+              } else { 
+                  loadSavedCustomerData(); 
+                  syncLoyaltyWithServer(); 
+                  
+                  // فحص التتبع مباشرة لكي لا يذهب للواجهة الرئيسية وتختفي الخريطة
+                  let savedService = localStorage.getItem('tracking_service');
+                  let savedCode = localStorage.getItem('tracking_code');
+                  if(savedService && savedCode) {
+                      restoreTrackingState();
+                  } else {
+                      showScreen('home-screen'); 
+                  }
+              }
           }
       }
 
-      // --- الدالة الأساسية اللي تتنفذ من يفتح التطبيق ---
+      // --- الدالة الأساسية اللي تتنفذ من يفتح التطبيق أو يتحدث ---
       document.addEventListener('DOMContentLoaded', () => { 
           checkStatus(); 
           initAutoLocation(); 
@@ -1408,16 +1449,6 @@
           document.addEventListener("visibilitychange", function() { 
               if (document.visibilityState === 'visible') { checkGlobalStatusFromServer(); } 
           }); 
-
-          // --- استرجاع حالة التتبع إذا كانت محفوظة بالذاكرة الدائمة ---
-          let savedService = localStorage.getItem('tracking_service');
-          let savedCode = localStorage.getItem('tracking_code');
-          if(savedService && savedCode && localStorage.getItem('isVerifiedDriver') !== 'true') {
-              setTimeout(() => {
-                  startOrderTracking(savedService, savedCode);
-                  showToast("🔄 تم استرجاع حالة التتبع لطلبك الحالي.");
-              }, 500);
-          }
       });
 
       function shareApp() {
@@ -1494,7 +1525,6 @@
           if (typeof closeSidebar === 'function') closeSidebar();
       }
 
-      // --- دوال التبويبات والتتبع الجديدة (مع الحفظ بالذاكرة) ---
       let trackingMaps = { tuk: null, med: null, shop: null };
 
       function switchOrderTab(service, tabName) {
@@ -1509,7 +1539,7 @@
           if (tabName === 'track') { initTrackingMap(service); }
       }
 
-      // دالة استشعار اكمال الطلب 
+      // دالة استشعار وبدء الطلب 
       function startOrderTracking(service, codeStr) {
           // حفظ الحالة بالذاكرة الدائمة حتى ما تنمسح من نحدث التطبيق
           localStorage.setItem('tracking_service', service);
