@@ -885,7 +885,7 @@
       }
 
       async function trackLiveVisit() {
-          try { fetch(`${GS_URL}?action=trackVisit`); } catch(e) {}
+          try { fetch(`${GS_URL}?action=trackVisit&t=${new Date().getTime()}`); } catch(e) {}
       }
 
       let secretCounter = 0;
@@ -934,7 +934,7 @@
       async function checkNewOrdersForSound() {
           if(!isSoundEnabled || !navigator.onLine) return;
           try {
-              const resp = await fetch(`${GS_URL}?action=checkNewOrders`);
+              const resp = await fetch(`${GS_URL}?action=checkNewOrders&t=${new Date().getTime()}`);
               const currentCount = parseInt(await resp.text());
               if(!isNaN(currentCount)) {
                   if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
@@ -1002,7 +1002,7 @@
           else { btnClose.innerHTML = '<span class="baly-spinner"></span>'; }
           btnOpen.disabled = true; btnClose.disabled = true;
           try {
-              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}`, { mode: 'no-cors' });
+              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}&t=${new Date().getTime()}`, { mode: 'no-cors' });
               showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
               setTimeout(() => { checkGlobalStatusFromServer(); }, 1500);
           } catch(e) { 
@@ -1018,7 +1018,7 @@
 
       async function checkGlobalStatusFromServer() {
           try {
-              const resp = await fetch(`${GS_URL}?action=getAppStatus`);
+              const resp = await fetch(`${GS_URL}?action=getAppStatus&t=${new Date().getTime()}`);
               const status = await resp.text();
               const lockScreen = document.getElementById('global-lock-screen');
               const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
@@ -1067,7 +1067,7 @@
           const phone = (phoneInput && phoneInput.value.trim() !== "") ? phoneInput.value.trim() : localStorage.getItem('saved_customer_phone');
           if (!phone || !validateIraqiPhone(phone)) return;
           try {
-              const resp = await fetch(`${GS_URL}?action=getCustomerOrders&phone=${phone}`);
+              const resp = await fetch(`${GS_URL}?action=getCustomerOrders&phone=${phone}&t=${new Date().getTime()}`);
               const countText = await resp.text();
               const count = parseInt(countText);
               if (!isNaN(count)) {
@@ -1146,7 +1146,7 @@
       async function checkTelegramLoginStatus() {
           if (!currentLoginSession) return;
           try {
-              const resp = await fetch(`${GS_URL}?action=checkTelegramLogin&session=${currentLoginSession}`);
+              const resp = await fetch(`${GS_URL}?action=checkTelegramLogin&session=${currentLoginSession}&t=${new Date().getTime()}`);
               const data = await resp.json();
               
               if (data.status === 'success') {
