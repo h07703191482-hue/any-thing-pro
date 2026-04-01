@@ -297,9 +297,26 @@
           border: none;
           box-shadow: var(--shadow-sm);
       }
+
+      /* تنسيقات نافذة التحديد الجغرافي (تمت الإضافة) */
+      #out-of-zone-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; backdrop-filter: blur(8px); }
+      .out-zone-card { background: var(--surface); padding: 35px 20px; border-radius: var(--radius-lg); max-width: 400px; width: 95%; box-shadow: 0 20px 50px rgba(239, 68, 68, 0.2); animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid var(--danger); }
     </style>
 </head>
 <body>
+    <div id="out-of-zone-popup">
+        <div class="out-zone-card">
+            <i class="fas fa-map-marker-slash" style="font-size: 70px; color: var(--danger); margin-bottom: 20px; animation: bouncePin 1s infinite alternate;"></i>
+            <h2 style="margin: 0 0 15px; color: var(--danger); font-weight: 800; font-size: 24px;">عذراً، أنت خارج نطاق الخدمة</h2>
+            <p style="color: var(--text-main); font-size: 15px; font-weight: 700; line-height: 1.6; margin-bottom: 10px;">
+                تطبيق البندر يخدم <span style="color: var(--primary);">ناحية أم قصر فقط</span>.
+            </p>
+            <p style="color: var(--text-muted); font-size: 13px; font-weight: 600; line-height: 1.6; margin: 0;">
+                (الميناء، المستشفى، المجمع الكويتي، ومركز الناحية). لا يمكننا استقبال طلبات من موقعك الحالي.
+            </p>
+        </div>
+    </div>
+
     <div id="map-modal">
         <div class="map-container">
             <div class="map-header">
@@ -901,6 +918,39 @@
           window.location.reload(true); 
       }
 
+      // ==========================================
+      // إضافة نظام التحديد الجغرافي (Geofencing) لأم قصر
+      // ==========================================
+      const umQasrPolygon = [
+          { lat: 30.0800, lng: 47.9600 }, // الحدود الشمالية الشرقية (الميناء وما حوله)
+          { lat: 30.0800, lng: 47.8800 }, // الحدود الشمالية الغربية
+          { lat: 30.0100, lng: 47.8800 }, // الحدود الجنوبية الغربية (المجمعات، القاعدة، المستشفى)
+          { lat: 30.0100, lng: 47.9600 }  // الحدود الجنوبية الشرقية
+      ];
+
+      function isUserInUmQasr(userLat, userLng, polygon) {
+          let isInside = false;
+          for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+              const xi = polygon[i].lat, yi = polygon[i].lng;
+              const xj = polygon[j].lat, yj = polygon[j].lng;
+              const intersect = ((yi > userLng) != (yj > userLng)) && (userLat < (xj - xi) * (userLng - yi) / (yj - yi) + xi);
+              if (intersect) isInside = !isInside;
+          }
+          return isInside;
+      }
+
+      function checkAppAccess(lat, lng) {
+          const isAdmin = localStorage.getItem('isAdmin') === 'true';
+          // الآدمن يقدر يفتح التطبيق من أي مكان حتى لا ينقفل عليه
+          if(isAdmin) return; 
+
+          const accessGranted = isUserInUmQasr(lat, lng, umQasrPolygon);
+          if (!accessGranted) {
+              document.getElementById('out-of-zone-popup').style.display = 'flex';
+          }
+      }
+      // ==========================================
+
       async function trackLiveVisit() {
           try { fetch(`${GS_URL}?action=trackVisit&t=${new Date().getTime()}`); } catch(e) {}
       }
@@ -975,6 +1025,8 @@
               navigator.geolocation.getCurrentPosition(
                   (position) => {
                       userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
+                      // تفعيل فحص الموقع والحظر الجغرافي
+                      checkAppAccess(position.coords.latitude, position.coords.longitude);
                   },
                   (error) => { console.warn("GPS Denied on load"); },
                   { enableHighAccuracy: true }
@@ -1050,7 +1102,6 @@
               applyGlobalStatus();
           } catch(e) {
           } finally {
-              // إخفاء شاشة البداية فقط بعد ما يجي الرد من السيرفر وتقفل الشاشة اذا جانت مسدودة
               const splash = document.getElementById('splash-screen');
               if(splash && splash.style.display !== 'none') { 
                   splash.style.opacity = '0'; 
@@ -1138,7 +1189,6 @@
 
       function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
       function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
-
       let loginPollInterval = null;
       let currentLoginSession = "";
 
@@ -1936,7 +1986,19 @@
       function openMapModal() {
           document.getElementById('map-modal').style.display = 'flex';
           if (!appMap) {
-              appMap = L.map('map-view', { attributionControl: false }).setView([30.0396, 47.9298], 15);
+              // إضافة التقييد (Restriction) الخاص بخريطة أم قصر
+              const umQasrBounds = L.latLngBounds(
+                  L.latLng(30.0100, 47.8800), // الزاوية الجنوبية الغربية
+                  L.latLng(30.0800, 47.9600)  // الزاوية الشمالية الشرقية
+              );
+              
+              appMap = L.map('map-view', { 
+                  attributionControl: false,
+                  maxBounds: umQasrBounds, // منع السحب خارج أم قصر
+                  maxBoundsViscosity: 1.0, // جعل الحدود قوية وصلبة
+                  minZoom: 13 // منع تصغير الخريطة لرؤية مناطق بعيدة
+              }).setView([30.0396, 47.9298], 15);
+              
               L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(appMap);
           }
           setTimeout(() => { appMap.invalidateSize(); }, 300);
