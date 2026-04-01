@@ -301,9 +301,49 @@
       /* تنسيقات نافذة التحديد الجغرافي (تمت الإضافة) */
       #out-of-zone-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; backdrop-filter: blur(8px); }
       .out-zone-card { background: var(--surface); padding: 35px 20px; border-radius: var(--radius-lg); max-width: 400px; width: 95%; box-shadow: 0 20px 50px rgba(239, 68, 68, 0.2); animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid var(--danger); }
+
+      /* --- إضافات تتبع المندوب والموقع (الرمز 2006) --- */
+      #gps-lock-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 1000000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; }
+      .gps-icon-anim { font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: pulse-red 1.5s infinite; }
+      @keyframes pulse-red { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+      #customer-tracking-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100006; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+      .tracking-card { width: 95%; max-width: 450px; background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-floating); animation: scaleIn 0.3s ease-out; }
+      .tracking-header { padding: 15px; background: #10B981; color: white; text-align: center; font-weight: 800; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
+      #track-map-view { width: 100%; height: 350px; z-index: 1; }
+      .track-btn { background: rgba(16, 185, 129, 0.1); color: #10B981; border: 2px solid #10B981; padding: 12px; border-radius: var(--radius-md); font-weight: 800; width: 100%; margin-top: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
+      .track-btn:active { transform: scale(0.96); }
     </style>
 </head>
 <body>
+    <div id="gps-lock-overlay">
+        <i class="fas fa-map-marker-alt gps-icon-anim"></i>
+        <h2 style="margin: 0 0 15px; color: var(--danger); font-weight: 800; font-size: 24px;">الموقع مغلق! 📍</h2>
+        <p style="color: var(--text-main); font-size: 15px; font-weight: 700; line-height: 1.6; margin-bottom: 20px;">
+            عزيزي الكابتن، لا يمكنك العمل أو استقبال الطلبات بدون تفعيل خدمة الموقع (GPS) وإعطاء الصلاحية للتطبيق.
+        </p>
+        <button class="send-btn ripple" style="background: var(--danger);" onclick="requestGPSPermission()">تفعيل الموقع الآن</button>
+    </div>
+
+    <div id="customer-tracking-modal">
+        <div class="tracking-card">
+            <div class="tracking-header">
+                <span>تتبع المندوب 🛵</span>
+                <button class="close-map-btn" onclick="closeTrackingModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="position: relative;">
+                <div id="track-map-view"></div>
+            </div>
+            <div style="padding: 15px; text-align: center; background: var(--surface);">
+                <p style="margin: 0; font-size: 14px; font-weight: 700; color: var(--primary);">
+                    <i class="fas fa-broadcast-tower"></i> جاري تحديث موقع المندوب مباشرة...
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <button id="floating-track-btn" class="send-btn ripple" style="display: none; position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 350px; background: #10B981; z-index: 9997; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);" onclick="openTrackingModal()">
+        <i class="fas fa-map-marked-alt"></i> تتبع طلبك الحالي 📍
+    </button>
     <div id="out-of-zone-popup">
         <div class="out-zone-card">
             <i class="fas fa-map-marker-slash" style="font-size: 70px; color: var(--danger); margin-bottom: 20px; animation: bouncePin 1s infinite alternate;"></i>
@@ -922,10 +962,10 @@
       // إضافة نظام التحديد الجغرافي (Geofencing) لأم قصر
       // ==========================================
       const umQasrPolygon = [
-          { lat: 30.0800, lng: 47.9600 }, // الحدود الشمالية الشرقية (الميناء وما حوله)
-          { lat: 30.0800, lng: 47.8800 }, // الحدود الشمالية الغربية
-          { lat: 30.0100, lng: 47.8800 }, // الحدود الجنوبية الغربية (المجمعات، القاعدة، المستشفى)
-          { lat: 30.0100, lng: 47.9600 }  // الحدود الجنوبية الشرقية
+          { lat: 30.0800, lng: 47.9600 }, 
+          { lat: 30.0800, lng: 47.8800 }, 
+          { lat: 30.0100, lng: 47.8800 }, 
+          { lat: 30.0100, lng: 47.9600 }  
       ];
 
       function isUserInUmQasr(userLat, userLng, polygon) {
@@ -941,13 +981,91 @@
 
       function checkAppAccess(lat, lng) {
           const isAdmin = localStorage.getItem('isAdmin') === 'true';
-          // الآدمن يقدر يفتح التطبيق من أي مكان حتى لا ينقفل عليه
           if(isAdmin) return; 
 
           const accessGranted = isUserInUmQasr(lat, lng, umQasrPolygon);
           if (!accessGranted) {
               document.getElementById('out-of-zone-popup').style.display = 'flex';
           }
+      }
+
+      // ==========================================
+      // --- إضافات التتبع والموقع للمندوب والزبون (الرمز 2006) ---
+      // ==========================================
+      let driverLocationWatchId = null;
+
+      function requestGPSPermission() {
+          if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(
+                  (position) => {
+                      document.getElementById('gps-lock-overlay').style.display = 'none';
+                      showToast("تم تفعيل الموقع بنجاح ✅");
+                      
+                      // تحديث موقع المندوب بشكل مستمر وإرساله
+                      driverLocationWatchId = navigator.geolocation.watchPosition(
+                          (pos) => {
+                              let lat = pos.coords.latitude;
+                              let lng = pos.coords.longitude;
+                              let phone = localStorage.getItem('driver_phone');
+                              let isBusy = localStorage.getItem('driver_status') === 'busy';
+                              // يرسل الموقع فقط اذا كان المندوب مفعل وحالته مشغول (يعني حاجز طلب)
+                              if (phone && isBusy) {
+                                  // إرسال الموقع لقاعدة البيانات بصمت
+                                  fetch(`${GS_URL}?action=updateLocation&phone=${phone}&lat=${lat}&lng=${lng}`, { mode: 'no-cors' }).catch(e=>{});
+                              }
+                          },
+                          (err) => { document.getElementById('gps-lock-overlay').style.display = 'flex'; },
+                          { enableHighAccuracy: true, maximumAge: 0 }
+                      );
+                  },
+                  (error) => { showToast("يرجى السماح بالوصول للموقع للمتابعة ❌"); },
+                  { enableHighAccuracy: true }
+              );
+          } else { alert("جهازك لا يدعم تحديد الموقع!"); }
+      }
+
+      let trackMapObj = null;
+      let trackMarker = null;
+      let trackInterval = null;
+
+      function openTrackingModal() {
+          document.getElementById('customer-tracking-modal').style.display = 'flex';
+          if(!trackMapObj) {
+              trackMapObj = L.map('track-map-view', { attributionControl: false }).setView([30.0396, 47.9298], 15);
+              L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(trackMapObj);
+              
+              // أيقونة المندوب (الدراجة)
+              const bikeIcon = L.icon({
+                  iconUrl: 'https://cdn-icons-png.flaticon.com/512/1986/1986906.png',
+                  iconSize: [40, 40],
+                  iconAnchor: [20, 20]
+              });
+              trackMarker = L.marker([30.0396, 47.9298], {icon: bikeIcon}).addTo(trackMapObj);
+          }
+          setTimeout(() => { trackMapObj.invalidateSize(); }, 300);
+          
+          fetchDriverLocation();
+          trackInterval = setInterval(fetchDriverLocation, 5000); // تحديث كل 5 ثواني
+      }
+
+      function closeTrackingModal() {
+          document.getElementById('customer-tracking-modal').style.display = 'none';
+          if(trackInterval) clearInterval(trackInterval);
+      }
+
+      async function fetchDriverLocation() {
+          const vc = localStorage.getItem('last_order_vc');
+          if(!vc) return;
+          try {
+              // جلب موقع المندوب المرتبط برمز الطلب الحالي
+              const resp = await fetch(`${GS_URL}?action=getDriverLocation&vc=${vc}`);
+              const data = await resp.json();
+              if(data.lat && data.lng) {
+                  const newLatLng = new L.LatLng(data.lat, data.lng);
+                  trackMarker.setLatLng(newLatLng);
+                  trackMapObj.panTo(newLatLng);
+              }
+          } catch(e) {}
       }
       // ==========================================
 
@@ -998,6 +1116,7 @@
               showToast("تم إيقاف الجرس 🔕");
           }
       }
+
       async function checkNewOrdersForSound() {
           if(!isSoundEnabled || !navigator.onLine) return;
           try {
@@ -1025,7 +1144,6 @@
               navigator.geolocation.getCurrentPosition(
                   (position) => {
                       userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
-                      // تفعيل فحص الموقع والحظر الجغرافي
                       checkAppAccess(position.coords.latitude, position.coords.longitude);
                   },
                   (error) => { console.warn("GPS Denied on load"); },
@@ -1260,8 +1378,7 @@
           document.getElementById('login-step-2').style.display = 'none'; document.getElementById('login-step-1').style.display = 'block';
           document.getElementById('loginNameInput').value = '';
       }
-
-      const menus = {
+              const menus = {
           'ali_salem': {
               name: 'مطعم برجر علي سالم',
               items: [
@@ -1557,6 +1674,12 @@
           const ref = urlParams.get('ref');
           const myPhone = localStorage.getItem('saved_customer_phone');
           if (ref && ref !== myPhone) { localStorage.setItem('referred_by', ref); }
+
+          // إظهار زر التتبع إذا كان هنالك طلب سابق (للزبون فقط)
+          if(localStorage.getItem('last_order_vc') && localStorage.getItem('isVerifiedDriver') !== 'true') {
+              document.getElementById('floating-track-btn').style.display = 'flex';
+          }
+
           if (localStorage.getItem('isVerifiedDriver') === 'true') {
               document.getElementById('join-driver-card').style.display = 'none';
               document.getElementById('driver-plaza-card').style.display = 'flex';
@@ -1692,7 +1815,11 @@
           const bottomNav = document.getElementById('bottomNavigation');
           if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id === 'restaurant-menu-screen') ? 'none' : 'flex';
           
-          if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
+          if(id === 'plaza-screen') { 
+              updateStatsUI(); refreshLeaderboard(); 
+              document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); 
+              if(typeof checkDriverGPS === 'function') checkDriverGPS(); // تفعيل فحص الـ GPS هنا
+          }
           if(id === 'log-screen') { renderDriverLog(); } 
           if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') { loadSavedCustomerData(); }
           if(id === 'order-screen') updateLoyaltyUI();
@@ -1716,7 +1843,13 @@
           }
           const btn = document.getElementById('tukSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
-              saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
+              saveCustomerData(name, phone); 
+              const vc = generateSecureVC(); 
+              // تفعيل زر التتبع للزبون
+              localStorage.setItem('last_order_vc', vc);
+              document.getElementById('floating-track-btn').style.display = 'flex';
+
+              let referrer = localStorage.getItem('referred_by') || "";
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`);
               localStorage.removeItem('referred_by'); 
               const msg = `🚖 طلب تكتك توصيلة\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الموقع: ${userCoords}\n📝 تفاصيل: ${dropLink}\nدالة: ${land}`;
@@ -1724,7 +1857,8 @@
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية", callback_data: `claim|${name}|${vc}` }]] } })
               });
-              showToast("تم الإرسال بنجاح ✅"); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+              showToast("تم الإرسال بنجاح ✅ يمكنك الآن تتبع المندوب!"); 
+              document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1744,13 +1878,20 @@
           }
           const btn = document.getElementById('medSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
-              saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
+              saveCustomerData(name, phone); 
+              const vc = generateSecureVC(); 
+              // تفعيل زر التتبع للزبون
+              localStorage.setItem('last_order_vc', vc);
+              document.getElementById('floating-track-btn').style.display = 'flex';
+
+              let referrer = localStorage.getItem('referred_by') || "";
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`); localStorage.removeItem('referred_by');
               const msg = `🔵 طلب وسيط\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📝 الغرض: ${order}\n📍 الموقع: ${userCoords}`;
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
               });
-              showToast("تم الإرسال بنجاح ✅"); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+              showToast("تم الإرسال بنجاح ✅ يمكنك الآن تتبع المندوب!"); 
+              document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1794,8 +1935,12 @@
           try {
               saveCustomerData(name, phone); 
               const vc = generateSecureVC(); 
-              let photoMsgs = [];
               
+              // تفعيل زر التتبع للزبون
+              localStorage.setItem('last_order_vc', vc);
+              document.getElementById('floating-track-btn').style.display = 'flex';
+
+              let photoMsgs = [];
               if (files.length > 0) {
                   for (let i = 0; i < files.length; i++) {
                       let fd = new FormData(); 
@@ -1827,41 +1972,36 @@
               let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص)**" : "";
               const msg = `🔵 طلب مسواك\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📝 الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍 الموقع: ${userCoords}`;
               
-              // 1. إرسال الطلب لقناة المندوبين
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                   method: "POST", headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
 
-              // 2. مطعم علي سالم
               let isAliSalemOrder = order.includes("مطعم برجر علي سالم");
               if (isAliSalemOrder) {
                   const restMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                   await fetch(`https://api.telegram.org/bot${ALI_SALEM_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ALI_SALEM_CHAT_ID, text: restMsg }) }).catch(e => {});
               }
 
-              // 3. مطعم ابو حمودي
               let isAboHmodeOrder = order.includes("مطعم بركر ابو حمودي");
               if (isAboHmodeOrder) {
                   const hmodeMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                   await fetch(`https://api.telegram.org/bot${ABO_HMODE_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ABO_HMODE_CHAT_ID, text: hmodeMsg }) }).catch(e => {});
               }
 
-              // 4. مطعم فيكتوريا
               let isVictoriaOrder = order.includes("مطعم فيكتوريا");
               if (isVictoriaOrder) {
                   const vicMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                   await fetch(`https://api.telegram.org/bot${VICTORIA_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: VICTORIA_CHAT_ID, text: vicMsg }) }).catch(e => {});
               }
 
-              // 5. كلاشي
               let isKlasheOrder = order.includes("كلاشي");
               if (isKlasheOrder) {
                   const klasheMsg = `🥤 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                   await fetch(`https://api.telegram.org/bot${KLASHE_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: KLASHE_CHAT_ID, text: klasheMsg }) }).catch(e => {});
               }
 
-              showToast("تم إرسال طلبك بنجاح ✅"); 
+              showToast("تم إرسال طلبك بنجاح ✅ يمكنك الآن تتبع المندوب!"); 
               document.getElementById('custOrder').value = ""; 
               document.getElementById('custLandmark').value = ""; 
               loadSavedCustomerData();
@@ -1986,17 +2126,16 @@
       function openMapModal() {
           document.getElementById('map-modal').style.display = 'flex';
           if (!appMap) {
-              // إضافة التقييد (Restriction) الخاص بخريطة أم قصر
               const umQasrBounds = L.latLngBounds(
-                  L.latLng(30.0100, 47.8800), // الزاوية الجنوبية الغربية
-                  L.latLng(30.0800, 47.9600)  // الزاوية الشمالية الشرقية
+                  L.latLng(30.0100, 47.8800), 
+                  L.latLng(30.0800, 47.9600)  
               );
               
               appMap = L.map('map-view', { 
                   attributionControl: false,
-                  maxBounds: umQasrBounds, // منع السحب خارج أم قصر
-                  maxBoundsViscosity: 1.0, // جعل الحدود قوية وصلبة
-                  minZoom: 13 // منع تصغير الخريطة لرؤية مناطق بعيدة
+                  maxBounds: umQasrBounds, 
+                  maxBoundsViscosity: 1.0, 
+                  minZoom: 13 
               }).setView([30.0396, 47.9298], 15);
               
               L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(appMap);
