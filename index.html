@@ -559,6 +559,12 @@
                   <small>عصائر ومشروبات</small>
               </div>
 
+              <div class="rest-card ripple" onclick="openMenu('haleg')">
+                  <img src="Haleg.jpg" alt="مطعم الخليج">
+                  <h4>مطعم الخليج</h4>
+                  <small>أشهى المأكولات</small>
+              </div>
+
               <div class="rest-card" style="opacity: 0.6; cursor: default;">
                   <div style="width: 100%; height: 90px; border-radius: 15px; background: var(--border-color); display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
                       <i class="fas fa-utensils" style="font-size: 30px; color: var(--text-muted);"></i>
@@ -927,13 +933,19 @@
       const VICTORIA_BOT_TOKEN = "8769449664:AAErwMuaA893BKDvbKcOk4sFgFPXUIxlnmc"; 
       const KLASHE_BOT_TOKEN = "8719779552:AAE5MMDa12ats3qocRoZoy_DMCS9RU8IQvQ"; 
       
+      // الإضافة الجديدة: توكن مطعم الخليج
+      const HALEG_BOT_TOKEN = "8607099366:AAEK-D1553k9Mz94fcZJ9KiPUxZqusQSMqs";
+      
       const ALI_SALEM_CHAT_ID = "399195479";
       const ABO_HMODE_CHAT_ID = "651243067";
       const VICTORIA_CHAT_ID = "7479342799"; 
       const KLASHE_CHAT_ID = "7479342799"; 
+      
+      // الإضافة الجديدة: آيدي مطعم الخليج
+      const HALEG_CHAT_ID = "7479342799";
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.19"; 
+      const CURRENT_VERSION = "2.0.20"; // تم تحديث النسخة ليظهر التغيير للمستخدمين
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -962,7 +974,6 @@
 
       function checkAppAccess(lat, lng) {
           const isAdmin = localStorage.getItem('isAdmin') === 'true';
-          // الآدمن يقدر يفتح التطبيق من أي مكان حتى لا ينقفل عليه
           if(isAdmin) return; 
 
           const accessGranted = isUserInUmQasr(lat, lng, umQasrPolygon);
@@ -1046,7 +1057,6 @@
               navigator.geolocation.getCurrentPosition(
                   (position) => {
                       userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
-                      // تفعيل فحص الموقع والحظر الجغرافي
                       checkAppAccess(position.coords.latitude, position.coords.longitude);
                   },
                   (error) => { console.warn("GPS Denied on load"); },
@@ -1283,6 +1293,40 @@
       }
 
       const menus = {
+          // ==============================
+          // إضافة منيو مطعم الخليج الجديد
+          // ==============================
+          'haleg': {
+              name: 'مطعم الخليج',
+              items: [
+                  { id: 'hal1', name: 'ربع دجاجة', price: 5000, category: 'قسم الدجاج', desc: 'ذبح فرش مع نصف كيلو تمن مع شطة وطرشي ومرق' },
+                  { id: 'hal2', name: 'نصف دجاجة', price: 10000, category: 'قسم الدجاج', desc: 'ذبح فرش مع كيلو تمن مع شطة وطرشي ومرق' },
+                  { id: 'hal3', name: 'دجاجة كاملة (1)', price: 20000, category: 'قسم الدجاج', desc: 'ذبح فرش مع كيلوين تمن مع شطة وطرشي و 2 كاسة مرق' },
+                  { id: 'hal4', name: 'دجاجة كاملة (2)', price: 25000, category: 'قسم الدجاج', desc: 'ذبح فرش مع ثلاثة كيلو تمن مع شطة وطرشي و 2 كاسة مرق' },
+                  
+                  { id: 'hal5', name: 'ربع لحم عجل', price: 12000, category: 'أنواع اللحم', desc: '150 غرام مع نصف كيلو تمن وشطة وطرشي وكاسة مرق' },
+                  { id: 'hal6', name: 'نصف لحم عجل', price: 18000, category: 'أنواع اللحم', desc: '300 غرام مع كيلو تمن وشطة وطرشي وكاسة مرق' },
+                  { id: 'hal7', name: 'لحم عجل كامل', price: 35000, category: 'أنواع اللحم', desc: '600 غرام مع كيلوين تمن وشطة وطرشي و 2 كاسة مرق' },
+                  { id: 'hal8', name: 'ربع لحم غنم', price: 12000, category: 'أنواع اللحم', desc: '150 غرام مع نصف كيلو تمن وشطة وطرشي وكاسة مرق' },
+                  { id: 'hal9', name: 'نصف لحم غنم', price: 18000, category: 'أنواع اللحم', desc: '300 غرام مع كيلو تمن وشطة وطرشي وكاسة مرق' },
+                  { id: 'hal10', name: 'غنم كامل', price: 35000, category: 'أنواع اللحم', desc: '600 غرام مع كيلوين تمن وشطة وطرشي و 2 كاسة مرق' },
+                  
+                  { id: 'hal11', name: 'مطبق سمك (نصف كيلو)', price: 10000, category: 'السمك', desc: 'نصف كيلو سمك مع كيلو تمن' },
+                  { id: 'hal12', name: 'مطبق سمك (كيلو)', price: 20000, category: 'السمك', desc: 'كيلو سمك بحري مع كيلوين تمن' },
+                  
+                  { id: 'hal13', name: 'نصف كيلو دولمة', price: 6000, category: 'الدولمة', desc: '' },
+                  { id: 'hal14', name: 'كيلو دولمة', price: 12000, category: 'الدولمة', desc: '' },
+                  
+                  { id: 'hal15', name: 'ربع برياني', price: 5000, category: 'البرياني (بدون دجاج)', desc: '' },
+                  { id: 'hal16', name: 'كيلو برياني', price: 10000, category: 'البرياني (بدون دجاج)', desc: '' },
+                  { id: 'hal17', name: 'كيلوين برياني', price: 20000, category: 'البرياني (بدون دجاج)', desc: '' },
+                  
+                  { id: 'hal18', name: 'نفر تمن ومرق مع الملحقات', price: 3500, category: 'التمن والمرق', desc: '' },
+                  { id: 'hal19', name: 'كاسة مرق', price: 1000, category: 'التمن والمرق', desc: '' }
+              ]
+          },
+          // ==============================
+          
           'ali_salem': {
               name: 'مطعم برجر علي سالم',
               items: [
@@ -1413,7 +1457,6 @@
               ]
           }
       };
-
       async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
@@ -1881,6 +1924,15 @@
                   const klasheMsg = `🥤 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                   await fetch(`https://api.telegram.org/bot${KLASHE_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: KLASHE_CHAT_ID, text: klasheMsg }) }).catch(e => {});
               }
+              
+              // ===================================
+              // 6. الإضافة الجديدة: مطعم الخليج
+              // ===================================
+              let isHalegOrder = order.includes("مطعم الخليج");
+              if (isHalegOrder) {
+                  const halegMsg = `🍽️ طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 تفاصيل الطلب:\n${msgContent}\n\n⚠️ ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
+                  await fetch(`https://api.telegram.org/bot${HALEG_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: HALEG_CHAT_ID, text: halegMsg }) }).catch(e => {});
+              }
 
               showToast("تم إرسال طلبك بنجاح ✅"); 
               document.getElementById('custOrder').value = ""; 
@@ -2007,17 +2059,16 @@
       function openMapModal() {
           document.getElementById('map-modal').style.display = 'flex';
           if (!appMap) {
-              // إضافة التقييد (Restriction) الخاص بخريطة أم قصر
               const umQasrBounds = L.latLngBounds(
-                  L.latLng(30.0100, 47.8800), // الزاوية الجنوبية الغربية
-                  L.latLng(30.0800, 47.9600)  // الزاوية الشمالية الشرقية
+                  L.latLng(30.0100, 47.8800), 
+                  L.latLng(30.0800, 47.9600)  
               );
               
               appMap = L.map('map-view', { 
                   attributionControl: false,
-                  maxBounds: umQasrBounds, // منع السحب خارج أم قصر
-                  maxBoundsViscosity: 1.0, // جعل الحدود قوية وصلبة
-                  minZoom: 13 // منع تصغير الخريطة لرؤية مناطق بعيدة
+                  maxBounds: umQasrBounds, 
+                  maxBoundsViscosity: 1.0, 
+                  minZoom: 13 
               }).setView([30.0396, 47.9298], 15);
               
               L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(appMap);
@@ -2037,4 +2088,4 @@
       function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
     </script>
 </body>
-    </html>
+</html>
