@@ -343,14 +343,36 @@
                 <button class="close-prices-btn" onclick="closePricesModal()"><i class="fas fa-times"></i></button>
             </div>
             <div class="prices-content">
-                <div class="price-item"><span style="flex:1; line-height: 1.6;">شوارع، صناعه، جاهزه، فاروق، حي لمعلمين، لمخازن، مشروع، هندسة، شعبي</span><span class="price-val" style="margin-right: 15px; white-space: nowrap;">1,500 د.ع</span></div>
-                <div class="price-item"><span style="flex:1; line-height: 1.6;">الهدامه، الهنديه الجنوبيه، الهنديه الشماليه، القاعده، المجمع الكويتي</span><span class="price-val" style="margin-right: 15px; white-space: nowrap;">3,000 د.ع</span></div>
-                <div class="price-item" style="border-bottom: none;"><span style="flex:1;">الميناء</span><span class="price-val" style="margin-right: 15px; white-space: nowrap;">4,000 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">الخمسين</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">المشروع</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">حي المعلمين</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">شوارع</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">هندية جنوبية</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">الهندسة</span><span class="price-val">1,500 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">شعبي</span><span class="price-val">1,500 د.ع</span></div>
+                
+                <div class="price-item"><span style="flex:1;">دور الظباط</span><span class="price-val">2,000 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">دور سمنت</span><span class="price-val">2,000 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">البهو</span><span class="price-val">2,000 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">صناعة</span><span class="price-val">2,000 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">هندية الشمالية</span><span class="price-val">2,000 د.ع</span></div>
+                
+                <div class="price-item"><span style="flex:1;">القاعدة</span><span class="price-val">3,000 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">هدامة</span><span class="price-val">3,000 د.ع</span></div>
+                
+                <div class="price-item"><span style="flex:1;">ميناء الجنوبي</span><span class="price-val">4,000 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">الارصفة العشرة</span><span class="price-val">4,000 د.ع</span></div>
+                
+                <div class="price-item"><span style="flex:1;">ميناء 27</span><span class="price-val">5,000 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">الترحيب</span><span class="price-val">5,000 د.ع</span></div>
+                
+                <div class="price-item"><span style="flex:1;">الصمود</span><span class="price-val">7,000 د.ع</span></div>
+                <div class="price-item"><span style="flex:1;">الستباقية</span><span class="price-val">7,000 د.ع</span></div>
+                <div class="price-item" style="border-bottom: none;"><span style="flex:1;">التحليات</span><span class="price-val">7,000 د.ع</span></div>
             </div>
         </div>
     </div>
-
-    <div id="global-lock-screen">
+        <div id="global-lock-screen">
         <img src="https://cdn-icons-png.flaticon.com/512/2888/2888746.png" alt="صيانة" style="width: 180px; margin-bottom: 25px; cursor: pointer; animation: scaleIn 0.5s ease;" onclick="handleLockScreenSecret()">
         <h2 id="lock-h2" class="lock-title">التطبيق مغلق للصيانة 🛠️</h2>
         <p id="lock-p" class="lock-text">نعتذر منكم عيني، دا نسوي شوية تحديثات وتطوير للتطبيق. نرجع نستقبل طلباتكم بأقرب وقت!</p>
@@ -675,7 +697,6 @@
 
         <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">طلب تكتك توصيلة</span></button>
     </div>
-    
     <div id="mediator-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> <span id="med-head">خدمة الوسيط</span></h2>
@@ -2016,4 +2037,4 @@
       function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
     </script>
 </body>
-</html>
+    </html>
