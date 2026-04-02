@@ -232,7 +232,8 @@
       .qty-controls { display: flex; align-items: center; gap: 10px; background: var(--bg-color); border-radius: var(--radius-pill); padding: 5px; border: 1px solid var(--border-color); }
       .qty-btn { width: 32px; height: 32px; border-radius: 50%; border: none; background: white; color: var(--primary); font-weight: bold; font-size: 18px; box-shadow: var(--shadow-sm); cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
       .qty-btn:active { transform: scale(0.9); background: var(--primary); color: white; }
-      .qty-val { font-weight: 800; font-size: 16px; min-width: 20px; text-align: center; color: var(--text-main); }/* شريط المجموع الكلي الثابت بالأسفل */
+      .qty-val { font-weight: 800; font-size: 16px; min-width: 20px; text-align: center; color: var(--text-main); }
+      /* شريط المجموع الكلي الثابت بالأسفل */
       .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); padding: 15px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 10000; border-top-left-radius: 20px; border-top-right-radius: 20px; border-top: 1px solid var(--border-color); animation: fadeSlideUp 0.3s ease-out; }
       body.dark-mode .cart-bar { box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
       .cart-bar-total { font-size: 20px; font-weight: 800; color: var(--primary); display: block; }
@@ -502,7 +503,8 @@
                 <i class="fas fa-arrow-right"></i> رجوع لتعديل الاسم
             </button>
         </div>
-    </div><div id="admin-panel" class="screen container">
+    </div>
+    <div id="admin-panel" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> <span id="adm-title">لوحة التحكم السرية</span></h2>
         <div class="form-card" style="text-align: center;">
@@ -1452,7 +1454,8 @@
                   { id: 'k39', name: 'كابتشينو مكسرات', price: 1000, category: 'قسم القهوة', desc: '' }
               ]
           }
-      };async function fetchDynamicMenus() {
+      };
+      async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
               const data = await resp.json();
