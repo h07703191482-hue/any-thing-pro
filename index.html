@@ -460,7 +460,6 @@
       <div class="road-realistic"><div class="road-lines"></div></div>
       <div class="bike-box"><i class="fas fa-motorcycle"></i><div class="exhaust"><div class="smoke"></div><div class="smoke"></div><div class="smoke"></div></div></div>
     </div>
-
     <div id="login-screen" class="screen container">
         <div style="text-align: center; margin-bottom: 30px;">
             <div style="width:100px; height:100px; background:rgba(90, 34, 139, 0.1); border-radius:30px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: var(--shadow-sm);">
@@ -534,16 +533,10 @@
 
       <div style="margin-top: -45px; position: relative; z-index: 5;">
           <div class="rest-slider">
-              <div class="rest-card ripple" onclick="openMenu('ali_salem')">
-                 <img src="Burger.jpg.jpg" alt="برجر علي سالم">
-                 <h4>برجر علي سالم</h4>
-                 <small>أطيب برجر بأم قصر</small>
-             </div>
-             
-              <div class="rest-card ripple" onclick="openMenu('abo_hmode')">
-                 <img src="Hmode.jpg.jpg" alt="بركر ابو حمودي">
-                 <h4>بركر ابو حمودي</h4>
-                 <small>الطعم الأصلي</small>
+             <div class="rest-card ripple" onclick="openMenu('royal_food')">
+                 <img src="Roealfod.jpg" alt="رويال فود">
+                 <h4>رويال فود</h4>
+                 <small>بركر، بيتزا ووجبات</small>
              </div>
 
               <div class="rest-card ripple" onclick="openMenu('victoria')">
@@ -558,22 +551,28 @@
                  <small>عصائر ومشروبات</small>
              </div>
 
-             <div class="rest-card ripple" onclick="openMenu('scozi')">
-                 <img src="scoozi.jpg" alt="سكوزي">
-                 <h4>سكوزي</h4>
-                 <small>أشهى الوجبات</small>
-             </div>
-
               <div class="rest-card ripple" onclick="openMenu('haleg')">
                  <img src="Haleg.jpg" alt="مطعم الخليج">
                  <h4>مطعم الخليج</h4>
                  <small>أشهى المأكولات</small>
              </div>
 
-             <div class="rest-card ripple" onclick="openMenu('royal_food')">
-                 <img src="Roealfod.jpg" alt="رويال فود">
-                 <h4>رويال فود</h4>
-                 <small>بركر، بيتزا ووجبات</small>
+             <div class="rest-card ripple" onclick="openMenu('scozi')">
+                 <img src="scoozi.jpg" alt="سكوزي">
+                 <h4>سكوزي</h4>
+                 <small>أشهى الوجبات</small>
+             </div>
+
+              <div class="rest-card ripple" onclick="openMenu('abo_hmode')">
+                 <img src="Hmode.jpg.jpg" alt="بركر ابو حمودي">
+                 <h4>بركر ابو حمودي</h4>
+                 <small>الطعم الأصلي</small>
+             </div>
+
+              <div class="rest-card ripple" onclick="openMenu('ali_salem')">
+                 <img src="Burger.jpg.jpg" alt="برجر علي سالم">
+                 <h4>برجر علي سالم</h4>
+                 <small>أطيب برجر بأم قصر</small>
              </div>
 
               <div class="rest-card" style="opacity: 0.6; cursor: default;">
@@ -1309,78 +1308,117 @@
       }
 
       const menus = {
-          'haleg': {
-              name: 'مطعم الخليج',
+          'royal_food': {
+              name: 'رويال فود',
               items: [
-                  { id: 'hal1', name: 'ربع دجاجة', price: 5000, category: 'قسم الدجاج', desc: 'ذبح فرش مع نصف كيلو تمن مع شطة وطرشي ومرق' },
-                  { id: 'hal2', name: 'نصف دجاجة', price: 10000, category: 'قسم الدجاج', desc: 'ذبح فرش مع كيلو تمن مع شطة وطرشي ومرق' },
-                  { id: 'hal3', name: 'دجاجة كاملة (1)', price: 20000, category: 'قسم الدجاج', desc: 'ذبح فرش مع كيلوين تمن مع شطة وطرشي و 2 كاسة مرق' },
-                  { id: 'hal4', name: 'دجاجة كاملة (2)', price: 25000, category: 'قسم الدجاج', desc: 'ذبح فرش مع ثلاثة كيلو تمن مع شطة وطرشي و 2 كاسة مرق' },
+                  { id: 'rf1', name: 'بركر كلاسيك', price: 2500, category: 'بركر اللحم' },
+                  { id: 'rf2', name: 'بركر بالجبن', price: 3000, category: 'بركر اللحم' },
+                  { id: 'rf3', name: 'بركر دبل', price: 5000, category: 'بركر اللحم' },
                   
-                  { id: 'hal5', name: 'ربع لحم عجل', price: 12000, category: 'أنواع اللحم', desc: '150 غرام مع نصف كيلو تمن وشطة وطرشي وكاسة مرق' },
-                  { id: 'hal6', name: 'نصف لحم عجل', price: 18000, category: 'أنواع اللحم', desc: '300 غرام مع كيلو تمن وشطة وطرشي وكاسة مرق' },
-                  { id: 'hal7', name: 'لحم عجل كامل', price: 35000, category: 'أنواع اللحم', desc: '600 غرام مع كيلوين تمن وشطة وطرشي و 2 كاسة مرق' },
-                  { id: 'hal8', name: 'ربع لحم غنم', price: 12000, category: 'أنواع اللحم', desc: '150 غرام مع نصف كيلو تمن وشطة وطرشي وكاسة مرق' },
-                  { id: 'hal9', name: 'نصف لحم غنم', price: 18000, category: 'أنواع اللحم', desc: '300 غرام مع كيلو تمن وشطة وطرشي وكاسة مرق' },
-                  { id: 'hal10', name: 'غنم كامل', price: 35000, category: 'أنواع اللحم', desc: '600 غرام مع كيلوين تمن وشطة وطرشي و 2 كاسة مرق' },
+                  { id: 'rf4', name: 'بركر كلاسيك', price: 2000, category: 'بركر دجاج' },
+                  { id: 'rf5', name: 'بركر بالجبن', price: 2500, category: 'بركر دجاج' },
+                  { id: 'rf6', name: 'بركر دبل', price: 4000, category: 'بركر دجاج' },
                   
-                  { id: 'hal11', name: 'مطبق سمك (نصف كيلو)', price: 10000, category: 'السمك', desc: 'نصف كيلو سمك مع كيلو تمن' },
-                  { id: 'hal12', name: 'مطبق سمك (كيلو)', price: 20000, category: 'السمك', desc: 'كيلو سمك بحري مع كيلوين تمن' },
+                  { id: 'rf7', name: 'بركر كلاسيك', price: 2500, category: 'بركر سكالوب' },
+                  { id: 'rf8', name: 'بركر بالجبن', price: 3000, category: 'بركر سكالوب' },
+                  { id: 'rf9', name: 'بركر دبل', price: 4000, category: 'بركر سكالوب' },
                   
-                  { id: 'hal13', name: 'نصف كيلو دولمة', price: 6000, category: 'الدولمة', desc: '' },
-                  { id: 'hal14', name: 'كيلو دولمة', price: 12000, category: 'الدولمة', desc: '' },
+                  { id: 'rf10', name: 'بركر ستيك رويال', price: 5000, category: 'بركر سبشل' },
+                  { id: 'rf11', name: 'بركر هيمي', price: 6000, category: 'بركر سبشل' },
+                  { id: 'rf12', name: 'لغم بركر لحم', price: 7000, category: 'بركر سبشل' },
+                  { id: 'rf13', name: 'لغم بركر دجاج', price: 5000, category: 'بركر سبشل' },
+                  { id: 'rf14', name: 'ستيك دجاج دايت', price: 6000, category: 'بركر سبشل' },
+                  { id: 'rf15', name: 'انشيلادا', price: 5000, category: 'بركر سبشل' },
                   
-                  { id: 'hal15', name: 'ربع برياني', price: 5000, category: 'البرياني ', desc: '' },
-                  { id: 'hal16', name: 'كيلو برياني', price: 10000, category: 'البرياني ', desc: '' },
-                  { id: 'hal17', name: 'كيلوين برياني', price: 20000, category: 'البرياني ', desc: '' },
+                  { id: 'rf16', name: 'صغير', price: 8000, category: 'جاينت بركر لحم' },
+                  { id: 'rf17', name: 'وسط', price: 10000, category: 'جاينت بركر لحم' },
+                  { id: 'rf18', name: 'كبير', price: 15000, category: 'جاينت بركر لحم' },
                   
-                  { id: 'hal18', name: 'نفر تمن ومرق مع الملحقات', price: 3500, category: 'التمن والمرق', desc: '' },
-                  { id: 'hal19', name: 'كاسة مرق', price: 1000, category: 'التمن والمرق', desc: '' }
-              ]
-          },
-          'scozi': {
-              name: 'مطعم سكوزي',
-              items: [
-                  { id: 'sc1', name: 'وجبة كرسبي', price: 6000, category: 'الوجبات والريزو', desc: '' },
-                  { id: 'sc2', name: 'نص وجبة كرسبي', price: 4000, category: 'الوجبات والريزو', desc: '' },
-                  { id: 'sc3', name: 'وجبة فاهيتا', price: 6000, category: 'الوجبات والريزو', desc: '' },
-                  { id: 'sc4', name: 'وجبة فيله سمك', price: 7000, category: 'الوجبات والريزو', desc: '' },
-                  { id: 'sc5', name: 'ريزو', price: 6000, category: 'الوجبات والريزو', desc: '' },
-                  { id: 'sc6', name: 'ريزو روبيان', price: 7000, category: 'الوجبات والريزو', desc: '' },
-                  { id: 'sc7', name: 'ريزو سمك', price: 7000, category: 'الوجبات والريزو', desc: '' },
+                  { id: 'rf19', name: 'صغير', price: 6000, category: 'جاينت بركر دجاج' },
+                  { id: 'rf20', name: 'وسط', price: 8000, category: 'جاينت بركر دجاج' },
+                  { id: 'rf21', name: 'كبير', price: 12000, category: 'جاينت بركر دجاج' },
                   
-                  { id: 'sc8', name: 'بيتزا وسط', price: 5000, category: 'البيتزا', desc: '' },
-                  { id: 'sc9', name: 'بيتزا كبير', price: 10000, category: 'البيتزا', desc: '' },
+                  { id: 'rf22', name: 'نفر شاورما لحم', price: 7000, category: 'شاورما لحم' },
+                  { id: 'rf23', name: 'ربع كيلو شاورما لحم', price: 10000, category: 'شاورما لحم' },
+                  { id: 'rf24', name: 'نص كيلو شاورما لحم', price: 20000, category: 'شاورما لحم' },
+                  { id: 'rf25', name: 'كيلو شاورما لحم', price: 40000, category: 'شاورما لحم' },
                   
-                  { id: 'sc10', name: 'لفة سكالوب', price: 2500, category: 'اللفات (الساندويش)', desc: '' },
-                  { id: 'sc11', name: 'لفة همبركر', price: 2000, category: 'اللفات (الساندويش)', desc: '' },
-                  { id: 'sc12', name: 'لفة فاهيته', price: 2000, category: 'اللفات (الساندويش)', desc: '' },
-                  { id: 'sc13', name: 'لفة صاج دجاج', price: 2000, category: 'اللفات (الساندويش)', desc: '' },
+                  { id: 'rf26', name: 'نفر شاورما دجاج', price: 6000, category: 'شاورما دجاج' },
+                  { id: 'rf27', name: 'ربع كيلو شاورما دجاج', price: 9000, category: 'شاورما دجاج' },
+                  { id: 'rf28', name: 'نص كيلو شاورما دجاج', price: 18000, category: 'شاورما دجاج' },
+                  { id: 'rf29', name: 'كيلو شاورما دجاج', price: 35000, category: 'شاورما دجاج' },
                   
-                  { id: 'sc14', name: 'شيش طاووق', price: 6000, category: 'المشويات والاستيك', desc: '' },
-                  { id: 'sc15', name: 'ستيك دجاج دايت', price: 6000, category: 'المشويات والاستيك', desc: '' },
-                  { id: 'sc16', name: 'ستيك دجاج', price: 6000, category: 'المشويات والاستيك', desc: '' },
+                  { id: 'rf30', name: 'صاج لحم صغير', price: 3000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf31', name: 'صاج لحم كبير', price: 4000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf32', name: 'صاج دجاج صغير', price: 2500, category: 'الصاجات (سنجل)' },
+                  { id: 'rf33', name: 'صاج دجاج كبير', price: 3500, category: 'الصاجات (سنجل)' },
+                  { id: 'rf34', name: 'صاج فلافل صغير', price: 1500, category: 'الصاجات (سنجل)' },
+                  { id: 'rf35', name: 'صاج فلافل كبير', price: 2000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf36', name: 'صاج كرسبي صغير', price: 2500, category: 'الصاجات (سنجل)' },
+                  { id: 'rf37', name: 'صاج كرسبي كبير', price: 3000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf38', name: 'صاج ايطالي لحم', price: 6000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf39', name: 'صاج ايطالي دجاج', price: 5000, category: 'الصاجات (سنجل)' },
                   
-                  { id: 'sc17', name: 'ماعون مقبلات صغير', price: 3000, category: 'المقبلات', desc: '' },
-                  { id: 'sc18', name: 'ماعون مقبلات كبير', price: 5000, category: 'المقبلات', desc: '' }
-              ]
-          },
-          'ali_salem': {
-              name: 'مطعم برجر علي سالم',
-              items: [
-                  { id: 'm1', name: 'برجر', price: 1000 }, { id: 'm2', name: 'برجر جبن', price: 1500 }, { id: 'm3', name: 'ريزو دجاج', price: 3000 },
-                  { id: 'm4', name: 'لبن بطل صغير', price: 750 }, { id: 'm5', name: 'لبن بطل كبير', price: 2000 }, { id: 'm6', name: 'بيبسي', price: 500 }, { id: 'm7', name: 'ديو', price: 500 }
-              ]
-          },
-          'abo_hmode': {
-              name: 'مطعم بركر ابو حمودي',
-              items: [
-                  { id: 'h1', name: 'بركر كلاسيك', price: 1000 }, { id: 'h2', name: 'بركر جبن', price: 1250 }, { id: 'h3', name: 'بركر مكسيكي', price: 1500 },
-                  { id: 'h4', name: 'بركر كرانشي', price: 3000 }, { id: 'h5', name: 'بركر دبل لحم دبل جبن', price: 2500 }, { id: 'h6', name: 'ريزو كلاسيك', price: 3000 },
-                  { id: 'h7', name: 'ريزو ابو حمودي', price: 5000 }, { id: 'h8', name: 'اجنحه فحم نص', price: 8000 }, { id: 'h9', name: 'تكه دجاج نص', price: 8000 },
-                  { id: 'h10', name: 'فروج ابو حمودي', price: 8000 }, { id: 'h11', name: 'عصير كلاص', price: 1000 }, { id: 'h12', name: 'عصير بطل', price: 1500 },
-                  { id: 'h13', name: 'لبن بطل صغير', price: 750 }, { id: 'h14', name: 'لبن بطل جبير', price: 2000 }, { id: 'h15', name: 'ببسي', price: 500 },
-                  { id: 'h16', name: 'ديو', price: 500 }, { id: 'h17', name: 'سبرايت', price: 500 }, { id: 'h18', name: 'كولا', price: 500 }
+                  { id: 'rf40', name: 'وجبة صاج لحم', price: 7000, category: 'وجبات الصاج' },
+                  { id: 'rf41', name: 'وجبة صاج دجاج', price: 6000, category: 'وجبات الصاج' },
+                  { id: 'rf42', name: 'وجبة صاج فلافل', price: 4000, category: 'وجبات الصاج' },
+                  { id: 'rf43', name: 'وجبة صاج كرسبي', price: 5000, category: 'وجبات الصاج' },
+                  
+                  { id: 'rf44', name: 'سندويش لحم', price: 2000, category: 'سندويش' },
+                  { id: 'rf45', name: 'سندويش دجاج', price: 2000, category: 'سندويش' },
+                  { id: 'rf46', name: 'فاهيتا دجاج', price: 3000, category: 'سندويش' },
+                  
+                  { id: 'rf47', name: 'كرسبي 3 قطع', price: 4000, category: 'كرسبي' },
+                  { id: 'rf48', name: 'كرسبي 5 قطع', price: 6000, category: 'كرسبي' },
+                  
+                  { id: 'rf49', name: 'ريزو عادي', price: 5000, category: 'ريزو' },
+                  { id: 'rf50', name: 'ريزو BBQ', price: 5000, category: 'ريزو' },
+                  { id: 'rf51', name: 'ريزو مكس', price: 5000, category: 'ريزو' },
+                  { id: 'rf52', name: 'ريزو هلابينو', price: 6000, category: 'ريزو' },
+                  
+                  { id: 'rf53', name: 'دجاج', price: 5000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf54', name: 'لحم', price: 7000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf55', name: 'ببروني', price: 7000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf56', name: 'مشكل', price: 7000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf57', name: 'لحم رانش', price: 8000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf58', name: 'دجاج رانش', price: 6000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf59', name: 'جبن', price: 6000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf60', name: 'خضار', price: 5000, category: 'بيتزا (الحجم الصغير)' },
+                  
+                  { id: 'rf61', name: 'دجاج', price: 8000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf62', name: 'لحم', price: 9000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf63', name: 'ببروني', price: 10000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf64', name: 'مشكل', price: 9000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf65', name: 'لحم رانش', price: 10000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf66', name: 'دجاج رانش', price: 9000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf67', name: 'جبن', price: 9000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf68', name: 'خضار', price: 7000, category: 'بيتزا (الحجم الوسط)' },
+                  
+                  { id: 'rf69', name: 'دجاج', price: 10000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf70', name: 'لحم', price: 13000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf71', name: 'ببروني', price: 13000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf72', name: 'مشكل', price: 13000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf73', name: 'لحم رانش', price: 13000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf74', name: 'دجاج رانش', price: 12000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf75', name: 'جبن', price: 12000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf76', name: 'خضار', price: 10000, category: 'بيتزا (الحجم الكبير)' },
+                  
+                  { id: 'rf77', name: 'علبة فنكر', price: 1000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf78', name: 'طبق فنكر', price: 2000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf79', name: 'جيز فنكر', price: 3000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf80', name: 'فرايز چكن هلابينو', price: 6000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf81', name: 'مقبلات صغير', price: 3000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf82', name: 'مقبلات كبير', price: 5000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf83', name: 'سلطة سيزر', price: 5000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf84', name: 'حمص باللحم', price: 4000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf85', name: 'حمص دجاج', price: 3000, category: 'المقبلات والجانبيات' },
+                  
+                  { id: 'rf86', name: 'بيبسي', price: 500, category: 'المشروبات والصوصات' },
+                  { id: 'rf87', name: 'ديو', price: 500, category: 'المشروبات والصوصات' },
+                  { id: 'rf88', name: 'بيبسي دايت', price: 500, category: 'المشروبات والصوصات' },
+                  { id: 'rf89', name: 'صوص عادي', price: 500, category: 'المشروبات والصوصات' },
+                  { id: 'rf90', name: 'صوص ثومية', price: 250, category: 'المشروبات والصوصات' },
+                  { id: 'rf91', name: 'صوص BBQ', price: 500, category: 'المشروبات والصوصات' }
               ]
           },
           'victoria': {
@@ -1494,120 +1532,82 @@
                   { id: 'k39', name: 'كابتشينو مكسرات', price: 1000, category: 'قسم القهوة', desc: '' }
               ]
           },
-          'royal_food': {
-              name: 'رويال فود',
+          'haleg': {
+              name: 'مطعم الخليج',
               items: [
-                  { id: 'rf1', name: 'بركر كلاسيك', price: 2500, category: 'بركر اللحم' },
-                  { id: 'rf2', name: 'بركر بالجبن', price: 3000, category: 'بركر اللحم' },
-                  { id: 'rf3', name: 'بركر دبل', price: 5000, category: 'بركر اللحم' },
+                  { id: 'hal1', name: 'ربع دجاجة', price: 5000, category: 'قسم الدجاج', desc: 'ذبح فرش مع نصف كيلو تمن مع شطة وطرشي ومرق' },
+                  { id: 'hal2', name: 'نصف دجاجة', price: 10000, category: 'قسم الدجاج', desc: 'ذبح فرش مع كيلو تمن مع شطة وطرشي ومرق' },
+                  { id: 'hal3', name: 'دجاجة كاملة (1)', price: 20000, category: 'قسم الدجاج', desc: 'ذبح فرش مع كيلوين تمن مع شطة وطرشي و 2 كاسة مرق' },
+                  { id: 'hal4', name: 'دجاجة كاملة (2)', price: 25000, category: 'قسم الدجاج', desc: 'ذبح فرش مع ثلاثة كيلو تمن مع شطة وطرشي و 2 كاسة مرق' },
                   
-                  { id: 'rf4', name: 'بركر كلاسيك', price: 2000, category: 'بركر دجاج' },
-                  { id: 'rf5', name: 'بركر بالجبن', price: 2500, category: 'بركر دجاج' },
-                  { id: 'rf6', name: 'بركر دبل', price: 4000, category: 'بركر دجاج' },
+                  { id: 'hal5', name: 'ربع لحم عجل', price: 12000, category: 'أنواع اللحم', desc: '150 غرام مع نصف كيلو تمن وشطة وطرشي وكاسة مرق' },
+                  { id: 'hal6', name: 'نصف لحم عجل', price: 18000, category: 'أنواع اللحم', desc: '300 غرام مع كيلو تمن وشطة وطرشي وكاسة مرق' },
+                  { id: 'hal7', name: 'لحم عجل كامل', price: 35000, category: 'أنواع اللحم', desc: '600 غرام مع كيلوين تمن وشطة وطرشي و 2 كاسة مرق' },
+                  { id: 'hal8', name: 'ربع لحم غنم', price: 12000, category: 'أنواع اللحم', desc: '150 غرام مع نصف كيلو تمن وشطة وطرشي وكاسة مرق' },
+                  { id: 'hal9', name: 'نصف لحم غنم', price: 18000, category: 'أنواع اللحم', desc: '300 غرام مع كيلو تمن وشطة وطرشي وكاسة مرق' },
+                  { id: 'hal10', name: 'غنم كامل', price: 35000, category: 'أنواع اللحم', desc: '600 غرام مع كيلوين تمن وشطة وطرشي و 2 كاسة مرق' },
                   
-                  { id: 'rf7', name: 'بركر كلاسيك', price: 2500, category: 'بركر سكالوب' },
-                  { id: 'rf8', name: 'بركر بالجبن', price: 3000, category: 'بركر سكالوب' },
-                  { id: 'rf9', name: 'بركر دبل', price: 4000, category: 'بركر سكالوب' },
+                  { id: 'hal11', name: 'مطبق سمك (نصف كيلو)', price: 10000, category: 'السمك', desc: 'نصف كيلو سمك مع كيلو تمن' },
+                  { id: 'hal12', name: 'مطبق سمك (كيلو)', price: 20000, category: 'السمك', desc: 'كيلو سمك بحري مع كيلوين تمن' },
                   
-                  { id: 'rf10', name: 'بركر ستيك رويال', price: 5000, category: 'بركر سبشل' },
-                  { id: 'rf11', name: 'بركر هيمي', price: 6000, category: 'بركر سبشل' },
-                  { id: 'rf12', name: 'لغم بركر لحم', price: 7000, category: 'بركر سبشل' },
-                  { id: 'rf13', name: 'لغم بركر دجاج', price: 5000, category: 'بركر سبشل' },
-                  { id: 'rf14', name: 'ستيك دجاج دايت', price: 6000, category: 'بركر سبشل' },
-                  { id: 'rf15', name: 'انشيلادا', price: 5000, category: 'بركر سبشل' },
+                  { id: 'hal13', name: 'نصف كيلو دولمة', price: 6000, category: 'الدولمة', desc: '' },
+                  { id: 'hal14', name: 'كيلو دولمة', price: 12000, category: 'الدولمة', desc: '' },
                   
-                  { id: 'rf16', name: 'صغير', price: 8000, category: 'جاينت بركر لحم' },
-                  { id: 'rf17', name: 'وسط', price: 10000, category: 'جاينت بركر لحم' },
-                  { id: 'rf18', name: 'كبير', price: 15000, category: 'جاينت بركر لحم' },
+                  { id: 'hal15', name: 'ربع برياني', price: 5000, category: 'البرياني ', desc: '' },
+                  { id: 'hal16', name: 'كيلو برياني', price: 10000, category: 'البرياني ', desc: '' },
+                  { id: 'hal17', name: 'كيلوين برياني', price: 20000, category: 'البرياني ', desc: '' },
                   
-                  { id: 'rf19', name: 'صغير', price: 6000, category: 'جاينت بركر دجاج' },
-                  { id: 'rf20', name: 'وسط', price: 8000, category: 'جاينت بركر دجاج' },
-                  { id: 'rf21', name: 'كبير', price: 12000, category: 'جاينت بركر دجاج' },
+                  { id: 'hal18', name: 'نفر تمن ومرق مع الملحقات', price: 3500, category: 'التمن والمرق', desc: '' },
+                  { id: 'hal19', name: 'كاسة مرق', price: 1000, category: 'التمن والمرق', desc: '' }
+              ]
+          },
+          'scozi': {
+              name: 'مطعم سكوزي',
+              items: [
+                  { id: 'sc1', name: 'وجبة كرسبي', price: 6000, category: 'الوجبات والريزو', desc: '' },
+                  { id: 'sc2', name: 'نص وجبة كرسبي', price: 4000, category: 'الوجبات والريزو', desc: '' },
+                  { id: 'sc3', name: 'وجبة فاهيتا', price: 6000, category: 'الوجبات والريزو', desc: '' },
+                  { id: 'sc4', name: 'وجبة فيله سمك', price: 7000, category: 'الوجبات والريزو', desc: '' },
+                  { id: 'sc5', name: 'ريزو', price: 6000, category: 'الوجبات والريزو', desc: '' },
+                  { id: 'sc6', name: 'ريزو روبيان', price: 7000, category: 'الوجبات والريزو', desc: '' },
+                  { id: 'sc7', name: 'ريزو سمك', price: 7000, category: 'الوجبات والريزو', desc: '' },
                   
-                  { id: 'rf22', name: 'نفر شاورما لحم', price: 7000, category: 'شاورما لحم' },
-                  { id: 'rf23', name: 'ربع كيلو شاورما لحم', price: 10000, category: 'شاورما لحم' },
-                  { id: 'rf24', name: 'نص كيلو شاورما لحم', price: 20000, category: 'شاورما لحم' },
-                  { id: 'rf25', name: 'كيلو شاورما لحم', price: 40000, category: 'شاورما لحم' },
+                  { id: 'sc8', name: 'بيتزا وسط', price: 5000, category: 'البيتزا', desc: '' },
+                  { id: 'sc9', name: 'بيتزا كبير', price: 10000, category: 'البيتزا', desc: '' },
                   
-                  { id: 'rf26', name: 'نفر شاورما دجاج', price: 6000, category: 'شاورما دجاج' },
-                  { id: 'rf27', name: 'ربع كيلو شاورما دجاج', price: 9000, category: 'شاورما دجاج' },
-                  { id: 'rf28', name: 'نص كيلو شاورما دجاج', price: 18000, category: 'شاورما دجاج' },
-                  { id: 'rf29', name: 'كيلو شاورما دجاج', price: 35000, category: 'شاورما دجاج' },
+                  { id: 'sc10', name: 'لفة سكالوب', price: 2500, category: 'اللفات (الساندويش)', desc: '' },
+                  { id: 'sc11', name: 'لفة همبركر', price: 2000, category: 'اللفات (الساندويش)', desc: '' },
+                  { id: 'sc12', name: 'لفة فاهيته', price: 2000, category: 'اللفات (الساندويش)', desc: '' },
+                  { id: 'sc13', name: 'لفة صاج دجاج', price: 2000, category: 'اللفات (الساندويش)', desc: '' },
                   
-                  { id: 'rf30', name: 'صاج لحم صغير', price: 3000, category: 'الصاجات (سنجل)' },
-                  { id: 'rf31', name: 'صاج لحم كبير', price: 4000, category: 'الصاجات (سنجل)' },
-                  { id: 'rf32', name: 'صاج دجاج صغير', price: 2500, category: 'الصاجات (سنجل)' },
-                  { id: 'rf33', name: 'صاج دجاج كبير', price: 3500, category: 'الصاجات (سنجل)' },
-                  { id: 'rf34', name: 'صاج فلافل صغير', price: 1500, category: 'الصاجات (سنجل)' },
-                  { id: 'rf35', name: 'صاج فلافل كبير', price: 2000, category: 'الصاجات (سنجل)' },
-                  { id: 'rf36', name: 'صاج كرسبي صغير', price: 2500, category: 'الصاجات (سنجل)' },
-                  { id: 'rf37', name: 'صاج كرسبي كبير', price: 3000, category: 'الصاجات (سنجل)' },
-                  { id: 'rf38', name: 'صاج ايطالي لحم', price: 6000, category: 'الصاجات (سنجل)' },
-                  { id: 'rf39', name: 'صاج ايطالي دجاج', price: 5000, category: 'الصاجات (سنجل)' },
+                  { id: 'sc14', name: 'شيش طاووق', price: 6000, category: 'المشويات والاستيك', desc: '' },
+                  { id: 'sc15', name: 'ستيك دجاج دايت', price: 6000, category: 'المشويات والاستيك', desc: '' },
+                  { id: 'sc16', name: 'ستيك دجاج', price: 6000, category: 'المشويات والاستيك', desc: '' },
                   
-                  { id: 'rf40', name: 'وجبة صاج لحم', price: 7000, category: 'وجبات الصاج' },
-                  { id: 'rf41', name: 'وجبة صاج دجاج', price: 6000, category: 'وجبات الصاج' },
-                  { id: 'rf42', name: 'وجبة صاج فلافل', price: 4000, category: 'وجبات الصاج' },
-                  { id: 'rf43', name: 'وجبة صاج كرسبي', price: 5000, category: 'وجبات الصاج' },
-                  
-                  { id: 'rf44', name: 'سندويش لحم', price: 2000, category: 'سندويش' },
-                  { id: 'rf45', name: 'سندويش دجاج', price: 2000, category: 'سندويش' },
-                  { id: 'rf46', name: 'فاهيتا دجاج', price: 3000, category: 'سندويش' },
-                  
-                  { id: 'rf47', name: 'كرسبي 3 قطع', price: 4000, category: 'كرسبي' },
-                  { id: 'rf48', name: 'كرسبي 5 قطع', price: 6000, category: 'كرسبي' },
-                  
-                  { id: 'rf49', name: 'ريزو عادي', price: 5000, category: 'ريزو' },
-                  { id: 'rf50', name: 'ريزو BBQ', price: 5000, category: 'ريزو' },
-                  { id: 'rf51', name: 'ريزو مكس', price: 5000, category: 'ريزو' },
-                  { id: 'rf52', name: 'ريزو هلابينو', price: 6000, category: 'ريزو' },
-                  
-                  { id: 'rf53', name: 'دجاج', price: 5000, category: 'بيتزا (الحجم الصغير)' },
-                  { id: 'rf54', name: 'لحم', price: 7000, category: 'بيتزا (الحجم الصغير)' },
-                  { id: 'rf55', name: 'ببروني', price: 7000, category: 'بيتزا (الحجم الصغير)' },
-                  { id: 'rf56', name: 'مشكل', price: 7000, category: 'بيتزا (الحجم الصغير)' },
-                  { id: 'rf57', name: 'لحم رانش', price: 8000, category: 'بيتزا (الحجم الصغير)' },
-                  { id: 'rf58', name: 'دجاج رانش', price: 6000, category: 'بيتزا (الحجم الصغير)' },
-                  { id: 'rf59', name: 'جبن', price: 6000, category: 'بيتزا (الحجم الصغير)' },
-                  { id: 'rf60', name: 'خضار', price: 5000, category: 'بيتزا (الحجم الصغير)' },
-                  
-                  { id: 'rf61', name: 'دجاج', price: 8000, category: 'بيتزا (الحجم الوسط)' },
-                  { id: 'rf62', name: 'لحم', price: 9000, category: 'بيتزا (الحجم الوسط)' },
-                  { id: 'rf63', name: 'ببروني', price: 10000, category: 'بيتزا (الحجم الوسط)' },
-                  { id: 'rf64', name: 'مشكل', price: 9000, category: 'بيتزا (الحجم الوسط)' },
-                  { id: 'rf65', name: 'لحم رانش', price: 10000, category: 'بيتزا (الحجم الوسط)' },
-                  { id: 'rf66', name: 'دجاج رانش', price: 9000, category: 'بيتزا (الحجم الوسط)' },
-                  { id: 'rf67', name: 'جبن', price: 9000, category: 'بيتزا (الحجم الوسط)' },
-                  { id: 'rf68', name: 'خضار', price: 7000, category: 'بيتزا (الحجم الوسط)' },
-                  
-                  { id: 'rf69', name: 'دجاج', price: 10000, category: 'بيتزا (الحجم الكبير)' },
-                  { id: 'rf70', name: 'لحم', price: 13000, category: 'بيتزا (الحجم الكبير)' },
-                  { id: 'rf71', name: 'ببروني', price: 13000, category: 'بيتزا (الحجم الكبير)' },
-                  { id: 'rf72', name: 'مشكل', price: 13000, category: 'بيتزا (الحجم الكبير)' },
-                  { id: 'rf73', name: 'لحم رانش', price: 13000, category: 'بيتزا (الحجم الكبير)' },
-                  { id: 'rf74', name: 'دجاج رانش', price: 12000, category: 'بيتزا (الحجم الكبير)' },
-                  { id: 'rf75', name: 'جبن', price: 12000, category: 'بيتزا (الحجم الكبير)' },
-                  { id: 'rf76', name: 'خضار', price: 10000, category: 'بيتزا (الحجم الكبير)' },
-                  
-                  { id: 'rf77', name: 'علبة فنكر', price: 1000, category: 'المقبلات والجانبيات' },
-                  { id: 'rf78', name: 'طبق فنكر', price: 2000, category: 'المقبلات والجانبيات' },
-                  { id: 'rf79', name: 'جيز فنكر', price: 3000, category: 'المقبلات والجانبيات' },
-                  { id: 'rf80', name: 'فرايز چكن هلابينو', price: 6000, category: 'المقبلات والجانبيات' },
-                  { id: 'rf81', name: 'مقبلات صغير', price: 3000, category: 'المقبلات والجانبيات' },
-                  { id: 'rf82', name: 'مقبلات كبير', price: 5000, category: 'المقبلات والجانبيات' },
-                  { id: 'rf83', name: 'سلطة سيزر', price: 5000, category: 'المقبلات والجانبيات' },
-                  { id: 'rf84', name: 'حمص باللحم', price: 4000, category: 'المقبلات والجانبيات' },
-                  { id: 'rf85', name: 'حمص دجاج', price: 3000, category: 'المقبلات والجانبيات' },
-                  
-                  { id: 'rf86', name: 'بيبسي', price: 500, category: 'المشروبات والصوصات' },
-                  { id: 'rf87', name: 'ديو', price: 500, category: 'المشروبات والصوصات' },
-                  { id: 'rf88', name: 'بيبسي دايت', price: 500, category: 'المشروبات والصوصات' },
-                  { id: 'rf89', name: 'صوص عادي', price: 500, category: 'المشروبات والصوصات' },
-                  { id: 'rf90', name: 'صوص ثومية', price: 250, category: 'المشروبات والصوصات' },
-                  { id: 'rf91', name: 'صوص BBQ', price: 500, category: 'المشروبات والصوصات' }
+                  { id: 'sc17', name: 'ماعون مقبلات صغير', price: 3000, category: 'المقبلات', desc: '' },
+                  { id: 'sc18', name: 'ماعون مقبلات كبير', price: 5000, category: 'المقبلات', desc: '' }
+              ]
+          },
+          'abo_hmode': {
+              name: 'مطعم بركر ابو حمودي',
+              items: [
+                  { id: 'h1', name: 'بركر كلاسيك', price: 1000 }, { id: 'h2', name: 'بركر جبن', price: 1250 }, { id: 'h3', name: 'بركر مكسيكي', price: 1500 },
+                  { id: 'h4', name: 'بركر كرانشي', price: 3000 }, { id: 'h5', name: 'بركر دبل لحم دبل جبن', price: 2500 }, { id: 'h6', name: 'ريزو كلاسيك', price: 3000 },
+                  { id: 'h7', name: 'ريزو ابو حمودي', price: 5000 }, { id: 'h8', name: 'اجنحه فحم نص', price: 8000 }, { id: 'h9', name: 'تكه دجاج نص', price: 8000 },
+                  { id: 'h10', name: 'فروج ابو حمودي', price: 8000 }, { id: 'h11', name: 'عصير كلاص', price: 1000 }, { id: 'h12', name: 'عصير بطل', price: 1500 },
+                  { id: 'h13', name: 'لبن بطل صغير', price: 750 }, { id: 'h14', name: 'لبن بطل جبير', price: 2000 }, { id: 'h15', name: 'ببسي', price: 500 },
+                  { id: 'h16', name: 'ديو', price: 500 }, { id: 'h17', name: 'سبرايت', price: 500 }, { id: 'h18', name: 'كولا', price: 500 }
+              ]
+          },
+          'ali_salem': {
+              name: 'مطعم برجر علي سالم',
+              items: [
+                  { id: 'm1', name: 'برجر', price: 1000 }, { id: 'm2', name: 'برجر جبن', price: 1500 }, { id: 'm3', name: 'ريزو دجاج', price: 3000 },
+                  { id: 'm4', name: 'لبن بطل صغير', price: 750 }, { id: 'm5', name: 'لبن بطل كبير', price: 2000 }, { id: 'm6', name: 'بيبسي', price: 500 }, { id: 'm7', name: 'ديو', price: 500 }
               ]
           }
       };
+      
       async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
@@ -1638,7 +1638,6 @@
               }
           } catch(e) { console.log("لا توجد تحديثات للسلع حالياً"); }
       }
-      
       let currentCart = {};
       let currentRestaurantId = '';
 
