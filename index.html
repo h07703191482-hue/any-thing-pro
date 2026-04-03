@@ -329,7 +329,7 @@
            </div>
             <div class="map-footer">
                 <p style="margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--text-muted);">حرك الخريطة ليصير الدبوس على المكان المضبوط</p>
-                <button class="send-btn ripple" style="margin-top: 0; background: #10B981;" onclick="confirmMapLocation()">
+                <button class="send-btn ripple" style="margin-top: 0; background: #10B981;" onclick="confirmMapLocation()">
                    تأكيد الموقع <i class="fas fa-check"></i>
                </button>
            </div>
@@ -482,11 +482,11 @@
             <button class="send-btn ripple" onclick="goToLoginStep2()">
                 التالي <i class="fas fa-arrow-left"></i>
            </button>
-        </div>
+        </div>
 
         <div class="form-card" id="login-step-2" style="display: none; text-align: center; padding: 30px 20px;">
             <i class="fab fa-telegram-plane icon-pulse" style="font-size: 60px; color: #0088cc; margin-bottom: 20px;"></i>
-            <h3 style="margin-top: 0;">تفعيل الحساب برقمك</h3>
+            <h3 style="margin-top: 0;">تفعيل الحساب برقمك</h3>
             <p style="font-size: 14px; color: var(--text-muted); font-weight: bold; margin-bottom: 25px;">
                 اضغط على الزر الجوه راح يفتح بوت تليكرام، انطيه "مشاركة جهة الاتصال" وراح يتفعل حسابك!
             </p>
@@ -499,7 +499,7 @@
                <button class="resign-btn ripple-dark" onclick="cancelTelegramLogin()">إلغاء العملية</button>
            </div>
             
-            <button class="resign-btn ripple-dark" style="margin-top: 15px; border: none; color: var(--text-muted);" onclick="backToLoginStep1()">
+            <button class="resign-btn ripple-dark" style="margin-top: 15px; border: none; color: var(--text-muted);" onclick="backToLoginStep1()">
                 <i class="fas fa-arrow-right"></i> رجوع لتعديل الاسم
            </button>
         </div>
@@ -510,10 +510,10 @@
         <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> <span id="adm-title">لوحة التحكم السرية</span></h2>
         <div class="form-card" style="text-align: center;">
             <p id="adm-status-desc" style="font-weight: 700; margin-bottom: 20px;">حالة استقبال الطلبات للزبائن</p>
-           
+           
             <div style="display: flex; gap: 15px; justify-content: center;">
                <button id="btn-open-app" class="send-btn ripple" style="margin-top: 0; background: #10B981;" onclick="setGlobalAppStatus('online')">
-                   <i class="fas fa-unlock"></i> فتح التطبيق
+                   <i class="fas fa-unlock"></i> فتح التطبيق
                </button>
                <button id="btn-close-app" class="send-btn ripple" style="margin-top: 0; background: var(--danger);" onclick="setGlobalAppStatus('offline')">
                    <i class="fas fa-lock"></i> إغلاق التطبيق
@@ -568,6 +568,12 @@
                  <img src="Haleg.jpg" alt="مطعم الخليج">
                  <h4>مطعم الخليج</h4>
                  <small>أشهى المأكولات</small>
+             </div>
+
+             <div class="rest-card ripple" onclick="openMenu('royal_food')">
+                 <img src="Roealfod.jpg" alt="رويال فود">
+                 <h4>رويال فود</h4>
+                 <small>بركر، بيتزا ووجبات</small>
              </div>
 
               <div class="rest-card" style="opacity: 0.6; cursor: default;">
@@ -646,7 +652,7 @@
            </div>
         
         <div class="cart-bar" id="cartBar" style="display: none;">
-            <div>
+            <div>
                <span style="font-size: 13px; color: var(--text-muted); font-weight: bold;">المجموع الكلي للطلب:</span>
                <span class="cart-bar-total" id="cartTotal">0 د.ع</span>
            </div>
@@ -673,7 +679,7 @@
             <div class="form-group">
                <label id="lbl-tuk-phone">رقم الموبايل</label>
                <input type="tel" id="tukPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
                <span class="step-number">خطوة رقم (2)</span>
            </div>
         </div>
@@ -714,7 +720,7 @@
         <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
         
         <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
-            ⚠️ تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
+            ⚠️ تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
         </div>
         
         <div class="form-card" id="med-user-card">
@@ -778,7 +784,7 @@
                <label>رقم الهاتف</label>
                <input type="tel" id="custPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); updateLoyaltyUI(); checkPhoneLive(this)" onblur="syncLoyaltyWithServer()">
                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-                <span class="step-number">خطوة رقم (2)</span>
+                <span class="step-number">خطوة رقم (2)</span>
            </div>
             <div class="form-group">
                <label>نقطة دالة</label>
@@ -869,7 +875,7 @@
                 <i class="fas fa-check-circle"></i> أنا متاح للعمل
            </button>
             
-            <button id="soundToggleBtn" class="send-btn ripple" style="background: var(--text-muted); margin-top: 10px; box-shadow: none;" onclick="toggleOrderSound()">
+            <button id="soundToggleBtn" class="send-btn ripple" style="background: var(--text-muted); margin-top: 10px; box-shadow: none;" onclick="toggleOrderSound()">
                 <i class="fas fa-bell-slash"></i> جرس الطلبات: معطل
            </button>
             
@@ -941,6 +947,9 @@
       // توكن سكوزي
       const SCOZI_BOT_TOKEN = "8129985022:AAHlKRiRSH4Jop8J58iFQOjl2NcAZnLdkRo";
       
+      // توكن رويال فود (تمت الإضافة)
+      const ROYAL_FOOD_BOT_TOKEN = "8620504304:AAEuUp97cjQmyaHCYSUC4eygNBXhsL4ZmXo";
+
       const ALI_SALEM_CHAT_ID = "399195479";
       const ABO_HMODE_CHAT_ID = "651243067";
       // التعديل هنا: تم وضع ايديات القنوات الخاصة بدلاً من الايديات الشخصية
@@ -948,6 +957,9 @@
       const KLASHE_CHAT_ID = "-1003727059406"; 
       const HALEG_CHAT_ID = "-1003719488878";
       const SCOZI_CHAT_ID = "-1003315608193";
+      
+      // ايدي رويال فود (تمت الإضافة)
+      const ROYAL_FOOD_CHAT_ID = "-1003798976901";
 
       let userCoords = ""; 
       const CURRENT_VERSION = "2.0.20"; // تم تحديث النسخة ليظهر التغيير للمستخدمين
@@ -1296,8 +1308,7 @@
          document.getElementById('login-step-2').style.display = 'none'; document.getElementById('login-step-1').style.display = 'block';
          document.getElementById('loginNameInput').value = '';
       }
-
-      const menus = {
+        const menus = {
           'haleg': {
               name: 'مطعم الخليج',
               items: [
@@ -1482,8 +1493,122 @@
                   { id: 'k38', name: 'كابتشينو', price: 1000, category: 'قسم القهوة', desc: '' },
                   { id: 'k39', name: 'كابتشينو مكسرات', price: 1000, category: 'قسم القهوة', desc: '' }
               ]
+          },
+          'royal_food': {
+              name: 'رويال فود',
+              items: [
+                  { id: 'rf1', name: 'بركر كلاسيك', price: 2500, category: 'بركر اللحم' },
+                  { id: 'rf2', name: 'بركر بالجبن', price: 3000, category: 'بركر اللحم' },
+                  { id: 'rf3', name: 'بركر دبل', price: 5000, category: 'بركر اللحم' },
+                  
+                  { id: 'rf4', name: 'بركر كلاسيك', price: 2000, category: 'بركر دجاج' },
+                  { id: 'rf5', name: 'بركر بالجبن', price: 2500, category: 'بركر دجاج' },
+                  { id: 'rf6', name: 'بركر دبل', price: 4000, category: 'بركر دجاج' },
+                  
+                  { id: 'rf7', name: 'بركر كلاسيك', price: 2500, category: 'بركر سكالوب' },
+                  { id: 'rf8', name: 'بركر بالجبن', price: 3000, category: 'بركر سكالوب' },
+                  { id: 'rf9', name: 'بركر دبل', price: 4000, category: 'بركر سكالوب' },
+                  
+                  { id: 'rf10', name: 'بركر ستيك رويال', price: 5000, category: 'بركر سبشل' },
+                  { id: 'rf11', name: 'بركر هيمي', price: 6000, category: 'بركر سبشل' },
+                  { id: 'rf12', name: 'لغم بركر لحم', price: 7000, category: 'بركر سبشل' },
+                  { id: 'rf13', name: 'لغم بركر دجاج', price: 5000, category: 'بركر سبشل' },
+                  { id: 'rf14', name: 'ستيك دجاج دايت', price: 6000, category: 'بركر سبشل' },
+                  { id: 'rf15', name: 'انشيلادا', price: 5000, category: 'بركر سبشل' },
+                  
+                  { id: 'rf16', name: 'صغير', price: 8000, category: 'جاينت بركر لحم' },
+                  { id: 'rf17', name: 'وسط', price: 10000, category: 'جاينت بركر لحم' },
+                  { id: 'rf18', name: 'كبير', price: 15000, category: 'جاينت بركر لحم' },
+                  
+                  { id: 'rf19', name: 'صغير', price: 6000, category: 'جاينت بركر دجاج' },
+                  { id: 'rf20', name: 'وسط', price: 8000, category: 'جاينت بركر دجاج' },
+                  { id: 'rf21', name: 'كبير', price: 12000, category: 'جاينت بركر دجاج' },
+                  
+                  { id: 'rf22', name: 'نفر شاورما لحم', price: 7000, category: 'شاورما لحم' },
+                  { id: 'rf23', name: 'ربع كيلو شاورما لحم', price: 10000, category: 'شاورما لحم' },
+                  { id: 'rf24', name: 'نص كيلو شاورما لحم', price: 20000, category: 'شاورما لحم' },
+                  { id: 'rf25', name: 'كيلو شاورما لحم', price: 40000, category: 'شاورما لحم' },
+                  
+                  { id: 'rf26', name: 'نفر شاورما دجاج', price: 6000, category: 'شاورما دجاج' },
+                  { id: 'rf27', name: 'ربع كيلو شاورما دجاج', price: 9000, category: 'شاورما دجاج' },
+                  { id: 'rf28', name: 'نص كيلو شاورما دجاج', price: 18000, category: 'شاورما دجاج' },
+                  { id: 'rf29', name: 'كيلو شاورما دجاج', price: 35000, category: 'شاورما دجاج' },
+                  
+                  { id: 'rf30', name: 'صاج لحم صغير', price: 3000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf31', name: 'صاج لحم كبير', price: 4000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf32', name: 'صاج دجاج صغير', price: 2500, category: 'الصاجات (سنجل)' },
+                  { id: 'rf33', name: 'صاج دجاج كبير', price: 3500, category: 'الصاجات (سنجل)' },
+                  { id: 'rf34', name: 'صاج فلافل صغير', price: 1500, category: 'الصاجات (سنجل)' },
+                  { id: 'rf35', name: 'صاج فلافل كبير', price: 2000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf36', name: 'صاج كرسبي صغير', price: 2500, category: 'الصاجات (سنجل)' },
+                  { id: 'rf37', name: 'صاج كرسبي كبير', price: 3000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf38', name: 'صاج ايطالي لحم', price: 6000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf39', name: 'صاج ايطالي دجاج', price: 5000, category: 'الصاجات (سنجل)' },
+                  
+                  { id: 'rf40', name: 'وجبة صاج لحم', price: 7000, category: 'وجبات الصاج' },
+                  { id: 'rf41', name: 'وجبة صاج دجاج', price: 6000, category: 'وجبات الصاج' },
+                  { id: 'rf42', name: 'وجبة صاج فلافل', price: 4000, category: 'وجبات الصاج' },
+                  { id: 'rf43', name: 'وجبة صاج كرسبي', price: 5000, category: 'وجبات الصاج' },
+                  
+                  { id: 'rf44', name: 'سندويش لحم', price: 2000, category: 'سندويش' },
+                  { id: 'rf45', name: 'سندويش دجاج', price: 2000, category: 'سندويش' },
+                  { id: 'rf46', name: 'فاهيتا دجاج', price: 3000, category: 'سندويش' },
+                  
+                  { id: 'rf47', name: 'كرسبي 3 قطع', price: 4000, category: 'كرسبي' },
+                  { id: 'rf48', name: 'كرسبي 5 قطع', price: 6000, category: 'كرسبي' },
+                  
+                  { id: 'rf49', name: 'ريزو عادي', price: 5000, category: 'ريزو' },
+                  { id: 'rf50', name: 'ريزو BBQ', price: 5000, category: 'ريزو' },
+                  { id: 'rf51', name: 'ريزو مكس', price: 5000, category: 'ريزو' },
+                  { id: 'rf52', name: 'ريزو هلابينو', price: 6000, category: 'ريزو' },
+                  
+                  { id: 'rf53', name: 'دجاج', price: 5000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf54', name: 'لحم', price: 7000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf55', name: 'ببروني', price: 7000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf56', name: 'مشكل', price: 7000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf57', name: 'لحم رانش', price: 8000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf58', name: 'دجاج رانش', price: 6000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf59', name: 'جبن', price: 6000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf60', name: 'خضار', price: 5000, category: 'بيتزا (الحجم الصغير)' },
+                  
+                  { id: 'rf61', name: 'دجاج', price: 8000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf62', name: 'لحم', price: 9000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf63', name: 'ببروني', price: 10000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf64', name: 'مشكل', price: 9000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf65', name: 'لحم رانش', price: 10000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf66', name: 'دجاج رانش', price: 9000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf67', name: 'جبن', price: 9000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf68', name: 'خضار', price: 7000, category: 'بيتزا (الحجم الوسط)' },
+                  
+                  { id: 'rf69', name: 'دجاج', price: 10000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf70', name: 'لحم', price: 13000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf71', name: 'ببروني', price: 13000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf72', name: 'مشكل', price: 13000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf73', name: 'لحم رانش', price: 13000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf74', name: 'دجاج رانش', price: 12000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf75', name: 'جبن', price: 12000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf76', name: 'خضار', price: 10000, category: 'بيتزا (الحجم الكبير)' },
+                  
+                  { id: 'rf77', name: 'علبة فنكر', price: 1000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf78', name: 'طبق فنكر', price: 2000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf79', name: 'جيز فنكر', price: 3000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf80', name: 'فرايز چكن هلابينو', price: 6000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf81', name: 'مقبلات صغير', price: 3000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf82', name: 'مقبلات كبير', price: 5000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf83', name: 'سلطة سيزر', price: 5000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf84', name: 'حمص باللحم', price: 4000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf85', name: 'حمص دجاج', price: 3000, category: 'المقبلات والجانبيات' },
+                  
+                  { id: 'rf86', name: 'بيبسي', price: 500, category: 'المشروبات والصوصات' },
+                  { id: 'rf87', name: 'ديو', price: 500, category: 'المشروبات والصوصات' },
+                  { id: 'rf88', name: 'بيبسي دايت', price: 500, category: 'المشروبات والصوصات' },
+                  { id: 'rf89', name: 'صوص عادي', price: 500, category: 'المشروبات والصوصات' },
+                  { id: 'rf90', name: 'صوص ثومية', price: 250, category: 'المشروبات والصوصات' },
+                  { id: 'rf91', name: 'صوص BBQ', price: 500, category: 'المشروبات والصوصات' }
+              ]
           }
       };
+
       async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
@@ -1512,7 +1637,7 @@
                      }
                   });
               }
-          } catch(e) { console.log("لا توجد تحديثات للسلع حالياً"); }
+          } catch(e) { console.log("لا توجد تحديثات للسلع حالياً"); }
       }
       
       let currentCart = {};
@@ -1572,7 +1697,7 @@
                                      ${item.desc ? `<p style="font-size: 11px; color: var(--text-muted); margin: 5px 0 0 0; line-height: 1.4;">${item.desc}</p>` : ''}
                                  </div>
                                  <div class="qty-controls" style="flex-shrink: 0;">
-                                     <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
+                                     <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
                                      <span class="qty-val" id="qty-${item.id}">${currentCart[item.id]}</span>
                                      <button class="qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
                                  </div>
@@ -1580,7 +1705,7 @@
                          }).join('')}
                      </div>
                  </div>`;
-                  catIndex++;
+                  catIndex++;
               }
              container.innerHTML = html;
           } else {
@@ -1618,7 +1743,7 @@
           let total = 0; let totalItems = 0;
           const items = menus[currentRestaurantId].items;
          items.forEach(item => { total += currentCart[item.id] * item.price; totalItems += currentCart[item.id]; });
-         const cartBar = document.getElementById('cartBar');
+         const cartBar = document.getElementById('cartBar');
           if (totalItems > 0) { cartBar.style.display = 'flex'; document.getElementById('cartTotal').innerText = total.toLocaleString() + ' د.ع'; } 
           else { cartBar.style.display = 'none'; }
       }
@@ -1640,8 +1765,7 @@
           showScreen('order-screen');
          showToast("تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
       }
-
-      function checkStatus() {
+        function checkStatus() {
          trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
          fetchDynamicMenus(); 
           const urlParams = new URLSearchParams(window.location.search);
@@ -1712,7 +1836,7 @@
              if(!myPhone) return;
               const response = await fetch(`${GS_URL}?action=checkReset&phone=${myPhone}`);
               const result = await response.text();
-              if (result === "reset_now") { 
+              if (result === "reset_now") { 
                  localStorage.setItem('d_count', 0); localStorage.setItem('league_count', 0); localStorage.removeItem('driver_logs'); 
                  updateStatsUI(); if(document.getElementById('log-screen').classList.contains('active-screen')) { renderDriverLog(); }
               } 
@@ -1721,7 +1845,7 @@
       }
 
       function openJoinScreen() {
-          if(localStorage.getItem('pending_join') === 'true') showScreen('activation-screen');
+          if(localStorage.getItem('pending_join') === 'true') showScreen('activation-screen');
           else showScreen('join-screen');
       }
 
@@ -1791,7 +1915,7 @@
       }
 
       async function sendTukOrder() {
-          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const name = document.getElementById('tukName').value.trim(); const phone = document.getElementById('tukPhone').value.trim();
           const land = document.getElementById('tukLandmark').value.trim(); const dropLink = document.getElementById('tukDropoffLink').value.trim(); 
           if(!name || !validateIraqiPhone(phone) || !dropLink) return showToast("أكمل البيانات وحدد موقع النزول 📍");
@@ -1837,7 +1961,7 @@
           try {
              saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`); localStorage.removeItem('referred_by');
-             const msg = `🔵طلب وسيط\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📝الغرض: ${order}\n📍الموقع: ${userCoords}`;
+             const msg = `🔵طلب وسيط\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📝الغرض: ${order}\n📍الموقع: ${userCoords}`;
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
               });
@@ -1845,10 +1969,10 @@
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
-      function previewImages() {
+      function previewImages() {
           const input = document.getElementById('custImages'); const container = document.getElementById('image-preview-container'); container.innerHTML = '';
           for (let i = 0; i < input.files.length; i++) {
-              const url = URL.createObjectURL(input.files[i]);
+              const url = URL.createObjectURL(input.files[i]);
              container.innerHTML += `<img src="${url}" style="width:70px; height:70px; border-radius:10px; object-fit:cover; border:1px solid var(--border-color);">`;
           }
           if(input.files.length > 0) container.innerHTML += `<div style="display:flex; align-items:center; color:var(--danger); font-size:13px; font-weight:bold; cursor:pointer; padding:5px; width: 100%;" onclick="clearImages()"><i class="fas fa-trash-alt" style="margin-left:5px;"></i> مسح الصور</div>`;
@@ -1901,7 +2025,7 @@
                   }
                  clearImages();
               }
-              
+              
               let photoIdsStr = photoMsgs.join(','); 
               let referrer = localStorage.getItem('referred_by') || "";
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&photoMsgs=${photoIdsStr}&referrer=${referrer}`);
@@ -1929,7 +2053,7 @@
                  await fetch(`https://api.telegram.org/bot${ALI_SALEM_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ALI_SALEM_CHAT_ID, text: restMsg }) }).catch(e => {});
               }
 
-              let isAboHmodeOrder = order.includes("مطعم بركر ابو حمودي");
+              let isAboHmodeOrder = order.includes("مطعم بركر ابو حمودي");
               if (isAboHmodeOrder) {
                  const hmodeMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                  await fetch(`https://api.telegram.org/bot${ABO_HMODE_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ABO_HMODE_CHAT_ID, text: hmodeMsg }) }).catch(e => {});
@@ -1942,10 +2066,10 @@
               }
 
               let isKlasheOrder = order.includes("كلاشي");
-             if (isKlasheOrder) {
+             if (isKlasheOrder) {
                  const klasheMsg = `🥤 طلب جديد من تطبيق البندر!\n\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                  await fetch(`https://api.telegram.org/bot${KLASHE_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: KLASHE_CHAT_ID, text: klasheMsg }) }).catch(e => {});
-              }
+              }
               
               let isHalegOrder = order.includes("مطعم الخليج");
               if (isHalegOrder) {
@@ -1957,6 +2081,13 @@
               if (isScoziOrder) {
                  const scoziMsg = `🍕 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                  await fetch(`https://api.telegram.org/bot${SCOZI_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: SCOZI_CHAT_ID, text: scoziMsg }) }).catch(e => {});
+              }
+
+              // التعديل الخاص بمطعم رويال فود (تمت الإضافة)
+              let isRoyalFoodOrder = order.includes("رويال فود");
+              if (isRoyalFoodOrder) {
+                 const royalMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
+                 await fetch(`https://api.telegram.org/bot${ROYAL_FOOD_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ROYAL_FOOD_CHAT_ID, text: royalMsg }) }).catch(e => {});
               }
 
              showToast("تم إرسال طلبك بنجاح ✅"); 
@@ -1982,14 +2113,14 @@
                   let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
                  logs.unshift({ date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }), phone: custPhone, price: "2,000 د.ع" });
                  localStorage.setItem('driver_logs', JSON.stringify(logs));
-                  localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
+                  localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
                  localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
                  updateStatsUI();
-                  let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
+                  let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
                  fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
                  syncLoyaltyWithServer(); 
                  showToast(`تم تأكيد العملية بنجاح! عاشت ايدك 👏`); refreshLeaderboard();
-                 document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
+                 document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
               } else { showToast("الكود غير صحيح ❌"); }
           } catch(e) {} finally { btn.innerHTML = oldText; btn.disabled = false; }
       }
@@ -2004,7 +2135,7 @@
           }
          container.innerHTML = logs.map((log, i) => `
               <div class="form-card" style="border-right: 4px solid var(--primary); padding: 15px;">
-                 <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:8px;">
+                 <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:8px;">
                      <span style="font-weight:800; color:var(--primary);">الطلب #${logs.length - i}</span>
                      <span style="font-size:12px; color:var(--text-muted);" dir="ltr">${log.date}</span>
                  </div>
@@ -2059,7 +2190,7 @@
              if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; }
           } else {
              localStorage.setItem('driver_status', 'available'); btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل';
-             if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; }
+             if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; }
           }
       }
 
@@ -2074,7 +2205,7 @@
              if(soundBtn) {
                  soundBtn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل';
                  soundBtn.style.background = '#F59E0B'; 
-                 soundBtn.style.color = 'white';
+                 soundBtn.style.color = 'white';
               }
              startOrderPolling();
           }
@@ -2090,7 +2221,7 @@
               );
               
               appMap = L.map('map-view', { 
-                  attributionControl: false,
+                  attributionControl: false,
                  maxBounds: umQasrBounds, 
                  maxBoundsViscosity: 1.0, 
                  minZoom: 13 
@@ -2105,7 +2236,7 @@
           const center = appMap.getCenter();
           const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng}`;
          document.getElementById('tukDropoffLink').value = googleMapsLink;
-         document.getElementById('map-success-msg').style.display = 'block';
+         document.getElementById('map-success-msg').style.display = 'block';
          closeMapModal();
       }
 
