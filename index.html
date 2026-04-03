@@ -923,6 +923,7 @@
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
     </div>
+
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
@@ -1299,9 +1300,6 @@
       }
 
       const menus = {
-          // ==============================
-          // إضافة منيو مطعم الخليج الجديد
-          // ==============================
           'haleg': {
               name: 'مطعم الخليج',
               items: [
@@ -1331,9 +1329,6 @@
                   { id: 'hal19', name: 'كاسة مرق', price: 1000, category: 'التمن والمرق', desc: '' }
               ]
           },
-          // ==============================
-          // منيو سكوزي الجديد اللي طلبته
-          // ==============================
           'scozi': {
               name: 'مطعم سكوزي',
               items: [
@@ -1361,8 +1356,6 @@
                   { id: 'sc18', name: 'ماعون مقبلات كبير', price: 5000, category: 'المقبلات', desc: '' }
               ]
           },
-          // ==============================
-          
           'ali_salem': {
               name: 'مطعم برجر علي سالم',
               items: [
@@ -1493,8 +1486,8 @@
               ]
           }
       };
-<body>
-    async function fetchDynamicMenus() {
+
+      async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
               const data = await resp.json();
@@ -1928,52 +1921,41 @@
               let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص)**" : "";
               const msg = `🔵 طلب مسواك\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍الموقع: ${userCoords}`;
               
-              // 1. إرسال الطلب لقناة المندوبين
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                  method: "POST", headers: { "Content-Type": "application/json" },
                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
 
-              // 2. مطعم علي سالم
               let isAliSalemOrder = order.includes("مطعم برجر علي سالم");
               if (isAliSalemOrder) {
                  const restMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                  await fetch(`https://api.telegram.org/bot${ALI_SALEM_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ALI_SALEM_CHAT_ID, text: restMsg }) }).catch(e => {});
               }
 
-              // 3. مطعم ابو حمودي
               let isAboHmodeOrder = order.includes("مطعم بركر ابو حمودي");
               if (isAboHmodeOrder) {
                  const hmodeMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                  await fetch(`https://api.telegram.org/bot${ABO_HMODE_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ABO_HMODE_CHAT_ID, text: hmodeMsg }) }).catch(e => {});
               }
 
-              // 4. مطعم فيكتوريا
               let isVictoriaOrder = order.includes("مطعم فيكتوريا");
               if (isVictoriaOrder) {
                  const vicMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                  await fetch(`https://api.telegram.org/bot${VICTORIA_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: VICTORIA_CHAT_ID, text: vicMsg }) }).catch(e => {});
               }
 
-              // 5. كلاشي
               let isKlasheOrder = order.includes("كلاشي");
              if (isKlasheOrder) {
                  const klasheMsg = `🥤 طلب جديد من تطبيق البندر!\n\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                  await fetch(`https://api.telegram.org/bot${KLASHE_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: KLASHE_CHAT_ID, text: klasheMsg }) }).catch(e => {});
               }
               
-              // ===================================
-              // 6. مطعم الخليج
-              // ===================================
               let isHalegOrder = order.includes("مطعم الخليج");
               if (isHalegOrder) {
                  const halegMsg = `🍽️ طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
                  await fetch(`https://api.telegram.org/bot${HALEG_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: HALEG_CHAT_ID, text: halegMsg }) }).catch(e => {});
               }
 
-              // ===================================
-              // 7. مطعم سكوزي (الإضافة الجديدة)
-              // ===================================
               let isScoziOrder = order.includes("مطعم سكوزي");
               if (isScoziOrder) {
                  const scoziMsg = `🍕 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
@@ -2135,3 +2117,4 @@
     </script>
 </body>
 </html>
+<body>
