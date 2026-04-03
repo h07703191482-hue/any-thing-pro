@@ -420,7 +420,6 @@
             <i class="fas fa-sign-out-alt" style="color: var(--danger); font-size: 20px; width: 25px;"></i> <span style="font-weight: 800;">تسجيل خروج</span>
         </div>
     </div>
-
     <div class="bottom-nav" id="bottomNavigation">
         <div class="nav-item active ripple-dark" onclick="showScreen('home-screen'); updateNav(this)">
             <i class="fas fa-compass"></i><span id="nav-home-text">الرئيسية</span>
@@ -753,7 +752,6 @@
 
         <button class="send-btn order-btn-logic ripple" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
     </div>
-
     <div id="order-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-shopping-cart" style="color:var(--primary);"></i> <span id="shop-head">تسوق مسواكك</span></h2>
@@ -945,12 +943,11 @@
       
       const ALI_SALEM_CHAT_ID = "399195479";
       const ABO_HMODE_CHAT_ID = "651243067";
-      const VICTORIA_CHAT_ID = "7479342799"; 
-      const KLASHE_CHAT_ID = "7479342799"; 
-      
-      const HALEG_CHAT_ID = "7479342799";
-      // ايدي سكوزي
-      const SCOZI_CHAT_ID = "7479342799";
+      // التعديل هنا: تم وضع ايديات القنوات الخاصة بدلاً من الايديات الشخصية
+      const VICTORIA_CHAT_ID = "-1003760108006"; 
+      const KLASHE_CHAT_ID = "-1003727059406"; 
+      const HALEG_CHAT_ID = "-1003719488878";
+      const SCOZI_CHAT_ID = "-1003315608193";
 
       let userCoords = ""; 
       const CURRENT_VERSION = "2.0.20"; // تم تحديث النسخة ليظهر التغيير للمستخدمين
@@ -1487,7 +1484,6 @@
               ]
           }
       };
-
       async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
