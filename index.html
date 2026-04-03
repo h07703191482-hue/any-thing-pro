@@ -928,7 +928,6 @@
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
     </div>
-
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
@@ -950,9 +949,9 @@
       // توكن رويال فود (تمت الإضافة)
       const ROYAL_FOOD_BOT_TOKEN = "8620504304:AAEuUp97cjQmyaHCYSUC4eygNBXhsL4ZmXo";
 
-      const ALI_SALEM_CHAT_ID = "399195479";
-      const ABO_HMODE_CHAT_ID = "651243067";
-      // التعديل هنا: تم وضع ايديات القنوات الخاصة بدلاً من الايديات الشخصية
+      // التعديل هنا: تم وضع ايديات القنوات الخاصة بدلاً من الايديات الشخصية للكل
+      const ALI_SALEM_CHAT_ID = "-1003722556479";
+      const ABO_HMODE_CHAT_ID = "-1003704352460";
       const VICTORIA_CHAT_ID = "-1003760108006"; 
       const KLASHE_CHAT_ID = "-1003727059406"; 
       const HALEG_CHAT_ID = "-1003719488878";
@@ -962,7 +961,7 @@
       const ROYAL_FOOD_CHAT_ID = "-1003798976901";
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.20"; // تم تحديث النسخة ليظهر التغيير للمستخدمين
+      const CURRENT_VERSION = "2.0.21"; // تم تحديث النسخة ليظهر التغيير للمستخدمين
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -1308,7 +1307,8 @@
          document.getElementById('login-step-2').style.display = 'none'; document.getElementById('login-step-1').style.display = 'block';
          document.getElementById('loginNameInput').value = '';
       }
-        const menus = {
+
+      const menus = {
           'haleg': {
               name: 'مطعم الخليج',
               items: [
@@ -1608,7 +1608,6 @@
               ]
           }
       };
-
       async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
@@ -1765,7 +1764,8 @@
           showScreen('order-screen');
          showToast("تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
       }
-        function checkStatus() {
+
+      function checkStatus() {
          trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
          fetchDynamicMenus(); 
           const urlParams = new URLSearchParams(window.location.search);
@@ -2036,65 +2036,45 @@
              localStorage.setItem('my_loyalty_orders', tempLoyalty);
              updateLocalLoyaltyUI();
 
-              let orderNum = (tempLoyalty % 10); 
               let loyaltyMsg = (tempLoyalty % 10) === 0 ? "🎁 هذا الطلب مجاني (الطلب العاشر)" : `الطلب رقم ${tempLoyalty % 10} من أصل 10`;
               let msgContent = order ? order : "الطلب موضح في الصور المرفقة 📸";
               let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص)**" : "";
               const msg = `🔵 طلب مسواك\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍الموقع: ${userCoords}`;
               
+              // الإرسال للقناة العامة للمناديب
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                  method: "POST", headers: { "Content-Type": "application/json" },
                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
 
-              let isAliSalemOrder = order.includes("مطعم برجر علي سالم");
-              if (isAliSalemOrder) {
-                 const restMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
-                 await fetch(`https://api.telegram.org/bot${ALI_SALEM_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ALI_SALEM_CHAT_ID, text: restMsg }) }).catch(e => {});
-              }
+              // --- توجيه الطلبات للقنوات الخاصة بالمطاعم ---
+              const restOrders = [
+                  { key: "مطعم برجر علي سالم", token: ALI_SALEM_BOT_TOKEN, id: ALI_SALEM_CHAT_ID },
+                  { key: "مطعم بركر ابو حمودي", token: ABO_HMODE_BOT_TOKEN, id: ABO_HMODE_CHAT_ID },
+                  { key: "مطعم فيكتوريا", token: VICTORIA_BOT_TOKEN, id: VICTORIA_CHAT_ID },
+                  { key: "كلاشي", token: KLASHE_BOT_TOKEN, id: KLASHE_CHAT_ID },
+                  { key: "مطعم الخليج", token: HALEG_BOT_TOKEN, id: HALEG_CHAT_ID },
+                  { key: "مطعم سكوزي", token: SCOZI_BOT_TOKEN, id: SCOZI_CHAT_ID },
+                  { key: "رويال فود", token: ROYAL_FOOD_BOT_TOKEN, id: ROYAL_FOOD_CHAT_ID }
+              ];
 
-              let isAboHmodeOrder = order.includes("مطعم بركر ابو حمودي");
-              if (isAboHmodeOrder) {
-                 const hmodeMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
-                 await fetch(`https://api.telegram.org/bot${ABO_HMODE_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ABO_HMODE_CHAT_ID, text: hmodeMsg }) }).catch(e => {});
-              }
-
-              let isVictoriaOrder = order.includes("مطعم فيكتوريا");
-              if (isVictoriaOrder) {
-                 const vicMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
-                 await fetch(`https://api.telegram.org/bot${VICTORIA_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: VICTORIA_CHAT_ID, text: vicMsg }) }).catch(e => {});
-              }
-
-              let isKlasheOrder = order.includes("كلاشي");
-             if (isKlasheOrder) {
-                 const klasheMsg = `🥤 طلب جديد من تطبيق البندر!\n\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
-                 await fetch(`https://api.telegram.org/bot${KLASHE_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: KLASHE_CHAT_ID, text: klasheMsg }) }).catch(e => {});
-              }
-              
-              let isHalegOrder = order.includes("مطعم الخليج");
-              if (isHalegOrder) {
-                 const halegMsg = `🍽️ طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
-                 await fetch(`https://api.telegram.org/bot${HALEG_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: HALEG_CHAT_ID, text: halegMsg }) }).catch(e => {});
-              }
-
-              let isScoziOrder = order.includes("مطعم سكوزي");
-              if (isScoziOrder) {
-                 const scoziMsg = `🍕 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
-                 await fetch(`https://api.telegram.org/bot${SCOZI_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: SCOZI_CHAT_ID, text: scoziMsg }) }).catch(e => {});
-              }
-
-              // التعديل الخاص بمطعم رويال فود (تمت الإضافة)
-              let isRoyalFoodOrder = order.includes("رويال فود");
-              if (isRoyalFoodOrder) {
-                 const royalMsg = `🍔 طلب جديد من تطبيق البندر!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝تفاصيل الطلب:\n${msgContent}\n\n⚠️ملاحظة: المندوب راح يستلم الطلب قريباً، يرجى التجهيز.`;
-                 await fetch(`https://api.telegram.org/bot${ROYAL_FOOD_BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ROYAL_FOOD_CHAT_ID, text: royalMsg }) }).catch(e => {});
+              for (let rest of restOrders) {
+                  if (order.includes(rest.key)) {
+                      const restMsg = `🍔 طلب جديد لـ ${rest.key}!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 التفاصيل:\n${msgContent}\n\n⚠️ يرجى التجهيز، المندوب سيصل قريباً.`;
+                      fetch(`https://api.telegram.org/bot${rest.token}/sendMessage`, { 
+                          method: "POST", headers: { "Content-Type": "application/json" }, 
+                          body: JSON.stringify({ chat_id: rest.id, text: restMsg }) 
+                      }).catch(e => {});
+                  }
               }
 
              showToast("تم إرسال طلبك بنجاح ✅"); 
              document.getElementById('custOrder').value = ""; 
              document.getElementById('custLandmark').value = ""; 
              loadSavedCustomerData();
-          } catch (e) {} finally { 
+          } catch (e) {
+              showToast("حدث خطأ أثناء الإرسال ❌");
+          } finally { 
              btn.innerHTML = originalText; 
              btn.disabled = false; 
           }
