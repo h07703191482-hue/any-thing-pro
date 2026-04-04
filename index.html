@@ -484,26 +484,26 @@
         </div>
 
         <div class="form-card" id="login-step-2" style="display: none; text-align: center; padding: 30px 20px;">
-            <i class="fab fa-telegram-plane icon-pulse" style="font-size: 60px; color: #0088cc; margin-bottom: 20px;"></i>
+            <i class="fas fa-mobile-alt icon-pulse" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
             <h3 style="margin-top: 0;">تفعيل الحساب برقمك</h3>
             <p style="font-size: 14px; color: var(--text-muted); font-weight: bold; margin-bottom: 25px;">
-                اضغط على الزر الجوه راح يفتح بوت تليكرام، انطيه "مشاركة جهة الاتصال" وراح يتفعل حسابك!
+                اكتب رقمك العراقي (يبدأ بـ 07) حتى يكمل تسجيل الدخول!
             </p>
             
-            <button id="tg-login-btn" class="send-btn ripple" style="background: #0088cc; font-size: 18px;" onclick="startTelegramLogin()">
-                <i class="fab fa-telegram-plane"></i> شارك رقمك عبر تليكرام
-           </button>
-
-            <div id="cancel-login-area" style="display: none; margin-top: 15px;">
-               <button class="resign-btn ripple-dark" onclick="cancelTelegramLogin()">إلغاء العملية</button>
+            <div class="form-group" style="text-align: right; margin-bottom: 20px;">
+               <input type="tel" id="loginPhoneInput" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)" style="text-align: center; font-size: 18px; font-weight: bold;">
+               <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
            </div>
+
+            <button id="direct-login-btn" class="send-btn ripple" onclick="completeDirectLogin()">
+                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+           </button>
             
             <button class="resign-btn ripple-dark" style="margin-top: 15px; border: none; color: var(--text-muted);" onclick="backToLoginStep1()">
                 <i class="fas fa-arrow-right"></i> رجوع لتعديل الاسم
            </button>
         </div>
     </div>
-
     <div id="admin-panel" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> <span id="adm-title">لوحة التحكم السرية</span></h2>
@@ -1235,9 +1235,6 @@
 
       function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
       function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
-      let loginPollInterval = null;
-      let currentLoginSession = "";
-
       function goToLoginStep2() {
           const nameInput = document.getElementById('loginNameInput').value.trim();
          if(!nameInput) return showToast("يرجى كتابة اسمك أولاً ⚠️");
@@ -1250,61 +1247,41 @@
          document.getElementById('login-step-1').style.display = 'block';
       }
 
-      function startTelegramLogin() {
-          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
-          
-         currentLoginSession = Math.floor(10000000 + Math.random() * 90000000).toString();
-          
-          const btn = document.getElementById('tg-login-btn');
-         btn.innerHTML = '<span class="baly-spinner"></span> جاري انتظار تليكرام...';
+      function completeDirectLogin() {
+          const userName = document.getElementById('loginNameInput').value.trim();
+          const userPhone = document.getElementById('loginPhoneInput').value.trim();
+
+          if(!userName) return showToast("يرجى كتابة اسمك ⚠️");
+          if(!validateIraqiPhone(userPhone)) return showToast("يرجى كتابة رقم عراقي صحيح ⚠️");
+
+          const btn = document.getElementById('direct-login-btn');
+          btn.innerHTML = '<span class="baly-spinner"></span> جاري الدخول...';
           btn.disabled = true;
-         document.getElementById('cancel-login-area').style.display = 'block';
 
-         window.open(`https://t.me/${NEW_BOT_USER}?start=login_${currentLoginSession}`, '_blank');
-         loginPollInterval = setInterval(checkTelegramLoginStatus, 3000);
-      }
-
-      async function checkTelegramLoginStatus() {
-          if (!currentLoginSession) return;
-          try {
-              const resp = await fetch(`${GS_URL}?action=checkTelegramLogin&session=${currentLoginSession}&t=${new Date().getTime()}`);
-              const data = await resp.json();
+          setTimeout(() => {
+              saveCustomerData(userName, userPhone); 
+              loadSavedCustomerData(); 
+              syncLoyaltyWithServer();
               
-              if (data.status === 'success') {
-                 clearInterval(loginPollInterval);
-                  if (navigator.onLine) fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => {});
-
-                 const userName = document.getElementById('loginNameInput').value.trim();
-                 const userPhone = data.phone;
-
-                 saveCustomerData(userName, userPhone); 
-                 loadSavedCustomerData(); 
-                 syncLoyaltyWithServer();
-                  
-                 const msg = `👤 تسجيل دخول جديد\nالاسم: ${userName}\nالرقم: ${userPhone}`;
-                 fetch(`https://api.telegram.org/bot${NEW_BOT_TOKEN}/sendMessage`, {
+              if (navigator.onLine) {
+                 const msg = `👤 تسجيل دخول جديد (مباشر)\nالاسم: ${userName}\nالرقم: ${userPhone}`;
+                 fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
                  }).catch(e => {});
-
-                 showScreen('home-screen'); 
-                 showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
-                 currentLoginSession = ""; resetLoginUI();
+                 fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => {});
               }
-          } catch(e) {}
-      }
 
-      function cancelTelegramLogin() {
-          if (loginPollInterval) clearInterval(loginPollInterval);
-         currentLoginSession = ""; resetLoginUI();
-         showToast("تم إلغاء عملية تسجيل الدخول ❌");
-      }
-
-      function resetLoginUI() {
-          const btn = document.getElementById('tg-login-btn');
-         btn.innerHTML = '<i class="fab fa-telegram-plane"></i> شارك رقمك عبر تليكرام'; btn.disabled = false;
-         document.getElementById('cancel-login-area').style.display = 'none';
-         document.getElementById('login-step-2').style.display = 'none'; document.getElementById('login-step-1').style.display = 'block';
-         document.getElementById('loginNameInput').value = '';
+              showScreen('home-screen'); 
+              showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
+              
+              // تفريغ الحقول وارجاع الزر لحالته
+              btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
+              btn.disabled = false;
+              document.getElementById('login-step-2').style.display = 'none'; 
+              document.getElementById('login-step-1').style.display = 'block';
+              document.getElementById('loginNameInput').value = '';
+              document.getElementById('loginPhoneInput').value = '';
+          }, 800);
       }
 
       const menus = {
