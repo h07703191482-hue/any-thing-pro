@@ -373,14 +373,15 @@
         </div>
     </div>
 
-    <div id="status-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100006; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;">
-        <div class="prices-container" style="text-align: center; padding-bottom: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
-            <div class="prices-header" id="status-header" style="justify-content: center;">
-                <span id="status-title" style="font-size: 20px;">إشعار الطلب</span>
+    <div id="status-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100006; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;">
+        <div class="prices-container" style="text-align: center; padding-bottom: 20px;">
+            <div class="prices-header" id="status-header">
+                <span id="status-title">إشعار الطلب</span>
+                <button class="close-prices-btn" onclick="closeStatusModal()"><i class="fas fa-times"></i></button>
             </div>
             <div style="padding: 30px 20px 10px;">
-                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/150px-Real_Madrid_CF.svg.png" alt="شعار رياضي" style="width: 90px; height: auto; margin-bottom: 20px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">
-                <h2 id="status-message" style="margin: 0 0 20px; font-weight: 800; font-size: 22px;"></h2>
+                <img id="status-sports-logo" src="https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/150px-Real_Madrid_CF.svg.png" alt="شعار رياضي" style="width: 100px; height: auto; margin-bottom: 20px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">
+                <h2 id="status-message" style="margin: 0 0 20px; font-weight: 800; font-size: 20px; color: var(--text-main);"></h2>
                 <button class="send-btn ripple" style="background: #10B981; margin-top: 10px; width: 100%; font-size: 20px; letter-spacing: 1px;" onclick="closeStatusModal()">NEXT</button>
             </div>
         </div>
@@ -979,7 +980,6 @@
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
       }
-
       // ==========================================
       // إضافة نظام التحديد الجغرافي (Geofencing) لأم قصر
       // ==========================================
@@ -1234,11 +1234,27 @@
          setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 3000);
       }
 
-      /* دوال التحكم في الإشعار المنبثق الجديد (رياضي/الريال) */
+      /* دوال التحكم في الإشعار المنبثق الجديد (رياضي) */
+      const sportsLogos = [
+          "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/150px-Real_Madrid_CF.svg.png", 
+          "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/FC_Barcelona_%28crest%29.svg/150px-FC_Barcelona_%28crest%29.svg.png", 
+          "https://upload.wikimedia.org/wikipedia/en/thumb/7/7a/Manchester_United_FC_crest.svg/150px-Manchester_United_FC_crest.svg.png",
+          "https://upload.wikimedia.org/wikipedia/en/thumb/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg/150px-FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg.png",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Juventus_FC_2017_icon_%28black%29.svg/150px-Juventus_FC_2017_icon_%28black%29.svg.png",
+          "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/Manchester_City_FC_badge.svg/150px-Manchester_City_FC_badge.svg.png"
+      ];
+
       function showStatusModal(isSuccess, message) {
           const modal = document.getElementById('status-modal');
           const msgEl = document.getElementById('status-message');
           const titleEl = document.getElementById('status-title');
+          const logoImg = document.getElementById('status-sports-logo');
+
+          // تغيير الشعار عشوائياً بكل مرة تفتح بيها الواجهة
+          if(logoImg) {
+              const randomLogo = sportsLogos[Math.floor(Math.random() * sportsLogos.length)];
+              logoImg.src = randomLogo;
+          }
 
           if(isSuccess) {
               titleEl.innerText = "اكتمل بنجاح ✅";
@@ -1622,22 +1638,6 @@
               ]
           }
       };
-      const sportsLogos = [
-          "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/150px-Real_Madrid_CF.svg.png", 
-          "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/FC_Barcelona_%28crest%29.svg/150px-FC_Barcelona_%28crest%29.svg.png", 
-          "https://upload.wikimedia.org/wikipedia/en/thumb/7/7a/Manchester_United_FC_crest.svg/150px-Manchester_United_FC_crest.svg.png",
-          "https://upload.wikimedia.org/wikipedia/en/thumb/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg/150px-FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg.png",
-          "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Juventus_FC_2017_icon_%28black%29.svg/150px-Juventus_FC_2017_icon_%28black%29.svg.png",
-          "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/Manchester_City_FC_badge.svg/150px-Manchester_City_FC_badge.svg.png"
-      ];
-
-      function updateStatusLogo() {
-          const logoImg = document.querySelector('#status-modal img');
-          if(logoImg) {
-              const randomLogo = sportsLogos[Math.floor(Math.random() * sportsLogos.length)];
-              logoImg.src = randomLogo;
-          }
-      }
 
       async function fetchDynamicMenus() {
           try {
@@ -1970,9 +1970,9 @@
                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية", callback_data: `claim|${name}|${vc}` }]] } })
               });
              document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
-             updateStatusLogo(); showStatusModal(true, "تم إرسال الطلب بنجاح ✅");
+             showStatusModal(true, "تم إرسال الطلب بنجاح ✅");
           } catch (e) {
-             updateStatusLogo(); showStatusModal(false, "خطأ في إرسال الطلب ❌");
+             showStatusModal(false, "خطأ في إرسال الطلب ❌");
           } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1999,9 +1999,9 @@
                  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
               });
              document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
-             updateStatusLogo(); showStatusModal(true, "تم إرسال الطلب بنجاح ✅");
+             showStatusModal(true, "تم إرسال الطلب بنجاح ✅");
           } catch (e) {
-             updateStatusLogo(); showStatusModal(false, "خطأ في إرسال الطلب ❌");
+             showStatusModal(false, "خطأ في إرسال الطلب ❌");
           } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -2107,9 +2107,9 @@
              document.getElementById('custOrder').value = ""; 
              document.getElementById('custLandmark').value = ""; 
              loadSavedCustomerData();
-             updateStatusLogo(); showStatusModal(true, "تم إرسال الطلب بنجاح ✅");
+             showStatusModal(true, "تم إرسال الطلب بنجاح ✅");
           } catch (e) {
-              updateStatusLogo(); showStatusModal(false, "خطأ في إرسال الطلب ❌");
+              showStatusModal(false, "خطأ في إرسال الطلب ❌");
           } finally { 
              btn.innerHTML = originalText; 
              btn.disabled = false; 
