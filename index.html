@@ -304,6 +304,15 @@
     </style>
 </head>
 <body>
+    <div id="sports-logo-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100006; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
+        <div style="background: var(--surface); padding: 30px; border-radius: var(--radius-lg); text-align: center; max-width: 300px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.3); animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+            <h3 style="margin: 0 0 15px; color: var(--primary); font-weight: 800;">عاشت ايدك يا بطل! ⚽</h3>
+            <img id="random-sport-logo" src="" alt="شعار رياضي" style="width: 140px; height: 140px; object-fit: contain; margin-bottom: 15px; animation: iconPulse 2s infinite ease-in-out;">
+            <p style="color: var(--text-muted); font-size: 14px; font-weight: bold; margin-bottom: 20px;">تم استلام طلبك، انتظر مندوبنا بالطريق!</p>
+            <button class="send-btn ripple" style="margin: 0; padding: 12px;" onclick="document.getElementById('sports-logo-modal').style.display='none'">تسلم حبيبي <i class="fas fa-heart" style="color: #ff4757;"></i></button>
+        </div>
+    </div>
+
     <div id="out-of-zone-popup">
         <div class="out-zone-card">
             <i class="fas fa-map-marker-slash" style="font-size: 70px; color: var(--danger); margin-bottom: 20px; animation: bouncePin 1s infinite alternate;"></i>
@@ -928,6 +937,35 @@
         <div id="driver-log-container"></div>
     </div>
     <script>
+      // الميزة الجديدة: الشعارات الرياضية العالمية
+      const sportsLogos = [
+          "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png", // ريال مدريد
+          "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/FC_Barcelona_logo.svg/1200px-FC_Barcelona_logo.svg.png", // برشلونة
+          "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/Manchester_City_FC_badge.svg/1200px-Manchester_City_FC_badge.svg.png", // مانشستر سيتي
+          "https://upload.wikimedia.org/wikipedia/en/thumb/0/0c/Liverpool_FC.svg/1200px-Liverpool_FC.svg.png", // ليفربول
+          "https://upload.wikimedia.org/wikipedia/en/thumb/1/1b/FC_Bayern_München_logo_%282017%29.svg/1200px-FC_Bayern_München_logo_%282017%29.svg.png", // بايرن ميونخ
+          "https://upload.wikimedia.org/wikipedia/en/thumb/e/e3/Manchester_United_FC_crest.svg/1200px-Manchester_United_FC_crest.svg.png", // مان يونايتد
+          "https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Paris_Saint-Germain_F.C..svg/1200px-Paris_Saint-Germain_F.C..svg.png", // باريس
+          "https://upload.wikimedia.org/wikipedia/en/thumb/0/05/FC_Internazionale_Milano_2021.svg/1200px-FC_Inter_Milano_2021.svg.png", // انتر ميلان
+          "https://upload.wikimedia.org/wikipedia/en/thumb/d/d0/Logo_of_AC_Milan.svg/1200px-Logo_of_AC_Milan.svg.png" // ميلان
+      ];
+
+      function showRandomSportsLogo() {
+          const randomIndex = Math.floor(Math.random() * sportsLogos.length);
+          const modal = document.getElementById('sports-logo-modal');
+          const logoImg = document.getElementById('random-sport-logo');
+          
+          if(modal && logoImg) {
+              logoImg.src = sportsLogos[randomIndex];
+              modal.style.display = 'flex';
+
+              // يختفي الشعار تلقائياً بعد ثانيتين
+              setTimeout(() => {
+                  modal.style.display = 'none';
+              }, 2000);
+          }
+      }
+
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
@@ -1916,6 +1954,7 @@
                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية", callback_data: `claim|${name}|${vc}` }]] } })
               });
              showToast("تم الإرسال بنجاح ✅"); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+             showRandomSportsLogo(); // استدعاء الدالة هنا
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1942,6 +1981,7 @@
                  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
               });
              showToast("تم الإرسال بنجاح ✅"); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+             showRandomSportsLogo(); // استدعاء الدالة هنا
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -2048,6 +2088,7 @@
              document.getElementById('custOrder').value = ""; 
              document.getElementById('custLandmark').value = ""; 
              loadSavedCustomerData();
+             showRandomSportsLogo(); // استدعاء الدالة هنا
           } catch (e) {
               showToast("حدث خطأ أثناء الإرسال ❌");
           } finally { 
@@ -2200,4 +2241,4 @@
       function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
     </script>
 </body>
-            </html>
+</html>
