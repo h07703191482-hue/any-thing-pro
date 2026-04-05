@@ -298,12 +298,47 @@
           box-shadow: var(--shadow-sm);
       }
 
-      /* تنسيقات نافذة التحديد الجغرافي (تمت الإضافة) */
+      /* تنسيقات نافذة التحديد الجغرافي */
      #out-of-zone-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; backdrop-filter: blur(8px); }
       .out-zone-card { background: var(--surface); padding: 35px 20px; border-radius: var(--radius-lg); max-width: 400px; width: 95%; box-shadow: 0 20px 50px rgba(239, 68, 68, 0.2); animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid var(--danger); }
+      
+      /* تنسيقات شاشة التحميل الجديدة */
+      .barca-spinner {
+          width: 90px;
+          height: 90px;
+          border: 4px dashed var(--primary);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: spin 3s linear infinite;
+      }
+      .barca-spinner img {
+          width: 55px;
+          height: 55px;
+          animation: counter-spin 3s linear infinite;
+      }
+      @keyframes counter-spin {
+          from { transform: rotate(360deg); }
+          to { transform: rotate(0deg); }
+      }
     </style>
 </head>
 <body>
+
+    <div id="order-loading-screen" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 1000000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;">
+        <div id="loading-spinner-container">
+            <div class="barca-spinner">
+                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/4/47/FC_Barcelona_%28crest%29.svg/1200px-FC_Barcelona_%28crest%29.svg.png" alt="برشلونة">
+            </div>
+        </div>
+        <div id="success-icon-container" style="display: none;">
+            <i class="fas fa-check-circle" style="font-size: 80px; color: #10B981; animation: scaleIn 0.5s ease;"></i>
+        </div>
+        <h2 id="loading-status-text" style="margin: 20px 0 10px; font-weight: 800; color: var(--text-main);">يتم ارسال طلبك...</h2>
+        <p id="loading-sub-text" style="display: none; color: var(--danger); font-size: 15px; font-weight: 800; margin-top: 5px;">لا ترسل نفس الطلب مره ثانيه</p>
+    </div>
+
     <div id="out-of-zone-popup">
         <div class="out-zone-card">
             <i class="fas fa-map-marker-slash" style="font-size: 70px; color: var(--danger); margin-bottom: 20px; animation: bouncePin 1s infinite alternate;"></i>
@@ -330,7 +365,7 @@
             <div class="map-footer">
                 <p style="margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--text-muted);">حرك الخريطة ليصير الدبوس على المكان المضبوط</p>
                 <button class="send-btn ripple" style="margin-top: 0; background: #10B981;" onclick="confirmMapLocation()">
-                   تأكيد الموقع <i class="fas fa-check"></i>
+                    تأكيد الموقع <i class="fas fa-check"></i>
                </button>
            </div>
         </div>
@@ -767,9 +802,9 @@
         </div>
         
         <div id="loyalty-info" class="loyalty-card">
-            <div class="loyalty-text"><span id="loy-txt">طلبك رقم</span> <span id="current-order-count" style="color:var(--primary); font-size:22px;">0</span> / 10</div>
+            <div class="loyalty-text"><span id="loy-txt">طلبك رقم</span> <span id="current-order-count" style="color:var(--primary); font-size:22px;">0</span> / 7</div>
             <div class="loyalty-progress"><div id="loyalty-bar" class="loyalty-bar"></div></div>
-            <span class="gift-note" id="loyalty-gift-msg"><i class="fas fa-gift"></i> أوصل للطلب 10 وكروتك مجانية</span>
+            <span class="gift-note" id="loyalty-gift-msg"><i class="fas fa-gift"></i> أوصل للطلب 7 وكروتك مجانية</span>
         </div>
 
         <div class="form-card" id="shop-user-card">
@@ -945,10 +980,10 @@
       // توكن سكوزي
       const SCOZI_BOT_TOKEN = "8129985022:AAHlKRiRSH4Jop8J58iFQOjl2NcAZnLdkRo";
       
-      // توكن رويال فود (تمت الإضافة)
+      // توكن رويال فود
       const ROYAL_FOOD_BOT_TOKEN = "8620504304:AAEuUp97cjQmyaHCYSUC4eygNBXhsL4ZmXo";
 
-      // التعديل هنا: تم وضع ايديات القنوات الخاصة بدلاً من الايديات الشخصية للكل
+      // الايديات
       const ALI_SALEM_CHAT_ID = "-1003722556479";
       const ABO_HMODE_CHAT_ID = "-1003704352460";
       const VICTORIA_CHAT_ID = "-1003760108006"; 
@@ -956,24 +991,44 @@
       const HALEG_CHAT_ID = "-1003719488878";
       const SCOZI_CHAT_ID = "-1003315608193";
       
-      // ايدي رويال فود (تمت الإضافة)
+      // ايدي رويال فود
       const ROYAL_FOOD_CHAT_ID = "-1003798976901";
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.21"; // تم تحديث النسخة ليظهر التغيير للمستخدمين
+      const CURRENT_VERSION = "2.0.21";
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
+      }
+
+      // دوال شاشة التحميل
+      function showOrderLoadingScreen() {
+          document.getElementById('order-loading-screen').style.display = 'flex';
+          document.getElementById('loading-spinner-container').style.display = 'flex';
+          document.getElementById('success-icon-container').style.display = 'none';
+          document.getElementById('loading-status-text').innerText = 'يتم ارسال طلبك...';
+          document.getElementById('loading-sub-text').style.display = 'none';
+      }
+
+      function completeOrderLoadingScreen() {
+          document.getElementById('loading-spinner-container').style.display = 'none';
+          document.getElementById('success-icon-container').style.display = 'block';
+          document.getElementById('loading-status-text').innerText = 'تم ارسال طلبك بنجاح';
+          document.getElementById('loading-sub-text').style.display = 'block';
+          setTimeout(() => {
+              document.getElementById('order-loading-screen').style.display = 'none';
+              showScreen('home-screen');
+          }, 3500);
       }
 
       // ==========================================
       // إضافة نظام التحديد الجغرافي (Geofencing) لأم قصر
       // ==========================================
       const umQasrPolygon = [
-          { lat: 30.0800, lng: 47.9600 }, // الحدود الشمالية الشرقية (الميناء وما حوله)
-          { lat: 30.0800, lng: 47.8800 }, // الحدود الشمالية الغربية
-          { lat: 30.0100, lng: 47.8800 }, // الحدود الجنوبية الغربية (المجمعات، القاعدة، المستشفى)
-          { lat: 30.0100, lng: 47.9600 }  // الحدود الجنوبية الشرقية
+          { lat: 30.0800, lng: 47.9600 }, 
+          { lat: 30.0800, lng: 47.8800 }, 
+          { lat: 30.0100, lng: 47.8800 }, 
+          { lat: 30.0100, lng: 47.9600 }  
       ];
 
       function isUserInUmQasr(userLat, userLng, polygon) {
@@ -1274,7 +1329,6 @@
               showScreen('home-screen'); 
               showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
               
-              // تفريغ الحقول وارجاع الزر لحالته
               btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
               btn.disabled = false;
               document.getElementById('login-step-2').style.display = 'none'; 
@@ -1769,9 +1823,9 @@
      document.addEventListener('DOMContentLoaded', () => {
          checkStatus();
          initAutoLocation(); 
-          
+         
          setInterval(checkGlobalStatusFromServer, 10000);
-          
+         
          document.addEventListener("visibilitychange", function() {
               if (document.visibilityState === 'visible') {
                  checkGlobalStatusFromServer();
@@ -1906,6 +1960,7 @@
               return;
           }
           const btn = document.getElementById('tukSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
+          showOrderLoadingScreen();
           try {
               saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`);
@@ -1915,8 +1970,10 @@
                  method: "POST", headers: { "Content-Type": "application/json" },
                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية", callback_data: `claim|${name}|${vc}` }]] } })
               });
-             showToast("تم الإرسال بنجاح ✅"); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
-          } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
+             completeOrderLoadingScreen(); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+          } catch (e) {
+             showToast("حدث خطأ أثناء الإرسال ❌"); document.getElementById('order-loading-screen').style.display = 'none';
+          } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       async function sendMedFinal() {
@@ -1934,6 +1991,7 @@
               return;
           }
           const btn = document.getElementById('medSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
+          showOrderLoadingScreen();
           try {
              saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`); localStorage.removeItem('referred_by');
@@ -1941,8 +1999,10 @@
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
               });
-             showToast("تم الإرسال بنجاح ✅"); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
-          } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
+             completeOrderLoadingScreen(); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+          } catch (e) {
+             showToast("حدث خطأ أثناء الإرسال ❌"); document.getElementById('order-loading-screen').style.display = 'none';
+          } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       function previewImages() {
@@ -1981,6 +2041,7 @@
           const originalText = btn.innerHTML; 
          btn.innerHTML = '<span class="baly-spinner"></span>'; 
           btn.disabled = true;
+          showOrderLoadingScreen();
           
           try {
              saveCustomerData(name, phone); 
@@ -2012,18 +2073,16 @@
              localStorage.setItem('my_loyalty_orders', tempLoyalty);
              updateLocalLoyaltyUI();
 
-              let loyaltyMsg = (tempLoyalty % 10) === 0 ? "🎁 هذا الطلب مجاني (الطلب العاشر)" : `الطلب رقم ${tempLoyalty % 10} من أصل 10`;
+              let loyaltyMsg = (tempLoyalty % 7) === 0 ? "🎁 هذا الطلب مجاني (الطلب السابع)" : `الطلب رقم ${tempLoyalty % 7} من أصل 7`;
               let msgContent = order ? order : "الطلب موضح في الصور المرفقة 📸";
               let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص)**" : "";
               const msg = `🔵 طلب مسواك\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍الموقع: ${userCoords}`;
               
-              // الإرسال للقناة العامة للمناديب
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                  method: "POST", headers: { "Content-Type": "application/json" },
                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
 
-              // --- توجيه الطلبات للقنوات الخاصة بالمطاعم ---
               const restOrders = [
                   { key: "مطعم برجر علي سالم", token: ALI_SALEM_BOT_TOKEN, id: ALI_SALEM_CHAT_ID },
                   { key: "مطعم بركر ابو حمودي", token: ABO_HMODE_BOT_TOKEN, id: ABO_HMODE_CHAT_ID },
@@ -2044,12 +2103,13 @@
                   }
               }
 
-             showToast("تم إرسال طلبك بنجاح ✅"); 
+             completeOrderLoadingScreen(); 
              document.getElementById('custOrder').value = ""; 
              document.getElementById('custLandmark').value = ""; 
              loadSavedCustomerData();
           } catch (e) {
               showToast("حدث خطأ أثناء الإرسال ❌");
+              document.getElementById('order-loading-screen').style.display = 'none';
           } finally { 
              btn.innerHTML = originalText; 
              btn.disabled = false; 
@@ -2130,11 +2190,11 @@
       let loyaltyCount = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
       function updateLocalLoyaltyUI() {
           const displayCount = document.getElementById('current-order-count'); const progressBar = document.getElementById('loyalty-bar'); const giftMsg = document.getElementById('loyalty-gift-msg');
-          let currentCount = parseInt(loyaltyCount % 10); 
+          let currentCount = parseInt(loyaltyCount % 7); 
          if(displayCount) displayCount.innerText = currentCount;
-         if(progressBar) progressBar.style.width = (currentCount / 10 * 100) + "%";
-         if(currentCount === 9) { if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i> اطلب الآن! هذا طلب المجاني 🎁"; giftMsg.style.color = "var(--secondary)"; } if(progressBar) progressBar.style.background = "var(--secondary)"; } 
-          else { if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i>أوصل للطلب 10 وكروتك مجانية"; giftMsg.style.color = "var(--primary)"; } if(progressBar) progressBar.style.background = "var(--gold)"; }
+         if(progressBar) progressBar.style.width = (currentCount / 7 * 100) + "%";
+         if(currentCount === 6) { if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i> اطلب الآن! هذا طلب المجاني 🎁"; giftMsg.style.color = "var(--secondary)"; } if(progressBar) progressBar.style.background = "var(--secondary)"; } 
+          else { if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i>أوصل للطلب 7 وكروتك مجانية"; giftMsg.style.color = "var(--primary)"; } if(progressBar) progressBar.style.background = "var(--gold)"; }
       }
       function updateLoyaltyUI() { updateLocalLoyaltyUI(); } updateLocalLoyaltyUI();
 
