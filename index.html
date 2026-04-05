@@ -372,24 +372,7 @@
             </div>
         </div>
     </div>
-
-    <div id="order-status-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100006; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;">
-        <div class="prices-container" style="text-align: center; padding-bottom: 10px;">
-            <div class="prices-header" id="order-status-header" style="justify-content: center; background: linear-gradient(135deg, #10B981 0%, #059669 100%);">
-                <span id="order-status-title" style="font-size: 20px;">تم إرسال الطلب بنجاح</span>
-            </div>
-            <div class="prices-content" style="padding: 30px 20px 20px; display: flex; flex-direction: column; align-items: center; overflow: hidden;">
-                <div id="order-status-icon" style="margin-bottom: 20px; width: 130px; height: 130px; display: flex; justify-content: center; align-items: center; animation: scaleIn 0.5s ease-out;">
-                    </div>
-                <h3 id="order-status-msg" style="margin: 0 0 25px; font-weight: 800; color: var(--text-main); font-size: 16px;">تم استلام طلبك!</h3>
-                <button class="send-btn ripple" style="background: #10B981; margin-top: 0; border-radius: var(--radius-pill); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); font-size: 22px; font-weight: 900; letter-spacing: 2px;" onclick="closeOrderStatusModal()">
-                    NEXT
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="global-lock-screen">
+        <div id="global-lock-screen">
         <img src="https://cdn-icons-png.flaticon.com/512/2888/2888746.png" alt="صيانة" style="width: 180px; margin-bottom: 25px; cursor: pointer; animation: scaleIn 0.5s ease;" onclick="handleLockScreenSecret()">
         <h2 id="lock-h2" class="lock-title">التطبيق مغلق للصيانة 🛠️</h2>
         <p id="lock-p" class="lock-text">نعتذر منكم عيني، دا نسوي شوية تحديثات وتطوير للتطبيق. نرجع نستقبل طلباتكم بأقرب وقت!</p>
@@ -831,7 +814,6 @@
 
         <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
-
     <div id="join-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> انضم ككابتن</h2>
@@ -960,75 +942,38 @@
       const KLASHE_BOT_TOKEN = "8719779552:AAE5MMDa12ats3qocRoZoy_DMCS9RU8IQvQ"; 
       
       const HALEG_BOT_TOKEN = "8607099366:AAEK-D1553k9Mz94fcZJ9KiPUxZqusQSMqs";
+      // توكن سكوزي
       const SCOZI_BOT_TOKEN = "8129985022:AAHlKRiRSH4Jop8J58iFQOjl2NcAZnLdkRo";
+      
+      // توكن رويال فود (تمت الإضافة)
       const ROYAL_FOOD_BOT_TOKEN = "8620504304:AAEuUp97cjQmyaHCYSUC4eygNBXhsL4ZmXo";
 
+      // التعديل هنا: تم وضع ايديات القنوات الخاصة بدلاً من الايديات الشخصية للكل
       const ALI_SALEM_CHAT_ID = "-1003722556479";
       const ABO_HMODE_CHAT_ID = "-1003704352460";
       const VICTORIA_CHAT_ID = "-1003760108006"; 
       const KLASHE_CHAT_ID = "-1003727059406"; 
       const HALEG_CHAT_ID = "-1003719488878";
       const SCOZI_CHAT_ID = "-1003315608193";
+      
+      // ايدي رويال فود (تمت الإضافة)
       const ROYAL_FOOD_CHAT_ID = "-1003798976901";
 
-      // ==========================================
-      // مصفوفة الشعارات الرياضية ونظام الإشعارات الجديد
-      // ==========================================
-      const sportsLogos = [
-          "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png", // ريال مدريد
-          "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/FC_Barcelona.svg/1200px-FC_Barcelona.svg.png", // برشلونة
-          "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/Manchester_City_FC_badge.svg/1200px-Manchester_City_FC_badge.svg.png", // مانشستر سيتي
-          "https://upload.wikimedia.org/wikipedia/en/thumb/b/be/Al_Hilal_SFC_logo.svg/1200px-Al_Hilal_SFC_logo.svg.png", // الهلال
-          "https://upload.wikimedia.org/wikipedia/ar/thumb/0/00/Al-Nassr_Logo.svg/1200px-Al-Nassr_Logo.svg.png", // النصر
-          "https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Arsenal_FC.svg/1200px-Arsenal_FC.svg.png", // أرسنال
-          "https://upload.wikimedia.org/wikipedia/ar/thumb/f/f3/Al-Zawraa_SC_logo.png/1200px-Al-Zawraa_SC_logo.png", // الزوراء
-          "https://upload.wikimedia.org/wikipedia/ar/thumb/d/d3/Al_Quwa_Al_Jawiya_Logo.png/1200px-Al_Quwa_Al_Jawiya_Logo.png" // القوة الجوية
-      ];
-
-      function showOrderResult(isSuccess, message) {
-          const modal = document.getElementById('order-status-modal');
-          const header = document.getElementById('order-status-header');
-          const title = document.getElementById('order-status-title');
-          const msg = document.getElementById('order-status-msg');
-          const iconContainer = document.getElementById('order-status-icon');
-          const nextBtn = modal.querySelector('.send-btn');
-
-          if (isSuccess) {
-              header.style.background = "linear-gradient(135deg, #10B981 0%, #059669 100%)";
-              title.innerText = "تم إرسال الطلب بنجاح";
-              nextBtn.style.background = "#10B981";
-              const randomLogo = sportsLogos[Math.floor(Math.random() * sportsLogos.length)];
-              iconContainer.innerHTML = `<img src="${randomLogo}" style="max-width:100%; max-height:100%; object-fit:contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));">`;
-              try { confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } }); } catch(e){}
-          } else {
-              header.style.background = "linear-gradient(135deg, #EF4444 0%, #B91C1C 100%)";
-              title.innerText = "فشل في إرسال الطلب";
-              nextBtn.style.background = "#10B981"; // زر NEXT يبقى أخضر حسب الطلب
-              iconContainer.innerHTML = `<i class="fas fa-exclamation-triangle" style="font-size: 80px; color: #EF4444; filter: drop-shadow(0 10px 15px rgba(239,68,68,0.3));"></i>`;
-          }
-
-          msg.innerText = message;
-          modal.style.display = 'flex';
-      }
-
-      function closeOrderStatusModal() {
-          document.getElementById('order-status-modal').style.display = 'none';
-          showScreen('home-screen');
-      }
-      // ==========================================
-
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.21"; 
+      const CURRENT_VERSION = "2.0.21"; // تم تحديث النسخة ليظهر التغيير للمستخدمين
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
       }
 
+      // ==========================================
+      // إضافة نظام التحديد الجغرافي (Geofencing) لأم قصر
+      // ==========================================
       const umQasrPolygon = [
-          { lat: 30.0800, lng: 47.9600 }, 
-          { lat: 30.0800, lng: 47.8800 }, 
-          { lat: 30.0100, lng: 47.8800 }, 
-          { lat: 30.0100, lng: 47.9600 }  
+          { lat: 30.0800, lng: 47.9600 }, // الحدود الشمالية الشرقية (الميناء وما حوله)
+          { lat: 30.0800, lng: 47.8800 }, // الحدود الشمالية الغربية
+          { lat: 30.0100, lng: 47.8800 }, // الحدود الجنوبية الغربية (المجمعات، القاعدة، المستشفى)
+          { lat: 30.0100, lng: 47.9600 }  // الحدود الجنوبية الشرقية
       ];
 
       function isUserInUmQasr(userLat, userLng, polygon) {
@@ -1051,6 +996,7 @@
              document.getElementById('out-of-zone-popup').style.display = 'flex';
           }
       }
+      // ==========================================
 
       async function trackLiveVisit() {
           try { fetch(`${GS_URL}?action=trackVisit&t=${new Date().getTime()}`); } catch(e) {}
@@ -1328,6 +1274,7 @@
               showScreen('home-screen'); 
               showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
               
+              // تفريغ الحقول وارجاع الزر لحالته
               btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
               btn.disabled = false;
               document.getElementById('login-step-2').style.display = 'none'; 
@@ -1943,11 +1890,8 @@
           if (typeof closeSidebar === 'function') closeSidebar();
       }
 
-      // ==========================================
-      // تطبيق واجهة الإشعارات الجديدة لطلبات التكتك والوسيط والتسوق
-      // ==========================================
       async function sendTukOrder() {
-          if (!navigator.onLine) return showOrderResult(false, "لا يوجد إنترنت ❌");
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const name = document.getElementById('tukName').value.trim(); const phone = document.getElementById('tukPhone').value.trim();
           const land = document.getElementById('tukLandmark').value.trim(); const dropLink = document.getElementById('tukDropoffLink').value.trim(); 
           if(!name || !validateIraqiPhone(phone) || !dropLink) return showToast("أكمل البيانات وحدد موقع النزول 📍");
@@ -1971,17 +1915,12 @@
                  method: "POST", headers: { "Content-Type": "application/json" },
                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية", callback_data: `claim|${name}|${vc}` }]] } })
               });
-             
-             // التعديل: ظهور الواجهة الجديدة بدلاً من التوست
-             showOrderResult(true, "تم الإرسال بنجاح ✅");
-             document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
-          } catch (e) {
-              showOrderResult(false, "خطاء في ارسال الطلب");
-          } finally { btn.innerHTML = originalText; btn.disabled = false; }
+             showToast("تم الإرسال بنجاح ✅"); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+          } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       async function sendMedFinal() {
-          if (!navigator.onLine) return showOrderResult(false, "لا يوجد إنترنت ❌");
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const name = document.getElementById('medName').value.trim(); const phone = document.getElementById('medPhone').value.trim(); const order = document.getElementById('medOrder').value.trim();
           if(!name || !validateIraqiPhone(phone) || !order) return showToast("أكمل البيانات بشكل صحيح 📝");
          if(!userCoords) {
@@ -2002,13 +1941,8 @@
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
               });
-             
-             // التعديل: ظهور الواجهة الجديدة بدلاً من التوست
-             showOrderResult(true, "تم الإرسال بنجاح ✅");
-             document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
-          } catch (e) {
-              showOrderResult(false, "خطاء في ارسال الطلب");
-          } finally { btn.innerHTML = originalText; btn.disabled = false; }
+             showToast("تم الإرسال بنجاح ✅"); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+          } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       function previewImages() {
@@ -2022,7 +1956,7 @@
       function clearImages() { document.getElementById('custImages').value = ''; document.getElementById('image-preview-container').innerHTML = ''; }
 
       async function sendFinal() {
-          if (!navigator.onLine) return showOrderResult(false, "لا يوجد إنترنت ❌");
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           
           const name = document.getElementById('custName').value.trim(); 
           const phone = document.getElementById('custPhone').value.trim();
@@ -2083,11 +2017,13 @@
               let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص)**" : "";
               const msg = `🔵 طلب مسواك\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍الموقع: ${userCoords}`;
               
+              // الإرسال للقناة العامة للمناديب
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                  method: "POST", headers: { "Content-Type": "application/json" },
                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
               });
 
+              // --- توجيه الطلبات للقنوات الخاصة بالمطاعم ---
               const restOrders = [
                   { key: "مطعم برجر علي سالم", token: ALI_SALEM_BOT_TOKEN, id: ALI_SALEM_CHAT_ID },
                   { key: "مطعم بركر ابو حمودي", token: ABO_HMODE_BOT_TOKEN, id: ABO_HMODE_CHAT_ID },
@@ -2108,13 +2044,12 @@
                   }
               }
 
-             // التعديل: ظهور الواجهة الجديدة بدلاً من التوست
-             showOrderResult(true, "تم إرسال طلبك بنجاح ✅");
+             showToast("تم إرسال طلبك بنجاح ✅"); 
              document.getElementById('custOrder').value = ""; 
              document.getElementById('custLandmark').value = ""; 
              loadSavedCustomerData();
           } catch (e) {
-              showOrderResult(false, "خطاء في ارسال الطلب");
+              showToast("حدث خطأ أثناء الإرسال ❌");
           } finally { 
              btn.innerHTML = originalText; 
              btn.disabled = false; 
@@ -2255,4 +2190,14 @@
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
       function confirmMapLocation() {
           const center = appMap.getCenter();
-          const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng
+          const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng}`;
+         document.getElementById('tukDropoffLink').value = googleMapsLink;
+         document.getElementById('map-success-msg').style.display = 'block';
+         closeMapModal();
+      }
+
+      function openPricesModal() { document.getElementById('prices-modal').style.display = 'flex'; }
+      function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
+    </script>
+</body>
+            </html>
