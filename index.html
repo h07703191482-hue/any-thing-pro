@@ -1258,17 +1258,21 @@
           btn.innerHTML = '<span class="baly-spinner"></span> جاري الدخول...';
           btn.disabled = true;
 
-          setTimeout(() => {
+          // التعديل هنا: إضافة async للسماح بالانتظار قبل الانتقال
+          setTimeout(async () => {
               saveCustomerData(userName, userPhone); 
               loadSavedCustomerData(); 
               syncLoyaltyWithServer();
               
               if (navigator.onLine) {
                  const msg = `👤 تسجيل دخول جديد (مباشر)\nالاسم: ${userName}\nالرقم: ${userPhone}`;
-                 fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
-                 }).catch(e => {});
-                 fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e => {});
+                 try {
+                     // التعديل هنا: إضافة await لضمان وصول الرسالة قبل اكتمال الكود والانتقال
+                     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+                     });
+                     await fetch(`${GS_URL}?action=incrementAuthUsers`);
+                 } catch(e) {}
               }
 
               showScreen('home-screen'); 
