@@ -1304,6 +1304,7 @@
               document.getElementById('loginPhoneInput').value = '';
           }, 800);
       }
+      
       const menus = {
           'royal_food': {
               name: 'رويال فود',
@@ -1604,7 +1605,6 @@
               ]
           }
       };
-      
       async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
@@ -1783,7 +1783,6 @@
           } else {
              if(!localStorage.getItem('saved_customer_phone')) {
                  showScreen('login-screen');
-                 // الإضافة هنا: إظهار النافذة للمستخدمين الغير مسجلين دخول
                  document.getElementById('device-type-modal').style.display = 'flex';
              }
               else { loadSavedCustomerData(); syncLoyaltyWithServer(); showScreen('home-screen'); }
@@ -2039,15 +2038,9 @@
               let loyaltyMsg = (tempLoyalty % 10) === 0 ? "🎁 هذا الطلب مجاني (الطلب العاشر)" : `الطلب رقم ${tempLoyalty % 10} من أصل 10`;
               let msgContent = order ? order : "الطلب موضح في الصور المرفقة 📸";
               let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص)**" : "";
-              const msg = `🔵 طلب مسواك\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل الطلب: ${loyaltyMsg}\n📍الموقع: ${userCoords}`;
               
-              // الإرسال للقناة العامة للمناديب
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                 method: "POST", headers: { "Content-Type": "application/json" },
-                 body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
-              });
-
-              // --- توجيه الطلبات للقنوات الخاصة بالمطاعم ---
+              // --- تجهيز أرقام الطلبات المستقلة لكل مطعم ---
+              let restOrderNumbers = "";
               const restOrders = [
                   { key: "مطعم برجر علي سالم", token: ALI_SALEM_BOT_TOKEN, id: ALI_SALEM_CHAT_ID },
                   { key: "مطعم بركر ابو حمودي", token: ABO_HMODE_BOT_TOKEN, id: ABO_HMODE_CHAT_ID },
@@ -2060,13 +2053,28 @@
 
               for (let rest of restOrders) {
                   if (order.includes(rest.key)) {
-                      const restMsg = `🍔 طلب جديد لـ ${rest.key}!\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 التفاصيل:\n${msgContent}\n\n⚠️ يرجى التجهيز، المندوب سيصل قريباً.`;
+                      // زيادة عداد الطلبات الخاص بهذا المطعم بمقدار 1 محلياً
+                      let currentRestCount = parseInt(localStorage.getItem('order_counter_' + rest.key) || "0") + 1;
+                      localStorage.setItem('order_counter_' + rest.key, currentRestCount);
+                      
+                      restOrderNumbers += `\n🔢 رقم طلب (${rest.key}): #${currentRestCount}`;
+                      
+                      // إرسال رسالة للمطعم متضمنة رقم الطلب
+                      const restMsg = `🍔 طلب جديد لـ ${rest.key}!\n🔢 رقم الطلب: #${currentRestCount}\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 التفاصيل:\n${msgContent}\n\n⚠️ يرجى التجهيز، المندوب سيصل قريباً.`;
                       fetch(`https://api.telegram.org/bot${rest.token}/sendMessage`, { 
                           method: "POST", headers: { "Content-Type": "application/json" }, 
                           body: JSON.stringify({ chat_id: rest.id, text: restMsg }) 
                       }).catch(e => {});
                   }
               }
+
+              const msg = `🔵 طلب مسواك\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل طلب العميل: ${loyaltyMsg}${restOrderNumbers}\n📍الموقع: ${userCoords}`;
+              
+              // الإرسال للقناة العامة للمناديب (سيظهر رقم الطلب للمندوب هنا)
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                 method: "POST", headers: { "Content-Type": "application/json" },
+                 body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
+              });
 
              showToast("تم إرسال طلبك بنجاح ✅"); 
              document.getElementById('custOrder').value = ""; 
