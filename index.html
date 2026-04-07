@@ -32,11 +32,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBXW3gL4PszJjmgmVVOjkuEqe-WkWHyO60",
+        authDomain: "al-bandar-f02f6.firebaseapp.com",
+        projectId: "al-bandar-f02f6",
+        storageBucket: "al-bandar-f02f6.firebasestorage.app",
+        messagingSenderId: "799678549296",
+        appId: "1:799678549296:web:bd1cc0ff99a680eabfccf5",
+        measurementId: "G-KRRFC79HC3"
+      };
+
+      // إذا لم يكن الفايربيس مهيئاً مسبقاً، قم بتهيئته
+      if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+      }
+      const db = firebase.database();
+    </script>
 
     <style>
       #map-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100005; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
@@ -959,25 +979,19 @@
       const KLASHE_BOT_TOKEN = "8719779552:AAE5MMDa12ats3qocRoZoy_DMCS9RU8IQvQ"; 
       
       const HALEG_BOT_TOKEN = "8607099366:AAEK-D1553k9Mz94fcZJ9KiPUxZqusQSMqs";
-      // توكن سكوزي
       const SCOZI_BOT_TOKEN = "8129985022:AAHlKRiRSH4Jop8J58iFQOjl2NcAZnLdkRo";
-      
-      // توكن رويال فود (تمت الإضافة)
       const ROYAL_FOOD_BOT_TOKEN = "8620504304:AAEuUp97cjQmyaHCYSUC4eygNBXhsL4ZmXo";
 
-      // التعديل هنا: تم وضع ايديات القنوات الخاصة بدلاً من الايديات الشخصية للكل
       const ALI_SALEM_CHAT_ID = "-1003722556479";
       const ABO_HMODE_CHAT_ID = "-1003704352460";
       const VICTORIA_CHAT_ID = "-1003760108006"; 
       const KLASHE_CHAT_ID = "-1003727059406"; 
       const HALEG_CHAT_ID = "-1003719488878";
       const SCOZI_CHAT_ID = "-1003315608193";
-      
-      // ايدي رويال فود (تمت الإضافة)
       const ROYAL_FOOD_CHAT_ID = "-1003798976901";
 
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.21"; // تم تحديث النسخة ليظهر التغيير للمستخدمين
+      const CURRENT_VERSION = "2.0.21"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -987,10 +1001,10 @@
       // إضافة نظام التحديد الجغرافي (Geofencing) لأم قصر
       // ==========================================
       const umQasrPolygon = [
-          { lat: 30.0800, lng: 47.9600 }, // الحدود الشمالية الشرقية (الميناء وما حوله)
-          { lat: 30.0800, lng: 47.8800 }, // الحدود الشمالية الغربية
-          { lat: 30.0100, lng: 47.8800 }, // الحدود الجنوبية الغربية (المجمعات، القاعدة، المستشفى)
-          { lat: 30.0100, lng: 47.9600 }  // الحدود الجنوبية الشرقية
+          { lat: 30.0800, lng: 47.9600 }, 
+          { lat: 30.0800, lng: 47.8800 }, 
+          { lat: 30.0100, lng: 47.8800 }, 
+          { lat: 30.0100, lng: 47.9600 }  
       ];
 
       function isUserInUmQasr(userLat, userLng, polygon) {
@@ -1275,7 +1289,6 @@
           btn.innerHTML = '<span class="baly-spinner"></span> جاري الدخول...';
           btn.disabled = true;
 
-          // التعديل هنا: إضافة async للسماح بالانتظار قبل الانتقال
           setTimeout(async () => {
               saveCustomerData(userName, userPhone); 
               loadSavedCustomerData(); 
@@ -1284,7 +1297,6 @@
               if (navigator.onLine) {
                  const msg = `👤 تسجيل دخول جديد (مباشر)\nالاسم: ${userName}\nالرقم: ${userPhone}`;
                  try {
-                     // التعديل هنا: إضافة await لضمان وصول الرسالة قبل اكتمال الكود والانتقال
                      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
                      });
@@ -1295,7 +1307,6 @@
               showScreen('home-screen'); 
               showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
               
-              // تفريغ الحقول وارجاع الزر لحالته
               btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
               btn.disabled = false;
               document.getElementById('login-step-2').style.display = 'none'; 
@@ -1312,40 +1323,32 @@
                   { id: 'rf1', name: 'بركر كلاسيك', price: 2500, category: 'بركر اللحم' },
                   { id: 'rf2', name: 'بركر بالجبن', price: 3000, category: 'بركر اللحم' },
                   { id: 'rf3', name: 'بركر دبل', price: 5000, category: 'بركر اللحم' },
-                  
                   { id: 'rf4', name: 'بركر كلاسيك', price: 2000, category: 'بركر دجاج' },
                   { id: 'rf5', name: 'بركر بالجبن', price: 2500, category: 'بركر دجاج' },
                   { id: 'rf6', name: 'بركر دبل', price: 4000, category: 'بركر دجاج' },
-                  
                   { id: 'rf7', name: 'بركر كلاسيك', price: 2500, category: 'بركر سكالوب' },
                   { id: 'rf8', name: 'بركر بالجبن', price: 3000, category: 'بركر سكالوب' },
                   { id: 'rf9', name: 'بركر دبل', price: 4000, category: 'بركر سكالوب' },
-                  
                   { id: 'rf10', name: 'بركر ستيك رويال', price: 5000, category: 'بركر سبشل' },
                   { id: 'rf11', name: 'بركر هيمي', price: 6000, category: 'بركر سبشل' },
                   { id: 'rf12', name: 'لغم بركر لحم', price: 7000, category: 'بركر سبشل' },
                   { id: 'rf13', name: 'لغم بركر دجاج', price: 5000, category: 'بركر سبشل' },
                   { id: 'rf14', name: 'ستيك دجاج دايت', price: 6000, category: 'بركر سبشل' },
                   { id: 'rf15', name: 'انشيلادا', price: 5000, category: 'بركر سبشل' },
-                  
                   { id: 'rf16', name: 'صغير', price: 8000, category: 'جاينت بركر لحم' },
                   { id: 'rf17', name: 'وسط', price: 10000, category: 'جاينت بركر لحم' },
                   { id: 'rf18', name: 'كبير', price: 15000, category: 'جاينت بركر لحم' },
-                  
                   { id: 'rf19', name: 'صغير', price: 6000, category: 'جاينت بركر دجاج' },
                   { id: 'rf20', name: 'وسط', price: 8000, category: 'جاينت بركر دجاج' },
                   { id: 'rf21', name: 'كبير', price: 12000, category: 'جاينت بركر دجاج' },
-                  
                   { id: 'rf22', name: 'نفر شاورما لحم', price: 7000, category: 'شاورما لحم' },
                   { id: 'rf23', name: 'ربع كيلو شاورما لحم', price: 10000, category: 'شاورما لحم' },
                   { id: 'rf24', name: 'نص كيلو شاورما لحم', price: 20000, category: 'شاورما لحم' },
                   { id: 'rf25', name: 'كيلو شاورما لحم', price: 40000, category: 'شاورما لحم' },
-                  
                   { id: 'rf26', name: 'نفر شاورما دجاج', price: 6000, category: 'شاورما دجاج' },
                   { id: 'rf27', name: 'ربع كيلو شاورما دجاج', price: 9000, category: 'شاورما دجاج' },
                   { id: 'rf28', name: 'نص كيلو شاورما دجاج', price: 18000, category: 'شاورما دجاج' },
                   { id: 'rf29', name: 'كيلو شاورما دجاج', price: 35000, category: 'شاورما دجاج' },
-                  
                   { id: 'rf30', name: 'صاج لحم صغير', price: 3000, category: 'الصاجات (سنجل)' },
                   { id: 'rf31', name: 'صاج لحم كبير', price: 4000, category: 'الصاجات (سنجل)' },
                   { id: 'rf32', name: 'صاج دجاج صغير', price: 2500, category: 'الصاجات (سنجل)' },
@@ -1356,24 +1359,19 @@
                   { id: 'rf37', name: 'صاج كرسبي كبير', price: 3000, category: 'الصاجات (سنجل)' },
                   { id: 'rf38', name: 'صاج ايطالي لحم', price: 6000, category: 'الصاجات (سنجل)' },
                   { id: 'rf39', name: 'صاج ايطالي دجاج', price: 5000, category: 'الصاجات (سنجل)' },
-                  
                   { id: 'rf40', name: 'وجبة صاج لحم', price: 7000, category: 'وجبات الصاج' },
                   { id: 'rf41', name: 'وجبة صاج دجاج', price: 6000, category: 'وجبات الصاج' },
                   { id: 'rf42', name: 'وجبة صاج فلافل', price: 4000, category: 'وجبات الصاج' },
                   { id: 'rf43', name: 'وجبة صاج كرسبي', price: 5000, category: 'وجبات الصاج' },
-                  
                   { id: 'rf44', name: 'سندويش لحم', price: 2000, category: 'سندويش' },
                   { id: 'rf45', name: 'سندويش دجاج', price: 2000, category: 'سندويش' },
                   { id: 'rf46', name: 'فاهيتا دجاج', price: 3000, category: 'سندويش' },
-                  
                   { id: 'rf47', name: 'كرسبي 3 قطع', price: 4000, category: 'كرسبي' },
                   { id: 'rf48', name: 'كرسبي 5 قطع', price: 6000, category: 'كرسبي' },
-                  
                   { id: 'rf49', name: 'ريزو عادي', price: 5000, category: 'ريزو' },
                   { id: 'rf50', name: 'ريزو BBQ', price: 5000, category: 'ريزو' },
                   { id: 'rf51', name: 'ريزو مكس', price: 5000, category: 'ريزو' },
                   { id: 'rf52', name: 'ريزو هلابينو', price: 6000, category: 'ريزو' },
-                  
                   { id: 'rf53', name: 'دجاج', price: 5000, category: 'بيتزا (الحجم الصغير)' },
                   { id: 'rf54', name: 'لحم', price: 7000, category: 'بيتزا (الحجم الصغير)' },
                   { id: 'rf55', name: 'ببروني', price: 7000, category: 'بيتزا (الحجم الصغير)' },
@@ -1382,7 +1380,6 @@
                   { id: 'rf58', name: 'دجاج رانش', price: 6000, category: 'بيتزا (الحجم الصغير)' },
                   { id: 'rf59', name: 'جبن', price: 6000, category: 'بيتزا (الحجم الصغير)' },
                   { id: 'rf60', name: 'خضار', price: 5000, category: 'بيتزا (الحجم الصغير)' },
-                  
                   { id: 'rf61', name: 'دجاج', price: 8000, category: 'بيتزا (الحجم الوسط)' },
                   { id: 'rf62', name: 'لحم', price: 9000, category: 'بيتزا (الحجم الوسط)' },
                   { id: 'rf63', name: 'ببروني', price: 10000, category: 'بيتزا (الحجم الوسط)' },
@@ -1391,7 +1388,6 @@
                   { id: 'rf66', name: 'دجاج رانش', price: 9000, category: 'بيتزا (الحجم الوسط)' },
                   { id: 'rf67', name: 'جبن', price: 9000, category: 'بيتزا (الحجم الوسط)' },
                   { id: 'rf68', name: 'خضار', price: 7000, category: 'بيتزا (الحجم الوسط)' },
-                  
                   { id: 'rf69', name: 'دجاج', price: 10000, category: 'بيتزا (الحجم الكبير)' },
                   { id: 'rf70', name: 'لحم', price: 13000, category: 'بيتزا (الحجم الكبير)' },
                   { id: 'rf71', name: 'ببروني', price: 13000, category: 'بيتزا (الحجم الكبير)' },
@@ -1400,7 +1396,6 @@
                   { id: 'rf74', name: 'دجاج رانش', price: 12000, category: 'بيتزا (الحجم الكبير)' },
                   { id: 'rf75', name: 'جبن', price: 12000, category: 'بيتزا (الحجم الكبير)' },
                   { id: 'rf76', name: 'خضار', price: 10000, category: 'بيتزا (الحجم الكبير)' },
-                  
                   { id: 'rf77', name: 'علبة فنكر', price: 1000, category: 'المقبلات والجانبيات' },
                   { id: 'rf78', name: 'طبق فنكر', price: 2000, category: 'المقبلات والجانبيات' },
                   { id: 'rf79', name: 'جيز فنكر', price: 3000, category: 'المقبلات والجانبيات' },
@@ -1410,7 +1405,6 @@
                   { id: 'rf83', name: 'سلطة سيزر', price: 5000, category: 'المقبلات والجانبيات' },
                   { id: 'rf84', name: 'حمص باللحم', price: 4000, category: 'المقبلات والجانبيات' },
                   { id: 'rf85', name: 'حمص دجاج', price: 3000, category: 'المقبلات والجانبيات' },
-                  
                   { id: 'rf86', name: 'بيبسي', price: 500, category: 'المشروبات والصوصات' },
                   { id: 'rf87', name: 'ديو', price: 500, category: 'المشروبات والصوصات' },
                   { id: 'rf88', name: 'بيبسي دايت', price: 500, category: 'المشروبات والصوصات' },
@@ -1933,6 +1927,22 @@
               saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`);
              localStorage.removeItem('referred_by'); 
+
+              // --- الإرسال للفايربيس ---
+              if(typeof db !== 'undefined') {
+                  db.ref('orders/' + vc).set({
+                      id: vc,
+                      customer: name,
+                      phone: phone,
+                      items: `تحصيل/تسليم: ${dropLink} | دالة: ${land}`,
+                      price: "حسب المسافة",
+                      restaurant: "تكتك توصيلة",
+                      status: 'pending_driver',
+                      timestamp: firebase.database.ServerValue.TIMESTAMP,
+                      location: userCoords
+                  });
+              }
+
               const msg = `🚖 طلب تكتك توصيلة\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الموقع: ${userCoords}\n📝تفاصيل: ${dropLink}\nدالة: ${land}`;
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                  method: "POST", headers: { "Content-Type": "application/json" },
@@ -1960,6 +1970,22 @@
           try {
              saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`); localStorage.removeItem('referred_by');
+
+             // --- الإرسال للفايربيس ---
+              if(typeof db !== 'undefined') {
+                  db.ref('orders/' + vc).set({
+                      id: vc,
+                      customer: name,
+                      phone: phone,
+                      items: `الغرض: ${order} | دالة: ${document.getElementById('medLandmark').value.trim()}`,
+                      price: "حسب الاتفاق",
+                      restaurant: "خدمة الوسيط",
+                      status: 'pending_driver',
+                      timestamp: firebase.database.ServerValue.TIMESTAMP,
+                      location: userCoords
+                  });
+              }
+
              const msg = `🔵طلب وسيط\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📝الغرض: ${order}\n📍الموقع: ${userCoords}`;
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
@@ -2039,7 +2065,6 @@
               let msgContent = order ? order : "الطلب موضح في الصور المرفقة 📸";
               let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص)**" : "";
               
-              // --- تجهيز أرقام الطلبات المستقلة لكل مطعم ---
               let restOrderNumbers = "";
               const restOrders = [
                   { key: "مطعم برجر علي سالم", token: ALI_SALEM_BOT_TOKEN, id: ALI_SALEM_CHAT_ID },
@@ -2051,15 +2076,15 @@
                   { key: "رويال فود", token: ROYAL_FOOD_BOT_TOKEN, id: ROYAL_FOOD_CHAT_ID }
               ];
 
+              let targetRestaurant = "توصيل عام";
               for (let rest of restOrders) {
                   if (order.includes(rest.key)) {
-                      // زيادة عداد الطلبات الخاص بهذا المطعم بمقدار 1 محلياً
+                      targetRestaurant = rest.key;
                       let currentRestCount = parseInt(localStorage.getItem('order_counter_' + rest.key) || "0") + 1;
                       localStorage.setItem('order_counter_' + rest.key, currentRestCount);
                       
                       restOrderNumbers += `\n🔢 رقم طلب (${rest.key}): #${currentRestCount}`;
                       
-                      // إرسال رسالة للمطعم متضمنة رقم الطلب
                       const restMsg = `🍔 طلب جديد لـ ${rest.key}!\n🔢 رقم الطلب: #${currentRestCount}\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 التفاصيل:\n${msgContent}\n\n⚠️ يرجى التجهيز، المندوب سيصل قريباً.`;
                       fetch(`https://api.telegram.org/bot${rest.token}/sendMessage`, { 
                           method: "POST", headers: { "Content-Type": "application/json" }, 
@@ -2068,9 +2093,23 @@
                   }
               }
 
+              // --- الإرسال للفايربيس ---
+              if(typeof db !== 'undefined') {
+                  db.ref('orders/' + vc).set({
+                      id: vc,
+                      customer: name,
+                      phone: phone,
+                      items: msgContent,
+                      price: "حسب الفاتورة",
+                      restaurant: targetRestaurant,
+                      status: targetRestaurant !== "توصيل عام" ? 'pending_restaurant' : 'pending_driver',
+                      timestamp: firebase.database.ServerValue.TIMESTAMP,
+                      location: userCoords
+                  });
+              }
+
               const msg = `🔵 طلب مسواك\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل طلب العميل: ${loyaltyMsg}${restOrderNumbers}\n📍الموقع: ${userCoords}`;
               
-              // الإرسال للقناة العامة للمناديب (سيظهر رقم الطلب للمندوب هنا)
               await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                  method: "POST", headers: { "Content-Type": "application/json" },
                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
