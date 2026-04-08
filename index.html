@@ -2558,4 +2558,11 @@
           const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng}`;
          document.getElementById('tukDropoffLink').value = googleMapsLink;
          document.getElementById('map-success-msg').style.display = 'block';
-         close
+         closeMapModal();
+      }
+
+      function openPricesModal() { document.getElementById('prices-modal').style.display = 'flex'; }
+      function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
+    </script>
+</body>
+</html>
