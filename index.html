@@ -235,7 +235,6 @@
       
       .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(90, 34, 139, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
       .location-notice { font-size: 13px; font-weight: 700; color: #10B981; text-align: center; margin-bottom: 15px; display: block; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: var(--radius-md); border: 1px dashed #10B981;}
-
       /* تصميم سلايدر المطاعم الجديد مقسم لصفين */
       .rest-slider { display: grid; grid-template-rows: repeat(2, 1fr); grid-auto-flow: column; grid-auto-columns: 120px; overflow-x: auto; gap: 15px; padding: 0 20px 20px; scroll-snap-type: x mandatory; }
      .rest-slider::-webkit-scrollbar { display: none; }
@@ -861,7 +860,6 @@
 
         <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
-
     <div id="join-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> انضم ككابتن</h2>
@@ -931,6 +929,12 @@
            </button>
         </div>
         
+        <div class="form-card" id="available-orders-section">
+            <div class="form-card-title"><i class="fas fa-motorcycle" style="color: #F59E0B;"></i> حجز الطلبات المتاحة</div>
+            <div id="available-orders-container" style="display: flex; flex-direction: column; gap: 10px;">
+                <p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات متاحة حالياً</p>
+            </div>
+        </div>
         <div class="form-card" style="background: linear-gradient(135deg, var(--primary) 0%, #818CF8 100%); color:white; border:none;">
             <h4 style="color:rgba(255,255,255,0.8); margin:0; font-size:15px;">إجمالي العمليات المنجزة 📦</h4>
             <p id="stat-count" style="font-size: 45px; font-weight:800; color:white; margin:10px 0 0;">0</p>
@@ -981,6 +985,9 @@
       const PUBLIC_CHANNEL = "@uumqaser";
       const ADMIN_CHAT_ID = "7479342799"; 
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
+
+      const DISCORD_PUBLIC_WEBHOOK = "https://discord.com/api/webhooks/1491324693871857684/i9PXJalQMx79I_Ev5i10jeS8TgKEe_Q_bdqhuhOC57LNiCw-kFFdJstxeuquI9abklp9";
+      const DISCORD_PRIVATE_WEBHOOK = "https://discord.com/api/webhooks/1491325381209362483/JmSQslp2XaCCPYOE3MbX3ODMr7NQIt0za7KCF_O_VTTmiemGCe7lI_fp_5wKquE-6wVz";
 
       const NEW_BOT_TOKEN = "8757179280:AAHEgp3YTaVv6qZNr32ZA7fgk4fT8v-cqCk";
       const NEW_BOT_USER = "CodAlbanderbot";
@@ -1324,6 +1331,7 @@
               document.getElementById('loginPhoneInput').value = '';
           }, 800);
       }
+      
       const menus = {
           'rken_estkana': {
               name: 'ركن استكانة',
@@ -1770,6 +1778,101 @@
           }
       };
 
+      // ===========================
+      // دوال ديسكورد وحجز الطلبات الجديدة
+      // ===========================
+
+      async function sendToDiscord(msg, orderId) {
+          try {
+              let response = await fetch(DISCORD_PUBLIC_WEBHOOK + "?wait=true", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ content: msg })
+              });
+              if(response.ok) {
+                  let data = await response.json();
+                  if(data.id && typeof db !== 'undefined') {
+                      db.ref('orders/' + orderId).update({ discordMsgId: data.id });
+                  }
+              }
+          } catch(e) { console.log("Discord Send Error:", e); }
+      }
+
+      async function editDiscordMessage(msgId, newMsg) {
+          try {
+              await fetch(DISCORD_PUBLIC_WEBHOOK + "/messages/" + msgId, {
+                  method: "PATCH",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ content: newMsg })
+              });
+          } catch(e) {}
+      }
+
+      async function sendToPrivateDiscord(msg) {
+          try {
+              await fetch(DISCORD_PRIVATE_WEBHOOK, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ content: msg })
+              });
+          } catch(e) {}
+      }
+
+      function listenToOrders() {
+          if(typeof db === 'undefined' || localStorage.getItem('isVerifiedDriver') !== 'true') return;
+          const container = document.getElementById('available-orders-container');
+          if(!container) return;
+
+          db.ref('orders').on('value', (snapshot) => {
+              const orders = snapshot.val();
+              container.innerHTML = '';
+              let hasOrders = false;
+              
+              for(let key in orders) {
+                  let order = orders[key];
+                  if(order.status === 'pending_driver') {
+                      hasOrders = true;
+                      let div = document.createElement('div');
+                      div.className = 'form-card';
+                      div.style = 'padding: 15px; border-right: 4px solid var(--secondary); margin-bottom: 10px; background: var(--surface); border-radius: var(--radius-md); text-align: right; box-shadow: var(--shadow-sm);';
+                      
+                      let safeItems = order.items ? order.items.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ') : '';
+                      
+                      div.innerHTML = `
+                          <p style="margin: 0 0 5px; font-weight: 800; color: var(--primary);">نوع الطلب: ${order.restaurant || 'عام'}</p>
+                          <p style="margin: 0 0 5px; font-size: 14px; font-weight: 600;">الزبون: ${order.customer}</p>
+                          <p style="margin: 0 0 15px; font-size: 13px; color: var(--text-main); line-height: 1.5;">التفاصيل: ${order.items}</p>
+                          <button class="send-btn ripple" style="padding: 12px; font-size: 14px; background: var(--secondary); color: #000; box-shadow: none; margin-top: 0;" onclick="claimOrder('${order.id}', '${order.customer}', '${order.discordMsgId || ''}', '${order.phone}', '${order.location || ''}', '${safeItems}')">
+                              <i class="fas fa-hand-paper"></i> حجز الطلب لي
+                          </button>
+                      `;
+                      container.appendChild(div);
+                  }
+              }
+              if(!hasOrders) {
+                  container.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات متاحة حالياً</p>';
+              }
+          });
+      }
+
+      async function claimOrder(orderId, customerName, discordMsgId, phone, location, items) {
+          const driverName = localStorage.getItem('driver_name') || 'كابتن غير معروف';
+          
+          if(typeof db !== 'undefined') {
+              db.ref('orders/' + orderId).update({ status: 'claimed', driver: driverName });
+          }
+          
+          if(discordMsgId) {
+              const newPublicMsg = `🔴 **تم حجز الطلب**\nباسم المندوب: ${driverName}\nواسم الزبون: ${customerName}`;
+              editDiscordMessage(discordMsgId, newPublicMsg);
+          }
+          
+          const privateMsg = `🟢 **طلب محجوز جديد للمندوب (${driverName})**\n\nرقم الطلب: ${orderId}\nالزبون: ${customerName}\nالهاتف: ${phone}\nالتفاصيل: ${items}\nالموقع: ${location}`;
+          sendToPrivateDiscord(privateMsg);
+          
+          showToast("تم حجز الطلب بنجاح! راجع قناة الديسكورد الخاصة للتفاصيل.");
+      }
+
       async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
@@ -1944,6 +2047,7 @@
                  document.getElementById('nav-acc-text').innerText = 'المندوبين';
               }
              initDriverStatus(); setInterval(checkRemoteReset, 15000); setInterval(refreshLeaderboard, 30000);
+             listenToOrders(); // تفعيل استماع الطلبات للمندوبين
              showScreen('home-screen');
           } else {
              if(!localStorage.getItem('saved_customer_phone')) {
@@ -2115,10 +2219,8 @@
               }
 
               const msg = `🚖 طلب تكتك توصيلة\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الموقع: ${userCoords}\n📝تفاصيل: ${dropLink}\nدالة: ${land}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                 method: "POST", headers: { "Content-Type": "application/json" },
-                 body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية", callback_data: `claim|${name}|${vc}` }]] } })
-              });
+              await sendToDiscord(msg, vc); // التعديل الجديد للإرسال للديسكورد بدل التليكرام
+             
              showToast("تم الإرسال بنجاح ✅"); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
@@ -2158,9 +2260,8 @@
               }
 
              const msg = `🔵طلب وسيط\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📝الغرض: ${order}\n📍الموقع: ${userCoords}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
-              });
+             await sendToDiscord(msg, vc); // التعديل الجديد للديسكورد
+             
              showToast("تم الإرسال بنجاح ✅"); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
@@ -2244,7 +2345,7 @@
                   { key: "كلاشي", token: KLASHE_BOT_TOKEN, id: KLASHE_CHAT_ID },
                   { key: "مطعم الخليج", token: HALEG_BOT_TOKEN, id: HALEG_CHAT_ID },
                   { key: "مطعم سكوزي", token: SCOZI_BOT_TOKEN, id: SCOZI_CHAT_ID },
-                  { key: "ركن استكانة", token: ROYAL_FOOD_BOT_TOKEN, id: ROYAL_FOOD_CHAT_ID } // تم تعديل الاسم هنا ليتوافق مع ركن استكانة للطلب السريع
+                  { key: "ركن استكانة", token: ROYAL_FOOD_BOT_TOKEN, id: ROYAL_FOOD_CHAT_ID }
               ];
 
               let targetRestaurant = "توصيل عام";
@@ -2281,10 +2382,7 @@
 
               const msg = `🔵 طلب مسواك\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل طلب العميل: ${loyaltyMsg}${restOrderNumbers}\n📍الموقع: ${userCoords}`;
               
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                 method: "POST", headers: { "Content-Type": "application/json" },
-                 body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
-              });
+              await sendToDiscord(msg, vc); // التعديل الجديد للديسكورد
 
              showToast("تم إرسال طلبك بنجاح ✅"); 
              document.getElementById('custOrder').value = ""; 
