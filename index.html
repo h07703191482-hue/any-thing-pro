@@ -1350,7 +1350,7 @@
 
 
       // ==========================================
-      // تهيئة وحالة التطبيق
+      // تهيئة وحالة التطبيق (معدلة لحل مشكلة الشاشة الترحيبية)
       // ==========================================
 
       function checkStatus() {
@@ -1390,6 +1390,15 @@
                   checkGlobalStatusFromServer();
               }
           });
+
+          // إخفاء الشاشة الترحيبية إجبارياً بعد 3 ثواني (بعد انتهاء حركة الدراجة)
+          setTimeout(() => {
+              const splash = document.getElementById('splash-screen');
+              if (splash && splash.style.display !== 'none') {
+                  splash.style.opacity = '0';
+                  setTimeout(() => splash.style.display = 'none', 500);
+              }
+          }, 3000);
       });
       
     </script>
