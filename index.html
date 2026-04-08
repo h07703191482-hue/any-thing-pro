@@ -80,6 +80,11 @@
       .price-val { color: var(--primary); font-weight: 900; background: rgba(90, 34, 139, 0.1); padding: 4px 12px; border-radius: var(--radius-pill); font-size: 14px;}
       body.dark-mode .price-val { background: rgba(255, 255, 255, 0.1); color: var(--gold); }
 
+      /* ستايل نافذة تم الإرسال بنجاح الجديدة */
+      #success-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100008; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;}
+      .success-container { width: 100%; max-width: 400px; background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-floating); display: flex; flex-direction: column; animation: scaleIn 0.3s ease-out; text-align: center; padding: 30px 20px; border: 2px solid #10B981;}
+      .success-icon { font-size: 70px; color: #10B981; margin-bottom: 15px; animation: scaleIn 0.5s ease;}
+
       :root { 
           --primary: #5A228B; --primary-hover: #4A1A75; --secondary: #FFC107; --gold: #FFC107; 
           --danger: #EF4444; --bg-color: #F4F6F9; --surface: #FFFFFF; --text-main: #111827; 
@@ -235,6 +240,7 @@
       
       .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(90, 34, 139, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
       .location-notice { font-size: 13px; font-weight: 700; color: #10B981; text-align: center; margin-bottom: 15px; display: block; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: var(--radius-md); border: 1px dashed #10B981;}
+
       /* تصميم سلايدر المطاعم الجديد مقسم لصفين */
       .rest-slider { display: grid; grid-template-rows: repeat(2, 1fr); grid-auto-flow: column; grid-auto-columns: 120px; overflow-x: auto; gap: 15px; padding: 0 20px 20px; scroll-snap-type: x mandatory; }
      .rest-slider::-webkit-scrollbar { display: none; }
@@ -322,6 +328,7 @@
       .out-zone-card { background: var(--surface); padding: 35px 20px; border-radius: var(--radius-lg); max-width: 400px; width: 95%; box-shadow: 0 20px 50px rgba(239, 68, 68, 0.2); animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid var(--danger); }
     </style>
 </head>
+</head>
 <body>
     <div id="out-of-zone-popup">
         <div class="out-zone-card">
@@ -388,6 +395,22 @@
                <div class="price-item"><span style="flex:1;">الستباقية</span><span class="price-val">7,000 د.ع</span></div>
                <div class="price-item" style="border-bottom: none;"><span style="flex:1;">التحليات</span><span class="price-val">7,000 د.ع</span></div>
             </div>
+        </div>
+    </div>
+
+    <div id="success-order-modal">
+        <div class="success-container">
+            <i class="fas fa-check-circle success-icon"></i>
+            <h2 style="margin: 0 0 15px; color: #10B981; font-weight: 800; font-size: 24px;">تم إرسال طلبك بنجاح!</h2>
+            <p style="color: var(--text-main); font-size: 15px; font-weight: 700; line-height: 1.6; margin-bottom: 10px;">
+                الرجاء الانتظار حتى يتم التواصل معك.
+            </p>
+            <p style="color: var(--danger); font-size: 14px; font-weight: 800; margin-bottom: 25px;">
+                ⚠️ لا تقوم بإرسال طلب آخر بالغلط لتجنب تكرار الطلب!
+            </p>
+            <button class="send-btn ripple" style="margin: 0; background: var(--primary);" onclick="document.getElementById('success-order-modal').style.display='none'">
+                رجوع <i class="fas fa-arrow-left"></i>
+            </button>
         </div>
     </div>
 
@@ -589,7 +612,7 @@
                  <small>بركر وسندويجات</small>
              </div>
 
-              <div class="rest-card ripple" onclick="openMenu('klashe')">
+              <div id="klashe-restaurant" class="rest-card ripple" onclick="openMenu('klashe')" style="display: none;">
                  <img src="klashe.jpg" alt="كلاشي">
                  <h4>كلاشي</h4>
                  <small>عصائر ومشروبات</small>
@@ -628,7 +651,6 @@
              </div>
           </div>
       </div>
-      
       <div style="padding: 0 5px 15px; position: relative; z-index: 5;">
           <div class="select-card ripple-dark" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--primary);" onclick="openPricesModal()">
               <div style="display: flex; align-items: center; gap: 15px;">
@@ -860,6 +882,7 @@
 
         <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
+
     <div id="join-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> انضم ككابتن</h2>
@@ -979,10 +1002,9 @@
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
     </div>
-    
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
-      const PUBLIC_CHANNEL = "@uumqaser";
+      const PUBLIC_CHANNEL = "@uumqaser"; // بقت للمتغيرات القديمة بس تم تحويل الإرسال للديسكورد
       const ADMIN_CHAT_ID = "7479342799"; 
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
@@ -1778,9 +1800,9 @@
           }
       };
 
-      // ===========================
-      // دوال ديسكورد وحجز الطلبات الجديدة
-      // ===========================
+      // ==========================================
+      // دوال إرسال الديسكورد وتحديث الطلبات الجديدة
+      // ==========================================
 
       async function sendToDiscord(msg, orderId) {
           try {
@@ -2047,7 +2069,7 @@
                  document.getElementById('nav-acc-text').innerText = 'المندوبين';
               }
              initDriverStatus(); setInterval(checkRemoteReset, 15000); setInterval(refreshLeaderboard, 30000);
-             listenToOrders(); // تفعيل استماع الطلبات للمندوبين
+             listenToOrders();
              showScreen('home-screen');
           } else {
              if(!localStorage.getItem('saved_customer_phone')) {
@@ -2182,6 +2204,10 @@
           if (typeof closeSidebar === 'function') closeSidebar();
       }
 
+      // ===================================
+      // دوال الإرسال المعدلة مع نافذة النجاح
+      // ===================================
+      
       async function sendTukOrder() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const name = document.getElementById('tukName').value.trim(); const phone = document.getElementById('tukPhone').value.trim();
@@ -2203,7 +2229,6 @@
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`);
              localStorage.removeItem('referred_by'); 
 
-              // --- الإرسال للفايربيس ---
               if(typeof db !== 'undefined') {
                   db.ref('orders/' + vc).set({
                       id: vc,
@@ -2219,9 +2244,10 @@
               }
 
               const msg = `🚖 طلب تكتك توصيلة\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الموقع: ${userCoords}\n📝تفاصيل: ${dropLink}\nدالة: ${land}`;
-              await sendToDiscord(msg, vc); // التعديل الجديد للإرسال للديسكورد بدل التليكرام
+              await sendToDiscord(msg, vc);
              
-             showToast("تم الإرسال بنجاح ✅"); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+             document.getElementById('success-order-modal').style.display = 'flex';
+             document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -2244,7 +2270,6 @@
              saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`); localStorage.removeItem('referred_by');
 
-             // --- الإرسال للفايربيس ---
               if(typeof db !== 'undefined') {
                   db.ref('orders/' + vc).set({
                       id: vc,
@@ -2260,9 +2285,10 @@
               }
 
              const msg = `🔵طلب وسيط\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📝الغرض: ${order}\n📍الموقع: ${userCoords}`;
-             await sendToDiscord(msg, vc); // التعديل الجديد للديسكورد
+             await sendToDiscord(msg, vc);
              
-             showToast("تم الإرسال بنجاح ✅"); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+             document.getElementById('success-order-modal').style.display = 'flex';
+             document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -2365,7 +2391,6 @@
                   }
               }
 
-              // --- الإرسال للفايربيس ---
               if(typeof db !== 'undefined') {
                   db.ref('orders/' + vc).set({
                       id: vc,
@@ -2382,9 +2407,9 @@
 
               const msg = `🔵 طلب مسواك\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل طلب العميل: ${loyaltyMsg}${restOrderNumbers}\n📍الموقع: ${userCoords}`;
               
-              await sendToDiscord(msg, vc); // التعديل الجديد للديسكورد
+              await sendToDiscord(msg, vc);
 
-             showToast("تم إرسال طلبك بنجاح ✅"); 
+             document.getElementById('success-order-modal').style.display = 'flex';
              document.getElementById('custOrder').value = ""; 
              document.getElementById('custLandmark').value = ""; 
              loadSavedCustomerData();
@@ -2533,11 +2558,4 @@
           const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng}`;
          document.getElementById('tukDropoffLink').value = googleMapsLink;
          document.getElementById('map-success-msg').style.display = 'block';
-         closeMapModal();
-      }
-
-      function openPricesModal() { document.getElementById('prices-modal').style.display = 'flex'; }
-      function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
-    </script>
-</body>
-</html>
+         close
