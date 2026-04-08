@@ -1039,52 +1039,1088 @@
           }
           return isInside;
       }
-        // ==========================================
-      // دوال التعامل مع سيرفرات الديسكورد الجديدة
+        <script>
       // ==========================================
+      // 1. حل مشكلة الشاشة الترحيبية (إخفاء إجباري)
+      // ==========================================
+      setTimeout(function() {
+          var splash = document.getElementById('splash-screen');
+          if (splash) {
+              splash.style.transition = 'opacity 0.5s ease';
+              splash.style.opacity = '0';
+              setTimeout(function() { splash.style.display = 'none'; }, 500);
+          }
+      }, 3000);
+
+      // ==========================================
+      // 2. مسارات الديسكورد وسيرفرات التليكرام
+      // ==========================================
+      const DISCORD_PUBLIC_WEBHOOK = "https://discord.com/api/webhooks/1491324693871857684/i9PXJalQMx79I_Ev5i10jeS8TgKEe_Q_bdqhuhOC57LNiCw-kFFdJstxeuquI9abklp9";
+      const DISCORD_PRIVATE_WEBHOOK = "https://discord.com/api/webhooks/1491325381209362483/JmSQslp2XaCCPYOE3MbX3ODMr7NQIt0za7KCF_O_VTTmiemGCe7lI_fp_5wKquE-6wVz";
+
+      const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
+      const PUBLIC_CHANNEL = "@uumqaser";
+      const ADMIN_CHAT_ID = "7479342799"; 
+      const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
+
+      const NEW_BOT_TOKEN = "8757179280:AAHEgp3YTaVv6qZNr32ZA7fgk4fT8v-cqCk";
+      const NEW_BOT_USER = "CodAlbanderbot";
       
-      // إرسال الطلب الجديد للقناة العامة (الطلبات المتاحة)
-      async function sendToDiscordPublic(msgText) {
-          try {
-              // إضافة wait=true حتى يرجع لنا الـ ID مال الرسالة
-              let response = await fetch(DISCORD_PUBLIC_WEBHOOK + "?wait=true", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ content: msgText })
-              });
-              let data = await response.json();
-              return data.id; // نحتفظ بالرقم حتى نعدل الرسالة بعدين
-          } catch(e) { console.error("Error sending to Discord Public:", e); return null; }
+      const ALI_SALEM_BOT_TOKEN = "8735092732:AAE9lBE3i6AJRkKe3LLlAAodFXuAv7VXpys";
+      const ABO_HMODE_BOT_TOKEN = "8695832371:AAHosUvA37U9U1qhiZJlbDKxJPZFgDHbJAk"; 
+      const VICTORIA_BOT_TOKEN = "8769449664:AAErwMuaA893BKDvbKcOk4sFgFPXUIxlnmc"; 
+      const KLASHE_BOT_TOKEN = "8719779552:AAE5MMDa12ats3qocRoZoy_DMCS9RU8IQvQ"; 
+      const HALEG_BOT_TOKEN = "8607099366:AAEK-D1553k9Mz94fcZJ9KiPUxZqusQSMqs";
+      const SCOZI_BOT_TOKEN = "8129985022:AAHlKRiRSH4Jop8J58iFQOjl2NcAZnLdkRo";
+      const ROYAL_FOOD_BOT_TOKEN = "8620504304:AAEuUp97cjQmyaHCYSUC4eygNBXhsL4ZmXo";
+
+      const ALI_SALEM_CHAT_ID = "-1003722556479";
+      const ABO_HMODE_CHAT_ID = "-1003704352460";
+      const VICTORIA_CHAT_ID = "-1003760108006"; 
+      const KLASHE_CHAT_ID = "-1003727059406"; 
+      const HALEG_CHAT_ID = "-1003719488878";
+      const SCOZI_CHAT_ID = "-1003315608193";
+      const ROYAL_FOOD_CHAT_ID = "-1003798976901";
+
+      let userCoords = ""; 
+      const CURRENT_VERSION = "2.0.25"; 
+      if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
+          localStorage.setItem('app_version', CURRENT_VERSION);
+          window.location.reload(true); 
+      }
+
+      const umQasrPolygon = [
+          { lat: 30.0800, lng: 47.9600 }, 
+          { lat: 30.0800, lng: 47.8800 }, 
+          { lat: 30.0100, lng: 47.8800 }, 
+          { lat: 30.0100, lng: 47.9600 }  
+      ];
+
+      function isUserInUmQasr(userLat, userLng, polygon) {
+          let isInside = false;
+          for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+              const xi = polygon[i].lat, yi = polygon[i].lng;
+              const xj = polygon[j].lat, yj = polygon[j].lng;
+              const intersect = ((yi > userLng) != (yj > userLng)) && (userLat < (xj - xi) * (userLng - yi) / (yj - yi) + xi);
+              if (intersect) isInside = !isInside;
+          }
+          return isInside;
+      }
+
+      function checkAppAccess(lat, lng) {
+          const isAdmin = localStorage.getItem('isAdmin') === 'true';
+          if(isAdmin) return; 
+          const accessGranted = isUserInUmQasr(lat, lng, umQasrPolygon);
+          if (!accessGranted) {
+              document.getElementById('out-of-zone-popup').style.display = 'flex';
+          }
+      }
+
+      async function trackLiveVisit() {
+          try { fetch(`${GS_URL}?action=trackVisit&t=${new Date().getTime()}`); } catch(e) {}
+      }
+
+      let secretCounter = 0;
+      let lockSecretCounter = 0;
+      let appIsActive = true;
+      let lastOrderCount = -1;
+      let orderPollInterval = null;
+      let isSoundEnabled = localStorage.getItem('sound_enabled') === 'true';
+      const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+
+      function checkPhoneLive(input) {
+          let errorSpan = input.parentNode.querySelector('.phone-error');
+          if (!errorSpan) return;
+          if (input.value.length === 0) {
+              errorSpan.style.display = 'none';
+              input.style.borderColor = '';
+          } else if (!/^07[0-9]{9}$/.test(input.value)) {
+              errorSpan.style.display = 'block';
+              input.style.borderColor = 'var(--danger)';
+          } else {
+              errorSpan.style.display = 'none';
+              input.style.borderColor = '#10B981'; 
+          }
+      }
+
+      function toggleOrderSound() {
+         isSoundEnabled = !isSoundEnabled;
+         localStorage.setItem('sound_enabled', isSoundEnabled); 
+          const btn = document.getElementById('soundToggleBtn');
+          if (isSoundEnabled) {
+              btn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل';
+              btn.style.background = '#F59E0B'; 
+              btn.style.color = 'white';
+              newOrderAudio.play().catch(e => {}); 
+              startOrderPolling();
+              showToast("🔔 تم تفعيل جرس تنبيه الطلبات!");
+          } else {
+              btn.innerHTML = '<i class="fas fa-bell-slash"></i> جرس الطلبات: معطل';
+             btn.style.background = 'var(--text-muted)';
+             btn.style.color = 'white';
+             clearInterval(orderPollInterval);
+             showToast("تم إيقاف الجرس 🔕");
+          }
       }
       
-      // تعديل الرسالة بالقناة العامة بعد حجز الطلب
+      async function checkNewOrdersForSound() {
+         if(!isSoundEnabled || !navigator.onLine) return;
+          try {
+              const resp = await fetch(`${GS_URL}?action=checkNewOrders&t=${new Date().getTime()}`);
+              const currentCount = parseInt(await resp.text());
+             if(!isNaN(currentCount)) {
+                 if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
+                     newOrderAudio.play().catch(e=>{});
+                      showToast("🔔طلب جديد نزل بالساحة!");
+                     if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                  }
+                 lastOrderCount = currentCount;
+              }
+          } catch(e) {}
+      }
+
+      function startOrderPolling() {
+         if(orderPollInterval) clearInterval(orderPollInterval);
+         checkNewOrdersForSound(); 
+         orderPollInterval = setInterval(checkNewOrdersForSound, 10000); 
+      }
+      
+      function initAutoLocation() {
+          if (navigator.geolocation) {
+             navigator.geolocation.getCurrentPosition(
+                 (position) => {
+                     userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
+                     checkAppAccess(position.coords.latitude, position.coords.longitude);
+                  },
+                 (error) => { console.warn("GPS Denied"); },
+                  { enableHighAccuracy: true }
+              );
+          }
+      }
+
+      function handleSecretClick() {
+         secretCounter++;
+          if (secretCounter === 5) {
+             secretCounter = 0;
+              let pass = prompt("أدخل الرمز السري:");
+              if (pass === "2006") {
+                 localStorage.setItem('isAdmin', 'true'); 
+                 showScreen('admin-panel');
+                 checkGlobalStatusFromServer(); 
+              } else if (pass !== null) {
+                 showToast("الرمز خطأ ❌");
+              }
+          }
+      }
+
+      function handleLockScreenSecret() {
+         lockSecretCounter++;
+          if (lockSecretCounter === 5) {
+             lockSecretCounter = 0;
+              let pass = prompt("أدخل الرمز السري:");
+              if (pass === "2006") {
+                 localStorage.setItem('isAdmin', 'true'); 
+                 document.getElementById('global-lock-screen').style.display = 'none';
+                 showScreen('admin-panel');
+              } else if (pass !== null) {
+                  showToast("الرمز خطأ ❌");
+              }
+          }
+      }
+      
+      async function setGlobalAppStatus(newStatus) {
+          const btnOpen = document.getElementById('btn-open-app');
+          const btnClose = document.getElementById('btn-close-app');
+          if(newStatus === 'online') { btnOpen.innerHTML = '<span class="baly-spinner"></span>'; } 
+          else { btnClose.innerHTML = '<span class="baly-spinner"></span>'; }
+         btnOpen.disabled = true; btnClose.disabled = true;
+          try {
+              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}&t=${new Date().getTime()}`, { mode: 'no-cors' });
+             showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
+              setTimeout(() => { checkGlobalStatusFromServer(); }, 1500);
+          } catch(e) {
+             showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
+             setTimeout(() => { checkGlobalStatusFromServer(); }, 1500);
+          } 
+          finally { 
+             btnOpen.innerHTML = '<i class="fas fa-unlock"></i>فتح التطبيق';
+             btnClose.innerHTML = '<i class="fas fa-lock"></i> إغلاق التطبيق';
+             btnOpen.disabled = false; btnClose.disabled = false;
+          }
+      }
+
+      async function checkGlobalStatusFromServer() {
+          try {
+              const resp = await fetch(`${GS_URL}?action=getAppStatus&t=${new Date().getTime()}`);
+              const status = await resp.text();
+              const lockScreen = document.getElementById('global-lock-screen');
+              const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
+              if (status === "offline") {
+                 appIsActive = false;
+                 if(lockScreen && !isAdmin) lockScreen.style.display = 'flex'; 
+                  else if(lockScreen && isAdmin) lockScreen.style.display = 'none';
+              } else {
+                 appIsActive = true;
+                 if(lockScreen) lockScreen.style.display = 'none'; 
+              }
+              applyGlobalStatus();
+          } catch(e) {
+          }
+      }
+
+      function applyGlobalStatus() {
+          const badge = document.getElementById('admin-status-badge');
+          const orderButtons = document.querySelectorAll('.order-btn-logic');
+          const isAdmin = localStorage.getItem('isAdmin') === 'true';
+          if (!appIsActive) {
+             badge.style.display = 'block'; 
+              if (!isAdmin) {
+                 orderButtons.forEach(btn => {
+                     btn.disabled = true;
+                     btn.innerHTML = '<i class="fas fa-lock"></i> مغلق حالياً';
+                  });
+              } else { orderButtons.forEach(btn => btn.disabled = false); }
+          } else {
+             badge.style.display = 'none';
+             document.getElementById('tukSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> طلب تكتك توصيلة';
+             document.getElementById('medSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
+             document.getElementById('sendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
+             orderButtons.forEach(btn => btn.disabled = false);
+          }
+      }
+
+      function userLogout() {
+          if (confirm("هل أنت متأكد من تسجيل الخروج من التطبيق؟")) {
+             localStorage.clear();
+             window.location.replace(window.location.href.split('?')[0]);
+          }
+      }
+      
+      async function syncLoyaltyWithServer() {
+          const phoneInput = document.getElementById('custPhone');
+          const phone = (phoneInput && phoneInput.value.trim() !== "") ? phoneInput.value.trim() : localStorage.getItem('saved_customer_phone');
+          if (!phone || !validateIraqiPhone(phone)) return;
+          try {
+              const resp = await fetch(`${GS_URL}?action=getCustomerOrders&phone=${phone}&t=${new Date().getTime()}`);
+              const countText = await resp.text();
+              const count = parseInt(countText);
+              if (!isNaN(count)) {
+                 loyaltyCount = count;
+                 localStorage.setItem('my_loyalty_orders', loyaltyCount);
+                 updateLocalLoyaltyUI();
+              }
+          } catch(e) {}
+      }
+
+      function checkConnection() {
+         document.getElementById('offline-screen').style.display = navigator.onLine ? 'none' : 'flex';
+      }
+      window.addEventListener('offline', checkConnection);
+      window.addEventListener('online', checkConnection);
+      function openWiFiSettings() { window.location.href = "intent:#Intent;action=android.settings.WIFI_SETTINGS;end"; }
+      function openDataSettings() { window.location.href = "intent:#Intent;action=android.settings.WIRELESS_SETTINGS;end"; }
+
+      window.originalAlert = window.alert;
+      window.alert = function(message) { showToast(message); };
+
+      function showToast(msg) {
+          const container = document.getElementById('toast-container');
+          const toast = document.createElement('div');
+         toast.className = 'toast';
+         toast.innerHTML = `<i class="fas fa-bell" style="color: var(--secondary);"></i> <span>${msg}</span>`;
+         container.appendChild(toast);
+         setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 3000);
+      }
+
+      function toggleTheme() {
+         document.body.classList.toggle('dark-mode');
+          localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+      }
+
+      function applyAutoTheme() {
+          const hour = new Date().getHours();
+          const isNight = hour >= 18 || hour < 6; 
+          const savedTheme = localStorage.getItem('theme');
+          if (!savedTheme && isNight) document.body.classList.add('dark-mode');
+          else if (savedTheme === 'dark') document.body.classList.add('dark-mode');
+      }
+
+      function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
+      function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
+      function goToLoginStep2() {
+          const nameInput = document.getElementById('loginNameInput').value.trim();
+         if(!nameInput) return showToast("يرجى كتابة اسمك أولاً ⚠️");
+         document.getElementById('login-step-1').style.display = 'none';
+         document.getElementById('login-step-2').style.display = 'block';
+      }
+
+      function backToLoginStep1() {
+         document.getElementById('login-step-2').style.display = 'none';
+         document.getElementById('login-step-1').style.display = 'block';
+      }
+
+      function completeDirectLogin() {
+          const userName = document.getElementById('loginNameInput').value.trim();
+          const userPhone = document.getElementById('loginPhoneInput').value.trim();
+
+          if(!userName) return showToast("يرجى كتابة اسمك ⚠️");
+          if(!validateIraqiPhone(userPhone)) return showToast("يرجى كتابة رقم عراقي صحيح ⚠️");
+
+          const btn = document.getElementById('direct-login-btn');
+          btn.innerHTML = '<span class="baly-spinner"></span> جاري الدخول...';
+          btn.disabled = true;
+
+          setTimeout(async () => {
+              saveCustomerData(userName, userPhone); 
+              loadSavedCustomerData(); 
+              syncLoyaltyWithServer();
+              
+              if (navigator.onLine) {
+                 const msg = `👤 تسجيل دخول جديد (مباشر)\nالاسم: ${userName}\nالرقم: ${userPhone}`;
+                 try {
+                     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+                     });
+                     await fetch(`${GS_URL}?action=incrementAuthUsers`);
+                 } catch(e) {}
+              }
+
+              showScreen('home-screen'); 
+              showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
+              
+              btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
+              btn.disabled = false;
+              document.getElementById('login-step-2').style.display = 'none'; 
+              document.getElementById('login-step-1').style.display = 'block';
+              document.getElementById('loginNameInput').value = '';
+              document.getElementById('loginPhoneInput').value = '';
+          }, 800);
+      }
+
+      // ==========================================
+      // قائمة المطاعم والوجبات
+      // ==========================================
+      const menus = {
+          'rken_estkana': {
+              name: 'ركن استكانة',
+              items: [
+                  { id: 'rk1', name: 'كيلو كباب لحم', price: 24000, category: '🥩 قسم أكلات المشاوي', desc: '16 شيش كباب، خبز، سلطة، طرشي، وشطة' },
+                  { id: 'rk2', name: 'نفر كباب لحم', price: 6000, category: '🥩 قسم أكلات المشاوي', desc: '4 شيش دبل، 3 خبزات، سلطة، طرشي، وشطة' },
+                  { id: 'rk3', name: 'نص نفر كباب لحم', price: 3000, category: '🥩 قسم أكلات المشاوي', desc: '2 شيش، 2 خبزة، سلطة، طرشي، وشطة' },
+                  { id: 'rk4', name: 'كيلو تكة لحم', price: 32000, category: '🥩 قسم أكلات المشاوي', desc: 'خبز، سلطة، طرشي، وشطة' },
+                  { id: 'rk5', name: 'نفر تكة لحم', price: 8000, category: '🥩 قسم أكلات المشاوي', desc: '4 شيش، خبز، سلطة، طرشي، وشطة' },
+                  { id: 'rk6', name: 'كيلو معلاق', price: 24000, category: '🥩 قسم أكلات المشاوي', desc: 'خبز، سلطة، طرشي، وشطة' },
+                  { id: 'rk7', name: 'نفر معلاق', price: 6000, category: '🥩 قسم أكلات المشاوي', desc: '4 شيش، خبز، سلطة، طرشي، وشطة' },
+                  { id: 'rk8', name: 'كيلو تكة دجاج (طاووق)', price: 16000, category: '🥩 قسم أكلات المشاوي', desc: 'خبز، سلطة، طرشي، وشطة' },
+                  { id: 'rk9', name: 'نفر تكة دجاج (طاووق)', price: 4000, category: '🥩 قسم أكلات المشاوي', desc: '4 شيش، خبز، سلطة، طرشي، وشطة' },
+                  { id: 'rk10', name: 'كيلو كباب دجاج', price: 16000, category: '🥩 قسم أكلات المشاوي', desc: 'خبز، سلطة، طرشي، وشطة' },
+                  { id: 'rk11', name: 'نفر كباب دجاج', price: 4000, category: '🥩 قسم أكلات المشاوي', desc: '4 شيش، خبز، سلطة، طرشي، وشطة' },
+                  { id: 'rk12', name: 'كيلو جوانح مشوية', price: 12000, category: '🥩 قسم أكلات المشاوي', desc: 'خبز، سلطة، طرشي، وشطة' },
+                  { id: 'rk13', name: 'نفر جوانح مشوية', price: 3000, category: '🥩 قسم أكلات المشاوي', desc: 'خبز، سلطة، طرشي، وشطة' },
+                  { id: 'rk14', name: 'لفة كباب لحم', price: 2000, category: '🥩 قسم أكلات المشاوي', desc: 'كباب، خضروات، وصمون حجري أو خبز' },
+                  { id: 'rk15', name: 'لفة تكة لحم', price: 2000, category: '🥩 قسم أكلات المشاوي', desc: 'تكة لحم، خضروات، وصمون حجري' },
+                  { id: 'rk16', name: 'لفة تكة دجاج', price: 1500, category: '🥩 قسم أكلات المشاوي', desc: 'تكة دجاج، خضروات، وصمون حجري' },
+                  { id: 'rk17', name: 'لفة كباب دجاج', price: 1500, category: '🥩 قسم أكلات المشاوي', desc: 'كباب دجاج، خضروات، وصمون حجري' },
+                  { id: 'rk18', name: 'لفة معلاق', price: 1500, category: '🥩 قسم أكلات المشاوي', desc: 'معلاق مشوي، خضروات، وصمون حجري' },
+                  { id: 'rk19', name: 'بيتزا شاورما لحم (صغير)', price: 7000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk20', name: 'بيتزا شاورما لحم (وسط)', price: 10000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk21', name: 'بيتزا شاورما لحم (كبير)', price: 14000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk22', name: 'بيتزا شاورما لحم (عائلي)', price: 18000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk23', name: 'بيتزا فوريو (صغير)', price: 7000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk24', name: 'بيتزا فوريو (وسط)', price: 10000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk25', name: 'بيتزا فوريو (كبير)', price: 14000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk26', name: 'بيتزا فوريو (عائلي)', price: 18000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk27', name: 'بيتزا مكس جبن (صغير)', price: 7000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk28', name: 'بيتزا مكس جبن (وسط)', price: 10000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk29', name: 'بيتزا مكس جبن (كبير)', price: 14000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk30', name: 'بيتزا مكس جبن (عائلي)', price: 18000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk31', name: 'بيتزا شاورما دجاج (صغير)', price: 6000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk32', name: 'بيتزا شاورما دجاج (وسط)', price: 9000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk33', name: 'بيتزا شاورما دجاج (كبير)', price: 12000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk34', name: 'بيتزا شاورما دجاج (عائلي)', price: 14000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk35', name: 'بيتزا مارغريتا (صغير)', price: 6000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk36', name: 'بيتزا مارغريتا (وسط)', price: 9000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk37', name: 'بيتزا مارغريتا (كبير)', price: 12000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk38', name: 'بيتزا مارغريتا (عائلي)', price: 14000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk39', name: 'بيتزا بابروني (صغير)', price: 7000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk40', name: 'بيتزا بابروني (وسط)', price: 10000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk41', name: 'بيتزا بابروني (كبير)', price: 12000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk42', name: 'بيتزا بابروني (عائلي)', price: 15000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk43', name: 'بيتزا مشكل (صغير)', price: 7000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk44', name: 'بيتزا مشكل (وسط)', price: 10000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk45', name: 'بيتزا مشكل (كبير)', price: 12000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk46', name: 'بيتزا مشكل (عائلي)', price: 15000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk47', name: 'بيتزا يونانية (صغير)', price: 7000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk48', name: 'بيتزا يونانية (وسط)', price: 10000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk49', name: 'بيتزا يونانية (كبير)', price: 12000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk50', name: 'بيتزا يونانية (عائلي)', price: 15000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk51', name: 'بيتزا خضروات (صغير)', price: 5000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk52', name: 'بيتزا خضروات (وسط)', price: 7000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk53', name: 'بيتزا خضروات (كبير)', price: 9000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk54', name: 'بيتزا خضروات (عائلي)', price: 12000, category: '🍕 قسم البيتزا' },
+                  { id: 'rk55', name: 'برجر استكانة (عادي)', price: 4000, category: '🍔 قسم البرجر' },
+                  { id: 'rk56', name: 'برجر استكانة (مع جبن)', price: 5000, category: '🍔 قسم البرجر' },
+                  { id: 'rk57', name: 'برجر استكانة (دبل)', price: 7000, category: '🍔 قسم البرجر' },
+                  { id: 'rk58', name: 'برجر سماش (عادي)', price: 4000, category: '🍔 قسم البرجر' },
+                  { id: 'rk59', name: 'برجر سماش (مع جبن)', price: 5000, category: '🍔 قسم البرجر' },
+                  { id: 'rk60', name: 'برجر سماش (دبل)', price: 7000, category: '🍔 قسم البرجر' },
+                  { id: 'rk61', name: 'برجر لحم (عادي)', price: 3000, category: '🍔 قسم البرجر' },
+                  { id: 'rk62', name: 'برجر لحم (مع جبن)', price: 4000, category: '🍔 قسم البرجر' },
+                  { id: 'rk63', name: 'برجر لحم (دبل)', price: 5000, category: '🍔 قسم البرجر' },
+                  { id: 'rk64', name: 'برجر تكساس (عادي)', price: 3000, category: '🍔 قسم البرجر' },
+                  { id: 'rk65', name: 'برجر تكساس (مع جبن)', price: 4000, category: '🍔 قسم البرجر' },
+                  { id: 'rk66', name: 'برجر تكساس (دبل)', price: 5000, category: '🍔 قسم البرجر' },
+                  { id: 'rk67', name: 'برجر مشرووم (عادي)', price: 3000, category: '🍔 قسم البرجر' },
+                  { id: 'rk68', name: 'برجر مشرووم (مع جبن)', price: 4000, category: '🍔 قسم البرجر' },
+                  { id: 'rk69', name: 'برجر مشرووم (دبل)', price: 5000, category: '🍔 قسم البرجر' },
+                  { id: 'rk70', name: 'برجر BBQ (عادي)', price: 3000, category: '🍔 قسم البرجر' },
+                  { id: 'rk71', name: 'برجر BBQ (مع جبن)', price: 4000, category: '🍔 قسم البرجر' },
+                  { id: 'rk72', name: 'برجر BBQ (دبل)', price: 5000, category: '🍔 قسم البرجر' },
+                  { id: 'rk73', name: 'برجر دجاج (عادي)', price: 2500, category: '🍔 قسم البرجر' },
+                  { id: 'rk74', name: 'برجر دجاج (مع جبن)', price: 3000, category: '🍔 قسم البرجر' },
+                  { id: 'rk75', name: 'برجر دجاج (دبل)', price: 4000, category: '🍔 قسم البرجر' },
+                  { id: 'rk76', name: 'برجر سكالب (عادي)', price: 2500, category: '🍔 قسم البرجر' },
+                  { id: 'rk77', name: 'برجر سكالب (مع جبن)', price: 3000, category: '🍔 قسم البرجر' },
+                  { id: 'rk78', name: 'برجر سكالب (دبل)', price: 4000, category: '🍔 قسم البرجر' },
+                  { id: 'rk79', name: 'برجر فوريو سبيشل (عادي)', price: 7000, category: '🍔 قسم البرجر' },
+                  { id: 'rk80', name: 'برجر فوريو سبيشل (دبل)', price: 10000, category: '🍔 قسم البرجر' },
+                  { id: 'rk81', name: 'صاج شاورما لحم (صغير)', price: 3000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk82', name: 'صاج شاورما لحم (كبير)', price: 5000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk83', name: 'صاج شاورما لحم (وجبة)', price: 6000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk84', name: 'صاج دجاج (صغير)', price: 2500, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk85', name: 'صاج دجاج (كبير)', price: 3000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk86', name: 'صاج دجاج (وجبة)', price: 5000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk87', name: 'صاج كرسبي (صغير)', price: 2500, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk88', name: 'صاج كرسبي (كبير)', price: 3000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk89', name: 'صاج كرسبي (وجبة)', price: 5000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk90', name: 'صاج مسخن (صغير)', price: 2500, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk91', name: 'صاج مسخن (كبير)', price: 3000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk92', name: 'صاج مسخن (وجبة)', price: 5000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk93', name: 'صاج فلافل (صغير)', price: 1500, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk94', name: 'صاج فلافل (كبير)', price: 2000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk95', name: 'صاج فلافل (وجبة)', price: 4000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk96', name: 'صاج تركي لحم', price: 7000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk97', name: 'صاج تركي دجاج', price: 6000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk98', name: 'صاج إيطالي لحم', price: 7000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk99', name: 'صاج إيطالي دجاج', price: 6000, category: '🌯 قسم الصاج واللفات' },
+                  { id: 'rk100', name: 'طبق فنكر الشيف (سبيشل)', price: 7000, category: '🍟 المقبلات والبطاطا' },
+                  { id: 'rk101', name: 'فرايز جكن هلابينو', price: 6000, category: '🍟 المقبلات والبطاطا' },
+                  { id: 'rk102', name: 'فرايز شاورما', price: 6000, category: '🍟 المقبلات والبطاطا' },
+                  { id: 'rk103', name: 'جكن سيزر سلاد (سلطة)', price: 5000, category: '🍟 المقبلات والبطاطا' },
+                  { id: 'rk104', name: 'فنكر جيز خضار', price: 4000, category: '🍟 المقبلات والبطاطا' },
+                  { id: 'rk105', name: 'أورديف مقبلات مشكلة (صغير)', price: 3000, category: '🍟 المقبلات والبطاطا' },
+                  { id: 'rk106', name: 'أورديف مقبلات مشكلة (كبير)', price: 5000, category: '🍟 المقبلات والبطاطا' },
+                  { id: 'rk107', name: 'جاينت برجر العملاق (لحم)', price: 12000, category: '🍱 وجبات الريزو والعملاقة' },
+                  { id: 'rk108', name: 'جاينت برجر العملاق (دجاج)', price: 10000, category: '🍱 وجبات الريزو والعملاقة' },
+                  { id: 'rk109', name: 'انشيلادا مكسيكي', price: 8000, category: '🍱 وجبات الريزو والعملاقة' },
+                  { id: 'rk110', name: 'ماك اند جيز', price: 8000, category: '🍱 وجبات الريزو والعملاقة' },
+                  { id: 'rk111', name: 'لغم برجر (لحم)', price: 6000, category: '🍱 وجبات الريزو والعملاقة' },
+                  { id: 'rk112', name: 'لغم برجر (دجاج)', price: 5000, category: '🍱 وجبات الريزو والعملاقة' },
+                  { id: 'rk113', name: 'ريزو عادي', price: 5000, category: '🍱 وجبات الريزو والعملاقة' },
+                  { id: 'rk114', name: 'ريزو BBQ', price: 5000, category: '🍱 وجبات الريزو والعملاقة' },
+                  { id: 'rk115', name: 'ريزو مكس', price: 5000, category: '🍱 وجبات الريزو والعملاقة' },
+                  { id: 'rk116', name: 'لبن', price: 500, category: '🥤 المشروبات الباردة' },
+                  { id: 'rk117', name: 'بيبسي', price: 500, category: '🥤 المشروبات الباردة' },
+                  { id: 'rk118', name: 'سفن', price: 500, category: '🥤 المشروبات الباردة' },
+                  { id: 'rk119', name: 'فانتا', price: 500, category: '🥤 المشروبات الباردة' },
+                  { id: 'rk120', name: 'كوكا', price: 500, category: '🥤 المشروبات الباردة' },
+                  { id: 'rk121', name: 'ميرندا', price: 500, category: '🥤 المشروبات الباردة' },
+                  { id: 'rk122', name: 'شاني', price: 500, category: '🥤 المشروبات الباردة' },
+                  { id: 'rk123', name: 'صينية كيلو لحم مندي', price: 45000, category: '🍖 أطباق اللحوم الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk124', name: 'صينية كيلو لحم برياني', price: 45000, category: '🍖 أطباق اللحوم الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk125', name: 'نص لحم (500 غرام)', price: 24000, category: '🍖 أطباق اللحوم الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk126', name: 'نفر برياني لحم كامل', price: 15000, category: '🍖 أطباق اللحوم الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk127', name: 'ربع لحم (250 غرام)', price: 12000, category: '🍖 أطباق اللحوم الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk128', name: 'تشريب لحم', price: 6000, category: '🍖 أطباق اللحوم الشرقية', desc: 'سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk129', name: 'دليمية لحم', price: 5000, category: '🍖 أطباق اللحوم الشرقية', desc: 'مرق، سلطة، طرشي، وشطة' },
+                  { id: 'rk130', name: 'صينية دجاجة كاملة مندي', price: 20000, category: '🍗 أطباق الدجاج الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk131', name: 'صينية دجاجة كاملة برياني', price: 20000, category: '🍗 أطباق الدجاج الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk132', name: 'نفر برياني دجاج كامل', price: 10000, category: '🍗 أطباق الدجاج الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk133', name: 'نص دجاجة مندي', price: 10000, category: '🍗 أطباق الدجاج الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk134', name: 'نص دجاجة برياني', price: 10000, category: '🍗 أطباق الدجاج الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk135', name: 'ربع دجاجة مندي', price: 5000, category: '🍗 أطباق الدجاج الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk136', name: 'ربع دجاجة برياني', price: 5000, category: '🍗 أطباق الدجاج الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk137', name: 'تشريب دجاج', price: 5000, category: '🍗 أطباق الدجاج الشرقية', desc: 'سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk138', name: 'دليمية دجاج', price: 4000, category: '🍗 أطباق الدجاج الشرقية', desc: 'مرق، سلطة، طرشي، وشطة' },
+                  { id: 'rk139', name: 'نص مندي مشكل (لحم + دجاج)', price: 17000, category: '🍱 الوجبات المشكلة', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk140', name: 'ربع مندي مشكل (لحم + دجاج)', price: 10000, category: '🍱 الوجبات المشكلة', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk141', name: 'صينية كيلو سمك نويبي متبل', price: 25000, category: '🐟 أطباق الأسماك', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk142', name: 'نص نفر سمك نويبي متبل', price: 15000, category: '🐟 أطباق الأسماك', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
+                  { id: 'rk143', name: 'نفر سمك نويبي متبل', price: 8000, category: '🐟 أطباق الأسماك', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' }
+              ]
+          },
+          'royal_food': {
+              name: 'رويال فود',
+              items: [
+                  { id: 'rf1', name: 'بركر كلاسيك', price: 2500, category: 'بركر اللحم' },
+                  { id: 'rf2', name: 'بركر بالجبن', price: 3000, category: 'بركر اللحم' },
+                  { id: 'rf3', name: 'بركر دبل', price: 5000, category: 'بركر اللحم' },
+                  { id: 'rf4', name: 'بركر كلاسيك', price: 2000, category: 'بركر دجاج' },
+                  { id: 'rf5', name: 'بركر بالجبن', price: 2500, category: 'بركر دجاج' },
+                  { id: 'rf6', name: 'بركر دبل', price: 4000, category: 'بركر دجاج' },
+                  { id: 'rf7', name: 'بركر كلاسيك', price: 2500, category: 'بركر سكالوب' },
+                  { id: 'rf8', name: 'بركر بالجبن', price: 3000, category: 'بركر سكالوب' },
+                  { id: 'rf9', name: 'بركر دبل', price: 4000, category: 'بركر سكالوب' },
+                  { id: 'rf10', name: 'بركر ستيك رويال', price: 5000, category: 'بركر سبشل' },
+                  { id: 'rf11', name: 'بركر هيمي', price: 6000, category: 'بركر سبشل' },
+                  { id: 'rf12', name: 'لغم بركر لحم', price: 7000, category: 'بركر سبشل' },
+                  { id: 'rf13', name: 'لغم بركر دجاج', price: 5000, category: 'بركر سبشل' },
+                  { id: 'rf14', name: 'ستيك دجاج دايت', price: 6000, category: 'بركر سبشل' },
+                  { id: 'rf15', name: 'انشيلادا', price: 5000, category: 'بركر سبشل' },
+                  { id: 'rf16', name: 'صغير', price: 8000, category: 'جاينت بركر لحم' },
+                  { id: 'rf17', name: 'وسط', price: 10000, category: 'جاينت بركر لحم' },
+                  { id: 'rf18', name: 'كبير', price: 15000, category: 'جاينت بركر لحم' },
+                  { id: 'rf19', name: 'صغير', price: 6000, category: 'جاينت بركر دجاج' },
+                  { id: 'rf20', name: 'وسط', price: 8000, category: 'جاينت بركر دجاج' },
+                  { id: 'rf21', name: 'كبير', price: 12000, category: 'جاينت بركر دجاج' },
+                  { id: 'rf22', name: 'نفر شاورما لحم', price: 7000, category: 'شاورما لحم' },
+                  { id: 'rf23', name: 'ربع كيلو شاورما لحم', price: 10000, category: 'شاورما لحم' },
+                  { id: 'rf24', name: 'نص كيلو شاورما لحم', price: 20000, category: 'شاورما لحم' },
+                  { id: 'rf25', name: 'كيلو شاورما لحم', price: 40000, category: 'شاورما لحم' },
+                  { id: 'rf26', name: 'نفر شاورما دجاج', price: 6000, category: 'شاورما دجاج' },
+                  { id: 'rf27', name: 'ربع كيلو شاورما دجاج', price: 9000, category: 'شاورما دجاج' },
+                  { id: 'rf28', name: 'نص كيلو شاورما دجاج', price: 18000, category: 'شاورما دجاج' },
+                  { id: 'rf29', name: 'كيلو شاورما دجاج', price: 35000, category: 'شاورما دجاج' },
+                  { id: 'rf30', name: 'صاج لحم صغير', price: 3000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf31', name: 'صاج لحم كبير', price: 4000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf32', name: 'صاج دجاج صغير', price: 2500, category: 'الصاجات (سنجل)' },
+                  { id: 'rf33', name: 'صاج دجاج كبير', price: 3500, category: 'الصاجات (سنجل)' },
+                  { id: 'rf34', name: 'صاج فلافل صغير', price: 1500, category: 'الصاجات (سنجل)' },
+                  { id: 'rf35', name: 'صاج فلافل كبير', price: 2000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf36', name: 'صاج كرسبي صغير', price: 2500, category: 'الصاجات (سنجل)' },
+                  { id: 'rf37', name: 'صاج كرسبي كبير', price: 3000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf38', name: 'صاج ايطالي لحم', price: 6000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf39', name: 'صاج ايطالي دجاج', price: 5000, category: 'الصاجات (سنجل)' },
+                  { id: 'rf40', name: 'وجبة صاج لحم', price: 7000, category: 'وجبات الصاج' },
+                  { id: 'rf41', name: 'وجبة صاج دجاج', price: 6000, category: 'وجبات الصاج' },
+                  { id: 'rf42', name: 'وجبة صاج فلافل', price: 4000, category: 'وجبات الصاج' },
+                  { id: 'rf43', name: 'وجبة صاج كرسبي', price: 5000, category: 'وجبات الصاج' },
+                  { id: 'rf44', name: 'سندويش لحم', price: 2000, category: 'سندويش' },
+                  { id: 'rf45', name: 'سندويش دجاج', price: 2000, category: 'سندويش' },
+                  { id: 'rf46', name: 'فاهيتا دجاج', price: 3000, category: 'سندويش' },
+                  { id: 'rf47', name: 'كرسبي 3 قطع', price: 4000, category: 'كرسبي' },
+                  { id: 'rf48', name: 'كرسبي 5 قطع', price: 6000, category: 'كرسبي' },
+                  { id: 'rf49', name: 'ريزو عادي', price: 5000, category: 'ريزو' },
+                  { id: 'rf50', name: 'ريزو BBQ', price: 5000, category: 'ريزو' },
+                  { id: 'rf51', name: 'ريزو مكس', price: 5000, category: 'ريزو' },
+                  { id: 'rf52', name: 'ريزو هلابينو', price: 6000, category: 'ريزو' },
+                  { id: 'rf53', name: 'دجاج', price: 5000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf54', name: 'لحم', price: 7000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf55', name: 'ببروني', price: 7000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf56', name: 'مشكل', price: 7000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf57', name: 'لحم رانش', price: 8000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf58', name: 'دجاج رانش', price: 6000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf59', name: 'جبن', price: 6000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf60', name: 'خضار', price: 5000, category: 'بيتزا (الحجم الصغير)' },
+                  { id: 'rf61', name: 'دجاج', price: 8000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf62', name: 'لحم', price: 9000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf63', name: 'ببروني', price: 10000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf64', name: 'مشكل', price: 9000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf65', name: 'لحم رانش', price: 10000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf66', name: 'دجاج رانش', price: 9000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf67', name: 'جبن', price: 9000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf68', name: 'خضار', price: 7000, category: 'بيتزا (الحجم الوسط)' },
+                  { id: 'rf69', name: 'دجاج', price: 10000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf70', name: 'لحم', price: 13000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf71', name: 'ببروني', price: 13000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf72', name: 'مشكل', price: 13000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf73', name: 'لحم رانش', price: 13000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf74', name: 'دجاج رانش', price: 12000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf75', name: 'جبن', price: 12000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf76', name: 'خضار', price: 10000, category: 'بيتزا (الحجم الكبير)' },
+                  { id: 'rf77', name: 'علبة فنكر', price: 1000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf78', name: 'طبق فنكر', price: 2000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf79', name: 'جيز فنكر', price: 3000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf80', name: 'فرايز چكن هلابينو', price: 6000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf81', name: 'مقبلات صغير', price: 3000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf82', name: 'مقبلات كبير', price: 5000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf83', name: 'سلطة سيزر', price: 5000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf84', name: 'حمص باللحم', price: 4000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf85', name: 'حمص دجاج', price: 3000, category: 'المقبلات والجانبيات' },
+                  { id: 'rf86', name: 'بيبسي', price: 500, category: 'المشروبات والصوصات' },
+                  { id: 'rf87', name: 'ديو', price: 500, category: 'المشروبات والصوصات' },
+                  { id: 'rf88', name: 'بيبسي دايت', price: 500, category: 'المشروبات والصوصات' },
+                  { id: 'rf89', name: 'صوص عادي', price: 500, category: 'المشروبات والصوصات' },
+                  { id: 'rf90', name: 'صوص ثومية', price: 250, category: 'المشروبات والصوصات' },
+                  { id: 'rf91', name: 'صوص BBQ', price: 500, category: 'المشروبات والصوصات' }
+              ]
+          },
+          'victoria': {
+              name: 'مطعم فيكتوريا',
+              items: [
+                  { id: 'v1', name: 'برجر كلاسيك', price: 2500, category: 'قسم البرجر', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو' },
+                  { id: 'v2', name: 'برجر جبن', price: 3000, category: 'قسم البرجر', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو + صوص الجبن' },
+                  { id: 'v3', name: 'برجر مشروم', price: 3500, category: 'قسم البرجر', desc: 'كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل' },
+                  { id: 'v4', name: 'برجر دبل', price: 5000, category: 'قسم البرجر', desc: 'كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
+                  { id: 'v5', name: 'برجر فيكتوريا', price: 6000, category: 'قسم البرجر', desc: 'تندر مقرمش 2 قطعة + صوص مدخن + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
+                  { id: 'v6', name: 'برجر دجاج', price: 2500, category: 'قسم البرجر', desc: '' },
+                  { id: 'v7', name: 'برجر دجاج دبل', price: 4000, category: 'قسم البرجر', desc: '' },
+                  { id: 'v8', name: 'سندويش زنجر', price: 2500, category: 'قسم السندويجات', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو' },
+                  { id: 'v9', name: 'سندويش زنجر جيز', price: 3000, category: 'قسم السندويجات', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو + صوص الجبن' },
+                  { id: 'v10', name: 'سندويش كرسبي', price: 2500, category: 'قسم السندويجات', desc: 'كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل' },
+                  { id: 'v11', name: 'سندويش كرسبي جيز', price: 3000, category: 'قسم السندويجات', desc: 'كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
+                  { id: 'v12', name: 'تويستر راب', price: 3500, category: 'قسم السندويجات', desc: 'تندر مقرمش 2 قطعة + صوص مدخن + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز' },
+                  { id: 'v13', name: 'سندويش فاهيته', price: 3500, category: 'قسم السندويجات', desc: 'قطع الدجاج + خضار مشوي + جبن موزريلا + صوص افوكادو' },
+                  { id: 'v14', name: 'سندويش فلادلفيه', price: 4000, category: 'قسم السندويجات', desc: 'قطع حبل الظهر + خضار مشوي + جبن موزريلا + صوص مدخن' },
+                  { id: 'v15', name: 'سندويش سكالوب', price: 3500, category: 'قسم السندويجات', desc: 'قطع سكالوب + صوص افوكادو + مخلل + كولسلو' },
+                  { id: 'v16', name: 'سندويش الشيف', price: 4000, category: 'قسم السندويجات', desc: 'قطع التندر مقرمش + صوص الطبخ + مخلل + كولسلو' },
+                  { id: 'v17', name: 'مقبلات حجم صغير', price: 2000, category: 'قسم المقبلات', desc: 'رمانية - حمص بطحينة - كولسلو - جاجيك - فتة دجاج - فتة بتنجان - اناناس - فراوله - بيتنجانية - مسبحة - جزر' },
+                  { id: 'v18', name: 'مقبلات حجم كبير', price: 4000, category: 'قسم المقبلات', desc: 'رمانية - حمص بطحينة - كولسلو - جاجيك - فتة دجاج - فتة بتنجان - اناناس - فراوله - بيتنجانية - مسبحة - جزر' },
+                  { id: 'v19', name: 'كنتاكي 3 قطع', price: 6000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 3 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v20', name: 'كنتاكي 5 قطع', price: 10000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 5 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v21', name: 'كنتاكي 10 قطع', price: 18000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 10 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v22', name: 'كرسبي 5 قطع', price: 6000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 5 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v23', name: 'كرسبي 10 قطع', price: 12000, category: 'قسم الكنتاكي والكرسبي', desc: 'صمون 10 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v24', name: 'كنتاكي سبايسي 3 قطع', price: 6500, category: 'قسم السبايسي', desc: 'صمون 3 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v25', name: 'كنتاكي سبايسي 5 قطع', price: 10500, category: 'قسم السبايسي', desc: 'صمون 5 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v26', name: 'كنتاكي سبايسي 10 قطع', price: 18500, category: 'قسم السبايسي', desc: 'صمون 10 قطع + ثوميه + كولسلو + بيبسي' },
+                  { id: 'v27', name: 'كرسبي سبايسي 5 قطع', price: 6500, category: 'قسم السبايسي', desc: 'صمون 5 قطع + ثوميه + صوص كوكتيل' },
+                  { id: 'v28', name: 'كرسبي سبايسي 10 قطع', price: 10500, category: 'قسم السبايسي', desc: 'صمون 10 قطع + ثوميه + صوص كوكتيل' },
+                  { id: 'v29', name: 'بيتزا لحم صغير', price: 6000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v30', name: 'بيتزا لحم وسط', price: 8000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v31', name: 'بيتزا لحم كبير', price: 14000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v32', name: 'بيتزا دجاج صغير', price: 5000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v33', name: 'بيتزا دجاج وسط', price: 7000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v34', name: 'بيتزا دجاج كبير', price: 13000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v35', name: 'بيتزا خضار صغير', price: 5000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v36', name: 'بيتزا خضار وسط', price: 7000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v37', name: 'بيتزا خضار كبير', price: 12000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v38', name: 'بيتزا مرغريتا صغير', price: 5000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v39', name: 'بيتزا مرغريتا وسط', price: 7000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v40', name: 'بيتزا مرغريتا كبير', price: 10000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v41', name: 'بيتزا الشيف وسط', price: 10000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v42', name: 'بيتزا الشيف كبير', price: 15000, category: 'قسم البيتزا', desc: '' },
+                  { id: 'v43', name: 'صاج إيطالي لحم', price: 6000, category: 'الصاج الإيطالي', desc: '' },
+                  { id: 'v44', name: 'صاج إيطالي دجاج', price: 5000, category: 'الصاج الإيطالي', desc: '' },
+                  { id: 'v45', name: 'ريزو كلاسيك', price: 4500, category: 'قسم الريزو', desc: 'قطع دجاج + صوص كوكتيل' },
+                  { id: 'v46', name: 'ريزو مدخن', price: 5000, category: 'قسم الريزو', desc: 'قطع دجاج + صوص مدخن' },
+                  { id: 'v47', name: 'ريزو باربيكيو', price: 5000, category: 'قسم الريزو', desc: 'قطع دجاج + صوص الباربيكيو' },
+                  { id: 'v48', name: 'ريزو فيكتوريا', price: 6000, category: 'قسم الريزو', desc: 'قطع دجاج + شاورمه لحم + شاورمه دجاج + صوص ميكس' },
+                  { id: 'v49', name: 'ريزو شاورمه دجاج', price: 5000, category: 'قسم الريزو', desc: 'شاورمه دجاج + صوص كوكتيل' },
+                  { id: 'v50', name: 'ريزو شاورمه لحم', price: 5500, category: 'قسم الريزو', desc: 'شاورمه لحم + صوص مدخن' },
+                  { id: 'v51', name: 'ريزو ميكس', price: 5000, category: 'قسم الريزو', desc: '' },
+                  { id: 'v52', name: 'صاج لحم صغير', price: 3000, category: 'قسم الصاج', desc: '' },
+                  { id: 'v53', name: 'صاج لحم كبير', price: 4000, category: 'قسم الصاج', desc: '' },
+                  { id: 'v54', name: 'صاج دجاج صغير', price: 2000, category: 'قسم الصاج', desc: '' },
+                  { id: 'v55', name: 'صاج دجاج كبير', price: 3000, category: 'قسم الصاج', desc: '' },
+                  { id: 'v56', name: 'صاج فلافل صغير', price: 1500, category: 'قسم الصاج', desc: '' },
+                  { id: 'v57', name: 'صاج فلافل كبير', price: 2000, category: 'قسم الصاج', desc: '' },
+                  { id: 'v58', name: 'فنكر صغير', price: 1000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
+                  { id: 'v59', name: 'فنكر صوص كبير', price: 2000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
+                  { id: 'v60', name: 'فنكر بالجبن', price: 2500, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
+                  { id: 'v61', name: 'حلقات بصل', price: 3000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' },
+                  { id: 'v62', name: 'فرايز دجاج مقرمش', price: 4000, category: 'قسم الفنكر والمقبلات الساخنة', desc: '' }
+              ]
+          },
+          'klashe': {
+              name: 'كلاشي',
+              items: [
+                  { id: 'k1', name: 'عصير برتقال', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k2', name: 'عصير ليمون', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k3', name: 'عصير بطيخ بالحليب', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k4', name: 'عصير موز بالكاكاو', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k5', name: 'عصير تين', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k6', name: 'عصير خوخ', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k7', name: 'عصير كوكتيل', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k8', name: 'عصير فراولة', price: 1000, category: 'قسم العصائر', desc: '' },
+                  { id: 'k9', name: 'عصير ككرزات حليب', price: 1500, category: 'قسم العصائر', desc: '' },
+                  { id: 'k10', name: 'سكنجبيل', price: 1000, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k11', name: 'موهيتو فراولة', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k12', name: 'موهيتو علج بوبي', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k13', name: 'موهيتو بلو بيري', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k14', name: 'موهيتو روز بيري', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k15', name: 'موهيتو ليمون', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k16', name: 'موهيتو رمان', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k17', name: 'موهيتو مانجو', price: 1500, category: 'قسم الموهيتو', desc: '' },
+                  { id: 'k18', name: 'سموذي مانجو', price: 3000, category: 'قسم السموذي', desc: '' },
+                  { id: 'k19', name: 'سموذي فراولة', price: 3000, category: 'قسم السموذي', desc: '' },
+                  { id: 'k20', name: 'سموذي توت ازرق', price: 3000, category: 'قسم السموذي', desc: '' },
+                  { id: 'k21', name: 'ايس لاتيه', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
+                  { id: 'k22', name: 'ايس أمريكانو', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
+                  { id: 'k23', name: 'ايس اسبانيش', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
+                  { id: 'k24', name: 'ايس اسبانيش بلو', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
+                  { id: 'k25', name: 'ايس روز لاتيه', price: 2000, category: 'قسم القهوة الباردة', desc: '' },
+                  { id: 'k26', name: 'شاي مهيل', price: 500, category: 'قسم المشروبات الساخنة', desc: '' },
+                  { id: 'k27', name: 'شاي كرك', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
+                  { id: 'k28', name: 'شاي توت', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
+                  { id: 'k29', name: 'شاي ليمون', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
+                  { id: 'k30', name: 'شاي رمان', price: 1000, category: 'قسم المشروبات الساخنة', desc: '' },
+                  { id: 'k31', name: 'قهوة تركية ساده', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k32', name: 'قهوة وسط', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k33', name: 'قهوة جكليتية', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k34', name: 'قهوة عثمانية', price: 2000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k35', name: 'قهوة أسبريسو', price: 2000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k36', name: 'حليب فقط', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k37', name: 'مشروب الكاكاو', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k38', name: 'كابتشينو', price: 1000, category: 'قسم القهوة', desc: '' },
+                  { id: 'k39', name: 'كابتشينو مكسرات', price: 1000, category: 'قسم القهوة', desc: '' }
+              ]
+          },
+          'haleg': {
+              name: 'مطعم الخليج',
+              items: [
+                  { id: 'hal1', name: 'ربع دجاجة', price: 5000, category: 'قسم الدجاج', desc: 'ذبح فرش مع نصف كيلو تمن مع شطة وطرشي ومرق' },
+                  { id: 'hal2', name: 'نصف دجاجة', price: 10000, category: 'قسم الدجاج', desc: 'ذبح فرش مع كيلو تمن مع شطة وطرشي ومرق' },
+                  { id: 'hal3', name: 'دجاجة كاملة (1)', price: 20000, category: 'قسم الدجاج', desc: 'ذبح فرش مع كيلوين تمن مع شطة وطرشي و 2 كاسة مرق' },
+                  { id: 'hal4', name: 'دجاجة كاملة (2)', price: 25000, category: 'قسم الدجاج', desc: 'ذبح فرش مع ثلاثة كيلو تمن مع شطة وطرشي و 2 كاسة مرق' },
+                  { id: 'hal5', name: 'ربع لحم عجل', price: 12000, category: 'أنواع اللحم', desc: '150 غرام مع نصف كيلو تمن وشطة وطرشي وكاسة مرق' },
+                  { id: 'hal6', name: 'نصف لحم عجل', price: 18000, category: 'أنواع اللحم', desc: '300 غرام مع كيلو تمن وشطة وطرشي وكاسة مرق' },
+                  { id: 'hal7', name: 'لحم عجل كامل', price: 35000, category: 'أنواع اللحم', desc: '600 غرام مع كيلوين تمن وشطة وطرشي و 2 كاسة مرق' },
+                  { id: 'hal8', name: 'ربع لحم غنم', price: 12000, category: 'أنواع اللحم', desc: '150 غرام مع نصف كيلو تمن وشطة وطرشي وكاسة مرق' },
+                  { id: 'hal9', name: 'نصف لحم غنم', price: 18000, category: 'أنواع اللحم', desc: '300 غرام مع كيلو تمن وشطة وطرشي وكاسة مرق' },
+                  { id: 'hal10', name: 'غنم كامل', price: 35000, category: 'أنواع اللحم', desc: '600 غرام مع كيلوين تمن وشطة وطرشي و 2 كاسة مرق' },
+                  { id: 'hal11', name: 'مطبق سمك (نصف كيلو)', price: 10000, category: 'السمك', desc: 'نصف كيلو سمك مع كيلو تمن' },
+                  { id: 'hal12', name: 'مطبق سمك (كيلو)', price: 20000, category: 'السمك', desc: 'كيلو سمك بحري مع كيلوين تمن' },
+                  { id: 'hal13', name: 'نصف كيلو دولمة', price: 6000, category: 'الدولمة', desc: '' },
+                  { id: 'hal14', name: 'كيلو دولمة', price: 12000, category: 'الدولمة', desc: '' },
+                  { id: 'hal15', name: 'ربع برياني', price: 5000, category: 'البرياني ', desc: '' },
+                  { id: 'hal16', name: 'كيلو برياني', price: 10000, category: 'البرياني ', desc: '' },
+                  { id: 'hal17', name: 'كيلوين برياني', price: 20000, category: 'البرياني ', desc: '' },
+                  { id: 'hal18', name: 'نفر تمن ومرق مع الملحقات', price: 3500, category: 'التمن والمرق', desc: '' },
+                  { id: 'hal19', name: 'كاسة مرق', price: 1000, category: 'التمن والمرق', desc: '' }
+              ]
+          },
+          'scozi': {
+              name: 'مطعم سكوزي',
+              items: [
+                  { id: 'sc1', name: 'وجبة كرسبي', price: 6000, category: 'الوجبات والريزو', desc: '' },
+                  { id: 'sc2', name: 'نص وجبة كرسبي', price: 4000, category: 'الوجبات والريزو', desc: '' },
+                  { id: 'sc3', name: 'وجبة فاهيتا', price: 6000, category: 'الوجبات والريزو', desc: '' },
+                  { id: 'sc4', name: 'وجبة فيله سمك', price: 7000, category: 'الوجبات والريزو', desc: '' },
+                  { id: 'sc5', name: 'ريزو', price: 6000, category: 'الوجبات والريزو', desc: '' },
+                  { id: 'sc6', name: 'ريزو روبيان', price: 7000, category: 'الوجبات والريزو', desc: '' },
+                  { id: 'sc7', name: 'ريزو سمك', price: 7000, category: 'الوجبات والريزو', desc: '' },
+                  { id: 'sc8', name: 'بيتزا وسط', price: 5000, category: 'البيتزا', desc: '' },
+                  { id: 'sc9', name: 'بيتزا كبير', price: 10000, category: 'البيتزا', desc: '' },
+                  { id: 'sc10', name: 'لفة سكالوب', price: 2500, category: 'اللفات (الساندويش)', desc: '' },
+                  { id: 'sc11', name: 'لفة همبركر', price: 2000, category: 'اللفات (الساندويش)', desc: '' },
+                  { id: 'sc12', name: 'لفة فاهيته', price: 2000, category: 'اللفات (الساندويش)', desc: '' },
+                  { id: 'sc13', name: 'لفة صاج دجاج', price: 2000, category: 'اللفات (الساندويش)', desc: '' },
+                  { id: 'sc14', name: 'شيش طاووق', price: 6000, category: 'المشويات والاستيك', desc: '' },
+                  { id: 'sc15', name: 'ستيك دجاج دايت', price: 6000, category: 'المشويات والاستيك', desc: '' },
+                  { id: 'sc16', name: 'ستيك دجاج', price: 6000, category: 'المشويات والاستيك', desc: '' },
+                  { id: 'sc17', name: 'ماعون مقبلات صغير', price: 3000, category: 'المقبلات', desc: '' },
+                  { id: 'sc18', name: 'ماعون مقبلات كبير', price: 5000, category: 'المقبلات', desc: '' }
+              ]
+          },
+          'abo_hmode': {
+              name: 'مطعم بركر ابو حمودي',
+              items: [
+                  { id: 'h1', name: 'بركر كلاسيك', price: 1000 }, { id: 'h2', name: 'بركر جبن', price: 1250 }, { id: 'h3', name: 'بركر مكسيكي', price: 1500 },
+                  { id: 'h4', name: 'بركر كرانشي', price: 3000 }, { id: 'h5', name: 'بركر دبل لحم دبل جبن', price: 2500 }, { id: 'h6', name: 'ريزو كلاسيك', price: 3000 },
+                  { id: 'h7', name: 'ريزو ابو حمودي', price: 5000 }, { id: 'h8', name: 'اجنحه فحم نص', price: 8000 }, { id: 'h9', name: 'تكه دجاج نص', price: 8000 },
+                  { id: 'h10', name: 'فروج ابو حمودي', price: 8000 }, { id: 'h11', name: 'عصير كلاص', price: 1000 }, { id: 'h12', name: 'عصير بطل', price: 1500 },
+                  { id: 'h13', name: 'لبن بطل صغير', price: 750 }, { id: 'h14', name: 'لبن بطل جبير', price: 2000 }, { id: 'h15', name: 'ببسي', price: 500 },
+                  { id: 'h16', name: 'ديو', price: 500 }, { id: 'h17', name: 'سبرايت', price: 500 }, { id: 'h18', name: 'كولا', price: 500 }
+              ]
+          },
+          'ali_salem': {
+              name: 'مطعم برجر علي سالم',
+              items: [
+                  { id: 'm1', name: 'برجر', price: 1000 }, { id: 'm2', name: 'برجر جبن', price: 1500 }, { id: 'm3', name: 'ريزو دجاج', price: 3000 },
+                  { id: 'm4', name: 'لبن بطل صغير', price: 750 }, { id: 'm5', name: 'لبن بطل كبير', price: 2000 }, { id: 'm6', name: 'بيبسي', price: 500 }, { id: 'm7', name: 'ديو', price: 500 }
+              ]
+          }
+      };
+
+      async function fetchDynamicMenus() {
+          try {
+              const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
+              const data = await resp.json();
+              if (data && typeof data === 'object' && !Array.isArray(data)) {
+                  if (data.added && data.added.length > 0) {
+                     data.added.forEach(newItem => {
+                         if(menus[newItem.restId]) {
+                             const exists = menus[newItem.restId].items.find(i => i.name === newItem.name);
+                             if(!exists) menus[newItem.restId].items.push(newItem);
+                         }
+                     });
+                  }
+                  if (data.deleted && data.deleted.length > 0) {
+                     data.deleted.forEach(delItem => {
+                         if(menus[delItem.restId]) {
+                             menus[delItem.restId].items = menus[delItem.restId].items.filter(i => i.name !== delItem.name);
+                         }
+                     });
+                  }
+              } else if (Array.isArray(data) && data.length > 0) {
+                 data.forEach(newItem => {
+                     if(menus[newItem.restId]) {
+                         const exists = menus[newItem.restId].items.find(i => i.name === newItem.name);
+                         if(!exists) menus[newItem.restId].items.push(newItem);
+                     }
+                  });
+              }
+          } catch(e) { console.log("لا توجد تحديثات للسلع حالياً"); }
+      }
+      
+      let currentCart = {};
+      let currentRestaurantId = '';
+
+      function openMenu(restId) {
+         currentRestaurantId = restId;
+          currentCart = {}; 
+          document.getElementById('restaurant-name-header').innerText = menus[restId].name;
+         showScreen('restaurant-menu-screen');
+         renderMenu();
+         updateCartTotal();
+      }
+
+      function toggleCategory(catId) {
+          const content = document.getElementById(catId);
+          const icon = document.getElementById('icon-' + catId);
+          if (content.style.display === 'block') {
+             content.style.display = 'none';
+             icon.className = 'fas fa-chevron-down';
+          } else {
+             content.style.display = 'block';
+             icon.className = 'fas fa-chevron-up';
+          }
+      }
+
+      function renderMenu() {
+          const container = document.getElementById('menu-items-container');
+          const items = menus[currentRestaurantId].items;
+          const hasCategories = items.some(item => item.category);
+
+          if (hasCategories) {
+             container.classList.remove('menu-grid-view');
+              const grouped = {};
+              items.forEach(item => {
+                 const cat = item.category || 'أخرى';
+                  if (!grouped[cat]) grouped[cat] = [];
+                 grouped[cat].push(item);
+              });
+              let html = '';
+              let catIndex = 0;
+              for (const cat in grouped) {
+                  html += `
+                 <div class="category-section">
+                     <div class="category-header ripple" onclick="toggleCategory('cat-${catIndex}')">
+                         <span>${cat}</span>
+                         <i class="fas fa-chevron-down" id="icon-cat-${catIndex}"></i>
+                     </div>
+                     <div class="category-items" id="cat-${catIndex}">
+                         ${grouped[cat].map(item => {
+                             currentCart[item.id] = currentCart[item.id] || 0;
+                             return `
+                             <div class="menu-item" style="display: flex; flex-direction: row;">
+                                 <div class="menu-item-info" style="flex: 1; text-align: right;">
+                                     <h4>${item.name}</h4>
+                                     <span>${item.price.toLocaleString()} د.ع</span>
+                                     ${item.desc ? `<p style="font-size: 11px; color: var(--text-muted); margin: 5px 0 0 0; line-height: 1.4;">${item.desc}</p>` : ''}
+                                 </div>
+                                 <div class="qty-controls" style="flex-shrink: 0;">
+                                     <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
+                                     <span class="qty-val" id="qty-${item.id}">${currentCart[item.id]}</span>
+                                     <button class="qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
+                                 </div>
+                             </div>`;
+                         }).join('')}
+                     </div>
+                 </div>`;
+                  catIndex++;
+              }
+             container.innerHTML = html;
+          } else {
+              if (items.length > 10) container.classList.add('menu-grid-view');
+              else container.classList.remove('menu-grid-view');
+
+              container.innerHTML = items.map(item => {
+                 currentCart[item.id] = currentCart[item.id] || 0;
+                 return `
+                 <div class="menu-item">
+                     <div class="menu-item-info">
+                         <h4>${item.name}</h4>
+                         <span>${item.price.toLocaleString()} د.ع</span>
+                         ${item.desc ? `<p style="font-size: 11px; color: var(--text-muted); margin: 5px 0 0 0; line-height: 1.4;">${item.desc}</p>` : ''}
+                     </div>
+                     <div class="qty-controls">
+                         <button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button>
+                         <span class="qty-val" id="qty-${item.id}">${currentCart[item.id]}</span>
+                         <button class="qty-btn" onclick="updateQty('${item.id}', -1)">-</button>
+                     </div>
+                 </div>`;
+             }).join('');
+          }
+      }
+
+      function updateQty(id, change) {
+          if (currentCart[id] + change >= 0) {
+             currentCart[id] += change;
+             document.getElementById(`qty-${id}`).innerText = currentCart[id];
+             updateCartTotal();
+          }
+      }
+
+      function updateCartTotal() {
+          let total = 0; let totalItems = 0;
+          const items = menus[currentRestaurantId].items;
+         items.forEach(item => { total += currentCart[item.id] * item.price; totalItems += currentCart[item.id]; });
+         const cartBar = document.getElementById('cartBar');
+          if (totalItems > 0) { cartBar.style.display = 'flex'; document.getElementById('cartTotal').innerText = total.toLocaleString() + ' د.ع'; } 
+          else { cartBar.style.display = 'none'; }
+      }
+
+      function checkoutRestaurant() {
+          let restaurantName = menus[currentRestaurantId].name;
+          let orderDetails = `طلب من ${restaurantName}:\n\n`;
+          let total = 0;
+          const items = menus[currentRestaurantId].items;
+         items.forEach(item => {
+              if (currentCart[item.id] > 0) {
+                  let lineTotal = currentCart[item.id] * item.price;
+                 orderDetails += `🔸 ${currentCart[item.id]}x ${item.name} = ${lineTotal.toLocaleString()} د.ع\n`;
+                 total += lineTotal;
+              }
+          });
+          orderDetails += `\n💵 المجموع الكلي: ${total.toLocaleString()} د.ع (بدون أجرة التوصيل)`;
+         document.getElementById('custOrder').value = orderDetails;
+          showScreen('order-screen');
+         showToast("تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
+      }
+
+      function shareApp() {
+          let myPhone = localStorage.getItem('saved_customer_phone');
+          if (!myPhone) return showToast("لازم تسجل رقمك أولاً! ⚠️");
+          let link = window.location.href.split('?')[0] + "?ref=" + myPhone;
+          if (navigator.share) { navigator.share({ title: 'البندر', text: 'نزل التطبيق واطلب وهذا كود الدعوة مالتي! 🎁', url: link }).catch(console.error); } 
+          else { showToast("تم نسخ الرابط! دزه لأصدقائك 🔗"); }
+      }
+
+      function saveCustomerData(name, phone) { localStorage.setItem('saved_customer_name', name); localStorage.setItem('saved_customer_phone', phone); }
+      
+      function loadSavedCustomerData() {
+          const name = localStorage.getItem('saved_customer_name'); 
+          const phone = localStorage.getItem('saved_customer_phone');
+          if (name && phone) {
+             ['custName', 'medName', 'tukName'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = name; });
+             ['custPhone', 'medPhone', 'tukPhone'].forEach(id => { 
+                  let el = document.getElementById(id);
+                 if(el) { el.value = phone; checkPhoneLive(el); }
+              });
+          }
+      }
+
+      function skipWelcome() {
+          const welcome = document.getElementById('welcome-overlay');
+          if (welcome && welcome.style.display !== 'none') { welcome.style.display = 'none'; location.reload(); }
+      }
+
+      async function checkRemoteReset() {
+          try {
+              const myPhone = localStorage.getItem('driver_phone');
+             if(!myPhone) return;
+              const response = await fetch(`${GS_URL}?action=checkReset&phone=${myPhone}`);
+              const result = await response.text();
+              if (result === "reset_now") { 
+                 localStorage.setItem('d_count', 0); localStorage.setItem('league_count', 0); localStorage.removeItem('driver_logs'); 
+                 updateStatsUI(); if(document.getElementById('log-screen').classList.contains('active-screen')) { renderDriverLog(); }
+              } 
+              else if (result.includes("reset_league")) { localStorage.setItem('league_count', 0); updateStatsUI(); }
+          } catch(e) {}
+      }
+
+      function openJoinScreen() {
+          if(localStorage.getItem('pending_join') === 'true') showScreen('activation-screen');
+          else showScreen('join-screen');
+      }
+
+      async function submitJoinRequest() {
+          const name = document.getElementById('driverJoinName').value.trim();
+          const phone = document.getElementById('driverJoinPhone').value.trim();
+          const bike = document.getElementById('bikeType').value;
+          if(!name || !validateIraqiPhone(phone) || !bike) return showToast("أكمل البيانات بشكل صحيح 📝");
+          const btn = document.getElementById('joinSendBtn');
+          const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
+          try {
+             localStorage.setItem('temp_name', name); localStorage.setItem('temp_phone', phone);
+              const randomCode = Math.floor(100000 + Math.random() * 900000);
+             localStorage.setItem('temp_activation', randomCode); localStorage.setItem('pending_join', 'true');
+              const msg = `📥 طلب انضمام جديد\n👤الاسم: ${name}\n📞الهاتف: ${phone}\n🏍️المركبة: ${bike}\n🔑الكود: ${randomCode}`;
+              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
+              });
+             showScreen('activation-screen');
+          } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
+      }
+
+      async function verifyActivationCode() {
+          const input = document.getElementById('activationCodeInput').value.trim();
+          if(input === localStorage.getItem('temp_activation')) {
+              const dName = localStorage.getItem('temp_name'); const dPhone = localStorage.getItem('temp_phone');
+             localStorage.setItem('isVerifiedDriver', 'true'); localStorage.setItem('driver_name', dName); localStorage.setItem('driver_phone', dPhone); localStorage.removeItem('pending_join');
+              try {
+                 const msg = `✅ تم تفعيل كابتن جديد بنجاح:\n👤 الاسم: ${dName}\n📞 الهاتف: ${dPhone}`;
+                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) });
+              } catch(e) {}
+             document.getElementById('welcome-overlay').style.display = 'flex';
+             confetti({ particleCount: 200, spread: 90, origin: { y: 0.5 } });
+             setTimeout(() => { location.reload(); }, 3500);
+          } else { showToast("رمز التفعيل غير صحيح ❌"); }
+      }
+
+      function cancelJoinRequest() { if(confirm("تأكيد الإلغاء؟")) { localStorage.clear(); location.reload(); } }
+      
+      async function resignDriver() { 
+          if (confirm("هل أنت متأكد من تسجيل الخروج والاستقالة؟")) { 
+              const dName = localStorage.getItem('driver_name') || "غير معروف";
+              const dPhone = localStorage.getItem('driver_phone') || "غير معروف";
+              const btn = document.querySelector('.resign-btn');
+              if(btn) btn.innerHTML = '<span class="baly-spinner" style="border-top-color:var(--danger);"></span> جاري الخروج...';
+              try {
+                 const msg = `❌ استقالة / تسجيل خروج كابتن:\n👤 الاسم: ${dName}\n📞 الهاتف: ${dPhone}`;
+                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) });
+              } catch(e) {}
+             localStorage.clear(); location.reload(); 
+          } 
+      }
+
+      function showScreen(id) {
+         document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active-screen'); });
+          const target = document.getElementById(id);
+          if (target) { target.classList.add('active-screen'); }
+         window.scrollTo(0, 0);
+          const bottomNav = document.getElementById('bottomNavigation');
+         if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id === 'restaurant-menu-screen') ? 'none' : 'flex';
+          
+          if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
+          if(id === 'log-screen') { renderDriverLog(); } 
+          if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') { loadSavedCustomerData(); }
+          if(id === 'order-screen') updateLoyaltyUI();
+          if (typeof closeSidebar === 'function') closeSidebar();
+      }
+
+      // ==========================================
+      // دوال الديسكورد والطلبات
+      // ==========================================
+      async function sendToDiscordPublic(msgText) {
+          try {
+              let response = await fetch(DISCORD_PUBLIC_WEBHOOK + "?wait=true", {
+                  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: msgText })
+              });
+              let data = await response.json();
+              return data.id;
+          } catch(e) { console.error("Error sending to Discord:", e); return null; }
+      }
+      
       async function editDiscordPublicMessage(msgId, driverName, customerName) {
           if(!msgId) return;
           try {
               let updatedText = `✅ **تم حجز الطلب**\nباسم المندوب: ${driverName}\nواسم الزبون: ${customerName}`;
               await fetch(DISCORD_PUBLIC_WEBHOOK + "/messages/" + msgId, {
-                  method: "PATCH",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ content: updatedText })
+                  method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: updatedText })
               });
-          } catch(e) { console.error("Error editing Discord message:", e); }
+          } catch(e) {}
       }
       
-      // إرسال التفاصيل السرية للقناة الخاصة بالمندوب (البوت الخاص)
       async function sendToDiscordPrivate(msgText) {
           try {
               await fetch(DISCORD_PRIVATE_WEBHOOK, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ content: msgText })
+                  method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: msgText })
               });
-          } catch(e) { console.error("Error sending to Discord Private:", e); }
+          } catch(e) {}
       }
-
-
-      // ==========================================
-      // نظام لوحة الكابتن الجديد (الطلبات المتاحة والحالية)
-      // ==========================================
 
       function switchPlazaTab(tab) {
           document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -1100,7 +2136,6 @@
           const feed = document.getElementById('live-orders-feed');
           if(typeof db === 'undefined') return;
           
-          // نجيب بس الطلبات اللي حالتها pending (متاحة)
           db.ref('orders').orderByChild('status').equalTo('pending').on('value', (snapshot) => {
               feed.innerHTML = '';
               if(!snapshot.exists()) {
@@ -1128,7 +2163,6 @@
           const myPhone = localStorage.getItem('driver_phone');
           if(typeof db === 'undefined' || !myPhone) return;
           
-          // نجيب بس الطلبات اللي محجوزة برقم المندوب الحالي
           db.ref('orders').orderByChild('driverPhone').equalTo(myPhone).on('value', (snapshot) => {
               feed.innerHTML = '';
               let hasCurrent = false;
@@ -1153,10 +2187,10 @@
               
               if(hasCurrent) {
                   feed.innerHTML = html;
-                  verifyCard.style.display = 'block'; // إظهار خانة تأكيد التسليم
+                  verifyCard.style.display = 'block'; 
               } else {
                   feed.innerHTML = '<div class="empty-state">لا توجد طلبات محجوزة باسمك حالياً.</div>';
-                  verifyCard.style.display = 'none'; // إخفاء خانة التأكيد إذا ماكو طلب
+                  verifyCard.style.display = 'none'; 
               }
           });
       }
@@ -1170,19 +2204,10 @@
           
           showToast("جاري الحجز...");
 
-          // 1. تحديث حالة الطلب بالفايربيس (حتى يختفي من البقية ويطلع بخانتك)
-          db.ref('orders/' + orderId).update({
-              status: 'claimed',
-              driverName: driverName,
-              driverPhone: driverPhone
-          });
+          db.ref('orders/' + orderId).update({ status: 'claimed', driverName: driverName, driverPhone: driverPhone });
           
-          // 2. تعديل الرسالة بالديسكورد العام
-          if(discordMsgId) {
-              await editDiscordPublicMessage(discordMsgId, driverName, customerName);
-          }
+          if(discordMsgId) { await editDiscordPublicMessage(discordMsgId, driverName, customerName); }
           
-          // 3. إرسال التفاصيل لقناة الديسكورد الخاصة
           let privateMsg = `📦 **تفاصيل طلب محجوز**\n\nالكابتن: ${driverName}\nالزبون: ${customerName}\nرقم الزبون: ${customerPhone}\nالموقع: <${location}>\n\n**الطلب:**\n${orderItems}`;
           await sendToDiscordPrivate(privateMsg);
           
@@ -1190,71 +2215,46 @@
           switchPlazaTab('current');
       }
 
-      // ==========================================
-      // دوال إرسال الطلبات (مسواك، تكتك، وسيط) وتخزينها
-      // ==========================================
-
       async function sendFinal() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
-          
-          const name = document.getElementById('custName').value.trim(); 
-          const phone = document.getElementById('custPhone').value.trim();
-          const order = document.getElementById('custOrder').value.trim(); 
-          const land = document.getElementById('custLandmark').value.trim();
+          const name = document.getElementById('custName').value.trim(); const phone = document.getElementById('custPhone').value.trim();
+          const order = document.getElementById('custOrder').value.trim(); const land = document.getElementById('custLandmark').value.trim();
           
           if(!name || !validateIraqiPhone(phone) || !order) return showToast("أكمل البيانات من فضلك 📝");
-          
           if(!userCoords) {
               showToast("جاري تحديد موقعك الحالي للطلب...📍");
               if(navigator.geolocation) {
                   navigator.geolocation.getCurrentPosition(
-                      (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
+                      (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
                       (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
               return;
           }
           
-          const btn = document.getElementById('sendBtn'); 
-          const originalText = btn.innerHTML; 
-          btn.innerHTML = '<span class="baly-spinner"></span>'; 
-          btn.disabled = true;
-          
+          const btn = document.getElementById('sendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
-              saveCustomerData(name, phone); 
-              const vc = generateSecureVC(); 
-              
+              saveCustomerData(name, phone); const vc = generateSecureVC(); 
               let msgContent = `🔵 **طلب مسواك جديد**\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الدالة: ${land}\n📍 الموقع: <${userCoords}>\n\n📝 **الطلب:**\n${order}`;
-              
-              // الإرسال للديسكورد العام وأخذ الآي دي
               let discordMsgId = await sendToDiscordPublic(msgContent);
               
-              // تخزين بالفايربيس للوحة الكابتن
               if(typeof db !== 'undefined') {
                   db.ref('orders/' + vc).set({
-                      id: vc,
-                      customer: name,
-                      phone: phone,
-                      items: `الدالة: ${land}\nالطلب: ${order}`,
-                      price: "حسب الفاتورة",
-                      restaurant: "تسوق مسواكك",
-                      status: 'pending',
-                      timestamp: firebase.database.ServerValue.TIMESTAMP,
-                      location: userCoords,
-                      discordMsgId: discordMsgId
+                      id: vc, customer: name, phone: phone, items: `الدالة: ${land}\nالطلب: ${order}`, price: "حسب الفاتورة",
+                      restaurant: "تسوق مسواكك", status: 'pending', timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords, discordMsgId: discordMsgId
                   });
               }
+              
+              // الكود القديم الخاص بتسجيل الطلبات بالتليكرام والبوتات (متروك لضمان عدم توقف اي شيء سابق)
+              let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0); tempLoyalty++; localStorage.setItem('my_loyalty_orders', tempLoyalty); updateLocalLoyaltyUI();
+              let referrer = localStorage.getItem('referred_by') || ""; await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`); localStorage.removeItem('referred_by');
+              const tgMsg = `🔵 طلب مسواك\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${order}\n🔢 تسلسل طلب العميل: ${tempLoyalty}\n📍الموقع: ${userCoords}`;
+              fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: tgMsg }) }).catch(e=>{});
 
               showToast("تم إرسال طلبك بنجاح ✅ راح يتصل بيك المندوب ثواني!"); 
-              document.getElementById('custOrder').value = ""; 
-              document.getElementById('custLandmark').value = ""; 
+              document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = ""; 
               showScreen('home-screen');
-          } catch (e) {
-              showToast("حدث خطأ أثناء الإرسال ❌");
-          } finally { 
-              btn.innerHTML = originalText; 
-              btn.disabled = false; 
-          }
+          } catch (e) { showToast("حدث خطأ أثناء الإرسال ❌"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       async function sendTukOrder() {
@@ -1267,7 +2267,7 @@
               showToast("جاري تحديد موقعك الحالي للطلب...📍");
               if(navigator.geolocation) {
                   navigator.geolocation.getCurrentPosition(
-                      (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
+                      (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
                       (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -1277,25 +2277,19 @@
           const btn = document.getElementById('tukSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
               saveCustomerData(name, phone); const vc = generateSecureVC(); 
-              
               let msgContent = `🚖 **طلب تكتك توصيلة**\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n📌 الموقع الحالي: <${userCoords}>\n🎯 موقع النزول: <${dropLink}>\nدالة: ${land}`;
-              
               let discordMsgId = await sendToDiscordPublic(msgContent);
 
               if(typeof db !== 'undefined') {
                   db.ref('orders/' + vc).set({
-                      id: vc,
-                      customer: name,
-                      phone: phone,
-                      items: `تحصيل/توصيلة من موقع الزبون إلى: ${dropLink} | دالة: ${land}`,
-                      price: "حسب المسافة",
-                      restaurant: "تكتك توصيلة",
-                      status: 'pending',
-                      timestamp: firebase.database.ServerValue.TIMESTAMP,
-                      location: userCoords,
-                      discordMsgId: discordMsgId
+                      id: vc, customer: name, phone: phone, items: `تحصيل/توصيلة من موقع الزبون إلى: ${dropLink} | دالة: ${land}`,
+                      price: "حسب المسافة", restaurant: "تكتك توصيلة", status: 'pending', timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords, discordMsgId: discordMsgId
                   });
               }
+
+              let referrer = localStorage.getItem('referred_by') || ""; await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`); localStorage.removeItem('referred_by');
+              const tgMsg = `🚖 طلب تكتك توصيلة\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الموقع: ${userCoords}\n📝تفاصيل: ${dropLink}\nدالة: ${land}`;
+              fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: tgMsg }) }).catch(e=>{});
 
               showToast("تم الإرسال بنجاح ✅ المندوب راح يتصل بيك"); 
               document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = "";
@@ -1313,7 +2307,7 @@
               showToast("جاري تحديد موقعك الحالي للطلب...📍");
               if(navigator.geolocation) {
                   navigator.geolocation.getCurrentPosition(
-                      (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
+                      (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
                       (err) => { showToast("يرجى تفعيل الـ GPS ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -1322,25 +2316,19 @@
           const btn = document.getElementById('medSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
               saveCustomerData(name, phone); const vc = generateSecureVC(); 
-              
               let msgContent = `🤝 **طلب وسيط جديد**\n👤 المرسل: ${name}\n📞 الهاتف: ${phone}\n📍 الموقع: <${userCoords}>\n📌 دالة: ${land}\n\n📝 **الغرض والتفاصيل:**\n${order}`;
-              
               let discordMsgId = await sendToDiscordPublic(msgContent);
 
               if(typeof db !== 'undefined') {
                   db.ref('orders/' + vc).set({
-                      id: vc,
-                      customer: name,
-                      phone: phone,
-                      items: `الوسيط (الغرض): ${order} | دالة: ${land}`,
-                      price: "حسب الاتفاق",
-                      restaurant: "خدمة الوسيط",
-                      status: 'pending',
-                      timestamp: firebase.database.ServerValue.TIMESTAMP,
-                      location: userCoords,
-                      discordMsgId: discordMsgId
+                      id: vc, customer: name, phone: phone, items: `الوسيط (الغرض): ${order} | دالة: ${land}`, price: "حسب الاتفاق",
+                      restaurant: "خدمة الوسيط", status: 'pending', timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords, discordMsgId: discordMsgId
                   });
               }
+
+              let referrer = localStorage.getItem('referred_by') || ""; await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`); localStorage.removeItem('referred_by');
+              const tgMsg = `🔵طلب وسيط\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📝الغرض: ${order}\n📍الموقع: ${userCoords}`;
+              fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: tgMsg }) }).catch(e=>{});
 
               showToast("تم الإرسال بنجاح ✅"); 
               document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = "";
@@ -1348,15 +2336,149 @@
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
+      async function processVerifyCode() {
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          const code = document.getElementById('driverVerifyInput').value.trim(); const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
+         if(!validateIraqiPhone(custPhone) || !code) return showToast("أدخل بيانات صحيحة ⚠️");
+          const btn = document.querySelector('#plaza-screen .send-btn'); const oldText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
+          try {
+              const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
+              const checkResult = await checkResp.text();
+              if (checkResult.startsWith("valid")) {
+                  try { const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); cashAudio.play(); confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } }); } catch(e) {}
+                  let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
+                 logs.unshift({ date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }), phone: custPhone, price: "2,000 د.ع" });
+                 localStorage.setItem('driver_logs', JSON.stringify(logs));
+                  localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
+                 localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
+                 updateStatsUI();
+                  let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
+                 fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
+                 syncLoyaltyWithServer(); 
+                 showToast(`تم تأكيد العملية بنجاح! عاشت ايدك 👏`); refreshLeaderboard();
+                 document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
+                 
+                 // إذا كمل الطلب بنجاح، مسحه من الفايربيس حتى يفرغ خانة طلباتي الحالية
+                 if(typeof db !== 'undefined') {
+                     db.ref('orders').orderByChild('driverPhone').equalTo(localStorage.getItem('driver_phone')).once('value', snapshot => {
+                         snapshot.forEach(child => { if(child.val().phone === custPhone) { db.ref('orders/' + child.key).remove(); } });
+                     });
+                 }
+              } else { showToast("الكود غير صحيح ❌"); }
+          } catch(e) {} finally { btn.innerHTML = oldText; btn.disabled = false; }
+      }
 
-      // ==========================================
-      // تهيئة وحالة التطبيق (معدلة لحل مشكلة الشاشة الترحيبية)
-      // ==========================================
+      function renderDriverLog() {
+          const container = document.getElementById('driver-log-container');
+         if(!container) return;
+          let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
+         if(logs.length === 0) {
+             container.innerHTML = '<div class="form-card" style="text-align:center;"><i class="fas fa-box-open" style="font-size:40px; color:var(--border-color); margin-bottom:10px;"></i><p style="color:var(--text-muted); font-weight:bold; margin:0;">السجل فارغ حالياً.</p></div>';
+              return;
+          }
+         container.innerHTML = logs.map((log, i) => `
+              <div class="form-card" style="border-right: 4px solid var(--primary); padding: 15px;">
+                 <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:8px;">
+                     <span style="font-weight:800; color:var(--primary);">الطلب #${logs.length - i}</span>
+                     <span style="font-size:12px; color:var(--text-muted);" dir="ltr">${log.date}</span>
+                 </div>
+                 <div style="font-size:14px; margin-bottom:5px;"><i class="fas fa-phone-alt" style="color:var(--text-muted); width:20px;"></i> هاتف الزبون: <strong>${log.phone}</strong></div>
+                 <div style="font-size:14px; margin-bottom:5px;"><i class="fas fa-map-marker-alt" style="color:var(--danger); width:20px;"></i> الموقع: <strong>أم قصر</strong></div>
+                 <div style="font-size:14px;"><i class="fas fa-money-bill-wave" style="color:var(--gold); width:20px;"></i> أجرة التوصيل: <strong>${log.price}</strong></div>
+             </div>
+          `).join('');
+      }
+
+      function updateStatsUI() { if(document.getElementById('stat-count')) document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0; }
+
+      async function refreshLeaderboard() {
+          if (!navigator.onLine) return;
+          const listDiv = document.getElementById('leaderboard-list');
+          try {
+              const response = await fetch(`${GS_URL}?action=getAllDriverStats`); const drivers = await response.json();
+             drivers.sort((a, b) => (parseInt(b.leagueCount) || 0) - (parseInt(a.leagueCount) || 0));
+             listDiv.innerHTML = "";
+             if(drivers.length === 0) { listDiv.innerHTML = '<p style="text-align: center; color: var(--text-muted);">لا يوجد كباتن حالياً</p>'; return; }
+             drivers.forEach((d, index) => {
+                  let medal = (index === 0) ? "🥇" : (index === 1) ? "🥈" : (index === 2) ? "🥉" : `<span style="font-size:16px; color:var(--text-muted);">${index + 1}</span>`;
+                  let isMe = d.phone === localStorage.getItem('driver_phone') ? " (أنت)" : "";
+                  let bgColor = isMe ? "background: var(--bg-color); border: 1px solid var(--primary);" : "";
+                 const div = document.createElement('div'); div.className = "driver-rank"; div.style = bgColor;
+                 div.innerHTML = `<div class="rank-info"><span class="rank-medal">${medal}</span> <span>${d.name}${isMe}</span></div><span class="rank-score">${d.leagueCount || 0}</span>`;
+                 listDiv.appendChild(div);
+              });
+          } catch (e) { listDiv.innerHTML = '<p style="text-align: center; color: var(--danger);">فشل التحميل</p>'; }
+      }
+
+      function updateNav(element) { document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); element.classList.add('active'); }
+      function openSidebar() { document.getElementById('appSidebar').classList.add('open'); const overlay = document.getElementById('sidebarOverlay'); overlay.style.display = 'block'; setTimeout(() => overlay.classList.add('show'), 10); }
+      function closeSidebar() { document.getElementById('appSidebar').classList.remove('open'); const overlay = document.getElementById('sidebarOverlay'); overlay.classList.remove('show'); setTimeout(() => overlay.style.display = 'none', 300); }
+
+      let loyaltyCount = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
+      function updateLocalLoyaltyUI() {
+          const displayCount = document.getElementById('current-order-count'); const progressBar = document.getElementById('loyalty-bar'); const giftMsg = document.getElementById('loyalty-gift-msg');
+          let currentCount = parseInt(loyaltyCount % 10); 
+         if(displayCount) displayCount.innerText = currentCount;
+         if(progressBar) progressBar.style.width = (currentCount / 10 * 100) + "%";
+         if(currentCount === 9) { if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i> اطلب الآن! هذا طلب المجاني 🎁"; giftMsg.style.color = "var(--secondary)"; } if(progressBar) progressBar.style.background = "var(--secondary)"; } 
+          else { if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i>أوصل للطلب 10 وكروتك مجانية"; giftMsg.style.color = "var(--primary)"; } if(progressBar) progressBar.style.background = "var(--gold)"; }
+      }
+      function updateLoyaltyUI() { updateLocalLoyaltyUI(); } updateLocalLoyaltyUI();
+
+      function toggleDriverStatus() {
+          const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
+          let current = localStorage.getItem('driver_status') || 'available';
+          if(current === 'available') {
+             localStorage.setItem('driver_status', 'busy'); btn.style.background = 'var(--danger)'; btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً';
+             if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; }
+          } else {
+             localStorage.setItem('driver_status', 'available'); btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل';
+             if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; }
+          }
+      }
+
+      function initDriverStatus() {
+          let current = localStorage.getItem('driver_status') || 'available';
+          const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
+          if(current === 'busy') { if(btn) { btn.style.background = 'var(--danger)'; btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً'; } if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; } } 
+          else { if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; } if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; } }
+          
+          const soundBtn = document.getElementById('soundToggleBtn');
+         if(isSoundEnabled) {
+             if(soundBtn) {
+                 soundBtn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل';
+                 soundBtn.style.background = '#F59E0B'; 
+                 soundBtn.style.color = 'white';
+              }
+             startOrderPolling();
+          }
+      }
+      
+      let appMap = null;
+      function openMapModal() {
+         document.getElementById('map-modal').style.display = 'flex';
+          if (!appMap) {
+              const umQasrBounds = L.latLngBounds( L.latLng(30.0100, 47.8800), L.latLng(30.0800, 47.9600) );
+              appMap = L.map('map-view', { attributionControl: false, maxBounds: umQasrBounds, maxBoundsViscosity: 1.0, minZoom: 13 }).setView([30.0396, 47.9298], 15);
+             L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(appMap);
+          }
+         setTimeout(() => { appMap.invalidateSize(); }, 300);
+      }
+      function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
+      function confirmMapLocation() {
+          const center = appMap.getCenter();
+          const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng}`;
+         document.getElementById('tukDropoffLink').value = googleMapsLink;
+         document.getElementById('map-success-msg').style.display = 'block';
+         closeMapModal();
+      }
+
+      function openPricesModal() { document.getElementById('prices-modal').style.display = 'flex'; }
+      function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
 
       function checkStatus() {
           checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
           fetchDynamicMenus(); 
-          const myPhone = localStorage.getItem('saved_customer_phone');
           
           if (localStorage.getItem('isVerifiedDriver') === 'true') {
               document.getElementById('join-driver-card').style.display = 'none';
@@ -1370,7 +2492,7 @@
               }
               initDriverStatus(); setInterval(checkRemoteReset, 15000); setInterval(refreshLeaderboard, 30000);
               showScreen('home-screen');
-              switchPlazaTab('available'); // الدخول الافتراضي للطلبات المتاحة
+              switchPlazaTab('available'); 
           } else {
               if(!localStorage.getItem('saved_customer_phone')) {
                   showScreen('login-screen');
@@ -1386,21 +2508,7 @@
           setInterval(checkGlobalStatusFromServer, 10000);
           
           document.addEventListener("visibilitychange", function() {
-              if (document.visibilityState === 'visible') {
-                  checkGlobalStatusFromServer();
-              }
+              if (document.visibilityState === 'visible') { checkGlobalStatusFromServer(); }
           });
-
-          // إخفاء الشاشة الترحيبية إجبارياً بعد 3 ثواني (بعد انتهاء حركة الدراجة)
-          setTimeout(() => {
-              const splash = document.getElementById('splash-screen');
-              if (splash && splash.style.display !== 'none') {
-                  splash.style.opacity = '0';
-                  setTimeout(() => splash.style.display = 'none', 500);
-              }
-          }, 3000);
       });
-      
     </script>
-</body>
-</html>
