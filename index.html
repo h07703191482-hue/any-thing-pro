@@ -282,7 +282,8 @@
       .claim-btn:active { transform: scale(0.95); }
     </style>
 </head>
-<body><div id="out-of-zone-popup">
+<body>
+    <div id="out-of-zone-popup">
         <div class="out-zone-card">
             <i class="fas fa-map-marker-slash" style="font-size: 70px; color: var(--danger); margin-bottom: 20px; animation: bouncePin 1s infinite alternate;"></i>
             <h2 style="margin: 0 0 15px; color: var(--danger); font-weight: 800; font-size: 24px;">عذراً، أنت خارج نطاق الخدمة</h2>
@@ -642,7 +643,8 @@
            </div>
             <button class="send-btn ripple" style="width: auto; margin: 0; padding: 12px 25px; font-size: 16px; box-shadow: none;" onclick="checkoutRestaurant()">استمرار <i class="fas fa-arrow-left"></i></button>
         </div>
-    </div><div id="tuk-screen" class="screen container">
+    </div>
+    <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
         <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
@@ -966,219 +968,11 @@
               });
           } catch(e) { console.error("Error sending to Discord", e); }
       }
-        <script>
-      // ==============================================================
-      // إعدادات الـ Webhooks مال الديسكورد
-      // ==============================================================
-      const DISCORD_ORDERS_WEBHOOK = "https://discord.com/api/webhooks/1491324693871857684/i9PXJalQMx79I_Ev5i10jeS8TgKEe_Q_bdqhuhOC57LNiCw-kFFdJstxeuquI9abklp9";
-      const DISCORD_ADMIN_WEBHOOK = "https://discord.com/api/webhooks/1491325381209362483/JmSQslp2XaCCPYOE3MbX3ODMr7NQIt0za7KCF_O_VTTmiemGCe7lI_fp_5wKquE-6wVz";
-      const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
-
-      let userCoords = ""; 
-      const CURRENT_VERSION = "3.0.1"; 
-      if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
-          localStorage.setItem('app_version', CURRENT_VERSION);
-          window.location.reload(true); 
-      }
-
-      // ==============================================================
-      // دوال النظام الأساسية (اللي كانت مفقودة)
-      // ==============================================================
-      let secretCounter = 0;
-      let lockSecretCounter = 0;
-      let appIsActive = true;
-      let loyaltyCount = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
-
-      window.originalAlert = window.alert;
-      window.alert = function(message) { showToast(message); };
-
-      function showToast(msg) {
-          const container = document.getElementById('toast-container');
-          if(!container) return;
-          const toast = document.createElement('div');
-          toast.className = 'toast';
-          toast.innerHTML = `<i class="fas fa-bell" style="color: var(--secondary);"></i> <span>${msg}</span>`;
-          container.appendChild(toast);
-          setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 3000);
-      }
-
-      function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
-      function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
-      function checkConnection() { document.getElementById('offline-screen').style.display = navigator.onLine ? 'none' : 'flex'; }
-      window.addEventListener('offline', checkConnection);
-      window.addEventListener('online', checkConnection);
-      
-      function openWiFiSettings() { window.location.href = "intent:#Intent;action=android.settings.WIFI_SETTINGS;end"; }
-      function openDataSettings() { window.location.href = "intent:#Intent;action=android.settings.WIRELESS_SETTINGS;end"; }
-
-      function toggleTheme() {
-         document.body.classList.toggle('dark-mode');
-         localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-      }
-
-      function applyAutoTheme() {
-          const hour = new Date().getHours();
-          const isNight = hour >= 18 || hour < 6; 
-          const savedTheme = localStorage.getItem('theme');
-          if (!savedTheme && isNight) document.body.classList.add('dark-mode');
-          else if (savedTheme === 'dark') document.body.classList.add('dark-mode');
-      }
-
-      function trackLiveVisit() { try { fetch(`${GS_URL}?action=trackVisit&t=${new Date().getTime()}`); } catch(e) {} }
-
-      function initAutoLocation() {
-          if (navigator.geolocation) {
-             navigator.geolocation.getCurrentPosition(
-                 (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; },
-                 (err) => { console.warn("GPS Denied"); }, { enableHighAccuracy: true }
-              );
-          }
-      }
-
-      function checkPhoneLive(input) {
-          let errorSpan = input.parentNode.querySelector('.phone-error');
-          if (!errorSpan) return;
-          if (input.value.length === 0) {
-             errorSpan.style.display = 'none';
-             input.style.borderColor = '';
-          } else if (!/^07[0-9]{9}$/.test(input.value)) {
-             errorSpan.style.display = 'block';
-             input.style.borderColor = 'var(--danger)';
-          } else {
-             errorSpan.style.display = 'none';
-             input.style.borderColor = '#10B981'; 
-          }
-      }
-
-      // ==============================================================
-      // دوال الإدارة وحالة التطبيق
-      // ==============================================================
-      function handleSecretClick() {
-         secretCounter++;
-          if (secretCounter === 5) {
-             secretCounter = 0;
-              let pass = prompt("أدخل الرمز السري:");
-              if (pass === "2006") {
-                 localStorage.setItem('isAdmin', 'true'); 
-                 showScreen('admin-panel');
-                 checkGlobalStatusFromServer(); 
-              } else if (pass !== null) { showToast("الرمز خطأ ❌"); }
-          }
-      }
-
-      function handleLockScreenSecret() {
-         lockSecretCounter++;
-          if (lockSecretCounter === 5) {
-             lockSecretCounter = 0;
-              let pass = prompt("أدخل الرمز السري:");
-              if (pass === "2006") {
-                 localStorage.setItem('isAdmin', 'true'); 
-                 document.getElementById('global-lock-screen').style.display = 'none';
-                 showScreen('admin-panel');
-              } else if (pass !== null) { showToast("الرمز خطأ ❌"); }
-          }
-      }
-
-      async function setGlobalAppStatus(newStatus) {
-          const btnOpen = document.getElementById('btn-open-app');
-          const btnClose = document.getElementById('btn-close-app');
-          if(newStatus === 'online') btnOpen.innerHTML = '<span class="baly-spinner"></span>'; 
-          else btnClose.innerHTML = '<span class="baly-spinner"></span>';
-          btnOpen.disabled = true; btnClose.disabled = true;
-          try {
-              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}&t=${new Date().getTime()}`, { mode: 'no-cors' });
-              showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
-              setTimeout(checkGlobalStatusFromServer, 1500);
-          } catch(e) {
-              setTimeout(checkGlobalStatusFromServer, 1500);
-          } finally { 
-             btnOpen.innerHTML = '<i class="fas fa-unlock"></i> فتح التطبيق';
-             btnClose.innerHTML = '<i class="fas fa-lock"></i> إغلاق التطبيق';
-             btnOpen.disabled = false; btnClose.disabled = false;
-          }
-      }
-
-      async function checkGlobalStatusFromServer() {
-          try {
-              const resp = await fetch(`${GS_URL}?action=getAppStatus&t=${new Date().getTime()}`);
-              const status = await resp.text();
-              const lockScreen = document.getElementById('global-lock-screen');
-              const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
-              if (status === "offline") {
-                 appIsActive = false;
-                 if(lockScreen && !isAdmin) lockScreen.style.display = 'flex'; 
-                  else if(lockScreen && isAdmin) lockScreen.style.display = 'none';
-              } else {
-                 appIsActive = true;
-                 if(lockScreen) lockScreen.style.display = 'none'; 
-              }
-              applyGlobalStatus();
-          } catch(e) {
-          } finally {
-              hideSplashScreen(); // إخفاء الشاشة الترحيبية
-          }
-      }
-
-      function applyGlobalStatus() {
-          const badge = document.getElementById('admin-status-badge');
-          const orderButtons = document.querySelectorAll('.order-btn-logic');
-          const isAdmin = localStorage.getItem('isAdmin') === 'true';
-          if (!appIsActive) {
-             if(badge) badge.style.display = 'block'; 
-              if (!isAdmin) {
-                 orderButtons.forEach(btn => {
-                     btn.disabled = true;
-                     btn.innerHTML = '<i class="fas fa-lock"></i> مغلق حالياً';
-                  });
-              } else { orderButtons.forEach(btn => btn.disabled = false); }
-          } else {
-             if(badge) badge.style.display = 'none';
-             if(document.getElementById('tukSendBtn')) document.getElementById('tukSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> طلب تكتك توصيلة';
-             if(document.getElementById('medSendBtn')) document.getElementById('medSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
-             if(document.getElementById('sendBtn')) document.getElementById('sendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
-             orderButtons.forEach(btn => btn.disabled = false);
-          }
-      }
-
-      function hideSplashScreen() {
-          const splash = document.getElementById('splash-screen');
-          if(splash && splash.style.display !== 'none') { 
-              splash.style.opacity = '0'; 
-              setTimeout(() => splash.style.display = 'none', 500); 
-          }
-      }
-
-      // ==============================================================
-      // دوال الإرسال للديسكورد (Webhook)
-      // ==============================================================
-      async function sendToDiscord(webhookUrl, title, description, color, fields = []) {
-          try {
-              const payload = {
-                  embeds: [{
-                      title: title,
-                      description: description,
-                      color: color, 
-                      fields: fields,
-                      footer: { text: "تطبيق البندر 📦" },
-                      timestamp: new Date().toISOString()
-                  }]
-              };
-              await fetch(webhookUrl, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(payload)
-              });
-          } catch(e) { console.error("Error sending to Discord", e); }
-      }
-
-      // ==============================================================
-      // قائمة المطاعم (المنيو)
-      // ==============================================================
-      const menus = {
+        const menus = {
           'rken_estkana': {
               name: 'ركن استكانة',
               items: [
-                  // --- قسم أكلات المشاوي ---
+                  // ================= قسم أكلات المشاوي =================
                   { id: 'rk1', name: 'كيلو كباب لحم', price: 24000, category: '🥩 قسم أكلات المشاوي', desc: '16 شيش كباب، خبز، سلطة، طرشي، وشطة' },
                   { id: 'rk2', name: 'نفر كباب لحم', price: 6000, category: '🥩 قسم أكلات المشاوي', desc: '4 شيش دبل، 3 خبزات، سلطة، طرشي، وشطة' },
                   { id: 'rk3', name: 'نص نفر كباب لحم', price: 3000, category: '🥩 قسم أكلات المشاوي', desc: '2 شيش، 2 خبزة، سلطة، طرشي، وشطة' },
@@ -1198,7 +992,8 @@
                   { id: 'rk17', name: 'لفة كباب دجاج', price: 1500, category: '🥩 قسم أكلات المشاوي', desc: 'كباب دجاج، خضروات، وصمون حجري' },
                   { id: 'rk18', name: 'لفة معلاق', price: 1500, category: '🥩 قسم أكلات المشاوي', desc: 'معلاق مشوي، خضروات، وصمون حجري' },
 
-                  // --- قسم الأكلات الغربية ---
+                  // ================= قسم الأكلات الغربية =================
+                  // --- البيتزا ---
                   { id: 'rk19', name: 'بيتزا شاورما لحم (صغير)', price: 7000, category: '🍕 قسم البيتزا' },
                   { id: 'rk20', name: 'بيتزا شاورما لحم (وسط)', price: 10000, category: '🍕 قسم البيتزا' },
                   { id: 'rk21', name: 'بيتزا شاورما لحم (كبير)', price: 14000, category: '🍕 قسم البيتزا' },
@@ -1236,6 +1031,7 @@
                   { id: 'rk53', name: 'بيتزا خضروات (كبير)', price: 9000, category: '🍕 قسم البيتزا' },
                   { id: 'rk54', name: 'بيتزا خضروات (عائلي)', price: 12000, category: '🍕 قسم البيتزا' },
 
+                  // --- البرجر ---
                   { id: 'rk55', name: 'برجر استكانة (عادي)', price: 4000, category: '🍔 قسم البرجر' },
                   { id: 'rk56', name: 'برجر استكانة (مع جبن)', price: 5000, category: '🍔 قسم البرجر' },
                   { id: 'rk57', name: 'برجر استكانة (دبل)', price: 7000, category: '🍔 قسم البرجر' },
@@ -1263,6 +1059,7 @@
                   { id: 'rk79', name: 'برجر فوريو سبيشل (عادي)', price: 7000, category: '🍔 قسم البرجر' },
                   { id: 'rk80', name: 'برجر فوريو سبيشل (دبل)', price: 10000, category: '🍔 قسم البرجر' },
 
+                  // --- الصاج واللفات ---
                   { id: 'rk81', name: 'صاج شاورما لحم (صغير)', price: 3000, category: '🌯 قسم الصاج واللفات' },
                   { id: 'rk82', name: 'صاج شاورما لحم (كبير)', price: 5000, category: '🌯 قسم الصاج واللفات' },
                   { id: 'rk83', name: 'صاج شاورما لحم (وجبة)', price: 6000, category: '🌯 قسم الصاج واللفات' },
@@ -1283,6 +1080,7 @@
                   { id: 'rk98', name: 'صاج إيطالي لحم', price: 7000, category: '🌯 قسم الصاج واللفات' },
                   { id: 'rk99', name: 'صاج إيطالي دجاج', price: 6000, category: '🌯 قسم الصاج واللفات' },
 
+                  // --- المقبلات والوجبات ---
                   { id: 'rk100', name: 'طبق فنكر الشيف (سبيشل)', price: 7000, category: '🍟 المقبلات والبطاطا' },
                   { id: 'rk101', name: 'فرايز جكن هلابينو', price: 6000, category: '🍟 المقبلات والبطاطا' },
                   { id: 'rk102', name: 'فرايز شاورما', price: 6000, category: '🍟 المقبلات والبطاطا' },
@@ -1300,6 +1098,7 @@
                   { id: 'rk114', name: 'ريزو BBQ', price: 5000, category: '🍱 وجبات الريزو والعملاقة' },
                   { id: 'rk115', name: 'ريزو مكس', price: 5000, category: '🍱 وجبات الريزو والعملاقة' },
 
+                  // --- المشروبات الباردة ---
                   { id: 'rk116', name: 'لبن', price: 500, category: '🥤 المشروبات الباردة' },
                   { id: 'rk117', name: 'بيبسي', price: 500, category: '🥤 المشروبات الباردة' },
                   { id: 'rk118', name: 'سفن', price: 500, category: '🥤 المشروبات الباردة' },
@@ -1308,7 +1107,7 @@
                   { id: 'rk121', name: 'ميرندا', price: 500, category: '🥤 المشروبات الباردة' },
                   { id: 'rk122', name: 'شاني', price: 500, category: '🥤 المشروبات الباردة' },
 
-                  // --- قسم الأكلات الشرقية ---
+                  // ================= قسم الأكلات الشرقية =================
                   { id: 'rk123', name: 'صينية كيلو لحم مندي', price: 45000, category: '🍖 أطباق اللحوم الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
                   { id: 'rk124', name: 'صينية كيلو لحم برياني', price: 45000, category: '🍖 أطباق اللحوم الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
                   { id: 'rk125', name: 'نص لحم (500 غرام)', price: 24000, category: '🍖 أطباق اللحوم الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
@@ -1732,28 +1531,43 @@
          showToast("تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
       }
 
-      function showScreen(id) {
-         document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active-screen'); });
-          const target = document.getElementById(id);
-          if (target) { target.classList.add('active-screen'); }
-         window.scrollTo(0, 0);
-          const bottomNav = document.getElementById('bottomNavigation');
-         if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id === 'restaurant-menu-screen') ? 'none' : 'flex';
-          
-          if(id === 'plaza-screen') { 
-              updateStatsUI(); refreshLeaderboard(); 
-              document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name');
-              document.getElementById('driverPersonalWebhook').value = localStorage.getItem('personal_webhook') || "";
+      function checkStatus() {
+         checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
+          if (localStorage.getItem('isVerifiedDriver') === 'true') {
+             document.getElementById('join-driver-card').style.display = 'none';
+             document.getElementById('driver-plaza-card').style.display = 'flex';
+             document.getElementById('driver-status-badge').style.display = 'block';
+              const accBtn = document.getElementById('nav-account-btn');
+             if(accBtn) {
+                 accBtn.setAttribute('onclick', "showScreen('plaza-screen'); updateNav(this)");
+                 document.getElementById('nav-acc-icon').className = 'fas fa-briefcase';
+                 document.getElementById('nav-acc-text').innerText = 'المندوبين';
+              }
+             initDriverStatus(); 
+             setInterval(refreshLeaderboard, 30000);
+             showScreen('home-screen');
+          } else {
+             if(!localStorage.getItem('saved_customer_phone')) {
+                 showScreen('login-screen');
+                 document.getElementById('device-type-modal').style.display = 'flex';
+             }
+              else { loadSavedCustomerData(); syncLoyaltyWithServer(); showScreen('home-screen'); }
           }
-          if(id === 'log-screen') renderDriverLog(); 
-          if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') loadSavedCustomerData(); 
-          if(id === 'order-screen') updateLoyaltyUI();
-          if (typeof closeSidebar === 'function') closeSidebar();
       }
 
-      function updateNav(element) { document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); element.classList.add('active'); }
-      function openSidebar() { document.getElementById('appSidebar').classList.add('open'); const overlay = document.getElementById('sidebarOverlay'); overlay.style.display = 'block'; setTimeout(() => overlay.classList.add('show'), 10); }
-      function closeSidebar() { document.getElementById('appSidebar').classList.remove('open'); const overlay = document.getElementById('sidebarOverlay'); overlay.classList.remove('show'); setTimeout(() => overlay.style.display = 'none', 300); }
+     document.addEventListener('DOMContentLoaded', () => {
+         checkStatus();
+         initAutoLocation(); 
+         setInterval(checkGlobalStatusFromServer, 10000);
+      });
+
+      function shareApp() {
+          let myPhone = localStorage.getItem('saved_customer_phone');
+          if (!myPhone) return showToast("لازم تسجل رقمك أولاً! ⚠️");
+          let link = window.location.href.split('?')[0] + "?ref=" + myPhone;
+          if (navigator.share) { navigator.share({ title: 'البندر', text: 'نزل التطبيق واطلب وهذا كود الدعوة مالتي! 🎁', url: link }).catch(console.error); } 
+          else { showToast("تم نسخ الرابط! دزه لأصدقائك 🔗"); }
+      }
 
       function saveCustomerData(name, phone) { localStorage.setItem('saved_customer_name', name); localStorage.setItem('saved_customer_phone', phone); }
       
@@ -1791,6 +1605,7 @@
               const randomCode = Math.floor(100000 + Math.random() * 900000);
              localStorage.setItem('temp_activation', randomCode); localStorage.setItem('pending_join', 'true');
               
+              // الإرسال للديسكورد (غرفة الإدارة)
               await sendToDiscord(DISCORD_ADMIN_WEBHOOK, "📥 طلب انضمام كابتن جديد", `**الاسم:** ${name}\n**الهاتف:** ${phone}\n**المركبة:** ${bike}\n**الكود السري:** ${randomCode}`, 15105570);
              showScreen('activation-screen');
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
@@ -1802,6 +1617,7 @@
               const dName = localStorage.getItem('temp_name'); const dPhone = localStorage.getItem('temp_phone');
              localStorage.setItem('isVerifiedDriver', 'true'); localStorage.setItem('driver_name', dName); localStorage.setItem('driver_phone', dPhone); localStorage.removeItem('pending_join');
               try {
+                  // الإرسال للديسكورد
                  await sendToDiscord(DISCORD_ADMIN_WEBHOOK, "✅ تم تفعيل كابتن جديد", `**الاسم:** ${dName}\n**الهاتف:** ${dPhone}`, 5763719);
               } catch(e) {}
              document.getElementById('welcome-overlay').style.display = 'flex';
@@ -1816,12 +1632,36 @@
           if (confirm("هل أنت متأكد من تسجيل الخروج والاستقالة؟")) { 
               const dName = localStorage.getItem('driver_name') || "غير معروف";
               const dPhone = localStorage.getItem('driver_phone') || "غير معروف";
+              const btn = document.querySelector('.resign-btn');
+              if(btn) btn.innerHTML = '<span class="baly-spinner" style="border-top-color:var(--danger);"></span> جاري الخروج...';
               try {
+                  // الإرسال للديسكورد
                  await sendToDiscord(DISCORD_ADMIN_WEBHOOK, "❌ استقالة / خروج كابتن", `**الاسم:** ${dName}\n**الهاتف:** ${dPhone}`, 15548997);
               } catch(e) {}
              localStorage.clear(); location.reload(); 
           } 
       }
+
+      function showScreen(id) {
+         document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active-screen'); });
+          const target = document.getElementById(id);
+          if (target) { target.classList.add('active-screen'); }
+         window.scrollTo(0, 0);
+          const bottomNav = document.getElementById('bottomNavigation');
+         if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id === 'restaurant-menu-screen') ? 'none' : 'flex';
+          
+          if(id === 'plaza-screen') { 
+              updateStatsUI(); refreshLeaderboard(); 
+              document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name');
+              document.getElementById('driverPersonalWebhook').value = localStorage.getItem('personal_webhook') || "";
+          }
+          if(id === 'log-screen') { renderDriverLog(); } 
+          if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') { loadSavedCustomerData(); }
+          if(id === 'order-screen') updateLoyaltyUI();
+          if (typeof closeSidebar === 'function') closeSidebar();
+      }
+
+      // ================= نظام الطلبات والحجز (ديسكورد + فايربيس) =================
 
       function saveDriverWebhook() {
           let val = document.getElementById('driverPersonalWebhook').value.trim();
@@ -1831,6 +1671,7 @@
           }
       }
 
+      // دالة استدعاء الطلبات المتاحة للوحة الكابتن
       function fetchAvailableOrders() {
           if(typeof db !== 'undefined' && localStorage.getItem('isVerifiedDriver') === 'true') {
               db.ref('orders').orderByChild('status').equalTo('pending_driver').on('value', (snapshot) => {
@@ -1855,7 +1696,10 @@
               });
           }
       }
+      // تحديث الطلبات كل 5 ثواني
+      setInterval(fetchAvailableOrders, 5000);
 
+      // دالة حجز الطلب للمندوب
       async function claimOrder(orderId) {
           let myWebhook = localStorage.getItem('personal_webhook');
           if(!myWebhook || !myWebhook.includes('discord.com/api/webhooks')) {
@@ -1864,16 +1708,25 @@
           if(!navigator.onLine) return showToast("لا يوجد انترنت ❌");
 
           try {
+              // جلب الطلب من الفايربيس
               const snapshot = await db.ref('orders/' + orderId).once('value');
               if(snapshot.exists()) {
                   let order = snapshot.val();
-                  if(order.status !== 'pending_driver') { return showToast("⚠️ عذراً، هذا الطلب انحجز من قبل مندوب ثاني!"); }
+                  if(order.status !== 'pending_driver') {
+                      return showToast("⚠️ عذراً، هذا الطلب انحجز من قبل مندوب ثاني!");
+                  }
 
                   let driverName = localStorage.getItem('driver_name') || 'كابتن';
                   
-                  await db.ref('orders/' + orderId).update({ status: 'claimed', driver: driverName });
+                  // تحديث الفايربيس
+                  await db.ref('orders/' + orderId).update({
+                      status: 'claimed',
+                      driver: driverName
+                  });
+
                   showToast("✅ تم حجز الطلب! روح للديسكورد مالتك شوف التفاصيل.");
 
+                  // إرسال التفاصيل لرابط المندوب الخاص
                   let fields = [
                       { name: "الزبون", value: order.customer, inline: true },
                       { name: "رقم الهاتف", value: order.phone, inline: true },
@@ -1882,10 +1735,14 @@
                   if(order.location) fields.push({ name: "الموقع الجغرافي", value: `[اضغط هنا لفتح الخريطة](${order.location})`, inline: false });
                   
                   await sendToDiscord(myWebhook, "🎯 تم حجز الطلب لك بنجاح!", "تفاصيل العملية:", 5763719, fields);
+
+                  // إرسال إشعار للقناة العامة بأن الطلب انحجز
                   await sendToDiscord(DISCORD_ORDERS_WEBHOOK, "✅ طلب محجوز", `تم حجز الطلب رقم (${orderId}) بواسطة الكابتن **${driverName}**`, 5763719);
               }
           } catch(e) { showToast("حدث خطأ أثناء الحجز ❌"); }
       }
+
+      // ================= إرسال الطلبات للفايربيس والديسكورد =================
 
       async function sendTukOrder() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
@@ -1894,12 +1751,18 @@
           if(!name || !validateIraqiPhone(phone) || !dropLink) return showToast("أكمل البيانات وحدد موقع النزول 📍");
          if(!userCoords) {
              showToast("جاري تحديد موقعك الحالي للطلب...📍");
-             initAutoLocation();
+             if(navigator.geolocation) {
+                 navigator.geolocation.getCurrentPosition(
+                     (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
+                     (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
+                  );
+              } else { showToast("جهازك لا يدعم تحديد الموقع ❌"); }
               return;
           }
           const btn = document.getElementById('tukSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
               saveCustomerData(name, phone); const vc = generateSecureVC();
+              
               if(typeof db !== 'undefined') {
                   db.ref('orders/' + vc).set({
                       id: vc, customer: name, phone: phone, items: `تحصيل/تسليم: ${dropLink} | دالة: ${land}`,
@@ -1907,8 +1770,10 @@
                       timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords
                   });
               }
+
               await sendToDiscord(DISCORD_ORDERS_WEBHOOK, "🚖 طلب تكتك توصيلة جديد!", `**رقم الطلب:** ${vc}\n**الموقع:** [فتح الخريطة](${userCoords})\n\n🚨 **مندوبينا الأبطال افتحوا التطبيق לחجز الطلب!**`, 15105570);
-             showToast("تم الإرسال بنجاح ✅"); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; loadSavedCustomerData();
+              
+             showToast("تم الإرسال بنجاح ✅"); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
@@ -1918,12 +1783,18 @@
           if(!name || !validateIraqiPhone(phone) || !order) return showToast("أكمل البيانات بشكل صحيح 📝");
          if(!userCoords) {
              showToast("جاري تحديد موقعك الحالي للطلب...📍");
-             initAutoLocation();
+             if(navigator.geolocation) {
+                 navigator.geolocation.getCurrentPosition(
+                     (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
+                     (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
+                  );
+              }
               return;
           }
           const btn = document.getElementById('medSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
              saveCustomerData(name, phone); const vc = generateSecureVC();
+
               if(typeof db !== 'undefined') {
                   db.ref('orders/' + vc).set({
                       id: vc, customer: name, phone: phone, items: `الغرض: ${order} | دالة: ${document.getElementById('medLandmark').value.trim()}`,
@@ -1931,15 +1802,21 @@
                       timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords
                   });
               }
+
               await sendToDiscord(DISCORD_ORDERS_WEBHOOK, "📦 طلب وسيط جديد!", `**رقم الطلب:** ${vc}\n**الموقع:** [فتح الخريطة](${userCoords})\n\n🚨 **مندوبينا الأبطال افتحوا التطبيق לחجز الطلب!**`, 3447003);
-             showToast("تم الإرسال بنجاح ✅"); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; loadSavedCustomerData();
+              
+             showToast("تم الإرسال بنجاح ✅"); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
+      // رفع الصور للديسكورد (بما أن الفايربيس للصور معقد، نستغل الديسكورد كمخزن)
       async function uploadImageToDiscord(file) {
           const formData = new FormData();
           formData.append('file', file);
-          try { await fetch(DISCORD_ORDERS_WEBHOOK, { method: 'POST', body: formData }); return true; } catch(e) { return false; }
+          try {
+              const response = await fetch(DISCORD_ORDERS_WEBHOOK, { method: 'POST', body: formData });
+              return true;
+          } catch(e) { return false; }
       }
 
       function previewImages() {
@@ -1954,26 +1831,47 @@
 
       async function sendFinal() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
-          const name = document.getElementById('custName').value.trim(); const phone = document.getElementById('custPhone').value.trim();
-          const order = document.getElementById('custOrder').value.trim(); const land = document.getElementById('custLandmark').value.trim();
+          
+          const name = document.getElementById('custName').value.trim(); 
+          const phone = document.getElementById('custPhone').value.trim();
+          const order = document.getElementById('custOrder').value.trim(); 
+          const land = document.getElementById('custLandmark').value.trim();
           const files = document.getElementById('custImages').files;
           
           if(!name || !validateIraqiPhone(phone) || (!order && files.length === 0)) return showToast("أكمل البيانات من فضلك 📝📸");
-         if(!userCoords) { showToast("جاري تحديد موقعك الحالي للطلب...📍"); initAutoLocation(); return; }
           
-          const btn = document.getElementById('sendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
+         if(!userCoords) {
+             showToast("جاري تحديد موقعك الحالي للطلب...📍");
+             if(navigator.geolocation) {
+                 navigator.geolocation.getCurrentPosition(
+                     (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
+                     (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
+                  );
+              }
+              return;
+          }
+          
+          const btn = document.getElementById('sendBtn'); 
+          const originalText = btn.innerHTML; 
+          btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
+          
           try {
-             saveCustomerData(name, phone); const vc = generateSecureVC(); 
+             saveCustomerData(name, phone); 
+              const vc = generateSecureVC(); 
               
               if (files.length > 0) {
-                  for (let i = 0; i < files.length; i++) await uploadImageToDiscord(files[i]);
+                  for (let i = 0; i < files.length; i++) {
+                     await uploadImageToDiscord(files[i]);
+                  }
                  clearImages();
               }
               
               let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0); 
              tempLoyalty++; localStorage.setItem('my_loyalty_orders', tempLoyalty); updateLocalLoyaltyUI();
 
+              let loyaltyMsg = (tempLoyalty % 10) === 0 ? "🎁 هذا الطلب مجاني (الطلب العاشر)" : `الطلب رقم ${tempLoyalty % 10} من أصل 10`;
               let msgContent = order ? order : "الطلب موضح في الصور المرفقة 📸";
+              
               let targetRestaurant = "توصيل عام";
               
               if(typeof db !== 'undefined') {
@@ -1985,15 +1883,23 @@
               }
 
               await sendToDiscord(DISCORD_ORDERS_WEBHOOK, "🛒 طلب مسواك جديد!", `**رقم الطلب:** ${vc}\n**الموقع:** [فتح الخريطة](${userCoords})\n\n🚨 **مندوبينا الأبطال افتحوا التطبيق לחجز الطلب!**`, 3447003);
-             showToast("تم إرسال طلبك بنجاح ✅"); document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = ""; loadSavedCustomerData();
-          } catch (e) { showToast("حدث خطأ أثناء الإرسال ❌"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
+              
+             showToast("تم إرسال طلبك بنجاح ✅"); 
+             document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = ""; loadSavedCustomerData();
+          } catch (e) {
+              showToast("حدث خطأ أثناء الإرسال ❌");
+          } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       async function processVerifyCode() {
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const code = document.getElementById('driverVerifyInput').value.trim(); const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
          if(!validateIraqiPhone(custPhone) || !code) return showToast("أدخل بيانات صحيحة ⚠️");
           const btn = document.querySelector('#plaza-screen .send-btn'); const oldText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
+              const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
+              const checkResult = await checkResp.text();
+              if (checkResult.startsWith("valid")) {
                   try { const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); cashAudio.play(); confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } }); } catch(e) {}
                   let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
                  logs.unshift({ date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }), phone: custPhone, price: "2,000 د.ع" });
@@ -2001,8 +1907,10 @@
                   localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
                  localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
                  updateStatsUI();
-                 showToast(`تم تأكيد العملية بنجاح! عاشت ايدك 👏`); 
+                 syncLoyaltyWithServer(); 
+                 showToast(`تم تأكيد العملية بنجاح! عاشت ايدك 👏`); refreshLeaderboard();
                  document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
+              } else { showToast("الكود غير صحيح ❌"); }
           } catch(e) {} finally { btn.innerHTML = oldText; btn.disabled = false; }
       }
 
@@ -2021,14 +1929,38 @@
                      <span style="font-size:12px; color:var(--text-muted);" dir="ltr">${log.date}</span>
                  </div>
                  <div style="font-size:14px; margin-bottom:5px;"><i class="fas fa-phone-alt" style="color:var(--text-muted); width:20px;"></i> هاتف الزبون: <strong>${log.phone}</strong></div>
+                 <div style="font-size:14px; margin-bottom:5px;"><i class="fas fa-map-marker-alt" style="color:var(--danger); width:20px;"></i> الموقع: <strong>أم قصر</strong></div>
                  <div style="font-size:14px;"><i class="fas fa-money-bill-wave" style="color:var(--gold); width:20px;"></i> أجرة التوصيل: <strong>${log.price}</strong></div>
              </div>
           `).join('');
       }
 
       function updateStatsUI() { if(document.getElementById('stat-count')) document.getElementById('stat-count').innerText = localStorage.getItem('d_count') || 0; }
-      function refreshLeaderboard() { /* Placeholder - leaderboard logic needs backend */ }
 
+      async function refreshLeaderboard() {
+          if (!navigator.onLine) return;
+          const listDiv = document.getElementById('leaderboard-list');
+          try {
+              const response = await fetch(`${GS_URL}?action=getAllDriverStats`); const drivers = await response.json();
+             drivers.sort((a, b) => (parseInt(b.leagueCount) || 0) - (parseInt(a.leagueCount) || 0));
+             listDiv.innerHTML = "";
+             if(drivers.length === 0) { listDiv.innerHTML = '<p style="text-align: center; color: var(--text-muted);">لا يوجد كباتن حالياً</p>'; return; }
+             drivers.forEach((d, index) => {
+                  let medal = (index === 0) ? "🥇" : (index === 1) ? "🥈" : (index === 2) ? "🥉" : `<span style="font-size:16px; color:var(--text-muted);">${index + 1}</span>`;
+                  let isMe = d.phone === localStorage.getItem('driver_phone') ? " (أنت)" : "";
+                  let bgColor = isMe ? "background: var(--bg-color); border: 1px solid var(--primary);" : "";
+                 const div = document.createElement('div'); div.className = "driver-rank"; div.style = bgColor;
+                 div.innerHTML = `<div class="rank-info"><span class="rank-medal">${medal}</span> <span>${d.name}${isMe}</span></div><span class="rank-score">${d.leagueCount || 0}</span>`;
+                 listDiv.appendChild(div);
+              });
+          } catch (e) { listDiv.innerHTML = '<p style="text-align: center; color: var(--danger);">فشل التحميل</p>'; }
+      }
+
+      function updateNav(element) { document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); element.classList.add('active'); }
+      function openSidebar() { document.getElementById('appSidebar').classList.add('open'); const overlay = document.getElementById('sidebarOverlay'); overlay.style.display = 'block'; setTimeout(() => overlay.classList.add('show'), 10); }
+      function closeSidebar() { document.getElementById('appSidebar').classList.remove('open'); const overlay = document.getElementById('sidebarOverlay'); overlay.classList.remove('show'); setTimeout(() => overlay.style.display = 'none', 300); }
+
+      let loyaltyCount = parseInt(localStorage.getItem('my_loyalty_orders') || 0);
       function updateLocalLoyaltyUI() {
           const displayCount = document.getElementById('current-order-count'); const progressBar = document.getElementById('loyalty-bar'); const giftMsg = document.getElementById('loyalty-gift-msg');
           let currentCount = parseInt(loyaltyCount % 10); 
@@ -2037,7 +1969,7 @@
          if(currentCount === 9) { if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i> اطلب الآن! هذا طلب المجاني 🎁"; giftMsg.style.color = "var(--secondary)"; } if(progressBar) progressBar.style.background = "var(--secondary)"; } 
           else { if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i>أوصل للطلب 10 وكروتك مجانية"; giftMsg.style.color = "var(--primary)"; } if(progressBar) progressBar.style.background = "var(--gold)"; }
       }
-      function updateLoyaltyUI() { updateLocalLoyaltyUI(); } 
+      function updateLoyaltyUI() { updateLocalLoyaltyUI(); } updateLocalLoyaltyUI();
 
       function toggleDriverStatus() {
           const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
@@ -2058,8 +1990,6 @@
           else { if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; } if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; } }
       }
       
-      function toggleOrderSound() { showToast("🔔 تم تفعيل جرس تنبيه الطلبات!"); }
-
       let appMap = null;
       function openMapModal() {
          document.getElementById('map-modal').style.display = 'flex';
@@ -2073,7 +2003,7 @@
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
       function confirmMapLocation() {
           const center = appMap.getCenter();
-          const googleMapsLink = `https://maps.google.com/?q=$${center.lat},${center.lng}`;
+          const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng}`;
          document.getElementById('tukDropoffLink').value = googleMapsLink;
          document.getElementById('map-success-msg').style.display = 'block';
          closeMapModal();
@@ -2081,67 +2011,6 @@
 
       function openPricesModal() { document.getElementById('prices-modal').style.display = 'flex'; }
       function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
-
-      function goToLoginStep2() {
-          const nameInput = document.getElementById('loginNameInput').value.trim();
-         if(!nameInput) return showToast("يرجى كتابة اسمك أولاً ⚠️");
-         document.getElementById('login-step-1').style.display = 'none';
-         document.getElementById('login-step-2').style.display = 'block';
-      }
-
-      function backToLoginStep1() {
-         document.getElementById('login-step-2').style.display = 'none';
-         document.getElementById('login-step-1').style.display = 'block';
-      }
-
-      function completeDirectLogin() {
-          const userName = document.getElementById('loginNameInput').value.trim();
-          const userPhone = document.getElementById('loginPhoneInput').value.trim();
-          if(!userName) return showToast("يرجى كتابة اسمك ⚠️");
-          if(!validateIraqiPhone(userPhone)) return showToast("يرجى كتابة رقم عراقي صحيح ⚠️");
-
-          const btn = document.getElementById('direct-login-btn');
-          btn.innerHTML = '<span class="baly-spinner"></span> جاري الدخول...'; btn.disabled = true;
-
-          setTimeout(async () => {
-              saveCustomerData(userName, userPhone); loadSavedCustomerData(); 
-              showScreen('home-screen'); showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
-              btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول'; btn.disabled = false;
-              document.getElementById('login-step-2').style.display = 'none'; document.getElementById('login-step-1').style.display = 'block';
-              document.getElementById('loginNameInput').value = ''; document.getElementById('loginPhoneInput').value = '';
-          }, 800);
-      }
-
-      function checkStatus() {
-         checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
-          if (localStorage.getItem('isVerifiedDriver') === 'true') {
-             document.getElementById('join-driver-card').style.display = 'none';
-             document.getElementById('driver-plaza-card').style.display = 'flex';
-             document.getElementById('driver-status-badge').style.display = 'block';
-              const accBtn = document.getElementById('nav-account-btn');
-             if(accBtn) {
-                 accBtn.setAttribute('onclick', "showScreen('plaza-screen'); updateNav(this)");
-                 document.getElementById('nav-acc-icon').className = 'fas fa-briefcase';
-                 document.getElementById('nav-acc-text').innerText = 'المندوبين';
-              }
-             initDriverStatus(); setInterval(fetchAvailableOrders, 5000);
-             showScreen('home-screen');
-          } else {
-             if(!localStorage.getItem('saved_customer_phone')) {
-                 showScreen('login-screen');
-                 document.getElementById('device-type-modal').style.display = 'flex';
-             } else { loadSavedCustomerData(); showScreen('home-screen'); }
-          }
-      }
-
-     document.addEventListener('DOMContentLoaded', () => {
-         checkStatus();
-         initAutoLocation(); 
-         setInterval(checkGlobalStatusFromServer, 10000);
-         
-         // حماية إضافية لإخفاء الشاشة الترحيبية غصباً عنها بعد 3 ثواني
-         setTimeout(() => { hideSplashScreen(); }, 3000);
-      });
     </script>
 </body>
 </html>
