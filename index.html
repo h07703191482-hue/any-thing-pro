@@ -2380,7 +2380,8 @@
              updateLocalLoyaltyUI();
 
               let loyaltyMsg = (tempLoyalty % 10) === 0 ? "🎁 هذا الطلب مجاني (الطلب العاشر)" : `الطلب رقم ${tempLoyalty % 10} من أصل 10`;
-              let msgContent = order ? order : "الطلب موضح في الصور المرفقة 📸";let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص)**" : "";
+              let msgContent = order ? order : "الطلب موضح في الصور المرفقة 📸";
+              let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص)**" : "";
               
               let restOrderNumbers = "";
               const restOrders = [
