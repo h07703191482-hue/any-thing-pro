@@ -51,7 +51,6 @@
         measurementId: "G-KRRFC79HC3"
       };
 
-      // إذا لم يكن الفايربيس مهيئاً مسبقاً، قم بتهيئته
       if (!firebase.apps.length) {
           firebase.initializeApp(firebaseConfig);
       }
@@ -259,68 +258,28 @@
       body.dark-mode .cart-bar { box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
       .cart-bar-total { font-size: 20px; font-weight: 800; color: var(--primary); display: block; }
       
-      /* الميزة الجديدة: ستايل الشبكة (الجريد) للمطاعم اللي بيها اكثر من 10 وجبات */
-      .menu-grid-view {
-          display: grid;
-         grid-template-columns: repeat(2, 1fr);
-          gap: 12px;
-          background: transparent !important;
-          border: none !important;
-          padding: 15px;
-      }
-      .menu-grid-view .menu-item {
-         flex-direction: column;
-          border: 1px solid var(--border-color);
-         border-radius: var(--radius-md);
-          box-shadow: var(--shadow-sm);
-          padding: 15px 10px;
-          text-align: center;
-      }
-      .menu-grid-view .menu-item:last-child {
-         border-bottom: 1px solid var(--border-color);
-      }
-      .menu-grid-view .menu-item-info {
-         margin-bottom: 12px;
-      }
-      .menu-grid-view .qty-controls {
-         justify-content: center;
-      }
+      .menu-grid-view { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; background: transparent !important; border: none !important; padding: 15px; }
+      .menu-grid-view .menu-item { flex-direction: column; border: 1px solid var(--border-color); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); padding: 15px 10px; text-align: center; }
+      .menu-grid-view .menu-item:last-child { border-bottom: 1px solid var(--border-color); }
+      .menu-grid-view .menu-item-info { margin-bottom: 12px; }
+      .menu-grid-view .qty-controls { justify-content: center; }
 
-      /* تنسيقات الأقسام الجديدة (Accordion) للمطاعم اللي بيها اقسام */
-     .category-section {
-         margin-bottom: 10px;
-          border: 1px solid var(--border-color);
-         border-radius: var(--radius-md);
-          overflow: hidden;
-      }
-      .category-header {
-          background: var(--surface);
-          padding: 15px;
-          font-weight: 800;
-          font-size: 16px;
-          color: var(--primary);
-          display: flex;
-         justify-content: space-between;
-          align-items: center;
-          cursor: pointer;
-          transition: background 0.3s;
-      }
-      .category-items {
-          background: var(--bg-color);
-          padding: 10px;
-          display: none;
-      }
-      .category-items .menu-item {
-          background: var(--surface);
-         margin-bottom: 8px;
-         border-radius: 10px;
-          border: none;
-          box-shadow: var(--shadow-sm);
-      }
+     .category-section { margin-bottom: 10px; border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; }
+      .category-header { background: var(--surface); padding: 15px; font-weight: 800; font-size: 16px; color: var(--primary); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.3s; }
+      .category-items { background: var(--bg-color); padding: 10px; display: none; }
+      .category-items .menu-item { background: var(--surface); margin-bottom: 8px; border-radius: 10px; border: none; box-shadow: var(--shadow-sm); }
 
-      /* تنسيقات نافذة التحديد الجغرافي (تمت الإضافة) */
      #out-of-zone-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; backdrop-filter: blur(8px); }
       .out-zone-card { background: var(--surface); padding: 35px 20px; border-radius: var(--radius-lg); max-width: 400px; width: 95%; box-shadow: 0 20px 50px rgba(239, 68, 68, 0.2); animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid var(--danger); }
+      
+      /* ستايل ساحة الطلبات للمندوبين (تمت الإضافة) */
+      .available-order-card { background: var(--surface); border: 2px solid #10B981; border-radius: var(--radius-lg); padding: 15px; margin-bottom: 15px; box-shadow: var(--shadow-md); text-align: right; position: relative; overflow: hidden; animation: scaleIn 0.3s ease; }
+      .available-order-card::before { content: ""; position: absolute; top: 0; right: 0; width: 6px; height: 100%; background: #10B981; }
+      .av-order-title { font-size: 16px; font-weight: 800; color: var(--text-main); margin: 0 0 8px; }
+      .av-order-info { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 5px; }
+      .av-order-info i { width: 20px; text-align: center; color: var(--primary); }
+      .claim-btn { background: #10B981; color: white; border: none; padding: 12px; width: 100%; border-radius: var(--radius-md); font-weight: 800; font-family: 'Cairo'; cursor: pointer; margin-top: 10px; font-size: 15px; transition: 0.3s; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
+      .claim-btn:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -355,6 +314,7 @@
            </div>
         </div>
     </div>
+    
     <div id="prices-modal">
         <div class="prices-container">
             <div class="prices-header">
@@ -369,22 +329,17 @@
                <div class="price-item"><span style="flex:1;">هندية جنوبية</span><span class="price-val">1,500 د.ع</span></div>
                <div class="price-item"><span style="flex:1;">الهندسة</span><span class="price-val">1,500 د.ع</span></div>
                <div class="price-item"><span style="flex:1;">شعبي</span><span class="price-val">1,500 د.ع</span></div>
-               
                <div class="price-item"><span style="flex:1;">دور الظباط</span><span class="price-val">2,000 د.ع</span></div>
                <div class="price-item"><span style="flex:1;">دور سمنت</span><span class="price-val">2,000 د.ع</span></div>
                <div class="price-item"><span style="flex:1;">البهو</span><span class="price-val">2,000 د.ع</span></div>
                <div class="price-item"><span style="flex:1;">صناعة</span><span class="price-val">2,000 د.ع</span></div>
                <div class="price-item"><span style="flex:1;">هندية الشمالية</span><span class="price-val">2,000 د.ع</span></div>
-               
                <div class="price-item"><span style="flex:1;">القاعدة</span><span class="price-val">3,000 د.ع</span></div>
                <div class="price-item"><span style="flex:1;">هدامة</span><span class="price-val">3,000 د.ع</span></div>
-               
                <div class="price-item"><span style="flex:1;">ميناء الجنوبي</span><span class="price-val">4,000 د.ع</span></div>
                <div class="price-item"><span style="flex:1;">الارصفة العشرة</span><span class="price-val">4,000 د.ع</span></div>
-               
                <div class="price-item"><span style="flex:1;">ميناء 27</span><span class="price-val">5,000 د.ع</span></div>
                <div class="price-item"><span style="flex:1;">الترحيب</span><span class="price-val">5,000 د.ع</span></div>
-               
                <div class="price-item"><span style="flex:1;">الصمود</span><span class="price-val">7,000 د.ع</span></div>
                <div class="price-item"><span style="flex:1;">الستباقية</span><span class="price-val">7,000 د.ع</span></div>
                <div class="price-item" style="border-bottom: none;"><span style="flex:1;">التحليات</span><span class="price-val">7,000 د.ع</span></div>
@@ -445,7 +400,7 @@
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
            </div>
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">البندر</h3>
-            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.12</p>
+            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 3.0.0 (ديسكورد)</p>
         </div>
         <div class="sidebar-item ripple-dark" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
             <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
@@ -457,6 +412,7 @@
             <i class="fas fa-sign-out-alt" style="color: var(--danger); font-size: 20px; width: 25px;"></i> <span style="font-weight: 800;">تسجيل خروج</span>
         </div>
     </div>
+
     <div class="bottom-nav" id="bottomNavigation">
         <div class="nav-item active ripple-dark" onclick="showScreen('home-screen'); updateNav(this)">
             <i class="fas fa-compass"></i><span id="nav-home-text">الرئيسية</span>
@@ -557,7 +513,6 @@
                    <i class="fas fa-lock"></i> إغلاق التطبيق
                </button>
            </div>
-            
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
@@ -577,55 +532,40 @@
                  <h4>ركن استكانة</h4>
                  <small>مشاوي، شرقي وغربي</small>
              </div>
-
              <div class="rest-card ripple" onclick="openMenu('royal_food')">
                  <img src="Roealfod.jpg" alt="رويال فود">
                  <h4>رويال فود</h4>
                  <small>بركر، بيتزا ووجبات</small>
              </div>
-
               <div class="rest-card ripple" onclick="openMenu('victoria')">
                  <img src="fktorea.jpg" alt="مطعم فيكتوريا">
                  <h4>مطعم فيكتوريا</h4>
                  <small>بركر وسندويجات</small>
              </div>
-
               <div class="rest-card ripple" onclick="openMenu('klashe')">
                  <img src="klashe.jpg" alt="كلاشي">
                  <h4>كلاشي</h4>
                  <small>عصائر ومشروبات</small>
              </div>
-
               <div class="rest-card ripple" onclick="openMenu('haleg')">
                  <img src="Haleg.jpg" alt="مطعم الخليج">
                  <h4>مطعم الخليج</h4>
                  <small>أشهى المأكولات</small>
              </div>
-
              <div class="rest-card ripple" onclick="openMenu('scozi')">
                  <img src="scoozi.jpg" alt="سكوزي">
                  <h4>سكوزي</h4>
                  <small>أشهى الوجبات</small>
              </div>
-
               <div class="rest-card ripple" onclick="openMenu('abo_hmode')">
                  <img src="Hmode.jpg.jpg" alt="بركر ابو حمودي">
                  <h4>بركر ابو حمودي</h4>
                  <small>الطعم الأصلي</small>
              </div>
-
               <div class="rest-card ripple" onclick="openMenu('ali_salem')">
                  <img src="Burger.jpg.jpg" alt="برجر علي سالم">
                  <h4>برجر علي سالم</h4>
                  <small>أطيب برجر بأم قصر</small>
-             </div>
-
-              <div class="rest-card" style="opacity: 0.6; cursor: default;">
-                 <div style="width: 100%; height: 90px; border-radius: 15px; background: var(--border-color); display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-                     <i class="fas fa-utensils" style="font-size: 30px; color: var(--text-muted);"></i>
-                 </div>
-                 <h4>مطعم جديد</h4>
-                 <small>قريباً...</small>
              </div>
           </div>
       </div>
@@ -703,7 +643,8 @@
            </div>
             <button class="send-btn ripple" style="width: auto; margin: 0; padding: 12px 25px; font-size: 16px; box-shadow: none;" onclick="checkoutRestaurant()">استمرار <i class="fas fa-arrow-left"></i></button>
         </div>
-    </div>    <div id="tuk-screen" class="screen container">
+    </div>
+    <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
         <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
@@ -913,9 +854,25 @@
 
         <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 14px; font-weight: 800; margin-bottom: 20px;">
             <i class="fas fa-exclamation-circle" style="font-size: 20px;"></i> 
-            <span style="display: block; margin-top: 5px;">قانون صارم: ممنوع تشتري أي مسواك أو تتحرك قبل ما تتصل بالزبون وتتأكد منه! إذا الزبون ما جاوب، الغي الطلب فوراً. المندوب اللي يخالف ويشتري بدون اتصال يتحمل الخسارة.</span>
+            <span style="display: block; margin-top: 5px;">قانون صارم: ممنوع تشتري أي مسواك أو تتحرك قبل ما تتصل بالزبون وتتأكد منه! إذا الزبون ما جاوب، الغي الطلب فوراً. المندوب اللي يخالف يتحمل الخسارة.</span>
         </div>
 
+        <div class="form-card" style="border: 2px solid #10B981; padding: 15px;">
+            <div class="form-card-title" style="justify-content: center; margin-bottom: 15px; color: #10B981;">
+                <i class="fas fa-satellite-dish" style="color: #10B981; animation: iconPulse 2s infinite;"></i> 
+                رادار الطلبات المتاحة
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label style="color: var(--primary);">رابط الـ Webhook الخاص بيك (تنبيهاتك بالخاص):</label>
+                <input type="text" id="driverPersonalWebhook" placeholder="الصق رابط الديسكورد مالتك هنا..." style="font-size: 12px;" onblur="saveDriverWebhook()">
+                <span class="step-number" style="font-size: 10px;">خطوة مهمة جداً (حتى يوصلك الطلب الخاص)</span>
+            </div>
+
+            <div id="available-orders-container">
+                <p style="text-align: center; color: var(--text-muted); font-weight: 600;">جاري البحث عن طلبات جديدة...</p>
+            </div>
+        </div>
         <div class="form-card" style="text-align: center; padding: 15px;">
             <button id="statusToggleBtn" class="send-btn ripple" style="background: #10B981; margin-top: 0; box-shadow: none;" onclick="toggleDriverStatus()">
                 <i class="fas fa-check-circle"></i> أنا متاح للعمل
@@ -960,9 +917,9 @@
             <small style="display: block; text-align: center; margin-top: 15px; color: var(--text-muted); font-weight:600;">المنافسة مستمرة🏆</small>
         </div>
 
-        <a href="tg://resolve?domain=uumqaser" class="select-card ripple-dark" style="background: #0088cc; color: white; border:none; padding:15px; text-decoration: none; display: flex;">
-            <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color:white; width:50px; height:50px;"><i class="fab fa-telegram-plane" style="font-size:22px;"></i></div>
-            <div class="card-text"><h3 style="margin:0; font-size:16px;">قناة العمل الرسمية</h3><small style="color:rgba(255,255,255,0.8);">انضم لتلقي الإشعارات والعمليات</small></div>
+        <a href="#" class="select-card ripple-dark" style="background: #5865F2; color: white; border:none; padding:15px; text-decoration: none; display: flex;">
+            <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color:white; width:50px; height:50px;"><i class="fab fa-discord" style="font-size:22px;"></i></div>
+            <div class="card-text"><h3 style="margin:0; font-size:16px;">سيرفر الديسكورد الرسمي</h3><small style="color:rgba(255,255,255,0.8);">انضم لتلقي الإشعارات</small></div>
         </a>
 
         <p id="driver-display-name" style="text-align: center; font-weight: 700; color: var(--text-muted); margin-top:30px;"></p>
@@ -976,354 +933,42 @@
     </div>
     
     <script>
-      const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
-      const PUBLIC_CHANNEL = "@uumqaser";
-      const ADMIN_CHAT_ID = "7479342799"; 
+      // ==============================================================
+      // إعدادات الـ Webhooks مال الديسكورد (تم حذف التليكرام نهائياً)
+      // ==============================================================
+      const DISCORD_ORDERS_WEBHOOK = "https://discord.com/api/webhooks/1491324693871857684/i9PXJalQMx79I_Ev5i10jeS8TgKEe_Q_bdqhuhOC57LNiCw-kFFdJstxeuquI9abklp9";
+      const DISCORD_ADMIN_WEBHOOK = "https://discord.com/api/webhooks/1491325381209362483/JmSQslp2XaCCPYOE3MbX3ODMr7NQIt0za7KCF_O_VTTmiemGCe7lI_fp_5wKquE-6wVz";
+      
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
-      const NEW_BOT_TOKEN = "8757179280:AAHEgp3YTaVv6qZNr32ZA7fgk4fT8v-cqCk";
-      const NEW_BOT_USER = "CodAlbanderbot";
-      
-      const ALI_SALEM_BOT_TOKEN = "8735092732:AAE9lBE3i6AJRkKe3LLlAAodFXuAv7VXpys";
-      const ABO_HMODE_BOT_TOKEN = "8695832371:AAHosUvA37U9U1qhiZJlbDKxJPZFgDHbJAk"; 
-      const VICTORIA_BOT_TOKEN = "8769449664:AAErwMuaA893BKDvbKcOk4sFgFPXUIxlnmc"; 
-      const KLASHE_BOT_TOKEN = "8719779552:AAE5MMDa12ats3qocRoZoy_DMCS9RU8IQvQ"; 
-      
-      const HALEG_BOT_TOKEN = "8607099366:AAEK-D1553k9Mz94fcZJ9KiPUxZqusQSMqs";
-      const SCOZI_BOT_TOKEN = "8129985022:AAHlKRiRSH4Jop8J58iFQOjl2NcAZnLdkRo";
-      const ROYAL_FOOD_BOT_TOKEN = "8620504304:AAEuUp97cjQmyaHCYSUC4eygNBXhsL4ZmXo";
-
-      const ALI_SALEM_CHAT_ID = "-1003722556479";
-      const ABO_HMODE_CHAT_ID = "-1003704352460";
-      const VICTORIA_CHAT_ID = "-1003760108006"; 
-      const KLASHE_CHAT_ID = "-1003727059406"; 
-      const HALEG_CHAT_ID = "-1003719488878";
-      const SCOZI_CHAT_ID = "-1003315608193";
-      const ROYAL_FOOD_CHAT_ID = "-1003798976901";
-
       let userCoords = ""; 
-      const CURRENT_VERSION = "2.0.21"; 
+      const CURRENT_VERSION = "3.0.0"; // تم تحديث رقم الإصدار
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
       }
 
-      const umQasrPolygon = [
-          { lat: 30.0800, lng: 47.9600 }, 
-          { lat: 30.0800, lng: 47.8800 }, 
-          { lat: 30.0100, lng: 47.8800 }, 
-          { lat: 30.0100, lng: 47.9600 }  
-      ];
-
-      function isUserInUmQasr(userLat, userLng, polygon) {
-          let isInside = false;
-          for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-              const xi = polygon[i].lat, yi = polygon[i].lng;
-              const xj = polygon[j].lat, yj = polygon[j].lng;
-              const intersect = ((yi > userLng) != (yj > userLng)) && (userLat < (xj - xi) * (userLng - yi) / (yj - yi) + xi);
-              if (intersect) isInside = !isInside;
-          }
-          return isInside;
-      }
-
-      function checkAppAccess(lat, lng) {
-          const isAdmin = localStorage.getItem('isAdmin') === 'true';
-          if(isAdmin) return; 
-
-          const accessGranted = isUserInUmQasr(lat, lng, umQasrPolygon);
-          if (!accessGranted) {
-             document.getElementById('out-of-zone-popup').style.display = 'flex';
-          }
-      }
-
-      async function trackLiveVisit() {
-          try { fetch(`${GS_URL}?action=trackVisit&t=${new Date().getTime()}`); } catch(e) {}
-      }
-
-      let secretCounter = 0;
-      let lockSecretCounter = 0;
-      let appIsActive = true;
-
-      let lastOrderCount = -1;
-      let orderPollInterval = null;
-      let isSoundEnabled = localStorage.getItem('sound_enabled') === 'true';
-      const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-
-      function checkPhoneLive(input) {
-          let errorSpan = input.parentNode.querySelector('.phone-error');
-          if (!errorSpan) return;
-          if (input.value.length === 0) {
-             errorSpan.style.display = 'none';
-             input.style.borderColor = '';
-          } else if (!/^07[0-9]{9}$/.test(input.value)) {
-             errorSpan.style.display = 'block';
-             input.style.borderColor = 'var(--danger)';
-          } else {
-             errorSpan.style.display = 'none';
-             input.style.borderColor = '#10B981'; 
-          }
-      }
-
-      function toggleOrderSound() {
-         isSoundEnabled = !isSoundEnabled;
-         localStorage.setItem('sound_enabled', isSoundEnabled); 
-          const btn = document.getElementById('soundToggleBtn');
-          if (isSoundEnabled) {
-             btn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل';
-              btn.style.background = '#F59E0B'; 
-             btn.style.color = 'white';
-             newOrderAudio.play().catch(e => {}); 
-             startOrderPolling();
-             showToast("🔔 تم تفعيل جرس تنبيه الطلبات!");
-          } else {
-              btn.innerHTML = '<i class="fas fa-bell-slash"></i> جرس الطلبات: معطل';
-             btn.style.background = 'var(--text-muted)';
-             btn.style.color = 'white';
-             clearInterval(orderPollInterval);
-             showToast("تم إيقاف الجرس 🔕");
-          }
-      }
-      
-      async function checkNewOrdersForSound() {
-         if(!isSoundEnabled || !navigator.onLine) return;
+      // دالة إرسال رسالة للديسكورد (بصيغة Embed احترافية)
+      async function sendToDiscord(webhookUrl, title, description, color, fields = []) {
           try {
-              const resp = await fetch(`${GS_URL}?action=checkNewOrders&t=${new Date().getTime()}`);
-              const currentCount = parseInt(await resp.text());
-             if(!isNaN(currentCount)) {
-                 if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
-                     newOrderAudio.play().catch(e=>{});
-                      showToast("🔔طلب جديد نزل بالساحة!");
-                     if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                  }
-                 lastOrderCount = currentCount;
-              }
-          } catch(e) {}
+              const payload = {
+                  embeds: [{
+                      title: title,
+                      description: description,
+                      color: color, // لون الرسالة (مثلاً 5814783 أخضر)
+                      fields: fields,
+                      footer: { text: "تطبيق البندر 📦" },
+                      timestamp: new Date().toISOString()
+                  }]
+              };
+              await fetch(webhookUrl, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload)
+              });
+          } catch(e) { console.error("Error sending to Discord", e); }
       }
-
-      function startOrderPolling() {
-         if(orderPollInterval) clearInterval(orderPollInterval);
-         checkNewOrdersForSound(); 
-         orderPollInterval = setInterval(checkNewOrdersForSound, 10000); 
-      }
-      
-      function initAutoLocation() {
-          if (navigator.geolocation) {
-             navigator.geolocation.getCurrentPosition(
-                 (position) => {
-                     userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
-                     checkAppAccess(position.coords.latitude, position.coords.longitude);
-                  },
-                 (error) => { console.warn("GPS Denied on load"); },
-                  { enableHighAccuracy: true }
-              );
-          }
-      }
-
-      function handleSecretClick() {
-         secretCounter++;
-          if (secretCounter === 5) {
-             secretCounter = 0;
-              let pass = prompt("أدخل الرمز السري:");
-              if (pass === "2006") {
-                 localStorage.setItem('isAdmin', 'true'); 
-                 showScreen('admin-panel');
-                 checkGlobalStatusFromServer(); 
-              } else if (pass !== null) {
-                 showToast("الرمز خطأ ❌");
-              }
-          }
-      }
-
-      function handleLockScreenSecret() {
-         lockSecretCounter++;
-          if (lockSecretCounter === 5) {
-             lockSecretCounter = 0;
-              let pass = prompt("أدخل الرمز السري:");
-              if (pass === "2006") {
-                 localStorage.setItem('isAdmin', 'true'); 
-                 document.getElementById('global-lock-screen').style.display = 'none';
-                 showScreen('admin-panel');
-              } else if (pass !== null) {
-                  showToast("الرمز خطأ ❌");
-              }
-          }
-      }
-      
-      async function setGlobalAppStatus(newStatus) {
-          const btnOpen = document.getElementById('btn-open-app');
-          const btnClose = document.getElementById('btn-close-app');
-          if(newStatus === 'online') { btnOpen.innerHTML = '<span class="baly-spinner"></span>'; } 
-          else { btnClose.innerHTML = '<span class="baly-spinner"></span>'; }
-         btnOpen.disabled = true; btnClose.disabled = true;
-          try {
-              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}&t=${new Date().getTime()}`, { mode: 'no-cors' });
-             showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
-              setTimeout(() => { checkGlobalStatusFromServer(); }, 1500);
-          } catch(e) {
-             showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
-             setTimeout(() => { checkGlobalStatusFromServer(); }, 1500);
-          } 
-          finally { 
-             btnOpen.innerHTML = '<i class="fas fa-unlock"></i>فتح التطبيق';
-             btnClose.innerHTML = '<i class="fas fa-lock"></i> إغلاق التطبيق';
-             btnOpen.disabled = false; btnClose.disabled = false;
-          }
-      }
-
-      async function checkGlobalStatusFromServer() {
-          try {
-              const resp = await fetch(`${GS_URL}?action=getAppStatus&t=${new Date().getTime()}`);
-              const status = await resp.text();
-              const lockScreen = document.getElementById('global-lock-screen');
-              const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
-              if (status === "offline") {
-                 appIsActive = false;
-                 if(lockScreen && !isAdmin) lockScreen.style.display = 'flex'; 
-                  else if(lockScreen && isAdmin) lockScreen.style.display = 'none';
-              } else {
-                 appIsActive = true;
-                 if(lockScreen) lockScreen.style.display = 'none'; 
-              }
-              applyGlobalStatus();
-          } catch(e) {
-          } finally {
-              const splash = document.getElementById('splash-screen');
-             if(splash && splash.style.display !== 'none') { 
-                 splash.style.opacity = '0'; 
-                 setTimeout(() => splash.style.display = 'none', 500); 
-              }
-          }
-      }
-
-      function applyGlobalStatus() {
-          const badge = document.getElementById('admin-status-badge');
-          const orderButtons = document.querySelectorAll('.order-btn-logic');
-          const isAdmin = localStorage.getItem('isAdmin') === 'true';
-          if (!appIsActive) {
-             badge.style.display = 'block'; 
-              if (!isAdmin) {
-                 orderButtons.forEach(btn => {
-                     btn.disabled = true;
-                     btn.innerHTML = '<i class="fas fa-lock"></i> مغلق حالياً';
-                  });
-              } else { orderButtons.forEach(btn => btn.disabled = false); }
-          } else {
-             badge.style.display = 'none';
-             document.getElementById('tukSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> طلب تكتك توصيلة';
-             document.getElementById('medSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
-             document.getElementById('sendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
-             orderButtons.forEach(btn => btn.disabled = false);
-          }
-      }
-
-      function userLogout() {
-          if (confirm("هل أنت متأكد من تسجيل الخروج من التطبيق؟")) {
-             localStorage.clear();
-             window.location.replace(window.location.href.split('?')[0]);
-          }
-      }
-      
-      async function syncLoyaltyWithServer() {
-          const phoneInput = document.getElementById('custPhone');
-          const phone = (phoneInput && phoneInput.value.trim() !== "") ? phoneInput.value.trim() : localStorage.getItem('saved_customer_phone');
-          if (!phone || !validateIraqiPhone(phone)) return;
-          try {
-              const resp = await fetch(`${GS_URL}?action=getCustomerOrders&phone=${phone}&t=${new Date().getTime()}`);
-              const countText = await resp.text();
-              const count = parseInt(countText);
-              if (!isNaN(count)) {
-                 loyaltyCount = count;
-                 localStorage.setItem('my_loyalty_orders', loyaltyCount);
-                 updateLocalLoyaltyUI();
-              }
-          } catch(e) {}
-      }
-
-      function checkConnection() {
-         document.getElementById('offline-screen').style.display = navigator.onLine ? 'none' : 'flex';
-      }
-      window.addEventListener('offline', checkConnection);
-      window.addEventListener('online', checkConnection);
-      function openWiFiSettings() { window.location.href = "intent:#Intent;action=android.settings.WIFI_SETTINGS;end"; }
-      function openDataSettings() { window.location.href = "intent:#Intent;action=android.settings.WIRELESS_SETTINGS;end"; }
-
-      window.originalAlert = window.alert;
-      window.alert = function(message) { showToast(message); };
-
-      function showToast(msg) {
-          const container = document.getElementById('toast-container');
-          const toast = document.createElement('div');
-         toast.className = 'toast';
-         toast.innerHTML = `<i class="fas fa-bell" style="color: var(--secondary);"></i> <span>${msg}</span>`;
-         container.appendChild(toast);
-         setTimeout(() => { if (container.contains(toast)) container.removeChild(toast); }, 3000);
-      }
-
-      function toggleTheme() {
-         document.body.classList.toggle('dark-mode');
-          localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-      }
-
-      function applyAutoTheme() {
-          const hour = new Date().getHours();
-          const isNight = hour >= 18 || hour < 6; 
-          const savedTheme = localStorage.getItem('theme');
-          if (!savedTheme && isNight) document.body.classList.add('dark-mode');
-          else if (savedTheme === 'dark') document.body.classList.add('dark-mode');
-      }
-
-      function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
-      function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
-      function goToLoginStep2() {
-          const nameInput = document.getElementById('loginNameInput').value.trim();
-         if(!nameInput) return showToast("يرجى كتابة اسمك أولاً ⚠️");
-         document.getElementById('login-step-1').style.display = 'none';
-         document.getElementById('login-step-2').style.display = 'block';
-      }
-
-      function backToLoginStep1() {
-         document.getElementById('login-step-2').style.display = 'none';
-         document.getElementById('login-step-1').style.display = 'block';
-      }
-
-      function completeDirectLogin() {
-          const userName = document.getElementById('loginNameInput').value.trim();
-          const userPhone = document.getElementById('loginPhoneInput').value.trim();
-
-          if(!userName) return showToast("يرجى كتابة اسمك ⚠️");
-          if(!validateIraqiPhone(userPhone)) return showToast("يرجى كتابة رقم عراقي صحيح ⚠️");
-
-          const btn = document.getElementById('direct-login-btn');
-          btn.innerHTML = '<span class="baly-spinner"></span> جاري الدخول...';
-          btn.disabled = true;
-
-          setTimeout(async () => {
-              saveCustomerData(userName, userPhone); 
-              loadSavedCustomerData(); 
-              syncLoyaltyWithServer();
-              
-              if (navigator.onLine) {
-                 const msg = `👤 تسجيل دخول جديد (مباشر)\nالاسم: ${userName}\nالرقم: ${userPhone}`;
-                 try {
-                     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
-                     });
-                     await fetch(`${GS_URL}?action=incrementAuthUsers`);
-                 } catch(e) {}
-              }
-
-              showScreen('home-screen'); 
-              showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
-              
-              btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
-              btn.disabled = false;
-              document.getElementById('login-step-2').style.display = 'none'; 
-              document.getElementById('login-step-1').style.display = 'block';
-              document.getElementById('loginNameInput').value = '';
-              document.getElementById('loginPhoneInput').value = '';
-          }, 800);
-      }
-      const menus = {
+        const menus = {
           'rken_estkana': {
               name: 'ركن استكانة',
               items: [
@@ -1700,24 +1345,19 @@
                   { id: 'hal2', name: 'نصف دجاجة', price: 10000, category: 'قسم الدجاج', desc: 'ذبح فرش مع كيلو تمن مع شطة وطرشي ومرق' },
                   { id: 'hal3', name: 'دجاجة كاملة (1)', price: 20000, category: 'قسم الدجاج', desc: 'ذبح فرش مع كيلوين تمن مع شطة وطرشي و 2 كاسة مرق' },
                   { id: 'hal4', name: 'دجاجة كاملة (2)', price: 25000, category: 'قسم الدجاج', desc: 'ذبح فرش مع ثلاثة كيلو تمن مع شطة وطرشي و 2 كاسة مرق' },
-                  
                   { id: 'hal5', name: 'ربع لحم عجل', price: 12000, category: 'أنواع اللحم', desc: '150 غرام مع نصف كيلو تمن وشطة وطرشي وكاسة مرق' },
                   { id: 'hal6', name: 'نصف لحم عجل', price: 18000, category: 'أنواع اللحم', desc: '300 غرام مع كيلو تمن وشطة وطرشي وكاسة مرق' },
                   { id: 'hal7', name: 'لحم عجل كامل', price: 35000, category: 'أنواع اللحم', desc: '600 غرام مع كيلوين تمن وشطة وطرشي و 2 كاسة مرق' },
                   { id: 'hal8', name: 'ربع لحم غنم', price: 12000, category: 'أنواع اللحم', desc: '150 غرام مع نصف كيلو تمن وشطة وطرشي وكاسة مرق' },
                   { id: 'hal9', name: 'نصف لحم غنم', price: 18000, category: 'أنواع اللحم', desc: '300 غرام مع كيلو تمن وشطة وطرشي وكاسة مرق' },
                   { id: 'hal10', name: 'غنم كامل', price: 35000, category: 'أنواع اللحم', desc: '600 غرام مع كيلوين تمن وشطة وطرشي و 2 كاسة مرق' },
-                  
                   { id: 'hal11', name: 'مطبق سمك (نصف كيلو)', price: 10000, category: 'السمك', desc: 'نصف كيلو سمك مع كيلو تمن' },
                   { id: 'hal12', name: 'مطبق سمك (كيلو)', price: 20000, category: 'السمك', desc: 'كيلو سمك بحري مع كيلوين تمن' },
-                  
                   { id: 'hal13', name: 'نصف كيلو دولمة', price: 6000, category: 'الدولمة', desc: '' },
                   { id: 'hal14', name: 'كيلو دولمة', price: 12000, category: 'الدولمة', desc: '' },
-                  
                   { id: 'hal15', name: 'ربع برياني', price: 5000, category: 'البرياني ', desc: '' },
                   { id: 'hal16', name: 'كيلو برياني', price: 10000, category: 'البرياني ', desc: '' },
                   { id: 'hal17', name: 'كيلوين برياني', price: 20000, category: 'البرياني ', desc: '' },
-                  
                   { id: 'hal18', name: 'نفر تمن ومرق مع الملحقات', price: 3500, category: 'التمن والمرق', desc: '' },
                   { id: 'hal19', name: 'كاسة مرق', price: 1000, category: 'التمن والمرق', desc: '' }
               ]
@@ -1732,19 +1372,15 @@
                   { id: 'sc5', name: 'ريزو', price: 6000, category: 'الوجبات والريزو', desc: '' },
                   { id: 'sc6', name: 'ريزو روبيان', price: 7000, category: 'الوجبات والريزو', desc: '' },
                   { id: 'sc7', name: 'ريزو سمك', price: 7000, category: 'الوجبات والريزو', desc: '' },
-                  
                   { id: 'sc8', name: 'بيتزا وسط', price: 5000, category: 'البيتزا', desc: '' },
                   { id: 'sc9', name: 'بيتزا كبير', price: 10000, category: 'البيتزا', desc: '' },
-                  
                   { id: 'sc10', name: 'لفة سكالوب', price: 2500, category: 'اللفات (الساندويش)', desc: '' },
                   { id: 'sc11', name: 'لفة همبركر', price: 2000, category: 'اللفات (الساندويش)', desc: '' },
                   { id: 'sc12', name: 'لفة فاهيته', price: 2000, category: 'اللفات (الساندويش)', desc: '' },
                   { id: 'sc13', name: 'لفة صاج دجاج', price: 2000, category: 'اللفات (الساندويش)', desc: '' },
-                  
                   { id: 'sc14', name: 'شيش طاووق', price: 6000, category: 'المشويات والاستيك', desc: '' },
                   { id: 'sc15', name: 'ستيك دجاج دايت', price: 6000, category: 'المشويات والاستيك', desc: '' },
                   { id: 'sc16', name: 'ستيك دجاج', price: 6000, category: 'المشويات والاستيك', desc: '' },
-                  
                   { id: 'sc17', name: 'ماعون مقبلات صغير', price: 3000, category: 'المقبلات', desc: '' },
                   { id: 'sc18', name: 'ماعون مقبلات كبير', price: 5000, category: 'المقبلات', desc: '' }
               ]
@@ -1769,36 +1405,6 @@
           }
       };
 
-      async function fetchDynamicMenus() {
-          try {
-              const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
-              const data = await resp.json();
-              if (data && typeof data === 'object' && !Array.isArray(data)) {
-                  if (data.added && data.added.length > 0) {
-                     data.added.forEach(newItem => {
-                         if(menus[newItem.restId]) {
-                             const exists = menus[newItem.restId].items.find(i => i.name === newItem.name);
-                             if(!exists) menus[newItem.restId].items.push(newItem);
-                         }
-                     });
-                  }
-                  if (data.deleted && data.deleted.length > 0) {
-                     data.deleted.forEach(delItem => {
-                         if(menus[delItem.restId]) {
-                             menus[delItem.restId].items = menus[delItem.restId].items.filter(i => i.name !== delItem.name);
-                         }
-                     });
-                  }
-              } else if (Array.isArray(data) && data.length > 0) {
-                 data.forEach(newItem => {
-                     if(menus[newItem.restId]) {
-                         const exists = menus[newItem.restId].items.find(i => i.name === newItem.name);
-                         if(!exists) menus[newItem.restId].items.push(newItem);
-                     }
-                  });
-              }
-          } catch(e) { console.log("لا توجد تحديثات للسلع حالياً"); }
-      }
       let currentCart = {};
       let currentRestaurantId = '';
 
@@ -1926,12 +1532,7 @@
       }
 
       function checkStatus() {
-         trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
-         fetchDynamicMenus(); 
-          const urlParams = new URLSearchParams(window.location.search);
-          const ref = urlParams.get('ref');
-          const myPhone = localStorage.getItem('saved_customer_phone');
-          if (ref && ref !== myPhone) { localStorage.setItem('referred_by', ref); }
+         checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
           if (localStorage.getItem('isVerifiedDriver') === 'true') {
              document.getElementById('join-driver-card').style.display = 'none';
              document.getElementById('driver-plaza-card').style.display = 'flex';
@@ -1942,7 +1543,8 @@
                  document.getElementById('nav-acc-icon').className = 'fas fa-briefcase';
                  document.getElementById('nav-acc-text').innerText = 'المندوبين';
               }
-             initDriverStatus(); setInterval(checkRemoteReset, 15000); setInterval(refreshLeaderboard, 30000);
+             initDriverStatus(); 
+             setInterval(refreshLeaderboard, 30000);
              showScreen('home-screen');
           } else {
              if(!localStorage.getItem('saved_customer_phone')) {
@@ -1956,14 +1558,7 @@
      document.addEventListener('DOMContentLoaded', () => {
          checkStatus();
          initAutoLocation(); 
-         
          setInterval(checkGlobalStatusFromServer, 10000);
-         
-         document.addEventListener("visibilitychange", function() {
-              if (document.visibilityState === 'visible') {
-                 checkGlobalStatusFromServer();
-              }
-          });
       });
 
       function shareApp() {
@@ -1993,20 +1588,6 @@
           if (welcome && welcome.style.display !== 'none') { welcome.style.display = 'none'; location.reload(); }
       }
 
-      async function checkRemoteReset() {
-          try {
-              const myPhone = localStorage.getItem('driver_phone');
-             if(!myPhone) return;
-              const response = await fetch(`${GS_URL}?action=checkReset&phone=${myPhone}`);
-              const result = await response.text();
-              if (result === "reset_now") { 
-                 localStorage.setItem('d_count', 0); localStorage.setItem('league_count', 0); localStorage.removeItem('driver_logs'); 
-                 updateStatsUI(); if(document.getElementById('log-screen').classList.contains('active-screen')) { renderDriverLog(); }
-              } 
-              else if (result.includes("reset_league")) { localStorage.setItem('league_count', 0); updateStatsUI(); }
-          } catch(e) {}
-      }
-
       function openJoinScreen() {
           if(localStorage.getItem('pending_join') === 'true') showScreen('activation-screen');
           else showScreen('join-screen');
@@ -2023,10 +1604,9 @@
              localStorage.setItem('temp_name', name); localStorage.setItem('temp_phone', phone);
               const randomCode = Math.floor(100000 + Math.random() * 900000);
              localStorage.setItem('temp_activation', randomCode); localStorage.setItem('pending_join', 'true');
-              const msg = `📥 طلب انضمام جديد\n👤الاسم: ${name}\n📞الهاتف: ${phone}\n🏍️المركبة: ${bike}\n🔑الكود: ${randomCode}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
-              });
+              
+              // الإرسال للديسكورد (غرفة الإدارة)
+              await sendToDiscord(DISCORD_ADMIN_WEBHOOK, "📥 طلب انضمام كابتن جديد", `**الاسم:** ${name}\n**الهاتف:** ${phone}\n**المركبة:** ${bike}\n**الكود السري:** ${randomCode}`, 15105570);
              showScreen('activation-screen');
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
@@ -2037,8 +1617,8 @@
               const dName = localStorage.getItem('temp_name'); const dPhone = localStorage.getItem('temp_phone');
              localStorage.setItem('isVerifiedDriver', 'true'); localStorage.setItem('driver_name', dName); localStorage.setItem('driver_phone', dPhone); localStorage.removeItem('pending_join');
               try {
-                 const msg = `✅ تم تفعيل كابتن جديد بنجاح:\n👤 الاسم: ${dName}\n📞 الهاتف: ${dPhone}`;
-                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) });
+                  // الإرسال للديسكورد
+                 await sendToDiscord(DISCORD_ADMIN_WEBHOOK, "✅ تم تفعيل كابتن جديد", `**الاسم:** ${dName}\n**الهاتف:** ${dPhone}`, 5763719);
               } catch(e) {}
              document.getElementById('welcome-overlay').style.display = 'flex';
              confetti({ particleCount: 200, spread: 90, origin: { y: 0.5 } });
@@ -2055,8 +1635,8 @@
               const btn = document.querySelector('.resign-btn');
               if(btn) btn.innerHTML = '<span class="baly-spinner" style="border-top-color:var(--danger);"></span> جاري الخروج...';
               try {
-                 const msg = `❌ استقالة / تسجيل خروج كابتن:\n👤 الاسم: ${dName}\n📞 الهاتف: ${dPhone}`;
-                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) });
+                  // الإرسال للديسكورد
+                 await sendToDiscord(DISCORD_ADMIN_WEBHOOK, "❌ استقالة / خروج كابتن", `**الاسم:** ${dName}\n**الهاتف:** ${dPhone}`, 15548997);
               } catch(e) {}
              localStorage.clear(); location.reload(); 
           } 
@@ -2070,12 +1650,99 @@
           const bottomNav = document.getElementById('bottomNavigation');
          if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id === 'restaurant-menu-screen') ? 'none' : 'flex';
           
-          if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
+          if(id === 'plaza-screen') { 
+              updateStatsUI(); refreshLeaderboard(); 
+              document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name');
+              document.getElementById('driverPersonalWebhook').value = localStorage.getItem('personal_webhook') || "";
+          }
           if(id === 'log-screen') { renderDriverLog(); } 
           if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') { loadSavedCustomerData(); }
           if(id === 'order-screen') updateLoyaltyUI();
           if (typeof closeSidebar === 'function') closeSidebar();
       }
+
+      // ================= نظام الطلبات والحجز (ديسكورد + فايربيس) =================
+
+      function saveDriverWebhook() {
+          let val = document.getElementById('driverPersonalWebhook').value.trim();
+          if(val) {
+              localStorage.setItem('personal_webhook', val);
+              showToast("تم حفظ رابطك بنجاح ✅ راح تستلم طلباتك بي.");
+          }
+      }
+
+      // دالة استدعاء الطلبات المتاحة للوحة الكابتن
+      function fetchAvailableOrders() {
+          if(typeof db !== 'undefined' && localStorage.getItem('isVerifiedDriver') === 'true') {
+              db.ref('orders').orderByChild('status').equalTo('pending_driver').on('value', (snapshot) => {
+                  const container = document.getElementById('available-orders-container');
+                  if(!container) return;
+                  container.innerHTML = '';
+                  let hasOrders = false;
+                  snapshot.forEach((child) => {
+                      hasOrders = true;
+                      let order = child.val();
+                      let typeIcon = order.restaurant === 'تكتك توصيلة' ? '🚖' : order.restaurant === 'خدمة الوسيط' ? '📦' : '🍔';
+                      
+                      container.innerHTML += `
+                      <div class="available-order-card">
+                          <h4 class="av-order-title">${typeIcon} طلب ${order.restaurant}</h4>
+                          <div class="av-order-info"><i class="fas fa-map-marker-alt"></i> الموقع: ${order.customer}</div>
+                          <div class="av-order-info" style="color:var(--danger);"><i class="fas fa-clock"></i> بانتظار مندوب...</div>
+                          <button class="claim-btn" onclick="claimOrder('${child.key}')">حجز الطلب 🚀</button>
+                      </div>`;
+                  });
+                  if(!hasOrders) container.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-weight: 600;">لا توجد طلبات متاحة حالياً...</p>';
+              });
+          }
+      }
+      // تحديث الطلبات كل 5 ثواني
+      setInterval(fetchAvailableOrders, 5000);
+
+      // دالة حجز الطلب للمندوب
+      async function claimOrder(orderId) {
+          let myWebhook = localStorage.getItem('personal_webhook');
+          if(!myWebhook || !myWebhook.includes('discord.com/api/webhooks')) {
+              return showToast("⚠️ لازم تخلي رابط الديسكورد مالتك فوك حتى تكدر تحجز!");
+          }
+          if(!navigator.onLine) return showToast("لا يوجد انترنت ❌");
+
+          try {
+              // جلب الطلب من الفايربيس
+              const snapshot = await db.ref('orders/' + orderId).once('value');
+              if(snapshot.exists()) {
+                  let order = snapshot.val();
+                  if(order.status !== 'pending_driver') {
+                      return showToast("⚠️ عذراً، هذا الطلب انحجز من قبل مندوب ثاني!");
+                  }
+
+                  let driverName = localStorage.getItem('driver_name') || 'كابتن';
+                  
+                  // تحديث الفايربيس
+                  await db.ref('orders/' + orderId).update({
+                      status: 'claimed',
+                      driver: driverName
+                  });
+
+                  showToast("✅ تم حجز الطلب! روح للديسكورد مالتك شوف التفاصيل.");
+
+                  // إرسال التفاصيل لرابط المندوب الخاص
+                  let fields = [
+                      { name: "الزبون", value: order.customer, inline: true },
+                      { name: "رقم الهاتف", value: order.phone, inline: true },
+                      { name: "تفاصيل الطلب", value: order.items, inline: false }
+                  ];
+                  if(order.location) fields.push({ name: "الموقع الجغرافي", value: `[اضغط هنا لفتح الخريطة](${order.location})`, inline: false });
+                  
+                  await sendToDiscord(myWebhook, "🎯 تم حجز الطلب لك بنجاح!", "تفاصيل العملية:", 5763719, fields);
+
+                  // إرسال إشعار للقناة العامة بأن الطلب انحجز
+                  await sendToDiscord(DISCORD_ORDERS_WEBHOOK, "✅ طلب محجوز", `تم حجز الطلب رقم (${orderId}) بواسطة الكابتن **${driverName}**`, 5763719);
+              }
+          } catch(e) { showToast("حدث خطأ أثناء الحجز ❌"); }
+      }
+
+      // ================= إرسال الطلبات للفايربيس والديسكورد =================
 
       async function sendTukOrder() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
@@ -2094,30 +1761,18 @@
           }
           const btn = document.getElementById('tukSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
-              saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
-              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`);
-             localStorage.removeItem('referred_by'); 
-
-              // --- الإرسال للفايربيس ---
+              saveCustomerData(name, phone); const vc = generateSecureVC();
+              
               if(typeof db !== 'undefined') {
                   db.ref('orders/' + vc).set({
-                      id: vc,
-                      customer: name,
-                      phone: phone,
-                      items: `تحصيل/تسليم: ${dropLink} | دالة: ${land}`,
-                      price: "حسب المسافة",
-                      restaurant: "تكتك توصيلة",
-                      status: 'pending_driver',
-                      timestamp: firebase.database.ServerValue.TIMESTAMP,
-                      location: userCoords
+                      id: vc, customer: name, phone: phone, items: `تحصيل/تسليم: ${dropLink} | دالة: ${land}`,
+                      price: "حسب المسافة", restaurant: "تكتك توصيلة", status: 'pending_driver',
+                      timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords
                   });
               }
 
-              const msg = `🚖 طلب تكتك توصيلة\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الموقع: ${userCoords}\n📝تفاصيل: ${dropLink}\nدالة: ${land}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                 method: "POST", headers: { "Content-Type": "application/json" },
-                 body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز العملية", callback_data: `claim|${name}|${vc}` }]] } })
-              });
+              await sendToDiscord(DISCORD_ORDERS_WEBHOOK, "🚖 طلب تكتك توصيلة جديد!", `**رقم الطلب:** ${vc}\n**الموقع:** [فتح الخريطة](${userCoords})\n\n🚨 **مندوبينا الأبطال افتحوا التطبيق לחجز الطلب!**`, 15105570);
+              
              showToast("تم الإرسال بنجاح ✅"); document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
@@ -2138,30 +1793,30 @@
           }
           const btn = document.getElementById('medSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
-             saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
-              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`); localStorage.removeItem('referred_by');
+             saveCustomerData(name, phone); const vc = generateSecureVC();
 
-             // --- الإرسال للفايربيس ---
               if(typeof db !== 'undefined') {
                   db.ref('orders/' + vc).set({
-                      id: vc,
-                      customer: name,
-                      phone: phone,
-                      items: `الغرض: ${order} | دالة: ${document.getElementById('medLandmark').value.trim()}`,
-                      price: "حسب الاتفاق",
-                      restaurant: "خدمة الوسيط",
-                      status: 'pending_driver',
-                      timestamp: firebase.database.ServerValue.TIMESTAMP,
-                      location: userCoords
+                      id: vc, customer: name, phone: phone, items: `الغرض: ${order} | دالة: ${document.getElementById('medLandmark').value.trim()}`,
+                      price: "حسب الاتفاق", restaurant: "خدمة الوسيط", status: 'pending_driver',
+                      timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords
                   });
               }
 
-             const msg = `🔵طلب وسيط\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📝الغرض: ${order}\n📍الموقع: ${userCoords}`;
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝حجز الطلب", callback_data: `claimMed|${name}|${vc}` }]] } })
-              });
+              await sendToDiscord(DISCORD_ORDERS_WEBHOOK, "📦 طلب وسيط جديد!", `**رقم الطلب:** ${vc}\n**الموقع:** [فتح الخريطة](${userCoords})\n\n🚨 **مندوبينا الأبطال افتحوا التطبيق לחجز الطلب!**`, 3447003);
+              
              showToast("تم الإرسال بنجاح ✅"); document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
+      }
+
+      // رفع الصور للديسكورد (بما أن الفايربيس للصور معقد، نستغل الديسكورد كمخزن)
+      async function uploadImageToDiscord(file) {
+          const formData = new FormData();
+          formData.append('file', file);
+          try {
+              const response = await fetch(DISCORD_ORDERS_WEBHOOK, { method: 'POST', body: formData });
+              return true;
+          } catch(e) { return false; }
       }
 
       function previewImages() {
@@ -2198,103 +1853,42 @@
           
           const btn = document.getElementById('sendBtn'); 
           const originalText = btn.innerHTML; 
-         btn.innerHTML = '<span class="baly-spinner"></span>'; 
-          btn.disabled = true;
+          btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           
           try {
              saveCustomerData(name, phone); 
               const vc = generateSecureVC(); 
-              let photoMsgs = [];
               
               if (files.length > 0) {
                   for (let i = 0; i < files.length; i++) {
-                     let fd = new FormData(); 
-                     fd.append('chat_id', "-1003786625443"); 
-                     fd.append('photo', files[i]); 
-                     fd.append('caption', `📦 صور طلب رقم: ${vc}\n👤 الزبون: ${name}`);
-                     try {
-                         let tgResp = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: fd });
-                         let tgData = await tgResp.json(); 
-                         if (tgData.ok) photoMsgs.push(tgData.result.message_id);
-                     } catch(err) {}
+                     await uploadImageToDiscord(files[i]);
                   }
                  clearImages();
               }
               
-              let photoIdsStr = photoMsgs.join(','); 
-              let referrer = localStorage.getItem('referred_by') || "";
-              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&photoMsgs=${photoIdsStr}&referrer=${referrer}`);
-             localStorage.removeItem('referred_by');
-              
               let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0); 
-             tempLoyalty++; 
-             localStorage.setItem('my_loyalty_orders', tempLoyalty);
-             updateLocalLoyaltyUI();
+             tempLoyalty++; localStorage.setItem('my_loyalty_orders', tempLoyalty); updateLocalLoyaltyUI();
 
               let loyaltyMsg = (tempLoyalty % 10) === 0 ? "🎁 هذا الطلب مجاني (الطلب العاشر)" : `الطلب رقم ${tempLoyalty % 10} من أصل 10`;
               let msgContent = order ? order : "الطلب موضح في الصور المرفقة 📸";
-              let photoNotice = files.length > 0 ? "\n\n⚠️ **(يوجد صور سرية للطلب ستصلك في الخاص)**" : "";
               
-              let restOrderNumbers = "";
-              const restOrders = [
-                  { key: "مطعم برجر علي سالم", token: ALI_SALEM_BOT_TOKEN, id: ALI_SALEM_CHAT_ID },
-                  { key: "مطعم بركر ابو حمودي", token: ABO_HMODE_BOT_TOKEN, id: ABO_HMODE_CHAT_ID },
-                  { key: "مطعم فيكتوريا", token: VICTORIA_BOT_TOKEN, id: VICTORIA_CHAT_ID },
-                  { key: "كلاشي", token: KLASHE_BOT_TOKEN, id: KLASHE_CHAT_ID },
-                  { key: "مطعم الخليج", token: HALEG_BOT_TOKEN, id: HALEG_CHAT_ID },
-                  { key: "مطعم سكوزي", token: SCOZI_BOT_TOKEN, id: SCOZI_CHAT_ID },
-                  { key: "ركن استكانة", token: ROYAL_FOOD_BOT_TOKEN, id: ROYAL_FOOD_CHAT_ID } // تم تعديل الاسم هنا ليتوافق مع ركن استكانة للطلب السريع
-              ];
-
               let targetRestaurant = "توصيل عام";
-              for (let rest of restOrders) {
-                  if (order.includes(rest.key)) {
-                      targetRestaurant = rest.key;
-                      let currentRestCount = parseInt(localStorage.getItem('order_counter_' + rest.key) || "0") + 1;
-                      localStorage.setItem('order_counter_' + rest.key, currentRestCount);
-                      
-                      restOrderNumbers += `\n🔢 رقم طلب (${rest.key}): #${currentRestCount}`;
-                      
-                      const restMsg = `🍔 طلب جديد لـ ${rest.key}!\n🔢 رقم الطلب: #${currentRestCount}\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 التفاصيل:\n${msgContent}\n\n⚠️ يرجى التجهيز، المندوب سيصل قريباً.`;
-                      fetch(`https://api.telegram.org/bot${rest.token}/sendMessage`, { 
-                          method: "POST", headers: { "Content-Type": "application/json" }, 
-                          body: JSON.stringify({ chat_id: rest.id, text: restMsg }) 
-                      }).catch(e => {});
-                  }
-              }
-
-              // --- الإرسال للفايربيس ---
+              
               if(typeof db !== 'undefined') {
                   db.ref('orders/' + vc).set({
-                      id: vc,
-                      customer: name,
-                      phone: phone,
-                      items: msgContent,
-                      price: "حسب الفاتورة",
-                      restaurant: targetRestaurant,
-                      status: targetRestaurant !== "توصيل عام" ? 'pending_restaurant' : 'pending_driver',
-                      timestamp: firebase.database.ServerValue.TIMESTAMP,
-                      location: userCoords
+                      id: vc, customer: name, phone: phone, items: msgContent + `\nدالة: ${land}`,
+                      price: "حسب الفاتورة", restaurant: targetRestaurant, status: 'pending_driver',
+                      timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords
                   });
               }
 
-              const msg = `🔵 طلب مسواك\n👤الزبون: ${name}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${msgContent}${photoNotice}\n🔢 تسلسل طلب العميل: ${loyaltyMsg}${restOrderNumbers}\n📍الموقع: ${userCoords}`;
+              await sendToDiscord(DISCORD_ORDERS_WEBHOOK, "🛒 طلب مسواك جديد!", `**رقم الطلب:** ${vc}\n**الموقع:** [فتح الخريطة](${userCoords})\n\n🚨 **مندوبينا الأبطال افتحوا التطبيق לחجز الطلب!**`, 3447003);
               
-              await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                 method: "POST", headers: { "Content-Type": "application/json" },
-                 body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg, reply_markup: { inline_keyboard: [[{ text: "📝 حجز الطلب", callback_data: `claim|${name}|${vc}` }]] } })
-              });
-
              showToast("تم إرسال طلبك بنجاح ✅"); 
-             document.getElementById('custOrder').value = ""; 
-             document.getElementById('custLandmark').value = ""; 
-             loadSavedCustomerData();
+             document.getElementById('custOrder').value = ""; document.getElementById('custLandmark').value = ""; loadSavedCustomerData();
           } catch (e) {
               showToast("حدث خطأ أثناء الإرسال ❌");
-          } finally { 
-             btn.innerHTML = originalText; 
-             btn.disabled = false; 
-          }
+          } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       async function processVerifyCode() {
@@ -2313,8 +1907,6 @@
                   localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
                  localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
                  updateStatsUI();
-                  let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
-                 fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
                  syncLoyaltyWithServer(); 
                  showToast(`تم تأكيد العملية بنجاح! عاشت ايدك 👏`); refreshLeaderboard();
                  document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
@@ -2396,34 +1988,14 @@
           const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
           if(current === 'busy') { if(btn) { btn.style.background = 'var(--danger)'; btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً'; } if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; } } 
           else { if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; } if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; } }
-          
-          const soundBtn = document.getElementById('soundToggleBtn');
-         if(isSoundEnabled) {
-             if(soundBtn) {
-                 soundBtn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل';
-                 soundBtn.style.background = '#F59E0B'; 
-                 soundBtn.style.color = 'white';
-              }
-             startOrderPolling();
-          }
       }
       
       let appMap = null;
       function openMapModal() {
          document.getElementById('map-modal').style.display = 'flex';
           if (!appMap) {
-              const umQasrBounds = L.latLngBounds(
-                 L.latLng(30.0100, 47.8800), 
-                 L.latLng(30.0800, 47.9600)  
-              );
-              
-              appMap = L.map('map-view', { 
-                  attributionControl: false,
-                 maxBounds: umQasrBounds, 
-                 maxBoundsViscosity: 1.0, 
-                 minZoom: 13 
-             }).setView([30.0396, 47.9298], 15);
-              
+              const umQasrBounds = L.latLngBounds( L.latLng(30.0100, 47.8800), L.latLng(30.0800, 47.9600) );
+              appMap = L.map('map-view', { attributionControl: false, maxBounds: umQasrBounds, maxBoundsViscosity: 1.0, minZoom: 13 }).setView([30.0396, 47.9298], 15);
              L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(appMap);
           }
          setTimeout(() => { appMap.invalidateSize(); }, 300);
