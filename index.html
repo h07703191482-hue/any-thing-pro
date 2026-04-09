@@ -1445,21 +1445,45 @@
                   else if (order.status === 'claimed' && order.driverPhone === myPhone) {
                       hasMyOrders = true;
                       
-                      myOrdersContainer.innerHTML += `
-                          <div class="form-card" style="padding: 15px; border-right: 4px solid #10B981; margin-bottom: 10px; background: #f0fdf4; border-radius: var(--radius-md); text-align: right; box-shadow: var(--shadow-sm);">
-                              <div style="text-align: center; margin-bottom: 15px;">
-                                  <span style="background: rgba(16, 185, 129, 0.2); color: #065F46; padding: 5px 15px; border-radius: 20px; font-weight: 800; font-size: 15px;">✅ تم حجز الطلب بنجاح</span>
+                      let locationButtonsHTML = '';
+                      // التعديل: فصل أزرار الخريطة في حال كان الطلب تكتك توصيلة
+                      if (order.type === 'توصيلة' || order.type === 'تكتك توصيلة') {
+                          let dropLinkMatch = order.items ? order.items.match(/(http[s]?:\/\/[^\s]+)/) : null;
+                          let dropLink = dropLinkMatch ? dropLinkMatch[0] : '';
+                          
+                          locationButtonsHTML = `
+                              <div style="display: flex; gap: 10px; margin-bottom: 5px; margin-top: 10px;">
+                                  ${order.location && order.location.includes('http') ? `<a href="${order.location}" target="_blank" class="location-btn ripple" style="flex:1; background: #3B82F6; color: white; text-decoration: none; padding: 10px; border: none; font-size: 13px;"><i class="fas fa-map-marker-alt"></i> موقع الصعود</a>` : '<p style="flex:1; font-size: 12px; color: var(--text-muted); text-align:center;">موقع الصعود غير متوفر</p>'}
+                                  ${dropLink ? `<a href="${dropLink}" target="_blank" class="location-btn ripple" style="flex:1; background: #10B981; color: white; text-decoration: none; padding: 10px; border: none; font-size: 13px;"><i class="fas fa-flag-checkered"></i> موقع النزول</a>` : ''}
                               </div>
-                              <p style="margin: 0 0 8px; font-weight: 800; color: var(--danger); font-size: 16px;">🔑 كود التأكيد: <span style="letter-spacing: 2px;">${key}</span></p>
-                              <p style="margin: 0 0 8px; font-weight: 800; color: var(--primary);">📦 التفاصيل:</p>
-                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 700;">🔵 طلب ${order.type || 'مسواك'}</p>
-                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 700;">👤الزبون: ${order.customer}</p>
-                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 700;">📞الهاتف: <a href="tel:${order.phone}" style="color: #3B82F6; text-decoration: none;">${order.phone}</a></p>
-                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 700;">📌الدالة: ${order.land || '-'}</p>
-                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 700; line-height: 1.5;">📝الطلب:<br><span style="font-weight: 600; color: var(--text-muted);">${displayItems}</span></p>
-                              <p style="margin: 0 0 10px; font-size: 14px; font-weight: 700;">🔢 تسلسل طلب العميل: <span style="color: #F59E0B;">${order.loyaltyMsg || '-'}</span></p>
-                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 800;">📍الموقع:</p>
+                          `;
+                      } else {
+                          locationButtonsHTML = `
+                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 800; color: var(--text-main);">📍 الموقع:</p>
                               ${order.location && order.location.includes('http') ? `<a href="${order.location}" target="_blank" class="location-btn ripple" style="background: #10B981; color: white; text-decoration: none; padding: 10px; border: none; margin-bottom: 5px;"><i class="fas fa-map-marker-alt"></i> فتح موقع الزبون بالخريطة</a>` : '<p style="font-size: 13px; color: var(--text-muted);">الموقع غير متوفر</p>'}
+                          `;
+                      }
+
+                      myOrdersContainer.innerHTML += `
+                          <div class="form-card" style="padding: 15px; border-right: 4px solid #10B981; margin-bottom: 10px; background: var(--surface); border-radius: var(--radius-md); text-align: right; box-shadow: var(--shadow-sm);">
+                              <div style="text-align: center; margin-bottom: 15px;">
+                                  <span style="background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid #10B981; padding: 5px 15px; border-radius: 20px; font-weight: 800; font-size: 15px;">✅ تم حجز الطلب بنجاح</span>
+                              </div>
+                              <p style="margin: 0 0 10px; font-weight: 800; color: var(--danger); font-size: 16px; text-align: center;">🔑 كود التأكيد: <span style="letter-spacing: 2px;">${key}</span></p>
+                              
+                              <div style="background: var(--bg-color); padding: 12px; border-radius: 12px; margin-bottom: 12px; border: 1px dashed #10B981;">
+                                  <p style="margin: 0 0 8px; font-size: 15px; font-weight: 800; color: var(--text-main);">👤 الزبون: <span style="color: var(--primary);">${order.customer}</span></p>
+                                  <p style="margin: 0 0 8px; font-size: 15px; font-weight: 800; color: var(--text-main);">📞 الهاتف: <a href="tel:${order.phone}" style="color: #3B82F6; text-decoration: none; font-size: 16px;">${order.phone}</a></p>
+                                  <p style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-main);">📌 الدالة: <span style="color: var(--danger);">${order.land || '-'}</span></p>
+                              </div>
+
+                              <p style="margin: 0 0 8px; font-weight: 800; color: var(--primary);">📦 تفاصيل الطلب:</p>
+                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 700; color: var(--text-main);">🔵 نوع الطلب: ${order.type || 'مسواك'}</p>
+                              <p style="margin: 0 0 8px; font-size: 14px; font-weight: 700; line-height: 1.5; color: var(--text-main);">📝 الطلب:<br><span style="font-weight: 600; color: var(--text-muted);">${displayItems}</span></p>
+                              <p style="margin: 0 0 10px; font-size: 14px; font-weight: 700; color: var(--text-main);">🔢 تسلسل العميل: <span style="color: #F59E0B;">${order.loyaltyMsg || '-'}</span></p>
+                              
+                              ${locationButtonsHTML}
+
                               <a href="tel:${order.phone}" class="send-btn ripple" style="background: #3B82F6; color: white; text-decoration: none; padding: 10px; display: block; text-align: center; margin-top: 10px;"><i class="fas fa-phone-alt"></i> اتصال بالزبون</a>
                           </div>
                       `;
