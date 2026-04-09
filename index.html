@@ -452,7 +452,6 @@
         <button id="off-btn-wifi" class="offline-btn-primary ripple" onclick="openWiFiSettings()">الاتصال عبر ال WiFi</button>
         <button id="off-btn-data" class="offline-btn-outline ripple" onclick="openDataSettings()">الاتصال عبر انترنت الهاتف</button>
     </div>
-    
     <div id="toast-container"></div>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
     <div class="sidebar" id="appSidebar">
@@ -1016,7 +1015,7 @@
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
     </div>
-    <script>
+        <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser"; 
       const ADMIN_CHAT_ID = "7479342799"; 
@@ -1445,14 +1444,24 @@
                   } 
                   else if (order.status === 'claimed' && order.driverPhone === myPhone) {
                       hasMyOrders = true;
+                      
+                      // التعديل اللي طلبته: خليت شكل الطلب المحجوز يطابق رسالتك بالضبط
                       myOrdersContainer.innerHTML += `
                           <div class="form-card" style="padding: 15px; border-right: 4px solid #10B981; margin-bottom: 10px; background: #f0fdf4; border-radius: var(--radius-md); text-align: right; box-shadow: var(--shadow-sm);">
-                              <p style="margin: 0 0 5px; font-weight: 800; color: var(--primary);">نوع الطلب: ${order.restaurant || 'عام'}</p>
-                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 600;">الزبون: ${order.customer}</p>
-                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 800; color: var(--danger);"><i class="fas fa-phone"></i> ${order.phone}</p>
-                              <p style="margin: 0 0 10px; font-size: 13px; color: var(--text-main); line-height: 1.5;">التفاصيل: ${displayItems}</p>
-                              ${order.location && order.location.includes('http') ? `<a href="${order.location}" target="_blank" class="location-btn ripple" style="background: #10B981; color: white; text-decoration: none; padding: 10px; border: none; margin-bottom: 5px;"><i class="fas fa-map-marker-alt"></i> موقع الزبون</a>` : ''}
-                              <a href="tel:${order.phone}" class="send-btn ripple" style="background: #3B82F6; color: white; text-decoration: none; padding: 10px; display: block; text-align: center; margin-top: 5px;"><i class="fas fa-phone-alt"></i> اتصال بالزبون</a>
+                              <div style="text-align: center; margin-bottom: 15px;">
+                                  <span style="background: rgba(16, 185, 129, 0.2); color: #065F46; padding: 5px 15px; border-radius: 20px; font-weight: 800; font-size: 15px;">✅ تم حجز الطلب بنجاح</span>
+                              </div>
+                              <p style="margin: 0 0 8px; font-weight: 800; color: var(--danger); font-size: 16px;">🔑 كود التأكيد: <span style="letter-spacing: 2px;">${key}</span></p>
+                              <p style="margin: 0 0 8px; font-weight: 800; color: var(--primary);">📦 التفاصيل:</p>
+                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 700;">🔵 طلب ${order.type || 'مسواك'}</p>
+                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 700;">👤الزبون: ${order.customer}</p>
+                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 700;">📞الهاتف: <a href="tel:${order.phone}" style="color: #3B82F6; text-decoration: none;">${order.phone}</a></p>
+                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 700;">📌الدالة: ${order.land || '-'}</p>
+                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 700; line-height: 1.5;">📝الطلب:<br><span style="font-weight: 600; color: var(--text-muted);">${displayItems}</span></p>
+                              <p style="margin: 0 0 10px; font-size: 14px; font-weight: 700;">🔢 تسلسل طلب العميل: <span style="color: #F59E0B;">${order.loyaltyMsg || '-'}</span></p>
+                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 800;">📍الموقع:</p>
+                              ${order.location && order.location.includes('http') ? `<a href="${order.location}" target="_blank" class="location-btn ripple" style="background: #10B981; color: white; text-decoration: none; padding: 10px; border: none; margin-bottom: 5px;"><i class="fas fa-map-marker-alt"></i> فتح موقع الزبون بالخريطة</a>` : '<p style="font-size: 13px; color: var(--text-muted);">الموقع غير متوفر</p>'}
+                              <a href="tel:${order.phone}" class="send-btn ripple" style="background: #3B82F6; color: white; text-decoration: none; padding: 10px; display: block; text-align: center; margin-top: 10px;"><i class="fas fa-phone-alt"></i> اتصال بالزبون</a>
                           </div>
                       `;
                   }
@@ -1480,7 +1489,6 @@
               editDiscordMessage(discordMsgId, newPublicMsg);
           }
           
-          // هنا التعديل مال رسالة الحجز اللي طلبتها
           const privateMsg = `✅ تم حجز الطلب بنجاح\n\n🔑 كود التأكيد: ${orderId}\n\n📦 التفاصيل:\n🔵 طلب ${type}\n👤الزبون: ${customerName}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${items}\n🔢 تسلسل طلب العميل: ${loyaltyMsg}\n📍الموقع: ${location}`;
           
           sendToPrivateDiscord(privateMsg);
@@ -1624,7 +1632,6 @@
           if (totalItems > 0) { cartBar.style.display = 'flex'; document.getElementById('cartTotal').innerText = total.toLocaleString() + ' د.ع'; } 
           else { cartBar.style.display = 'none'; }
       }
-
       function checkoutRestaurant() {
           let restaurantName = menus[currentRestaurantId].name;
           let orderDetails = `طلب من ${restaurantName}:\n\n`;
@@ -1689,7 +1696,6 @@
               }
           });
 
-          // تم إضافة الكود الخاص بإخفاء الشاشة الترحيبية إجبارياً هنا 
           setTimeout(() => {
               const splash = document.getElementById('splash-screen');
               if(splash && splash.style.display !== 'none') {
@@ -1853,7 +1859,6 @@
                   });
               }
 
-              // التعديل مال الرسالة هنا
               const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: تحصيل/تسليم - ${dropLink}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}\nموقع الزبون: ${userCoords}`;
               await sendToDiscord(msg, vc); 
              
@@ -1904,7 +1909,6 @@
                   });
               }
 
-             // التعديل مال الرسالة هنا
              const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${order}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}\nموقع الزبون: ${userCoords}`;
              await sendToDiscord(msg, vc); 
              
@@ -1915,14 +1919,11 @@
 
       async function sendFinal() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
-          
           const name = document.getElementById('custName').value.trim(); 
           const phone = document.getElementById('custPhone').value.trim();
           const order = document.getElementById('custOrder').value.trim(); 
           const land = document.getElementById('custLandmark').value.trim();
-          
           if(!name || !validateIraqiPhone(phone) || (!order)) return showToast("أكمل البيانات من فضلك 📝");
-          
          if(!userCoords) {
              showToast("جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
@@ -1933,28 +1934,22 @@
               }
               return;
           }
-          
           const btn = document.getElementById('sendBtn'); 
           const originalText = btn.innerHTML; 
          btn.innerHTML = '<span class="baly-spinner"></span>'; 
           btn.disabled = true;
-          
           try {
              saveCustomerData(name, phone); 
               const vc = generateSecureVC(); 
-              
               let referrer = localStorage.getItem('referred_by') || "";
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`);
              localStorage.removeItem('referred_by');
-              
               let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0); 
              tempLoyalty++; 
              localStorage.setItem('my_loyalty_orders', tempLoyalty);
              updateLocalLoyaltyUI();
-
               let loyaltyMsg = (tempLoyalty % 10) === 0 ? "🎁 هذا الطلب مجاني (الطلب العاشر)" : `الطلب رقم ${tempLoyalty % 10} من أصل 10`;
               let msgContent = order;
-              
               let restOrderNumbers = "";
               const restOrders = [
                   { key: "مطعم برجر علي سالم", token: ALI_SALEM_BOT_TOKEN, id: ALI_SALEM_CHAT_ID },
@@ -1965,16 +1960,13 @@
                   { key: "مطعم سكوزي", token: SCOZI_BOT_TOKEN, id: SCOZI_CHAT_ID },
                   { key: "ركن استكانة", token: ROYAL_FOOD_BOT_TOKEN, id: ROYAL_FOOD_CHAT_ID }
               ];
-
               let targetRestaurant = "توصيل عام";
               for (let rest of restOrders) {
                   if (order.includes(rest.key)) {
                       targetRestaurant = rest.key;
                       let currentRestCount = parseInt(localStorage.getItem('order_counter_' + rest.key) || "0") + 1;
                       localStorage.setItem('order_counter_' + rest.key, currentRestCount);
-                      
                       restOrderNumbers += `\n🔢 رقم طلب (${rest.key}): #${currentRestCount}`;
-                      
                       const restMsg = `🍔 طلب جديد لـ ${rest.key}!\n🔢 رقم الطلب: #${currentRestCount}\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 التفاصيل:\n${msgContent}\n\n⚠️ يرجى التجهيز، المندوب سيصل قريباً.`;
                       fetch(`https://api.telegram.org/bot${rest.token}/sendMessage`, { 
                           method: "POST", headers: { "Content-Type": "application/json" }, 
@@ -1982,42 +1974,22 @@
                       }).catch(e => {});
                   }
               }
-
               const type = 'مسواك';
-
               if(typeof db !== 'undefined') {
                   db.ref('orders/' + vc).set({
-                      id: vc,
-                      customer: name,
-                      phone: phone,
-                      items: msgContent,
-                      land: land,
-                      type: type,
-                      loyaltyMsg: loyaltyMsg,
-                      restOrderNumbers: restOrderNumbers,
-                      price: "حسب الفاتورة",
-                      restaurant: targetRestaurant,
-                      status: targetRestaurant !== "توصيل عام" ? 'pending_restaurant' : 'pending_driver',
-                      timestamp: firebase.database.ServerValue.TIMESTAMP,
-                      location: userCoords
+                      id: vc, customer: name, phone: phone, items: msgContent, land: land, type: type,
+                      loyaltyMsg: loyaltyMsg, restOrderNumbers: restOrderNumbers, price: "حسب الفاتورة",
+                      restaurant: targetRestaurant, status: targetRestaurant !== "توصيل عام" ? 'pending_restaurant' : 'pending_driver',
+                      timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords
                   });
               }
-
-              // التعديل مال الرسالة هنا
               const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${msgContent}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}${restOrderNumbers}\nموقع الزبون: ${userCoords}`;
-              
               await sendToDiscord(msg, vc);
-
              document.getElementById('success-order-modal').style.display = 'flex';
              document.getElementById('custOrder').value = ""; 
              document.getElementById('custLandmark').value = ""; 
              loadSavedCustomerData();
-          } catch (e) {
-              showToast("حدث خطأ أثناء الإرسال ❌");
-          } finally { 
-             btn.innerHTML = originalText; 
-             btn.disabled = false; 
-          }
+          } catch (e) { showToast("حدث خطأ أثناء الإرسال ❌"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
       async function processVerifyCode() {
@@ -2119,14 +2091,9 @@
           const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
           if(current === 'busy') { if(btn) { btn.style.background = 'var(--danger)'; btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً'; } if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; } } 
           else { if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; } if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; } }
-          
           const soundBtn = document.getElementById('soundToggleBtn');
          if(isSoundEnabled) {
-             if(soundBtn) {
-                 soundBtn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل';
-                 soundBtn.style.background = '#F59E0B'; 
-                 soundBtn.style.color = 'white';
-              }
+             if(soundBtn) { soundBtn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل'; soundBtn.style.background = '#F59E0B'; soundBtn.style.color = 'white'; }
              startOrderPolling();
           }
       }
@@ -2135,18 +2102,8 @@
       function openMapModal() {
          document.getElementById('map-modal').style.display = 'flex';
           if (!appMap) {
-              const umQasrBounds = L.latLngBounds(
-                 L.latLng(30.0100, 47.8800), 
-                 L.latLng(30.0800, 47.9600)  
-              );
-              
-              appMap = L.map('map-view', { 
-                  attributionControl: false,
-                 maxBounds: umQasrBounds, 
-                 maxBoundsViscosity: 1.0, 
-                 minZoom: 13 
-             }).setView([30.0396, 47.9298], 15);
-              
+              const umQasrBounds = L.latLngBounds(L.latLng(30.0100, 47.8800), L.latLng(30.0800, 47.9600));
+              appMap = L.map('map-view', { attributionControl: false, maxBounds: umQasrBounds, maxBoundsViscosity: 1.0, minZoom: 13 }).setView([30.0396, 47.9298], 15);
              L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(appMap);
           }
          setTimeout(() => { appMap.invalidateSize(); }, 300);
@@ -2159,9 +2116,44 @@
          document.getElementById('map-success-msg').style.display = 'block';
          closeMapModal();
       }
-
       function openPricesModal() { document.getElementById('prices-modal').style.display = 'flex'; }
       function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
+      
+      const menus = {
+          'ali_salem': { name: 'مطعم برجر علي سالم', items: [
+              { id: 'as1', name: 'همبرجر لحم', price: 2000, category: 'برجر' },
+              { id: 'as2', name: 'همبرجر دجاج', price: 2000, category: 'برجر' },
+              { id: 'as3', name: 'همبرجر دبل لحم', price: 3000, category: 'برجر' }
+          ]},
+          'abo_hmode': { name: 'مطعم بركر ابو حمودي', items: [
+              { id: 'ah1', name: 'بركر لحم خاص', price: 2500, category: 'بركر' },
+              { id: 'ah2', name: 'بركر دجاج خاص', price: 2500, category: 'بركر' }
+          ]},
+          'victoria': { name: 'مطعم فيكتوريا', items: [
+              { id: 'v1', name: 'صاج دجاج', price: 3000, category: 'صاج' },
+              { id: 'v2', name: 'صاج لحم', price: 3000, category: 'صاج' }
+          ]},
+          'klashe': { name: 'كلاشي', items: [
+              { id: 'k1', name: 'عصير برتقال طبيعي', price: 1500, category: 'عصائر' },
+              { id: 'k2', name: 'ميلك شيك شوكولاتة', price: 2000, category: 'مشروبات' }
+          ]},
+          'haleg': { name: 'مطعم الخليج', items: [
+              { id: 'h1', name: 'نفر كباب', price: 5000, category: 'مشاوي' },
+              { id: 'h2', name: 'نفر تكة دجاج', price: 5000, category: 'مشاوي' }
+          ]},
+          'scozi': { name: 'مطعم سكوزي', items: [
+              { id: 's1', name: 'بيتزا خضروات', price: 5000, category: 'بيتزا' },
+              { id: 's2', name: 'بيتزا لحم', price: 7000, category: 'بيتزا' }
+          ]},
+          'rken_estkana': { name: 'ركن استكانة', items: [
+              { id: 're1', name: 'شاي مخدر', price: 500, category: 'مشروبات حارة' },
+              { id: 're2', name: 'كباب عراقي', price: 6000, category: 'مشاوي' }
+          ]},
+          'royal_food': { name: 'رويال فود', items: [
+              { id: 'rf1', name: 'زنجر دجاج', price: 3500, category: 'وجبات سريعة' },
+              { id: 'rf2', name: 'برجر ملكي', price: 4000, category: 'برجر' }
+          ]}
+      };
     </script>
 </body>
 </html>
