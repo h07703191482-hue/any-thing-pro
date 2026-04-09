@@ -2065,7 +2065,6 @@
               const checkResult = await checkResp.text();
               if (checkResult.startsWith("valid") || checkResult === "valid") {
                   
-                  // تحديث حالة الطلب في الفايربيس إلى (مكتمل)
                   if(typeof db !== 'undefined') {
                       db.ref('orders/' + code).update({ status: 'completed' });
                   }
@@ -2086,7 +2085,6 @@
           } catch(e) {} finally { btn.innerHTML = oldText; btn.disabled = false; }
       }
 
-      // الدالة الجديدة لمعالجة الكود الإجباري من النافذة الحمراء
       async function processForcedVerifyCode() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const code = document.getElementById('forcedVerifyInput').value.trim();
