@@ -79,7 +79,6 @@
       .price-val { color: var(--primary); font-weight: 900; background: rgba(90, 34, 139, 0.1); padding: 4px 12px; border-radius: var(--radius-pill); font-size: 14px;}
       body.dark-mode .price-val { background: rgba(255, 255, 255, 0.1); color: var(--gold); }
 
-      /* نافذة النجاح الإجبارية */
       #success-order-modal { display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0,0,0,0.85) !important; z-index: 9999999 !important; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; box-sizing: border-box; margin: 0; }
       #success-order-modal > div { width: 100%; max-width: 400px; background: var(--surface); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; text-align: center; padding: 35px 20px; border: 2px solid #10B981; position: relative; animation: scaleIn 0.3s ease-out; }
 
@@ -174,7 +173,6 @@
       .card-join .icon-wrapper { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
       .card-plaza .icon-wrapper { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
       
-      /* إضافة ستايلات أزرار الطلبات للمندوب */
       .card-public-orders .icon-wrapper { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
       .card-private-orders .icon-wrapper { background: rgba(16, 185, 129, 0.1); color: #10B981; }
 
@@ -244,7 +242,6 @@
       .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(90, 34, 139, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
       .location-notice { font-size: 13px; font-weight: 700; color: #10B981; text-align: center; margin-bottom: 15px; display: block; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: var(--radius-md); border: 1px dashed #10B981;}
 
-      /* تصميم سلايدر المطاعم الجديد مقسم لصفين */
       .rest-slider { display: grid; grid-template-rows: repeat(2, 1fr); grid-auto-flow: column; grid-auto-columns: 120px; overflow-x: auto; gap: 15px; padding: 0 20px 20px; scroll-snap-type: x mandatory; }
      .rest-slider::-webkit-scrollbar { display: none; }
       .rest-card { scroll-snap-align: start; background: var(--surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 12px; text-align: center; box-shadow: var(--shadow-sm); cursor: pointer; transition: 0.3s; }
@@ -252,7 +249,6 @@
       .rest-card h4 { margin: 0; font-size: 14px; font-weight: 800; color: var(--primary); line-height: 1.3; }
       .rest-card small { font-size: 11px; color: var(--text-muted); font-weight: 600; }
 
-      /* تصميم قائمة الطعام (المنيو) */
       .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--surface); border-bottom: 1px solid var(--border-color); }
      .menu-item:last-child { border-bottom: none; }
       .menu-item-info h4 { margin: 0 0 5px 0; font-size: 16px; font-weight: 800; color: var(--text-main); }
@@ -262,12 +258,10 @@
       .qty-btn:active { transform: scale(0.9); background: var(--primary); color: white; }
       .qty-val { font-weight: 800; font-size: 16px; min-width: 20px; text-align: center; color: var(--text-main); }
       
-      /* شريط المجموع الكلي الثابت بالأسفل */
       .cart-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--surface); padding: 15px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 10000; border-top-left-radius: 20px; border-top-right-radius: 20px; border-top: 1px solid var(--border-color); animation: fadeSlideUp 0.3s ease-out; }
       body.dark-mode .cart-bar { box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
       .cart-bar-total { font-size: 20px; font-weight: 800; color: var(--primary); display: block; }
       
-      /* الميزة الجديدة: ستايل الشبكة (الجريد) للمطاعم اللي بيها اكثر من 10 وجبات */
       .menu-grid-view {
           display: grid;
          grid-template-columns: repeat(2, 1fr);
@@ -294,7 +288,6 @@
          justify-content: center;
       }
 
-      /* تنسيقات الأقسام الجديدة (Accordion) للمطاعم اللي بيها اقسام */
      .category-section {
          margin-bottom: 10px;
           border: 1px solid var(--border-color);
@@ -326,7 +319,6 @@
           box-shadow: var(--shadow-sm);
       }
 
-      /* تنسيقات نافذة التحديد الجغرافي */
      #out-of-zone-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; backdrop-filter: blur(8px); }
       .out-zone-card { background: var(--surface); padding: 35px 20px; border-radius: var(--radius-lg); max-width: 400px; width: 95%; box-shadow: 0 20px 50px rgba(239, 68, 68, 0.2); animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid var(--danger); }
     </style>
@@ -1488,13 +1480,13 @@
               editDiscordMessage(discordMsgId, newPublicMsg);
           }
           
+          // هنا التعديل مال رسالة الحجز اللي طلبتها
           const privateMsg = `✅ تم حجز الطلب بنجاح\n\n🔑 كود التأكيد: ${orderId}\n\n📦 التفاصيل:\n🔵 طلب ${type}\n👤الزبون: ${customerName}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${items}\n🔢 تسلسل طلب العميل: ${loyaltyMsg}\n📍الموقع: ${location}`;
           
           sendToPrivateDiscord(privateMsg);
           
           showToast("تم حجز الطلب بنجاح! راجع الطلبات المحجوزة.");
       }
-    </script>
       async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
@@ -1696,6 +1688,15 @@
                  checkGlobalStatusFromServer();
               }
           });
+
+          // تم إضافة الكود الخاص بإخفاء الشاشة الترحيبية إجبارياً هنا 
+          setTimeout(() => {
+              const splash = document.getElementById('splash-screen');
+              if(splash && splash.style.display !== 'none') {
+                  splash.style.opacity = '0';
+                  setTimeout(() => splash.style.display = 'none', 500);
+              }
+          }, 3000);
       });
 
       function shareApp() {
@@ -1852,6 +1853,7 @@
                   });
               }
 
+              // التعديل مال الرسالة هنا
               const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: تحصيل/تسليم - ${dropLink}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}\nموقع الزبون: ${userCoords}`;
               await sendToDiscord(msg, vc); 
              
@@ -1902,6 +1904,7 @@
                   });
               }
 
+             // التعديل مال الرسالة هنا
              const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${order}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}\nموقع الزبون: ${userCoords}`;
              await sendToDiscord(msg, vc); 
              
@@ -2000,6 +2003,7 @@
                   });
               }
 
+              // التعديل مال الرسالة هنا
               const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${msgContent}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}${restOrderNumbers}\nموقع الزبون: ${userCoords}`;
               
               await sendToDiscord(msg, vc);
