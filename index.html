@@ -1371,7 +1371,7 @@
               if (navigator.onLine) {
                  const msg = `👤 تسجيل دخول جديد (مباشر)\nالاسم: ${userName}\nالرقم: ${userPhone}`;
                  try {
-                     await fetch(`https://discord.gg/gAVRsE5qy`, {
+                     await fetch(`https://discord.com/api/webhooks/1491324693871857684/i9PXJalQMx79I_Ev5i10jeS8TgKEe_Q_bdqhuhOC57LNiCw-kFFdJstxeuquI9abklp9`, {
                          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: msg })
                      });
                      await fetch(`${GS_URL}?action=incrementAuthUsers`);
