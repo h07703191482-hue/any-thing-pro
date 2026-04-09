@@ -1015,7 +1015,8 @@
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
     </div>
-        <script>
+    
+    <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser"; 
       const ADMIN_CHAT_ID = "7479342799"; 
@@ -1145,7 +1146,6 @@
          checkNewOrdersForSound(); 
          orderPollInterval = setInterval(checkNewOrdersForSound, 10000); 
       }
-      
       function initAutoLocation() {
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
@@ -1445,7 +1445,6 @@
                   else if (order.status === 'claimed' && order.driverPhone === myPhone) {
                       hasMyOrders = true;
                       
-                      // التعديل اللي طلبته: خليت شكل الطلب المحجوز يطابق رسالتك بالضبط
                       myOrdersContainer.innerHTML += `
                           <div class="form-card" style="padding: 15px; border-right: 4px solid #10B981; margin-bottom: 10px; background: #f0fdf4; border-radius: var(--radius-md); text-align: right; box-shadow: var(--shadow-sm);">
                               <div style="text-align: center; margin-bottom: 15px;">
@@ -2000,7 +1999,15 @@
           try {
               const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
               const checkResult = await checkResp.text();
-              if (checkResult.startsWith("valid")) {
+              if (checkResult.startsWith("valid") || checkResult === "valid") {
+                  
+                  // ---------- التعديل هنا: إخفاء الطلب من قائمة الطلبات المحجوزة ----------
+                  // تحديث حالة الطلب في الفايربيس إلى (مكتمل) حتى ينحذف من واجهة المندوب
+                  if(typeof db !== 'undefined') {
+                      db.ref('orders/' + code).update({ status: 'completed' });
+                  }
+                  // -------------------------------------------------------------------------
+                  
                   try { const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); cashAudio.play(); confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } }); } catch(e) {}
                   let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
                  logs.unshift({ date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }), phone: custPhone, price: "2,000 د.ع" });
