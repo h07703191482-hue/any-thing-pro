@@ -2051,7 +2051,7 @@
              loadSavedCustomerData();
           } catch (e) { showToast("حدث خطأ أثناء الإرسال ❌"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
-        async function processVerifyCode() {
+      async function processVerifyCode() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const code = document.getElementById('driverVerifyInput').value.trim(); 
           const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
