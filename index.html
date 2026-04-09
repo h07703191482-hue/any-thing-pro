@@ -1851,7 +1851,7 @@
                   });
               }
 
-              const msg = `طلب جديد جاهز للحجز\nاسم الزبون : ${name}\nرقم الزبون: ${phone}\nتفاصيل الطلب: تحصيل/تسليم - ${dropLink}\nالتسلسل الطلب: ${loyaltyMsg}\nنقطه داله: ${land}\nالموقع: ${userCoords}`;
+              const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: تحصيل/تسليم - ${dropLink}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}\nموقع الزبون: ${userCoords}`;
               await sendToDiscord(msg, vc); 
              
              document.getElementById('success-order-modal').style.display = 'flex';
@@ -1901,7 +1901,7 @@
                   });
               }
 
-             const msg = `طلب جديد جاهز للحجز\nاسم الزبون : ${name}\nرقم الزبون: ${phone}\nتفاصيل الطلب: ${order}\nالتسلسل الطلب: ${loyaltyMsg}\nنقطه داله: ${land}\nالموقع: ${userCoords}`;
+             const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${order}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}\nموقع الزبون: ${userCoords}`;
              await sendToDiscord(msg, vc); 
              
              document.getElementById('success-order-modal').style.display = 'flex';
@@ -1999,7 +1999,7 @@
                   });
               }
 
-              const msg = `طلب جديد جاهز للحجز\nاسم الزبون : ${name}\nرقم الزبون: ${phone}\nتفاصيل الطلب: ${msgContent}\nالتسلسل الطلب: ${loyaltyMsg}${restOrderNumbers}\nنقطه داله: ${land}\nالموقع: ${userCoords}`;
+              const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${msgContent}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}${restOrderNumbers}\nموقع الزبون: ${userCoords}`;
               
               await sendToDiscord(msg, vc);
 
