@@ -79,10 +79,9 @@
       .price-val { color: var(--primary); font-weight: 900; background: rgba(90, 34, 139, 0.1); padding: 4px 12px; border-radius: var(--radius-pill); font-size: 14px;}
       body.dark-mode .price-val { background: rgba(255, 255, 255, 0.1); color: var(--gold); }
 
-      /* ستايل نافذة تم الإرسال بنجاح الجديدة */
-      #success-order-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100008; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;}
-      .success-container { width: 100%; max-width: 400px; background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-floating); display: flex; flex-direction: column; animation: scaleIn 0.3s ease-out; text-align: center; padding: 35px 20px; border: 2px solid #10B981;}
-      .success-icon { font-size: 70px; color: #10B981; margin-bottom: 20px; animation: iconPulse 2s infinite ease-in-out;}
+      /* نافذة النجاح الإجبارية */
+      #success-order-modal { display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0,0,0,0.85) !important; z-index: 9999999 !important; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; box-sizing: border-box; margin: 0; }
+      #success-order-modal > div { width: 100%; max-width: 400px; background: var(--surface); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; text-align: center; padding: 35px 20px; border: 2px solid #10B981; position: relative; animation: scaleIn 0.3s ease-out; }
 
       :root { 
           --primary: #5A228B; --primary-hover: #4A1A75; --secondary: #FFC107; --gold: #FFC107; 
@@ -359,7 +358,7 @@
            </div>
         </div>
     </div>
-    
+
     <div id="prices-modal">
         <div class="prices-container">
             <div class="prices-header">
@@ -650,7 +649,232 @@
              </div>
           </div>
       </div>
-      <div id="join-screen" class="screen container">
+      <div style="padding: 0 5px 15px; position: relative; z-index: 5;">
+          <div class="select-card ripple-dark" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--primary);" onclick="openPricesModal()">
+              <div style="display: flex; align-items: center; gap: 15px;">
+                 <div style="width: 45px; height: 45px; background: rgba(90, 34, 139, 0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 20px;"><i class="fas fa-map-signs"></i></div>
+                  <div>
+                     <h4 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--text-main);">أسعار التوصيل</h4>
+                     <small style="color: var(--text-muted); font-weight: 600;">تعرف على أسعار كل مناطق أم قصر</small>
+                 </div>
+             </div>
+              <i class="fas fa-chevron-left" style="color: var(--border-color); font-size: 14px;"></i>
+          </div>
+      </div>
+
+      <div class="services-grid">
+          <div class="select-card card-full card-cart ripple-dark" onclick="showScreen('order-screen')">
+            <div class="icon-wrapper icon-pulse"><i class="fas fa-shopping-cart"></i></div>
+            <div class="card-text"><h3 id="srv-shop-title">تسوق مسواكك</h3><small id="srv-shop-sub">أطلب أي شي ونوصله الك</small></div>
+            <i class="fas fa-chevron-left arrow-icon"></i>
+          </div>
+          
+          <div class="select-card card-half card-tuk ripple-dark" onclick="showScreen('tuk-screen')">
+            <div class="icon-wrapper icon-pulse"><i class="fas fa-money-bill-wave"></i></div>
+            <h3 id="srv-tuk-title">تكتك توصيلة</h3>
+            <small id="srv-tuk-sub">خدمات تحصيل<br>سريعة وآمنة</small>
+          </div>
+          
+          <div class="select-card card-half card-med ripple-dark" onclick="showScreen('mediator-screen')">
+            <div class="icon-wrapper icon-pulse"><i class="fas fa-handshake"></i></div>
+            <h3 id="srv-med-title">الوسيط</h3>
+            <small id="srv-med-sub">نقل الأغراض<br>بين شخصين</small>
+          </div>
+
+          <div class="select-card card-full ripple" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; margin-bottom: 5px;" onclick="shareApp()">
+            <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-gift"></i></div>
+            <div class="card-text">
+                <h3 id="srv-share-title">شارك واربح توصيل مجاني</h3>
+               <small id="srv-share-sub">انسخ رابطك ودزه لأصدقائك 🎁</small>
+           </div>
+          </div>
+          
+          <div id="join-driver-card" class="select-card card-full card-join ripple-dark" onclick="openJoinScreen()">
+            <div class="icon-wrapper"><i class="fas fa-id-card"></i></div>
+            <div class="card-text"><h3 id="srv-join-title">انضم ككابتن</h3><small id="srv-join-sub">سجل معنا وابدأ بتحقيق الدخل</small></div>
+            <i class="fas fa-chevron-left arrow-icon"></i>
+          </div>
+          
+          <div id="driver-plaza-card" class="select-card card-full card-plaza ripple-dark" style="display: none;" onclick="showScreen('plaza-screen')">
+            <div class="icon-wrapper"><i class="fas fa-briefcase"></i></div>
+            <div class="card-text"><h3 id="srv-plaza-title">لوحة الكابتن</h3><small id="srv-plaza-sub">تسليم الطلبات والإحصائيات</small></div>
+            <i class="fas fa-chevron-left arrow-icon"></i>
+          </div>
+      </div>
+    </div>
+
+    <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> <span id="restaurant-name-header">اسم المطعم</span></h2>
+        <p style="color: var(--text-muted); font-size: 14px; font-weight: 600; margin-bottom: 20px;">اختار طلبك وحدد الكمية، وراح نحسبلك المجموع مباشرة.</p>
+        
+        <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+          ⚠تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور الطلب كامله. يرجى التأكد قبل تثبيت الطلب.
+        </div>
+        
+        <div class="form-card" style="padding: 0; overflow: hidden; background: transparent; border: none; box-shadow: none;" id="menu-items-container">
+           </div>
+        
+        <div class="cart-bar" id="cartBar" style="display: none;">
+            <div>
+               <span style="font-size: 13px; color: var(--text-muted); font-weight: bold;">المجموع الكلي للطلب:</span>
+               <span class="cart-bar-total" id="cartTotal">0 د.ع</span>
+           </div>
+            <button class="send-btn ripple" style="width: auto; margin: 0; padding: 12px 25px; font-size: 16px; box-shadow: none;" onclick="checkoutRestaurant()">استمرار <i class="fas fa-arrow-left"></i></button>
+        </div>
+    </div>
+    
+    <div id="tuk-screen" class="screen container">
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
+        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
+        
+        <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+            ⚠️تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
+        </div>
+        
+        <div class="form-card" id="tuk-user-card">
+            <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="tuk-p-info">بيانات العميل</span></div>
+            <div class="form-group">
+               <label id="lbl-tuk-name">الاسم الكامل</label>
+               <input type="text" id="tukName" placeholder="اكتب اسمك هنا">
+               <span class="step-number">خطوة رقم (1)</span>
+           </div>
+            <div class="form-group">
+               <label id="lbl-tuk-phone">رقم الموبايل</label>
+               <input type="tel" id="tukPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+               <span class="step-number">خطوة رقم (2)</span>
+           </div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-route"></i> <span id="tuk-r-info">تفاصيل العملية</span></div>
+            <div class="form-group">
+               <label style="color:var(--danger);" id="lbl-tuk-drop">موقع التحصيل/التسليم (إجباري)</label>
+               
+               <div class="note" style="padding:12px; font-size:13px; margin-bottom:10px; background:rgba(16, 185, 129, 0.1); border-right-color:#10B981; color:var(--text-main);">
+                   💡هسه تگدر تحدد مكان النزول مباشرة من الخريطة داخل التطبيق بدون ما تطلع وتنسخ روابط! 🗺️
+               </div>
+               
+               <button type="button" class="location-btn ripple-dark" style="border: 2px dashed var(--primary); background: var(--surface); color: var(--primary);" onclick="openMapModal()">
+                   <i class="fas fa-map-marked-alt"></i> افتح الخريطة وحدد المكان 📍
+               </button>
+               
+               <input type="hidden" id="tukDropoffLink" value="">
+                <p id="map-success-msg" style="display: none; color: #10B981; font-weight: 800; font-size: 14px; margin-top: 10px; text-align: center;"><i class="fas fa-check-circle"></i> تم تحديد المكان بنجاح!</p>
+               <span class="step-number">خطوة رقم (3)</span>
+           </div>
+            <div class="form-group">
+               <label>أقرب نقطة دالة (اختياري)</label>
+               <input type="text" id="tukLandmark" placeholder="مدرسة، جامع، أو تقاطع...">
+               <span class="step-number">خطوة رقم (4)</span>
+           </div>
+        </div>
+
+        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
+        </div>
+
+        <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">طلب تكتك توصيلة</span></button>
+    </div>
+
+    <div id="mediator-screen" class="screen container">
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> <span id="med-head">خدمة الوسيط</span></h2>
+        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
+        
+        <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+            ⚠️ تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
+        </div>
+        
+        <div class="form-card" id="med-user-card">
+            <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="med-p-info">بيانات المرسل</span></div>
+            <div class="form-group">
+               <label>الاسم الكامل</label>
+               <input type="text" id="medName" placeholder="اكتب اسمك">
+               <span class="step-number">خطوة رقم (1)</span>
+           </div>
+            <div class="form-group">
+               <label>رقم الموبايل</label>
+               <input type="tel" id="medPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+               <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+               <span class="step-number">خطوة رقم (2)</span>
+           </div>
+            <div class="form-group">
+               <label>أقرب نقطة دالة لمكانك</label>
+               <input type="text" id="medLandmark" placeholder="لتسهيل وصول المندوب">
+               <span class="step-number">خطوة رقم (3)</span>
+           </div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-box-open"></i> <span id="med-o-info">تفاصيل الطلب</span></div>
+            <div class="form-group">
+               <label>ما هو الغرض؟ وإلى أين؟</label>
+               <textarea id="medOrder" rows="4" placeholder="مثال: أريد توصيل مفاتيح من تقاطع الميناء إلى حي المهندسين..."></textarea>
+                <span class="step-number">خطوة رقم (4)</span>
+           </div>
+        </div>
+
+        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
+        </div>
+
+        <button class="send-btn order-btn-logic ripple" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
+    </div>
+
+    <div id="order-screen" class="screen container">
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-shopping-cart" style="color:var(--primary);"></i> <span id="shop-head">تسوق مسواكك</span></h2>
+        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
+        
+        <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+            ⚠️تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور الطلب كاملة. يرجى التأكد قبل تثبيت الطلب.
+        </div>
+        
+        <div id="loyalty-info" class="loyalty-card">
+            <div class="loyalty-text"><span id="loy-txt">طلبك رقم</span> <span id="current-order-count" style="color:var(--primary); font-size:22px;">0</span> / 10</div>
+            <div class="loyalty-progress"><div id="loyalty-bar" class="loyalty-bar"></div></div>
+            <span class="gift-note" id="loyalty-gift-msg"><i class="fas fa-gift"></i> أوصل للطلب 10 وكروتك مجانية</span>
+        </div>
+
+        <div class="form-card" id="shop-user-card">
+            <div class="form-card-title"><i class="fas fa-address-card"></i> <span id="shop-p-info">بيانات التوصيل</span></div>
+            <div class="form-group">
+               <label>الاسم</label>
+               <input type="text" id="custName" placeholder="اسمك">
+               <span class="step-number">خطوة رقم (1)</span>
+           </div>
+            <div class="form-group">
+               <label>رقم الهاتف</label>
+               <input type="tel" id="custPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); updateLoyaltyUI(); checkPhoneLive(this)" onblur="syncLoyaltyWithServer()">
+               <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                <span class="step-number">خطوة رقم (2)</span>
+           </div>
+            <div class="form-group">
+               <label>نقطة دالة</label>
+               <input type="text" id="custLandmark" placeholder="وصف سريع لمكانك">
+                <span class="step-number">خطوة رقم (3)</span>
+           </div>
+        </div>
+
+        <div class="form-card">
+            <div class="form-card-title"><i class="fas fa-list-ul"></i> <span id="shop-o-info">ماذا تريد أن نشتري لك؟</span></div>
+            <div class="form-group">
+               <textarea id="custOrder" rows="5" placeholder="اكتب طلباتك هنا بالتفصيل (أكل، مسواك، صيدلية)..."></textarea>
+               <span class="step-number">خطوة رقم (4)</span>
+           </div>
+        </div>
+
+        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل شراء المواد. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
+        </div>
+
+        <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
+    </div>
+
+    <div id="join-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> انضم ككابتن</h2>
         
@@ -1598,7 +1822,7 @@
           } catch(e) {}
       }
 
-      // التعديل: فصل الطلبات המتاحة والطلبات المحجوزة الخاصة بالمندوب
+      // التعديل: فصل الطلبات المتاحة والطلبات المحجوزة الخاصة بالمندوب
       function listenToOrders() {
           if(typeof db === 'undefined' || localStorage.getItem('isVerifiedDriver') !== 'true') return;
           const availableContainer = document.getElementById('available-orders-container');
@@ -1616,8 +1840,8 @@
               
               for(let key in orders) {
                   let order = orders[key];
-                  let safeItems = order.items ? order.items.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '<br>') : '';
                   let displayItems = order.items ? order.items.replace(/\n/g, '<br>') : '';
+                  let safeItems = order.items ? order.items.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, ' ') : '';
 
                   // الطلبات اللي بعدها ممحجوزة
                   if(order.status === 'pending_driver' || order.status === 'pending_restaurant') {
@@ -1626,7 +1850,7 @@
                           <div class="form-card" style="padding: 15px; border-right: 4px solid var(--secondary); margin-bottom: 10px; background: var(--surface); border-radius: var(--radius-md); text-align: right; box-shadow: var(--shadow-sm);">
                               <p style="margin: 0 0 5px; font-weight: 800; color: var(--primary);">نوع الطلب: ${order.restaurant || 'عام'}</p>
                               <p style="margin: 0 0 15px; font-size: 13px; color: var(--text-main); line-height: 1.5;">التفاصيل: ${displayItems}</p>
-                              <button class="send-btn ripple" style="padding: 12px; font-size: 14px; background: var(--secondary); color: #000; box-shadow: none; margin-top: 0;" onclick="claimOrder('${order.id}', '${order.customer}', '${order.discordMsgId || ''}', '${order.phone}', '${order.location || ''}')">
+                              <button class="send-btn ripple" style="padding: 12px; font-size: 14px; background: var(--secondary); color: #000; box-shadow: none; margin-top: 0;" onclick="claimOrder('${order.id}', '${order.customer}', '${order.discordMsgId || ''}', '${order.phone}', '${order.location || ''}', '${safeItems}')">
                                   <i class="fas fa-hand-paper"></i> حجز الطلب لي
                               </button>
                           </div>
@@ -1641,7 +1865,7 @@
                               <p style="margin: 0 0 5px; font-size: 14px; font-weight: 600;">الزبون: ${order.customer}</p>
                               <p style="margin: 0 0 5px; font-size: 14px; font-weight: 800; color: var(--danger);"><i class="fas fa-phone"></i> ${order.phone}</p>
                               <p style="margin: 0 0 10px; font-size: 13px; color: var(--text-main); line-height: 1.5;">التفاصيل: ${displayItems}</p>
-                              ${order.location ? `<a href="${order.location}" target="_blank" class="location-btn ripple" style="background: #10B981; color: white; text-decoration: none; padding: 10px; border: none; margin-bottom: 5px;"><i class="fas fa-map-marker-alt"></i> موقع الزبون</a>` : ''}
+                              ${order.location && order.location.includes('http') ? `<a href="${order.location}" target="_blank" class="location-btn ripple" style="background: #10B981; color: white; text-decoration: none; padding: 10px; border: none; margin-bottom: 5px;"><i class="fas fa-map-marker-alt"></i> موقع الزبون</a>` : ''}
                               <a href="tel:${order.phone}" class="send-btn ripple" style="background: #3B82F6; color: white; text-decoration: none; padding: 10px; display: block; text-align: center; margin-top: 5px;"><i class="fas fa-phone-alt"></i> اتصال بالزبون</a>
                           </div>
                       `;
@@ -1653,7 +1877,7 @@
           });
       }
 
-      async function claimOrder(orderId, customerName, discordMsgId, phone, location) {
+      async function claimOrder(orderId, customerName, discordMsgId, phone, location, items) {
           const driverName = localStorage.getItem('driver_name') || 'كابتن غير معروف';
           const driverPhone = localStorage.getItem('driver_phone') || '';
           
@@ -1666,7 +1890,7 @@
           }
           
           if(discordMsgId) {
-              const newPublicMsg = `🔴 **تم حجز الطلب**\nباسم المندوب: ${driverName}\nواسم الزبون: ${customerName}`;
+              const newPublicMsg = `🔴 **تم حجز الطلب**\nباسم المندوب: ${driverName}`;
               editDiscordMessage(discordMsgId, newPublicMsg);
           }
           
