@@ -67,6 +67,16 @@
       .map-footer { padding: 15px; text-align: center; background: var(--surface); }
       @keyframes bouncePin { from { transform: translate(-50%, -100%); } to { transform: translate(-50%, -110%); } }
 
+      /* Styles for code entry modal */
+      #code-entry-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100005; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;}
+      .code-entry-container { width: 100%; max-width: 400px; background: var(--danger); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-floating); display: flex; flex-direction: column; animation: scaleIn 0.3s ease-out;}
+      .code-entry-header { padding: 18px; background: var(--danger); color: white; text-align: center; font-weight: 800; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
+      .close-code-entry-btn { background: transparent; border: none; color: white; font-size: 22px; cursor: pointer; padding: 0; transition: 0.3s; }
+      .close-code-entry-btn:active { transform: scale(0.8); }
+      .code-entry-content { padding: 10px 20px 20px; background: var(--surface); display: flex; flex-direction: column; gap: 15px; align-items: center; text-align: center; }
+      .code-entry-content input {text-align: center; letter-spacing: 4px; font-weight: bold; font-size: 20px;}
+      .code-entry-alert {color: var(--danger); font-size: 14px; font-weight: 800; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 8px;}
+
       #prices-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100005; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;}
      .prices-container { width: 100%; max-width: 400px; background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-floating); display: flex; flex-direction: column; animation: scaleIn 0.3s ease-out;}
       .prices-header { padding: 18px; background: var(--primary); background: linear-gradient(135deg, var(--primary) 0%, #3B1261 100%); color: white; text-align: center; font-weight: 800; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
@@ -337,31 +347,46 @@
         </div>
     </div>
 
+    <div id="code-entry-modal">
+        <div class="code-entry-container">
+            <div class="code-entry-header">
+                <span>⚠️ تنبيه: إدخال كود التسليم</span>
+                <button class="close-code-entry-btn" onclick="document.getElementById('code-entry-modal').style.display='none'"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="code-entry-content">
+                <i class="fas fa-exclamation-triangle" style="font-size: 50px; color: var(--danger);"></i>
+                <p class="code-entry-alert">يجب إدخال رمز تسليم الطلب السابق أولاً حتى تتمكن من حجز طلب جديد!</p>
+                <input type="number" id="forcedVerifyInput" placeholder="أدخل الكود هنا" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <button class="send-btn ripple" style="margin-top: 5px;" onclick="processForcedVerifyCode()">تأكيد الكود</button>
+            </div>
+        </div>
+    </div>
+
     <div id="map-modal">
         <div class="map-container">
             <div class="map-header">
-               <span>تحديد موقع النزول 📍</span>
-               <button class="close-map-btn" onclick="closeMapModal()"><i class="fas fa-times"></i></button>
-           </div>
+                <span>تحديد موقع النزول 📍</span>
+                <button class="close-map-btn" onclick="closeMapModal()"><i class="fas fa-times"></i></button>
+            </div>
             <div style="position: relative;">
                <div id="map-view"></div>
                 <i class="fas fa-map-marker-alt map-center-marker"></i>
-           </div>
+            </div>
             <div class="map-footer">
                 <p style="margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--text-muted);">حرك الخريطة ليصير الدبوس على المكان المضبوط</p>
                 <button class="send-btn ripple" style="margin-top: 0; background: #10B981;" onclick="confirmMapLocation()">
-                   تأكيد الموقع <i class="fas fa-check"></i>
-               </button>
-           </div>
+                    تأكيد الموقع <i class="fas fa-check"></i>
+                </button>
+            </div>
         </div>
     </div>
 
     <div id="prices-modal">
         <div class="prices-container">
             <div class="prices-header">
-               <span>أسعار التوصيل 🛵</span>
-               <button class="close-prices-btn" onclick="closePricesModal()"><i class="fas fa-times"></i></button>
-           </div>
+                <span>أسعار التوصيل 🛵</span>
+                <button class="close-prices-btn" onclick="closePricesModal()"><i class="fas fa-times"></i></button>
+            </div>
             <div class="prices-content">
                <div class="price-item"><span style="flex:1;">الخمسين</span><span class="price-val">1,500 د.ع</span></div>
                <div class="price-item"><span style="flex:1;">المشروع</span><span class="price-val">1,500 د.ع</span></div>
@@ -412,9 +437,9 @@
     <div id="device-type-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100006; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;">
         <div class="prices-container">
             <div class="prices-header">
-               <span>ما نوع جهازك؟</span>
-               <button class="close-prices-btn" onclick="document.getElementById('device-type-modal').style.display='none'"><i class="fas fa-times"></i></button>
-           </div>
+                <span>ما نوع جهازك؟</span>
+                <button class="close-prices-btn" onclick="document.getElementById('device-type-modal').style.display='none'"><i class="fas fa-times"></i></button>
+            </div>
             <div class="prices-content" style="display: flex; gap: 15px; padding-top: 25px;">
                <a href="https://www.instagram.com/p/DWx_KZgCP-b/?img_index=4&igsh=MXdrdWk3dW83em95bA==" style="flex:1; text-align:center; background:#3DDC84; color:white; padding:15px; border-radius:15px; text-decoration:none; font-weight:bold; display:flex; flex-direction:column; align-items:center; gap:8px;" class="ripple">
                    <i class="fab fa-android" style="font-size:30px;"></i> اندرويد
@@ -647,15 +672,15 @@
       </div>
 
       <div style="padding: 0 5px 15px; position: relative; z-index: 5;">
-          <div class="select-card ripple-dark" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--primary);" onclick="openPricesModal()">
+          <div class="select-card ripple-dark" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--danger); background: rgba(239, 68, 68, 0.05);" onclick="openPricesModal()">
               <div style="display: flex; align-items: center; gap: 15px;">
-                 <div style="width: 45px; height: 45px; background: rgba(90, 34, 139, 0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 20px;"><i class="fas fa-map-signs"></i></div>
+                 <div style="width: 45px; height: 45px; background: rgba(239, 68, 68, 0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--danger); font-size: 20px;"><i class="fas fa-exclamation-circle"></i></div>
                   <div>
-                     <h4 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--text-main);">أسعار التوصيل</h4>
+                     <h4 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--danger);">أسعار التوصيل (تنبيه)</h4>
                      <small style="color: var(--text-muted); font-weight: 600;">تعرف على أسعار كل مناطق أم قصر</small>
                  </div>
              </div>
-              <i class="fas fa-chevron-left" style="color: var(--border-color); font-size: 14px;"></i>
+              <i class="fas fa-chevron-left" style="color: var(--danger); font-size: 14px;"></i>
           </div>
       </div>
 
@@ -1043,6 +1068,12 @@
       const ROYAL_FOOD_CHAT_ID = "-1003798976901";
 
       let userCoords = ""; 
+      
+      // ----------- الإضافة الجديدة هنا -----------
+      let driverActiveOrders = 0; // متغير لحساب عدد الطلبات النشطة للمندوب
+      let forcedVerifyCustomerPhone = ""; // لحفظ رقم هاتف الزبون لعملية التقييد
+      // -----------------------------------------
+
       const CURRENT_VERSION = "2.0.21"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
@@ -1150,7 +1181,7 @@
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
                  (position) => {
-                     userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
+                     userCoords = `https://maps.google.com/?q=$${position.coords.latitude},${position.coords.longitude}`;
                      checkAppAccess(position.coords.latitude, position.coords.longitude);
                   },
                  (error) => { console.warn("GPS Denied on load"); },
@@ -1363,8 +1394,7 @@
               document.getElementById('loginPhoneInput').value = '';
           }, 800);
       }
-      
-      // ==========================================
+        // ==========================================
       // دوال إرسال الديسكورد وتحديث الطلبات الجديدة
       // ==========================================
 
@@ -1419,6 +1449,9 @@
               let hasAvailable = false;
               let hasMyOrders = false;
               
+              // التعديل هنا: تصفير العداد مع كل تحديث للبيانات
+              driverActiveOrders = 0; 
+              
               for(let key in orders) {
                   let order = orders[key];
                   let displayItems = order.items ? order.items.replace(/\n/g, '<br>') : '';
@@ -1444,6 +1477,9 @@
                   } 
                   else if (order.status === 'claimed' && order.driverPhone === myPhone) {
                       hasMyOrders = true;
+                      
+                      // التعديل هنا: زيادة عداد الطلبات النشطة للمندوب
+                      driverActiveOrders++;
                       
                       let locationButtonsHTML = '';
                       if (order.type === 'توصيلة' || order.type === 'تكتك توصيلة') {
@@ -1495,6 +1531,12 @@
       }
 
       async function claimOrder(orderId, customerName, discordMsgId, phone, location, items, land, loyaltyMsg, restOrderNumbers, price, type) {
+          // التعديل هنا: منع الحجز وإظهار نافذة إدخال الكود
+          if (driverActiveOrders >= 1) {
+              document.getElementById('code-entry-modal').style.display = 'flex';
+              return; // يتوقف الكود وما يكمل الحجز
+          }
+
           const driverName = localStorage.getItem('driver_name') || 'كابتن غير معروف';
           const driverPhone = localStorage.getItem('driver_phone') || '';
           
@@ -1517,6 +1559,7 @@
           
           showToast("تم حجز الطلب بنجاح! راجع الطلبات المحجوزة.");
       }
+
       async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
@@ -1847,7 +1890,7 @@
              showToast("جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
+                     (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               } else { showToast("جهازك لا يدعم تحديد الموقع ❌"); }
@@ -1898,7 +1941,7 @@
              showToast("جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
+                     (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -1950,7 +1993,7 @@
              showToast("جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
+                     (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -2013,38 +2056,92 @@
              loadSavedCustomerData();
           } catch (e) { showToast("حدث خطأ أثناء الإرسال ❌"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
-
-      async function processVerifyCode() {
+        async function processVerifyCode() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
-          const code = document.getElementById('driverVerifyInput').value.trim(); const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
-         if(!validateIraqiPhone(custPhone) || !code) return showToast("أدخل بيانات صحيحة ⚠️");
-          const btn = document.querySelector('#plaza-screen .send-btn'); const oldText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
+          const code = document.getElementById('driverVerifyInput').value.trim(); 
+          const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
+          if(!validateIraqiPhone(custPhone) || !code) return showToast("أدخل بيانات صحيحة ⚠️");
+          const btn = document.querySelector('#plaza-screen .send-btn'); 
+          const oldText = btn.innerHTML; 
+          btn.innerHTML = '<span class="baly-spinner"></span>'; 
+          btn.disabled = true;
           try {
               const checkResp = await fetch(`${GS_URL}?action=verifyOrder&phone=${custPhone}&code=${code}`);
               const checkResult = await checkResp.text();
               if (checkResult.startsWith("valid") || checkResult === "valid") {
                   
-                  // ---------- التعديل هنا: إخفاء الطلب من قائمة الطلبات المحجوزة ----------
-                  // تحديث حالة الطلب في الفايربيس إلى (مكتمل) حتى ينحذف من واجهة المندوب
+                  // تحديث حالة الطلب في الفايربيس إلى (مكتمل)
                   if(typeof db !== 'undefined') {
                       db.ref('orders/' + code).update({ status: 'completed' });
                   }
-                  // -------------------------------------------------------------------------
                   
                   try { const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); cashAudio.play(); confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } }); } catch(e) {}
                   let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
-                 logs.unshift({ date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }), phone: custPhone, price: "2,000 د.ع" });
-                 localStorage.setItem('driver_logs', JSON.stringify(logs));
+                  logs.unshift({ date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }), phone: custPhone, price: "2,000 د.ع" });
+                  localStorage.setItem('driver_logs', JSON.stringify(logs));
                   localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
-                 localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
-                 updateStatsUI();
+                  localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
+                  updateStatsUI();
                   let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
-                 fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
-                 syncLoyaltyWithServer(); 
-                 showToast(`تم تأكيد العملية بنجاح! عاشت ايدك 👏`); refreshLeaderboard();
-                 document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
+                  fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
+                  syncLoyaltyWithServer(); 
+                  showToast(`تم تأكيد العملية بنجاح! عاشت ايدك 👏`); refreshLeaderboard();
+                  document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
               } else { showToast("الكود غير صحيح ❌"); }
           } catch(e) {} finally { btn.innerHTML = oldText; btn.disabled = false; }
+      }
+
+      // الدالة الجديدة لمعالجة الكود الإجباري من النافذة الحمراء
+      async function processForcedVerifyCode() {
+          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          const code = document.getElementById('forcedVerifyInput').value.trim();
+          if(!code) return showToast("أدخل الكود أولاً ⚠️");
+
+          const btn = document.querySelector('#code-entry-modal .send-btn');
+          const oldText = btn.innerHTML;
+          btn.innerHTML = '<span class="baly-spinner"></span>';
+          btn.disabled = true;
+
+          try {
+              const myPhone = localStorage.getItem('driver_phone');
+              let targetOrder = null;
+
+              const snapshot = await db.ref('orders').once('value');
+              const orders = snapshot.val();
+              for(let key in orders) {
+                  if(orders[key].status === 'claimed' && orders[key].driverPhone === myPhone && key === code) {
+                      targetOrder = orders[key];
+                      break;
+                  }
+              }
+
+              if (targetOrder) {
+                  await fetch(`${GS_URL}?action=verifyOrder&phone=${targetOrder.phone}&code=${code}`);
+                  db.ref('orders/' + code).update({ status: 'completed' });
+
+                  try { const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); cashAudio.play(); confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } }); } catch(e) {}
+                  let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
+                  logs.unshift({ date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }), phone: targetOrder.phone, price: targetOrder.price || "حسب الاتفاق" });
+                  localStorage.setItem('driver_logs', JSON.stringify(logs));
+                  localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
+                  localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
+                  updateStatsUI();
+                  let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
+                  fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
+                  
+                  showToast(`تم تأكيد تسليم الطلب بنجاح! تكدر تحجز طلب جديد هسه 👏`); 
+                  refreshLeaderboard();
+                  document.getElementById('forcedVerifyInput').value = ""; 
+                  document.getElementById('code-entry-modal').style.display = 'none';
+              } else {
+                  showToast("الكود غير صحيح أو لا يعود لطلبك الحالي ❌");
+              }
+          } catch(e) {
+              showToast("حدث خطأ في التأكيد");
+          } finally {
+              btn.innerHTML = oldText;
+              btn.disabled = false;
+          }
       }
 
       function renderDriverLog() {
@@ -2153,7 +2250,6 @@
           'rken_estkana': {
               name: 'ركن استكانة',
               items: [
-                  // --- قسم أكلات المشاوي ---
                   { id: 'rk1', name: 'كيلو كباب لحم', price: 24000, category: '🥩 قسم أكلات المشاوي', desc: '16 شيش كباب، خبز، سلطة، طرشي، وشطة' },
                   { id: 'rk2', name: 'نفر كباب لحم', price: 6000, category: '🥩 قسم أكلات المشاوي', desc: '4 شيش دبل، 3 خبزات، سلطة، طرشي، وشطة' },
                   { id: 'rk3', name: 'نص نفر كباب لحم', price: 3000, category: '🥩 قسم أكلات المشاوي', desc: '2 شيش، 2 خبزة، سلطة، طرشي، وشطة' },
@@ -2173,7 +2269,6 @@
                   { id: 'rk17', name: 'لفة كباب دجاج', price: 1500, category: '🥩 قسم أكلات المشاوي', desc: 'كباب دجاج، خضروات، وصمون حجري' },
                   { id: 'rk18', name: 'لفة معلاق', price: 1500, category: '🥩 قسم أكلات المشاوي', desc: 'معلاق مشوي، خضروات، وصمون حجري' },
 
-                  // --- قسم الأكلات الغربية ---
                   { id: 'rk19', name: 'بيتزا شاورما لحم (صغير)', price: 7000, category: '🍕 قسم البيتزا' },
                   { id: 'rk20', name: 'بيتزا شاورما لحم (وسط)', price: 10000, category: '🍕 قسم البيتزا' },
                   { id: 'rk21', name: 'بيتزا شاورما لحم (كبير)', price: 14000, category: '🍕 قسم البيتزا' },
@@ -2283,7 +2378,6 @@
                   { id: 'rk121', name: 'ميرندا', price: 500, category: '🥤 المشروبات الباردة' },
                   { id: 'rk122', name: 'شاني', price: 500, category: '🥤 المشروبات الباردة' },
 
-                  // --- قسم الأكلات الشرقية ---
                   { id: 'rk123', name: 'صينية كيلو لحم مندي', price: 45000, category: '🍖 أطباق اللحوم الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
                   { id: 'rk124', name: 'صينية كيلو لحم برياني', price: 45000, category: '🍖 أطباق اللحوم الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
                   { id: 'rk125', name: 'نص لحم (500 غرام)', price: 24000, category: '🍖 أطباق اللحوم الشرقية', desc: 'تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة' },
