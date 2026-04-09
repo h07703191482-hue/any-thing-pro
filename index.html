@@ -1488,12 +1488,13 @@
               editDiscordMessage(discordMsgId, newPublicMsg);
           }
           
-          const privateMsg = `✅ تم حجز الطلب بنجاح\n\n🔑 كود التأكيد: ${orderId}\n\n📦 التفاصيل:\n🔵 طلب ${type}\n👤الزبون: ${customerName}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${items}\n\n💵 المجموع الكلي: ${price}\n🔢 تسلسل طلب العميل: ${loyaltyMsg}\n🔢 رقم طلب (): ${restOrderNumbers}\n📍الموقع: ${location}`;
+          const privateMsg = `✅ تم حجز الطلب بنجاح\n\n🔑 كود التأكيد: ${orderId}\n\n📦 التفاصيل:\n🔵 طلب ${type}\n👤الزبون: ${customerName}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${items}\n🔢 تسلسل طلب العميل: ${loyaltyMsg}\n📍الموقع: ${location}`;
           
           sendToPrivateDiscord(privateMsg);
           
           showToast("تم حجز الطلب بنجاح! راجع الطلبات المحجوزة.");
       }
+    </script>
       async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
