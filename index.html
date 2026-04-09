@@ -330,7 +330,7 @@
      #out-of-zone-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; backdrop-filter: blur(8px); }
       .out-zone-card { background: var(--surface); padding: 35px 20px; border-radius: var(--radius-lg); max-width: 400px; width: 95%; box-shadow: 0 20px 50px rgba(239, 68, 68, 0.2); animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid var(--danger); }
     </style>
-    </head>
+</head>
 <body>
     <div id="out-of-zone-popup">
         <div class="out-zone-card">
@@ -707,11 +707,11 @@
             <i class="fas fa-chevron-left arrow-icon"></i>
           </div>
           
-          <div id="public-orders-btn" class="select-card card-half ripple-dark" style="display: none; border: 1px solid #F59E0B; background: rgba(245, 158, 11, 0.05);" onclick="showScreen('plaza-screen')">
+          <div id="public-orders-btn" class="select-card card-half ripple-dark" style="display: none; border: 1px solid #F59E0B; background: rgba(245, 158, 11, 0.05);" onclick="showScreen('public-orders-screen')">
             <div class="icon-wrapper" style="background: rgba(245, 158, 11, 0.1); color: #F59E0B;"><i class="fas fa-list"></i></div>
             <h3 style="font-size: 15px; color: #F59E0B; margin-top: 5px;">الطلبات العامة</h3>
           </div>
-          <div id="private-orders-btn" class="select-card card-half ripple-dark" style="display: none; border: 1px solid #10B981; background: rgba(16, 185, 129, 0.05);" onclick="showScreen('plaza-screen')">
+          <div id="private-orders-btn" class="select-card card-half ripple-dark" style="display: none; border: 1px solid #10B981; background: rgba(16, 185, 129, 0.05);" onclick="showScreen('private-orders-screen')">
             <div class="icon-wrapper" style="background: rgba(16, 185, 129, 0.1); color: #10B981;"><i class="fas fa-box-open"></i></div>
             <h3 style="font-size: 15px; color: #10B981; margin-top: 5px;">الطلبات المحجوزة</h3>
           </div>
@@ -935,6 +935,28 @@
         </div>
     </div>
     
+    <div id="public-orders-screen" class="screen container">
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-list" style="color:#F59E0B;"></i> الطلبات العامة</h2>
+        <div class="form-card" id="available-orders-section">
+            <div class="form-card-title"><i class="fas fa-motorcycle" style="color: #F59E0B;"></i> حجز الطلبات المتاحة</div>
+            <div id="available-orders-container" style="display: flex; flex-direction: column; gap: 10px;">
+                <p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات متاحة حالياً</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="private-orders-screen" class="screen container">
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-box-open" style="color:#10B981;"></i> الطلبات المحجوزة</h2>
+        <div class="form-card" id="my-active-orders-section">
+            <div class="form-card-title"><i class="fas fa-box-open" style="color: #10B981;"></i> طلباتي الحالية</div>
+            <div id="my-active-orders-container" style="display: flex; flex-direction: column; gap: 10px;">
+                <p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات محجوزة لك حالياً</p>
+            </div>
+        </div>
+    </div>
+
     <div id="plaza-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-briefcase" style="color:#8B5CF6;"></i> لوحة الكابتن</h2>
@@ -958,20 +980,6 @@
            </button>
         </div>
         
-        <div class="form-card" id="my-active-orders-section">
-            <div class="form-card-title"><i class="fas fa-box-open" style="color: #10B981;"></i> طلباتي الحالية</div>
-            <div id="my-active-orders-container" style="display: flex; flex-direction: column; gap: 10px;">
-                <p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات محجوزة لك حالياً</p>
-            </div>
-        </div>
-
-        <div class="form-card" id="available-orders-section">
-            <div class="form-card-title"><i class="fas fa-motorcycle" style="color: #F59E0B;"></i> حجز الطلبات المتاحة</div>
-            <div id="available-orders-container" style="display: flex; flex-direction: column; gap: 10px;">
-                <p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات متاحة حالياً</p>
-            </div>
-        </div>
-
         <div class="form-card" style="background: linear-gradient(135deg, var(--primary) 0%, #818CF8 100%); color:white; border:none;">
             <h4 style="color:rgba(255,255,255,0.8); margin:0; font-size:15px;">إجمالي العمليات المنجزة 📦</h4>
             <p id="stat-count" style="font-size: 45px; font-weight:800; color:white; margin:10px 0 0;">0</p>
@@ -1484,9 +1492,8 @@
           
           sendToPrivateDiscord(privateMsg);
           
-          showToast("تم حجز الطلب بنجاح! راجع خانة طلباتي الحالية بالأسفل.");
+          showToast("تم حجز الطلب بنجاح! راجع الطلبات المحجوزة.");
       }
-
       async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
