@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#5A228B">
+    <meta name="theme-color" content="#1D4ED8">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -79,35 +79,35 @@
 
       #prices-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100005; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;}
      .prices-container { width: 100%; max-width: 400px; background: var(--surface); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-floating); display: flex; flex-direction: column; animation: scaleIn 0.3s ease-out;}
-      .prices-header { padding: 18px; background: var(--primary); background: linear-gradient(135deg, var(--primary) 0%, #3B1261 100%); color: white; text-align: center; font-weight: 800; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
+      .prices-header { padding: 18px; background: var(--primary); background: linear-gradient(135deg, var(--primary) 0%, #1E3A8A 100%); color: white; text-align: center; font-weight: 800; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
      .close-prices-btn { background: transparent; border: none; color: white; font-size: 22px; cursor: pointer; padding: 0; transition: 0.3s; }
      .close-prices-btn:active { transform: scale(0.8); }
       .prices-content { padding: 10px 20px 20px; max-height: 60vh; overflow-y: auto; }
       .price-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed var(--border-color); font-weight: 700; font-size: 15px; color: var(--text-main);}
      .price-item:last-child { border-bottom: none; }
       .price-item i { color: var(--gold); margin-left: 8px; width: 20px; text-align: center;}
-      .price-val { color: var(--primary); font-weight: 900; background: rgba(90, 34, 139, 0.1); padding: 4px 12px; border-radius: var(--radius-pill); font-size: 14px;}
+      .price-val { color: var(--primary); font-weight: 900; background: rgba(37, 99, 235, 0.1); padding: 4px 12px; border-radius: var(--radius-pill); font-size: 14px;}
       body.dark-mode .price-val { background: rgba(255, 255, 255, 0.1); color: var(--gold); }
 
       #success-order-modal { display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0,0,0,0.85) !important; z-index: 9999999 !important; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; box-sizing: border-box; margin: 0; }
       #success-order-modal > div { width: 100%; max-width: 400px; background: var(--surface); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; text-align: center; padding: 35px 20px; border: 2px solid #10B981; position: relative; animation: scaleIn 0.3s ease-out; }
 
       :root { 
-          --primary: #5A228B; --primary-hover: #4A1A75; --secondary: #FFC107; --gold: #FFC107; 
+          --primary: #2563EB; --primary-hover: #1D4ED8; --secondary: #FFC107; --gold: #FFC107; 
           --danger: #EF4444; --bg-color: #F4F6F9; --surface: #FFFFFF; --text-main: #111827; 
          --text-muted: #6B7280; --border-color: #E5E7EB; --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.04);
-          --shadow-md: 0 10px 30px rgba(90, 34, 139, 0.1); --shadow-floating: 0 20px 40px rgba(0, 0, 0, 0.12);
+          --shadow-md: 0 10px 30px rgba(37, 99, 235, 0.1); --shadow-floating: 0 20px 40px rgba(0, 0, 0, 0.12);
           --radius-md: 20px; --radius-lg: 24px; --radius-pill: 9999px;
       }
       body.dark-mode {
-          --primary: #7A3BBA; --bg-color: #121212; --surface: #1E1E1E; --text-main: #F9FAFB;
+          --primary: #3B82F6; --bg-color: #121212; --surface: #1E1E1E; --text-main: #F9FAFB;
          --text-muted: #9CA3AF; --border-color: #334155; --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.2);
           --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.4); --shadow-floating: 0 20px 40px rgba(0, 0, 0, 0.5);
       }
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
       body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; color: var(--text-main); min-height: 100vh; line-height: 1.6; overflow-x: hidden; transition: background-color 0.4s ease, color 0.4s ease; }
-      body::before { content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(90, 34, 139, 0.03) 0%, transparent 50%); z-index: -1; pointer-events: none; }
-     body.dark-mode::before { background: radial-gradient(circle at 50% 0%, rgba(122, 59, 186, 0.08) 0%, transparent 50%); }
+      body::before { content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.03) 0%, transparent 50%); z-index: -1; pointer-events: none; }
+     body.dark-mode::before { background: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 50%); }
       
       .ripple { position: relative; overflow: hidden; }
       .ripple::after { content: ""; position: absolute; top: 50%; left: 50%; width: 150%; padding-top: 150%; background: rgba(255, 255, 255, 0.3); border-radius: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; transition: transform 0.4s, opacity 0.4s; pointer-events: none; }
@@ -157,7 +157,7 @@
       @keyframes smoke-bloom { 0% { transform: translate(0, 0) scale(1); opacity: 0; } 20% { opacity: 0.7; } 100% { transform: translate(40px, -40px) scale(3); opacity: 0; filter: blur(5px); } }
       @keyframes drive-left { 0% { left: 110%; } 100% { left: -30%; } }
       
-      .header-main { background: var(--primary); background: linear-gradient(135deg, var(--primary) 0%, #3B1261 100%); color: white; padding: 70px 20px 80px; text-align: center; border-radius: 0 0 30px 30px; margin: -20px -20px 20px -20px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
+      .header-main { background: var(--primary); background: linear-gradient(135deg, var(--primary) 0%, #1E3A8A 100%); color: white; padding: 70px 20px 80px; text-align: center; border-radius: 0 0 30px 30px; margin: -20px -20px 20px -20px; box-shadow: var(--shadow-md); position: relative; overflow: hidden; }
       .header-main h1 { margin: 0; font-size: 28px; font-weight: 800; text-shadow: 0 2px 10px rgba(0,0,0,0.2); cursor: pointer; }
       .header-main p { margin: 8px 0 0; font-size: 15px; opacity: 0.9; font-weight: 600; }
      .driver-status-bar { display: none; background: var(--gold); color: #000; font-weight: 800; letter-spacing: 0.5px; font-size: 12px; padding: 6px 0; position: absolute; top: 0; left: 0; width: 100%; z-index: 10; text-align: center; transition: background 0.3s ease, color 0.3s ease; }
@@ -177,7 +177,7 @@
       .card-half h3 { margin: 0; font-size: 16px; font-weight: 800; }
       .card-half small { color: var(--text-muted); font-size: 12px; font-weight: 600; line-height: 1.4; display: block; }
       .card-half .arrow-icon { display: none; }
-      .card-cart .icon-wrapper { background: rgba(90, 34, 139, 0.1); color: var(--primary); }
+      .card-cart .icon-wrapper { background: rgba(37, 99, 235, 0.1); color: var(--primary); }
       .card-med .icon-wrapper { background: rgba(249, 115, 22, 0.1); color: #F97316; }
       .card-tuk .icon-wrapper { background: rgba(255, 193, 7, 0.15); color: #D97706; }
       .card-join .icon-wrapper { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
@@ -194,13 +194,13 @@
       .form-group label { display: block; font-size: 13px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; }
       input, textarea, select { width: 100%; padding: 16px 20px; border: 1.5px solid var(--border-color); border-radius: var(--radius-md); font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-main); background: var(--bg-color); transition: all 0.3s ease; appearance: none; }
      input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 0.7; font-weight: 500;}
-      input:focus, textarea:focus, select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 4px rgba(90, 34, 139, 0.1); outline: none; }
+      input:focus, textarea:focus, select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); outline: none; }
       .location-btn { background: var(--bg-color); color: var(--primary); border: 2px dashed var(--primary); padding: 14px; border-radius: var(--radius-md); width: 100%; font-family: 'Cairo'; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 12px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
      .location-btn:active { transform: scale(0.96); }
      .location-btn.success { background: rgba(16, 185, 129, 0.1); color: #10B981; border-color: #10B981; border-style: solid; }
       .phone-note { color: var(--danger); font-size: 12px; font-weight: 600; margin-top: 6px; display: block; text-align: right; padding-right: 5px; }
-      .send-btn { background: linear-gradient(135deg, var(--primary) 0%, #3B1261 100%); color: white; width: 100%; padding: 18px; border-radius: var(--radius-md); border: none; font-weight: 800; font-size: 18px; letter-spacing: 0.5px; cursor: pointer; box-shadow: 0 8px 20px rgba(90, 34, 139, 0.3); margin-top: 10px; transition: all 0.3s ease; }
-      .send-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(90, 34, 139, 0.2); }
+      .send-btn { background: linear-gradient(135deg, var(--primary) 0%, #1E3A8A 100%); color: white; width: 100%; padding: 18px; border-radius: var(--radius-md); border: none; font-weight: 800; font-size: 18px; letter-spacing: 0.5px; cursor: pointer; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); margin-top: 10px; transition: all 0.3s ease; }
+      .send-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
      .send-btn:disabled { background: var(--border-color) !important; color: var(--text-muted) !important; cursor: not-allowed; box-shadow: none !important; transform: none !important; }
       .back-btn { background: var(--surface); border: 1px solid var(--border-color); font-size: 18px; color: var(--text-main); width: 45px; height: 45px; border-radius: 14px; margin-bottom: 25px; box-shadow: var(--shadow-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
       .back-btn:active { transform: translateX(5px); }
@@ -216,7 +216,7 @@
       body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.9); border-color: rgba(255,255,255,0.05); }
       .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 15px; color: var(--text-muted); text-decoration: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; border-radius: var(--radius-pill); position: relative; }
       .nav-item i { font-size: 20px; transition: transform 0.3s; }
-      .nav-item.active { color: var(--primary); background: rgba(90, 34, 139, 0.1); }
+      .nav-item.active { color: var(--primary); background: rgba(37, 99, 235, 0.1); }
       .nav-item.active i { transform: translateY(-2px); }
       #toast-container { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 100000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 350px; }
       .toast { background: rgba(17, 24, 39, 0.95); color: white; padding: 16px 20px; border-radius: var(--radius-lg); box-shadow: var(--shadow-floating); font-family: 'Cairo', sans-serif; font-size: 14px; font-weight: 700; animation: slideDownToast 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards, fadeOutToast 0.4s ease forwards 3s; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px); }
@@ -249,7 +249,7 @@
       .sidebar-close { align-self: flex-start; font-size: 15px; color: var(--text-muted); cursor: pointer; background: var(--bg-color); padding: 10px 20px; border-radius: var(--radius-pill); display: flex; align-items: center; gap: 8px; transition: 0.3s; font-weight: 700; margin-bottom: 20px; }
       #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--text-main); text-align: center; padding: 20px; }
       
-      .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(90, 34, 139, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
+      .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(37, 99, 235, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
       .location-notice { font-size: 13px; font-weight: 700; color: #10B981; text-align: center; margin-bottom: 15px; display: block; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: var(--radius-md); border: 1px dashed #10B981;}
 
       .rest-slider { display: grid; grid-template-rows: repeat(2, 1fr); grid-auto-flow: column; grid-auto-columns: 120px; overflow-x: auto; gap: 15px; padding: 0 20px 20px; scroll-snap-type: x mandatory; }
@@ -332,7 +332,7 @@
      #out-of-zone-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; backdrop-filter: blur(8px); }
       .out-zone-card { background: var(--surface); padding: 35px 20px; border-radius: var(--radius-lg); max-width: 400px; width: 95%; box-shadow: 0 20px 50px rgba(239, 68, 68, 0.2); animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid var(--danger); }
     </style>
-    </head>
+</head>
 <body>
     <div id="out-of-zone-popup">
         <div class="out-zone-card">
@@ -428,7 +428,7 @@
             <p style="color: #EF4444; font-size: 14px; font-weight: 800; margin-bottom: 25px;">
                 ⚠️ لا تقوم بإرسال طلب آخر بالغلط لتجنب تكرار الطلب!
             </p>
-            <button class="ripple" style="margin: 0; background: #5A228B; color: white; width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 800; font-size: 18px; cursor: pointer;" onclick="document.getElementById('success-order-modal').style.display='none'">
+            <button class="ripple" style="margin: 0; background: #2563EB; color: white; width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 800; font-size: 18px; cursor: pointer;" onclick="document.getElementById('success-order-modal').style.display='none'">
                 رجوع <i class="fas fa-arrow-left"></i>
             </button>
         </div>
@@ -482,7 +482,7 @@
     <div class="sidebar" id="appSidebar">
         <div class="sidebar-close ripple-dark" id="side-close-text" onclick="closeSidebar()"><i class="fas fa-arrow-right"></i> إغلاق</div>
         <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width:80px; height:80px; background:rgba(90, 34, 139, 0.1); border-radius:24px; display:flex; align-items:center; justify-content:center; margin: 0 auto 15px;">
+            <div style="width:80px; height:80px; background:rgba(37, 99, 235, 0.1); border-radius:24px; display:flex; align-items:center; justify-content:center; margin: 0 auto 15px;">
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
            </div>
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">البندر</h3>
@@ -541,7 +541,7 @@
 
     <div id="login-screen" class="screen container">
         <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width:100px; height:100px; background:rgba(90, 34, 139, 0.1); border-radius:30px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: var(--shadow-sm);">
+            <div style="width:100px; height:100px; background:rgba(37, 99, 235, 0.1); border-radius:30px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: var(--shadow-sm);">
                 <i class="fas fa-user-circle" style="font-size: 50px; color: var(--primary);"></i>
            </div>
             <h2 style="margin: 0; font-weight: 800; font-size: 28px; color: var(--text-main);">أهلاً بيك في البندر</h2>
@@ -611,7 +611,16 @@
         <p id="main-sub">شنو مشتهين اليوم؟</p>
       </div>
 
-      <div style="margin-top: -45px; position: relative; z-index: 5;">
+      <div style="padding: 0 5px; position: relative; z-index: 5; margin-top: -30px; margin-bottom: 15px;">
+          <div class="select-card ripple" style="padding: 12px; display: flex; align-items: center; gap: 10px; border: 2px solid var(--danger); background: rgba(239, 68, 68, 0.1);">
+              <i class="fas fa-clock" style="font-size: 24px; color: var(--danger);"></i>
+              <div>
+                 <h4 style="margin: 0; font-size: 14px; font-weight: 800; color: var(--danger);">تنبيه النظام</h4>
+                 <small style="color: var(--text-main); font-weight: 600;">التطبيق يتوقف عن العمل تلقائياً من الساعة 2 ليلاً حتى 10 صباحاً.</small>
+             </div>
+          </div>
+      </div>
+      <div style="position: relative; z-index: 5;">
           <div class="rest-slider">
              <div class="rest-card ripple" onclick="openMenu('rken_estkana')">
                  <img src="Rken.jpg" alt="ركن استكانة">
@@ -1035,7 +1044,6 @@
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
     </div>
-    
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser"; 
@@ -1063,11 +1071,8 @@
       const ROYAL_FOOD_CHAT_ID = "-1003798976901";
 
       let userCoords = ""; 
-      
-      // ----------- الإضافة الجديدة هنا -----------
-      let driverActiveOrders = 0; // متغير لحساب عدد الطلبات النشطة للمندوب
-      let forcedVerifyCustomerPhone = ""; // لحفظ رقم هاتف الزبون لعملية التقييد
-      // -----------------------------------------
+      let driverActiveOrders = 0; 
+      let forcedVerifyCustomerPhone = ""; 
 
       const CURRENT_VERSION = "2.0.21"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
@@ -1115,6 +1120,35 @@
       let orderPollInterval = null;
       let isSoundEnabled = localStorage.getItem('sound_enabled') === 'true';
       const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+
+      // دالة الإغلاق التلقائي حسب الوقت
+      function checkTimeLock() {
+          const now = new Date();
+          const hour = now.getHours();
+          const lockScreen = document.getElementById('global-lock-screen');
+          const lockTitle = document.getElementById('lock-h2');
+          const lockDesc = document.getElementById('lock-p');
+          const isAdmin = localStorage.getItem('isAdmin') === 'true';
+
+          // إذا كانت الساعة من 2 فجراً حتى 10 صباحاً
+          if (hour >= 2 && hour < 10) {
+              appIsActive = false;
+              if (lockScreen && !isAdmin) {
+                  lockScreen.style.display = 'flex';
+                  if(lockTitle) lockTitle.innerText = "وقت الراحة 😴";
+                  if(lockDesc) lockDesc.innerText = "التطبيق مغلق حالياً، نرجع نستقبل طلباتكم الساعة 10 صباحاً. تصبحون على خير!";
+              }
+              return true; // التطبيق مقفل
+          }
+          
+          // إرجاع النصوص لحالتها الطبيعية في حال لم يكن وقت الإغلاق
+          if(lockTitle && lockTitle.innerText === "وقت الراحة 😴") {
+              lockTitle.innerText = "التطبيق مغلق للصيانة 🛠️";
+              lockDesc.innerText = "نعتذر منكم عيني، دا نسوي شوية تحديثات وتطوير للتطبيق. نرجع نستقبل طلباتكم بأقرب وقت!";
+          }
+          
+          return false; // التطبيق متاح
+      }
 
       function checkPhoneLive(input) {
           let errorSpan = input.parentNode.querySelector('.phone-error');
@@ -1172,6 +1206,7 @@
          checkNewOrdersForSound(); 
          orderPollInterval = setInterval(checkNewOrdersForSound, 10000); 
       }
+
       function initAutoLocation() {
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
@@ -1238,6 +1273,12 @@
 
       async function checkGlobalStatusFromServer() {
           try {
+              // التحقق من الوقت أولاً
+              if (checkTimeLock()) {
+                  applyGlobalStatus();
+                  return; // إيقاف الفحص إذا كان التطبيق مغلقاً بسبب الوقت
+              }
+
               const resp = await fetch(`${GS_URL}?action=getAppStatus&t=${new Date().getTime()}`);
               const status = await resp.text();
               const lockScreen = document.getElementById('global-lock-screen');
@@ -1389,9 +1430,6 @@
               document.getElementById('loginPhoneInput').value = '';
           }, 800);
       }
-        // ==========================================
-      // دوال إرسال الديسكورد وتحديث الطلبات الجديدة
-      // ==========================================
 
       async function sendToDiscord(msg, orderId) {
           try {
@@ -1444,7 +1482,6 @@
               let hasAvailable = false;
               let hasMyOrders = false;
               
-              // التعديل هنا: تصفير العداد مع كل تحديث للبيانات
               driverActiveOrders = 0; 
               
               for(let key in orders) {
@@ -1472,8 +1509,6 @@
                   } 
                   else if (order.status === 'claimed' && order.driverPhone === myPhone) {
                       hasMyOrders = true;
-                      
-                      // التعديل هنا: زيادة عداد الطلبات النشطة للمندوب
                       driverActiveOrders++;
                       
                       let locationButtonsHTML = '';
@@ -1526,10 +1561,9 @@
       }
 
       async function claimOrder(orderId, customerName, discordMsgId, phone, location, items, land, loyaltyMsg, restOrderNumbers, price, type) {
-          // التعديل هنا: منع الحجز وإظهار نافذة إدخال الكود
           if (driverActiveOrders >= 1) {
               document.getElementById('code-entry-modal').style.display = 'flex';
-              return; // يتوقف الكود وما يكمل الحجز
+              return; 
           }
 
           const driverName = localStorage.getItem('driver_name') || 'كابتن غير معروف';
@@ -1748,7 +1782,7 @@
          checkStatus();
          initAutoLocation(); 
          
-         setInterval(checkGlobalStatusFromServer, 10000);
+         setInterval(checkGlobalStatusFromServer, 10000); // يفحص الوقت والحالة كل 10 ثواني
          
          document.addEventListener("visibilitychange", function() {
               if (document.visibilityState === 'visible') {
