@@ -1131,7 +1131,7 @@
           const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
           // إذا كانت الساعة من 2 فجراً حتى 10 صباحاً
-          if (hour >= 2 && hour < 10) {
+         if (hour >= 2 && hour < 8) {
               appIsActive = false;
               if (lockScreen && !isAdmin) {
                   lockScreen.style.display = 'flex';
