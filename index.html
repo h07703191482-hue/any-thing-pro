@@ -1074,7 +1074,7 @@
       let driverActiveOrders = 0; 
       let forcedVerifyCustomerPhone = ""; 
 
-      const CURRENT_VERSION = "2.0.22"; 
+      const CURRENT_VERSION = "2.0.23"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
           window.location.reload(true); 
@@ -1250,24 +1250,59 @@
           }
       }
       
-      async function setGlobalAppStatus(newStatus) {
+     async function setGlobalAppStatus(newStatus) {
           const btnOpen = document.getElementById('btn-open-app');
           const btnClose = document.getElementById('btn-close-app');
           if(newStatus === 'online') { btnOpen.innerHTML = '<span class="baly-spinner"></span>'; } 
           else { btnClose.innerHTML = '<span class="baly-spinner"></span>'; }
-         btnOpen.disabled = true; btnClose.disabled = true;
+          btnOpen.disabled = true; btnClose.disabled = true;
+          
           try {
-              await fetch(`${GS_URL}?action=setAppStatus&status=${newStatus}&t=${new Date().getTime()}`, { mode: 'no-cors' });
-             showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
-              setTimeout(() => { checkGlobalStatusFromServer(); }, 1500);
+              if(typeof db !== 'undefined') {
+                  await db.ref('settings/app_status').set(newStatus);
+                  showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
+              }
           } catch(e) {
-             showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
-             setTimeout(() => { checkGlobalStatusFromServer(); }, 1500);
-          } 
-          finally { 
-             btnOpen.innerHTML = '<i class="fas fa-unlock"></i>فتح التطبيق';
-             btnClose.innerHTML = '<i class="fas fa-lock"></i> إغلاق التطبيق';
-             btnOpen.disabled = false; btnClose.disabled = false;
+              showToast("حدث خطأ في الاتصال ❌");
+          } finally { 
+              btnOpen.innerHTML = '<i class="fas fa-unlock"></i> فتح التطبيق';
+              btnClose.innerHTML = '<i class="fas fa-lock"></i> إغلاق التطبيق';
+              btnOpen.disabled = false; btnClose.disabled = false;
+          }
+      }
+
+      function listenToGlobalStatus() {
+          if(typeof db === 'undefined') return;
+          
+          db.ref('settings/app_status').on('value', (snapshot) => {
+              if (checkTimeLock()) {
+                  applyGlobalStatus();
+                  hideSplash();
+                  return; 
+              }
+
+              const status = snapshot.val() || 'online'; 
+              const lockScreen = document.getElementById('global-lock-screen');
+              const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
+              
+              if (status === "offline") {
+                 appIsActive = false;
+                 if(lockScreen && !isAdmin) lockScreen.style.display = 'flex'; 
+                 else if(lockScreen && isAdmin) lockScreen.style.display = 'none';
+              } else {
+                 appIsActive = true;
+                 if(lockScreen) lockScreen.style.display = 'none'; 
+              }
+              applyGlobalStatus();
+              hideSplash();
+          });
+      }
+
+      function hideSplash() {
+          const splash = document.getElementById('splash-screen');
+          if(splash && splash.style.display !== 'none') { 
+              splash.style.opacity = '0'; 
+              setTimeout(() => splash.style.display = 'none', 500); 
           }
       }
 
@@ -1745,7 +1780,7 @@
       }
 
       function checkStatus() {
-         trackLiveVisit(); checkConnection(); applyAutoTheme(); checkGlobalStatusFromServer(); 
+         trackLiveVisit(); checkConnection(); applyAutoTheme(); listenToGlobalStatus(); 
          fetchDynamicMenus(); 
           const urlParams = new URLSearchParams(window.location.search);
           const ref = urlParams.get('ref');
@@ -1778,25 +1813,19 @@
           }
       }
 
-     document.addEventListener('DOMContentLoaded', () => {
+   document.addEventListener('DOMContentLoaded', () => {
          checkStatus();
          initAutoLocation(); 
          
-         setInterval(checkGlobalStatusFromServer, 10000); // يفحص الوقت والحالة كل 10 ثواني
+         setInterval(() => {
+             if (checkTimeLock()) applyGlobalStatus();
+         }, 60000); 
          
          document.addEventListener("visibilitychange", function() {
               if (document.visibilityState === 'visible') {
-                 checkGlobalStatusFromServer();
+                  if (checkTimeLock()) applyGlobalStatus();
               }
           });
-
-          setTimeout(() => {
-              const splash = document.getElementById('splash-screen');
-              if(splash && splash.style.display !== 'none') {
-                  splash.style.opacity = '0';
-                  setTimeout(() => splash.style.display = 'none', 500);
-              }
-          }, 3000);
       });
 
       function shareApp() {
