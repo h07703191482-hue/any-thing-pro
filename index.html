@@ -486,7 +486,7 @@
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
            </div>
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">البندر</h3>
-            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.23</p>
+            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.25</p>
         </div>
         <div class="sidebar-item ripple-dark" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
             <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
@@ -538,7 +538,6 @@
       <div class="road-realistic"><div class="road-lines"></div></div>
       <div class="bike-box"><i class="fas fa-motorcycle"></i><div class="exhaust"><div class="smoke"></div><div class="smoke"></div><div class="smoke"></div></div></div>
     </div>
-
     <div id="login-screen" class="screen container">
         <div style="text-align: center; margin-bottom: 30px;">
             <div style="width:100px; height:100px; background:rgba(90, 34, 139, 0.1); border-radius:30px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: var(--shadow-sm);">
@@ -1042,8 +1041,7 @@
         <button class="back-btn ripple-dark" onclick="showScreen('plaza-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الطلبات المنجزة</h2>
         <div id="driver-log-container"></div>
-    </div>
-    <script>
+    </div><script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser"; 
       const ADMIN_CHAT_ID = "7479342799"; 
@@ -1103,7 +1101,7 @@
 
           const accessGranted = isUserInUmQasr(lat, lng, umQasrPolygon);
           if (!accessGranted) {
-             document.getElementById('out-of-zone-popup').style.display = 'flex';
+              document.getElementById('out-of-zone-popup').style.display = 'flex';
           }
       }
 
@@ -1207,7 +1205,7 @@
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
                  (position) => {
-                     userCoords = `https://maps.google.com/?q=$${position.coords.latitude},${position.coords.longitude}`;
+                     userCoords = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
                      checkAppAccess(position.coords.latitude, position.coords.longitude);
                   },
                  (error) => { console.warn("GPS Denied on load"); },
@@ -1216,7 +1214,6 @@
           }
       }
 
-      // الدالة الخاصة بالضغط على كلمة البندر (محدثة)
       function handleSecretClick() {
          secretCounter++;
           if (secretCounter === 5) {
@@ -1225,7 +1222,6 @@
               if (pass === "2006") {
                  localStorage.setItem('isAdmin', 'true'); 
                  
-                 // إضافة زر "فك الحظر" تلقائياً داخل لوحة التحكم إذا ما كان موجود
                  let adminCard = document.querySelector('#admin-panel .form-card');
                  if (adminCard && !document.getElementById('btn-unblock-order')) {
                      let unblockHtml = `
@@ -1246,7 +1242,6 @@
           }
       }
 
-      // الدالة الجديدة الخاصة بفك الحظر
       function unlockSecondOrder() {
           localStorage.setItem('allow_second_order', 'true');
           showToast("تم فك الحظر بنجاح! تكدر هسه تحجز طلب ثاني. 🔓");
@@ -1625,7 +1620,6 @@
           });
       }
 
-      // المنطق مال حجز الطلب والتحقق من الحظر
       async function claimOrder(orderId, customerName, discordMsgId, phone, location, items, land, loyaltyMsg, restOrderNumbers, price, type) {
           let limit = localStorage.getItem('allow_second_order') === 'true' ? 2 : 1;
           
@@ -1980,7 +1974,7 @@
              showToast("جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               } else { showToast("جهازك لا يدعم تحديد الموقع ❌"); }
@@ -2031,7 +2025,7 @@
              showToast("جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -2083,7 +2077,7 @@
              showToast("جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -2327,7 +2321,7 @@
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
       function confirmMapLocation() {
           const center = appMap.getCenter();
-          const googleMapsLink = `https://maps.google.com/?q=$${center.lat},${center.lng}`;
+          const googleMapsLink = `https://www.google.com/maps?q=${center.lat},${center.lng}`;
          document.getElementById('tukDropoffLink').value = googleMapsLink;
          document.getElementById('map-success-msg').style.display = 'block';
          closeMapModal();
