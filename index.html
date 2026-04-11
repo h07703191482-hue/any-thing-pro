@@ -486,7 +486,7 @@
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
            </div>
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">البندر</h3>
-            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.25</p>
+            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.26</p>
         </div>
         <div class="sidebar-item ripple-dark" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
             <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
@@ -601,6 +601,7 @@
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
+    
     <div id="home-screen" class="screen container active-screen">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
@@ -741,6 +742,7 @@
 
       </div>
     </div>
+    
     <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> <span id="restaurant-name-header">اسم المطعم</span></h2>
@@ -824,6 +826,33 @@
         
         <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
             ⚠️ تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
+        </div>
+
+        <div class="form-card" style="border-right: 4px solid #F97316;">
+            <div class="form-card-title"><i class="fas fa-info-circle" style="color: #F97316;"></i> أسعار خدمة الوسيط 🤝</div>
+            <div class="prices-content" style="padding: 0; max-height: 200px; overflow-y: auto;">
+               <div class="price-item"><span style="flex:1;">الخمسين</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">المشروع</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">حي المعلمين</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">شوارع</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">هندية جنوبية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">الهندسة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">شعبي</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">دور الظباط</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">دور سمنت</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">البهو</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">صناعة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">هندية الشمالية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">ميناء الجنوبي</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">الارصفة العشرة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">ميناء 27</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">الترحيب</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">القاعدة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">2,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">هدامة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">2,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">الصمود</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">4,000 د.ع</span></div>
+               <div class="price-item"><span style="flex:1;">الستباقية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">7,000 د.ع</span></div>
+               <div class="price-item" style="border-bottom: none;"><span style="flex:1;">التحليات</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">7,000 د.ع</span></div>
+            </div>
         </div>
         
         <div class="form-card" id="med-user-card">
@@ -972,6 +1001,12 @@
     <div id="private-orders-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-box-open" style="color:#10B981;"></i> الطلبات المحجوزة</h2>
+        
+        <div class="note" style="background: rgba(16, 185, 129, 0.1); border-right-color: #10B981; color: #065F46; font-size: 14px; font-weight: 800; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
+            <i class="fas fa-bullhorn" style="font-size: 20px; color: #10B981;"></i> 
+            <span style="display: block; margin-top: 5px;">ملاحظة للكابتن: 500 دينار من أجرة كل طلب تعود لصاحب التطبيق.</span>
+        </div>
+
         <div class="form-card" id="my-active-orders-section">
             <div class="form-card-title"><i class="fas fa-box-open" style="color: #10B981;"></i> طلباتي الحالية</div>
             <div id="my-active-orders-container" style="display: flex; flex-direction: column; gap: 10px;">
