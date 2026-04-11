@@ -2327,7 +2327,7 @@
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
       function confirmMapLocation() {
           const center = appMap.getCenter();
-          const googleMapsLink = `https://maps.google.com/?q=$${center.lat},${center.lng}`;
+          const googleMapsLink = `https://maps.google.com/?q=$${center.lat},0{center.lng}`;
          document.getElementById('tukDropoffLink').value = googleMapsLink;
          document.getElementById('map-success-msg').style.display = 'block';
          closeMapModal();
