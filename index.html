@@ -1207,11 +1207,12 @@
          orderPollInterval = setInterval(checkNewOrdersForSound, 10000); 
       }
 
-      function initAutoLocation() {
+     function initAutoLocation() {
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
                  (position) => {
-                     userCoords = `https://maps.google.com/?q=$${position.coords.latitude},${position.coords.longitude}`;
+                     // تم تصحيح الرابط هنا
+                     userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`;
                      checkAppAccess(position.coords.latitude, position.coords.longitude);
                   },
                  (error) => { console.warn("GPS Denied on load"); },
@@ -1219,7 +1220,6 @@
               );
           }
       }
-
       function handleSecretClick() {
          secretCounter++;
           if (secretCounter === 5) {
@@ -1987,7 +1987,7 @@
           if (typeof closeSidebar === 'function') closeSidebar();
       }
 
-      async function sendTukOrder() {
+     async function sendTukOrder() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const name = document.getElementById('tukName').value.trim(); const phone = document.getElementById('tukPhone').value.trim();
           const land = document.getElementById('tukLandmark').value.trim(); const dropLink = document.getElementById('tukDropoffLink').value.trim(); 
@@ -1996,7 +1996,11 @@
              showToast("جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
+                     (pos) => { 
+                         // تصحيح الرابط
+                         userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; 
+                         sendTukOrder(); 
+                     },
                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               } else { showToast("جهازك لا يدعم تحديد الموقع ❌"); }
@@ -2038,7 +2042,15 @@
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
-      async function sendMedFinal() {
+              const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: تحصيل/تسليم - ${dropLink}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}\nموقع الزبون: ${userCoords}`;
+              await sendToDiscord(msg, vc); 
+             
+             document.getElementById('success-order-modal').style.display = 'flex';
+             document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+          } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
+      }
+
+    async function sendMedFinal() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const name = document.getElementById('medName').value.trim(); const phone = document.getElementById('medPhone').value.trim(); const order = document.getElementById('medOrder').value.trim();
           const land = document.getElementById('medLandmark').value.trim();
@@ -2047,7 +2059,11 @@
              showToast("جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
+                     (pos) => { 
+                         // تصحيح الرابط
+                         userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; 
+                         sendMedFinal(); 
+                     },
                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -2088,7 +2104,15 @@
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
-      async function sendFinal() {
+             const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${order}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}\nموقع الزبون: ${userCoords}`;
+             await sendToDiscord(msg, vc); 
+             
+             document.getElementById('success-order-modal').style.display = 'flex';
+             document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+          } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
+      }
+
+     async function sendFinal() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const name = document.getElementById('custName').value.trim(); 
           const phone = document.getElementById('custPhone').value.trim();
@@ -2099,7 +2123,11 @@
              showToast("جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
+                     (pos) => { 
+                         // تصحيح الرابط
+                         userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; 
+                         sendFinal(); 
+                     },
                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -2154,6 +2182,14 @@
                       timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords
                   });
               }
+              const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${msgContent}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}${restOrderNumbers}\nموقع الزبون: ${userCoords}`;
+              await sendToDiscord(msg, vc);
+             document.getElementById('success-order-modal').style.display = 'flex';
+             document.getElementById('custOrder').value = ""; 
+             document.getElementById('custLandmark').value = ""; 
+             loadSavedCustomerData();
+          } catch (e) { showToast("حدث خطأ أثناء الإرسال ❌"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
+      }
               const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${msgContent}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}${restOrderNumbers}\nموقع الزبون: ${userCoords}`;
               await sendToDiscord(msg, vc);
              document.getElementById('success-order-modal').style.display = 'flex';
@@ -2341,9 +2377,10 @@
          setTimeout(() => { appMap.invalidateSize(); }, 300);
       }
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
-      function confirmMapLocation() {
+     function confirmMapLocation() {
           const center = appMap.getCenter();
-          const googleMapsLink = `https://maps.google.com/?q=$${center.lat},${center.lng}`;
+          // تم تصحيح الرابط هنا
+          const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng}`;
          document.getElementById('tukDropoffLink').value = googleMapsLink;
          document.getElementById('map-success-msg').style.display = 'block';
          closeMapModal();
