@@ -602,7 +602,6 @@
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
-    
     <div id="home-screen" class="screen container active-screen">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
@@ -1121,7 +1120,6 @@
       let isSoundEnabled = localStorage.getItem('sound_enabled') === 'true';
       const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
-      // دالة الإغلاق التلقائي حسب الوقت
       function checkTimeLock() {
           const now = new Date();
           const hour = now.getHours();
@@ -1130,7 +1128,6 @@
           const lockDesc = document.getElementById('lock-p');
           const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
-          // إذا كانت الساعة من 2 فجراً حتى 8 صباحاً
          if (hour >= 2 && hour < 8) {
               appIsActive = false;
               if (lockScreen && !isAdmin) {
@@ -1138,16 +1135,15 @@
                   if(lockTitle) lockTitle.innerText = "وقت الراحة 😴";
                   if(lockDesc) lockDesc.innerText = "التطبيق مغلق حالياً، نرجع نستقبل طلباتكم الساعة 8 صباحاً. تصبحون على خير!";
               }
-              return true; // التطبيق مقفل
+              return true; 
           }
           
-          // إرجاع النصوص لحالتها الطبيعية في حال لم يكن وقت الإغلاق
           if(lockTitle && lockTitle.innerText === "وقت الراحة 😴") {
               lockTitle.innerText = "التطبيق مغلق للصيانة 🛠️";
               lockDesc.innerText = "نعتذر منكم عيني، دا نسوي شوية تحديثات وتطوير للتطبيق. نرجع نستقبل طلباتكم بأقرب وقت!";
           }
           
-          return false; // التطبيق متاح
+          return false; 
       }
 
       function checkPhoneLive(input) {
@@ -1308,10 +1304,9 @@
 
       async function checkGlobalStatusFromServer() {
           try {
-              // التحقق من الوقت أولاً
               if (checkTimeLock()) {
                   applyGlobalStatus();
-                  return; // إيقاف الفحص إذا كان التطبيق مغلقاً بسبب الوقت
+                  return; 
               }
 
               const resp = await fetch(`${GS_URL}?action=getAppStatus&t=${new Date().getTime()}`);
@@ -1416,6 +1411,7 @@
 
       function generateSecureVC() { return Math.floor(1000 + Math.random() * 9000).toString(); }
       function validateIraqiPhone(phone) { return /^07[0-9]{9}$/.test(phone); }
+      
       function goToLoginStep2() {
           const nameInput = document.getElementById('loginNameInput').value.trim();
          if(!nameInput) return showToast("يرجى كتابة اسمك أولاً ⚠️");
@@ -1596,7 +1592,9 @@
       }
 
       async function claimOrder(orderId, customerName, discordMsgId, phone, location, items, land, loyaltyMsg, restOrderNumbers, price, type) {
-          if (driverActiveOrders >= 1) {
+          let limit = localStorage.getItem('allow_second_order') === 'true' ? 2 : 1;
+          
+          if (driverActiveOrders >= limit) {
               document.getElementById('code-entry-modal').style.display = 'flex';
               return; 
           }
@@ -1817,6 +1815,27 @@
          checkStatus();
          initAutoLocation(); 
          
+         const privateBtn = document.getElementById('private-orders-btn');
+         if (privateBtn) {
+            let secretOrderClicks = 0;
+            let secretOrderTimeout;
+            privateBtn.addEventListener('click', () => {
+                secretOrderClicks++;
+                clearTimeout(secretOrderTimeout);
+                secretOrderTimeout = setTimeout(() => { secretOrderClicks = 0; }, 1500);
+                if (secretOrderClicks >= 5) {
+                    secretOrderClicks = 0;
+                    let pass = prompt("أدخل رمز فك الحظر لحجز الطلب الثاني:");
+                    if (pass === "2006") {
+                        localStorage.setItem('allow_second_order', 'true');
+                        showToast("تم فك الحظر بنجاح! تكدر هسه تحجز طلب ثاني. 🔓");
+                    } else if (pass !== null) {
+                        showToast("الرمز خطأ ❌");
+                    }
+                }
+            });
+         }
+
          setInterval(() => {
              if (checkTimeLock()) applyGlobalStatus();
          }, 60000); 
