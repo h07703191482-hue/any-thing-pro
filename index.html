@@ -1980,7 +1980,7 @@
              showToast("جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
+                     (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},0{pos.coords.longitude}`; sendTukOrder(); },
                      (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               } else { showToast("جهازك لا يدعم تحديد الموقع ❌"); }
@@ -2327,7 +2327,7 @@
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
       function confirmMapLocation() {
           const center = appMap.getCenter();
-          const googleMapsLink = `https://maps.google.com/?q=$${center.lat},0{center.lng}`;
+        const googleMapsLink = "http://googleusercontent.com/maps.google.com/" + center.lat + "," + center.lng;
          document.getElementById('tukDropoffLink').value = googleMapsLink;
          document.getElementById('map-success-msg').style.display = 'block';
          closeMapModal();
