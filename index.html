@@ -100,7 +100,7 @@
     --radius-md: 20px; --radius-lg: 24px; --radius-pill: 9999px;
 }
    body.dark-mode {
-    --primary: #7A3BBA; --bg-color: #121212; --surface: #1E1E1E; --text-main: #F9FAFB;
+    --primary: #5A228B; --bg-color: #121212; --surface: #1E1E1E; --text-main: #F9FAFB;
     --text-muted: #9CA3AF; --border-color: #334155; --shadow-sm: 0 4px 15px rgba(0, 0, 0, 0.2);
     --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.4); --shadow-floating: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
@@ -328,21 +328,18 @@
           border: none;
           box-shadow: var(--shadow-sm);
       }
-
-     #out-of-zone-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; backdrop-filter: blur(8px); }
-      .out-zone-card { background: var(--surface); padding: 35px 20px; border-radius: var(--radius-lg); max-width: 400px; width: 95%; box-shadow: 0 20px 50px rgba(239, 68, 68, 0.2); animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid var(--danger); }
     </style>
 </head>
 <body>
-    <div id="out-of-zone-popup">
-        <div class="out-zone-card">
-            <i class="fas fa-map-marker-slash" style="font-size: 70px; color: var(--danger); margin-bottom: 20px; animation: bouncePin 1s infinite alternate;"></i>
-            <h2 style="margin: 0 0 15px; color: var(--danger); font-weight: 800; font-size: 24px;">عذراً، أنت خارج نطاق الخدمة</h2>
-            <p style="color: var(--text-main); font-size: 15px; font-weight: 700; line-height: 1.6; margin-bottom: 10px;">
-                تطبيق البندر يخدم <span style="color: var(--primary);">ناحية أم قصر فقط</span>.
+    <div id="out-of-zone-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--danger); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;">
+        <div class="out-zone-card" style="background: white; border: none; border-radius: 24px; max-width: 400px; width: 95%; padding: 35px 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+            <i class="fas fa-map-marker-slash" style="font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: bouncePin 1s infinite alternate;"></i>
+            <h2 style="margin: 0 0 15px; color: var(--danger); font-weight: 900; font-size: 26px;">خارج حدود أم قصر!</h2>
+            <p style="color: #111827; font-size: 16px; font-weight: 800; line-height: 1.6; margin-bottom: 10px;">
+                هذا التطبيق يعمل <span style="color: var(--danger);">فقط</span> داخل حدود أم قصر.
             </p>
-            <p style="color: var(--text-muted); font-size: 13px; font-weight: 600; line-height: 1.6; margin: 0;">
-                (الميناء، المستشفى، المجمع الكويتي، ومركز الناحية). لا يمكننا استقبال طلبات من موقعك الحالي.
+            <p style="color: #6B7280; font-size: 14px; font-weight: 600; line-height: 1.6; margin: 0;">
+                البرنامج متوقف عندك لأن موقعك الحالي خارج نطاق التغطية والمناطق المسموحة.
             </p>
         </div>
     </div>
@@ -361,7 +358,6 @@
             </div>
         </div>
     </div>
-
     <div id="map-modal">
         <div class="map-container">
             <div class="map-header">
@@ -447,7 +443,7 @@
                         <input type="radio" name="cancelReason" value="الزبون ما يرد" style="width: 18px; height: 18px; accent-color: var(--danger);"> الزبون ما يرد
                     </label>
                     <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-main); font-weight: 700; cursor: pointer;">
-                        <input type="radio" name="cancelReason" value="الطلب ما متوفر بالمطعم" style="width: 18px; height: 18px; accent-color: var(--danger);"> الطل ما متوفر بالمطعم
+                        <input type="radio" name="cancelReason" value="الطلب ما متوفر بالمطعم" style="width: 18px; height: 18px; accent-color: var(--danger);"> الطلب ما متوفر بالمطعم
                     </label>
                     <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-main); font-weight: 700; cursor: pointer;">
                         <input type="radio" name="cancelReason" value="مشكلة اخرى" style="width: 18px; height: 18px; accent-color: var(--danger);" onchange="toggleOtherReason(this)"> مشكلة اخرى
@@ -516,7 +512,7 @@
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
            </div>
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">البندر</h3>
-            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.27</p>
+            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.28</p>
         </div>
         <div class="sidebar-item ripple-dark" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
             <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
@@ -770,7 +766,6 @@
 
       </div>
     </div>
-    
     <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> <span id="restaurant-name-header">اسم المطعم</span></h2>
@@ -1196,7 +1191,6 @@
       let isSoundEnabled = localStorage.getItem('sound_enabled') === 'true';
       const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
-      // --- حماية إضافية: إخفاء الشاشة الترحيبية إجبارياً لتجنب التعليق ---
       window.addEventListener('load', () => {
           setTimeout(() => {
               const splash = document.getElementById('splash-screen');
@@ -1204,20 +1198,16 @@
                   splash.style.opacity = '0';
                   setTimeout(() => splash.style.display = 'none', 500);
               }
-          }, 3000); // تختفي إجبارياً بعد 3 ثواني
+          }, 3000); 
       });
 
-      // -----------------------------------------------------
-      // دالة العرض المؤقت للتوصيل (خصم 500 دينار لمدة أسبوع)
-      // -----------------------------------------------------
       function applyDeliveryDiscount() {
           try {
               const today = new Date();
-              const offerStart = new Date(2026, 3, 12); // يبدأ 12 نيسان
-              const offerEnd = new Date(2026, 3, 19, 23, 59, 59); // ينتهي 19 نيسان
+              const offerStart = new Date(2026, 3, 12); 
+              const offerEnd = new Date(2026, 3, 19, 23, 59, 59); 
 
               if (today >= offerStart && today <= offerEnd) {
-                  // 1. تغيير الأسعار في قائمة "أسعار التوصيل" فقط
                   const deliveryPrices = document.querySelectorAll('#prices-modal .price-item');
                   
                   deliveryPrices.forEach(item => {
@@ -1226,7 +1216,6 @@
                           let currentText = valSpan.innerText;
                           let numericValue = parseInt(currentText.replace(/[^0-9]/g, ''));
                           
-                          // تطبيق الخصم (إذا كان السعر أكبر من الخصم)
                           if (!isNaN(numericValue) && numericValue >= 500) {
                               let newPrice = numericValue - 500;
                               valSpan.innerHTML = `<s style="color:var(--text-muted); font-size:12px; margin-left:5px;">${numericValue.toLocaleString()}</s> <span style="color:var(--danger); font-weight:900;">${newPrice.toLocaleString()} د.ع</span>`;
@@ -1234,7 +1223,6 @@
                       }
                   });
                   
-                  // 2. إضافة بانر إعلاني للصفحة الرئيسية لإبلاغ الزبون
                   let homeScreen = document.querySelector('#home-screen .services-grid');
                   if(homeScreen && !document.getElementById('discount-banner')) {
                       let banner = document.createElement('div');
@@ -1413,7 +1401,7 @@
           }
       }
       
-     async function setGlobalAppStatus(newStatus) {
+      async function setGlobalAppStatus(newStatus) {
           const btnOpen = document.getElementById('btn-open-app');
           const btnClose = document.getElementById('btn-close-app');
           if(newStatus === 'online') { btnOpen.innerHTML = '<span class="baly-spinner"></span>'; } 
@@ -1590,8 +1578,7 @@
          document.getElementById('login-step-2').style.display = 'none';
          document.getElementById('login-step-1').style.display = 'block';
       }
-
-      function completeDirectLogin() {
+        function completeDirectLogin() {
           const userName = document.getElementById('loginNameInput').value.trim();
           const userPhone = document.getElementById('loginPhoneInput').value.trim();
 
@@ -2188,10 +2175,10 @@
              localStorage.setItem('temp_name', name); localStorage.setItem('temp_phone', phone);
               const randomCode = Math.floor(100000 + Math.random() * 900000);
              localStorage.setItem('temp_activation', randomCode); localStorage.setItem('pending_join', 'true');
-              
+             
               const msg = `📥 طلب انضمام جديد (كابتن)\n👤الاسم: ${name}\n📞الهاتف: ${phone}\n🏍️المركبة: ${bike}\n🔑الكود: ${randomCode}`;
               await sendToPrivateDiscord(msg);
-              
+             
              showScreen('activation-screen');
           } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
@@ -2234,7 +2221,7 @@
          window.scrollTo(0, 0);
           const bottomNav = document.getElementById('bottomNavigation');
          if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id === 'restaurant-menu-screen') ? 'none' : 'flex';
-          
+         
           if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
           if(id === 'log-screen') { renderDriverLog(); } 
           if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') { loadSavedCustomerData(); }
