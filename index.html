@@ -447,7 +447,7 @@
                         <input type="radio" name="cancelReason" value="الزبون ما يرد" style="width: 18px; height: 18px; accent-color: var(--danger);"> الزبون ما يرد
                     </label>
                     <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-main); font-weight: 700; cursor: pointer;">
-                        <input type="radio" name="cancelReason" value="الطلب ما متوفر بالمطعم" style="width: 18px; height: 18px; accent-color: var(--danger);"> الطلب ما متوفر بالمطعم
+                        <input type="radio" name="cancelReason" value="الطلب ما متوفر بالمطعم" style="width: 18px; height: 18px; accent-color: var(--danger);"> الطل ما متوفر بالمطعم
                     </label>
                     <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-main); font-weight: 700; cursor: pointer;">
                         <input type="radio" name="cancelReason" value="مشكلة اخرى" style="width: 18px; height: 18px; accent-color: var(--danger);" onchange="toggleOtherReason(this)"> مشكلة اخرى
@@ -612,7 +612,6 @@
            </button>
         </div>
     </div>
-
     <div id="admin-panel" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> <span id="adm-title">لوحة التحكم السرية</span></h2>
@@ -1148,7 +1147,7 @@
       let userCoords = ""; 
       let driverActiveOrders = 0; 
       let forcedVerifyCustomerPhone = ""; 
-      let currentLogTab = 'completed'; // للتحكم بتبويبات سجل الكابتن
+      let currentLogTab = 'completed'; 
 
       const CURRENT_VERSION = "2.0.26"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
@@ -1196,6 +1195,52 @@
       let orderPollInterval = null;
       let isSoundEnabled = localStorage.getItem('sound_enabled') === 'true';
       const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+
+      // -----------------------------------------------------
+      // دالة العرض المؤقت للتوصيل (خصم 500 دينار لمدة أسبوع)
+      // -----------------------------------------------------
+      function applyDeliveryDiscount() {
+          const today = new Date();
+          const offerStart = new Date(2026, 3, 12); // 12 أبريل 2026
+          const offerEnd = new Date(2026, 3, 19, 23, 59, 59); // ينتهي يوم 19 أبريل الساعة 11:59 ليلاً
+
+          if (today >= offerStart && today <= offerEnd) {
+              // 1. تغيير الأسعار في قائمة "أسعار التوصيل" فقط
+              const deliveryPrices = document.querySelectorAll('#prices-modal .price-item');
+              
+              deliveryPrices.forEach(item => {
+                  const valSpan = item.querySelector('.price-val');
+                  if (valSpan) {
+                      let currentText = valSpan.innerText;
+                      let numericValue = parseInt(currentText.replace(/[^0-9]/g, ''));
+                      
+                      // تطبيق الخصم (إذا كان السعر أكبر من الخصم)
+                      if (!isNaN(numericValue) && numericValue >= 500) {
+                          let newPrice = numericValue - 500;
+                          valSpan.innerHTML = `<s style="color:var(--text-muted); font-size:12px; margin-left:5px;">${numericValue.toLocaleString()}</s> <span style="color:var(--danger); font-weight:900;">${newPrice.toLocaleString()} د.ع</span>`;
+                      }
+                  }
+              });
+              
+              // 2. إضافة بانر إعلاني للصفحة الرئيسية لإبلاغ الزبون
+              let homeScreen = document.querySelector('#home-screen .services-grid');
+              if(homeScreen && !document.getElementById('discount-banner')) {
+                  let banner = document.createElement('div');
+                  banner.id = 'discount-banner';
+                  banner.className = 'select-card card-full ripple';
+                  banner.style = 'background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%); color: white; border: none; margin-bottom: 5px; animation: scaleIn 0.5s ease;';
+                  banner.innerHTML = `
+                      <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-percent"></i></div>
+                      <div class="card-text">
+                          <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800;">عرض الأسبوع المذهل! 🎉</h3>
+                          <small style="color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 600;">خصم 500 دينار على أسعار التوصيل لكل المناطق</small>
+                      </div>
+                  `;
+                  // إضافته في أعلى الشاشة الرئيسية
+                  homeScreen.insertBefore(banner, homeScreen.firstChild);
+              }
+          }
+      }
 
       function checkTimeLock() {
           const now = new Date();
@@ -1606,7 +1651,6 @@
           } catch(e) {}
       }
 
-      // --- دوال إلغاء الطلب الخاصة بالكابتن ---
       function cancelOrderPrompt(orderId, phone) {
           document.getElementById('cancelOrderId').value = orderId;
           document.getElementById('cancelOrderPhone').value = phone;
@@ -1657,12 +1701,10 @@
           btn.disabled = true;
 
           try {
-              // 1. تحديث حالة الطلب في فايربيس إلى ملغي
               if(typeof db !== 'undefined') {
                   await db.ref('orders/' + orderId).update({ status: 'canceled', cancelReason: reason });
               }
 
-              // 2. إضافة الطلب إلى سجل الملغيات المحلي
               let canceledLogs = JSON.parse(localStorage.getItem('canceled_logs') || '[]');
               canceledLogs.unshift({
                   date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }),
@@ -1671,12 +1713,10 @@
               });
               localStorage.setItem('canceled_logs', JSON.stringify(canceledLogs));
               
-              // 3. تحديث العداد
               let cCount = parseInt(localStorage.getItem('canceled_count') || 0) + 1;
               localStorage.setItem('canceled_count', cCount);
               updateStatsUI();
 
-              // 4. إرسال إشعار للديسكورد (اختياري)
               const dName = localStorage.getItem('driver_name') || 'غير معروف';
               const cancelMsg = `🚫 **طلب ملغي**\nالكابتن: ${dName}\nرقم الزبون: ${phone}\nرقم الطلب: ${orderId}\nسبب الإلغاء: ${reason}`;
               sendToPrivateDiscord(cancelMsg);
@@ -1692,7 +1732,6 @@
           }
       }
 
-      // --- دوال تبديل التبويبات في السجل ---
       function switchLogTab(tab) {
           currentLogTab = tab;
           document.getElementById('tab-completed').style.background = tab === 'completed' ? 'var(--primary)' : 'var(--surface)';
@@ -2062,9 +2101,10 @@
           }
       }
 
-   document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('DOMContentLoaded', () => {
          checkStatus();
          initAutoLocation(); 
+         applyDeliveryDiscount(); // تشغيل كود خصم التوصيل هنا!
 
          setInterval(() => {
              if (checkTimeLock()) applyGlobalStatus();
@@ -2188,7 +2228,7 @@
           if (typeof closeSidebar === 'function') closeSidebar();
       }
 
-        async function sendTukOrder() {
+      async function sendTukOrder() {
           if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
           const name = document.getElementById('tukName').value.trim(); const phone = document.getElementById('tukPhone').value.trim();
           const land = document.getElementById('tukLandmark').value.trim(); const dropLink = document.getElementById('tukDropoffLink').value.trim(); 
@@ -2972,9 +3012,3 @@
               items: [
                   { id: 'm1', name: 'برجر', price: 1000 }, { id: 'm2', name: 'برجر جبن', price: 1500 }, { id: 'm3', name: 'ريزو دجاج', price: 3000 },
                   { id: 'm4', name: 'لبن بطل صغير', price: 750 }, { id: 'm5', name: 'لبن بطل كبير', price: 2000 }, { id: 'm6', name: 'بيبسي', price: 500 }, { id: 'm7', name: 'ديو', price: 500 }
-              ]
-          }
-      };
-    </script>
-</body>
-</html>
