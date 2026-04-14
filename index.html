@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -328,17 +328,36 @@
           border: none;
           box-shadow: var(--shadow-sm);
       }
+      
+      /* --- إضافات الـ CSS لدعم اللغة الإنجليزية LTR --- */
+      html[dir="ltr"] body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+      html[dir="ltr"] .card-full .card-text, 
+      html[dir="ltr"] .form-group, 
+      html[dir="ltr"] .menu-item-info,
+      html[dir="ltr"] .phone-note { text-align: left; }
+      html[dir="ltr"] .card-full .arrow-icon, 
+      html[dir="ltr"] .select-card i.fa-chevron-left { transform: rotate(180deg); margin-right: 0; margin-left: auto; }
+      html[dir="ltr"] .card-full:hover .arrow-icon { transform: translateX(5px) rotate(180deg); }
+      html[dir="ltr"] .back-btn i, html[dir="ltr"] .sidebar-close i { transform: scaleX(-1); }
+      html[dir="ltr"] .sidebar { left: -300px; right: auto; transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+      html[dir="ltr"] .sidebar.open { left: 0; right: auto; }
+      html[dir="ltr"] .sidebar-close { align-self: flex-end; flex-direction: row-reverse; }
+      html[dir="ltr"] .sidebar-item { border-left: none; border-right: 1px solid transparent; }
+      html[dir="ltr"] .theme-toggle { right: 20px; left: auto; }
+      html[dir="ltr"] .note { border-right: none; border-left: 4px solid var(--gold); }
+      html[dir="ltr"] .select-card { border-left: none; border-right: 4px solid var(--danger); }
+      html[dir="ltr"] .form-card { border-right: none; border-left: 4px solid var(--primary); }
     </style>
 </head>
 <body>
     <div id="out-of-zone-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--danger); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;">
         <div class="out-zone-card" style="background: white; border: none; border-radius: 24px; max-width: 400px; width: 95%; padding: 35px 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
             <i class="fas fa-map-marker-slash" style="font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: bouncePin 1s infinite alternate;"></i>
-            <h2 style="margin: 0 0 15px; color: var(--danger); font-weight: 900; font-size: 26px;">خارج حدود أم قصر!</h2>
-            <p style="color: #111827; font-size: 16px; font-weight: 800; line-height: 1.6; margin-bottom: 10px;">
+            <h2 id="out-zone-title" style="margin: 0 0 15px; color: var(--danger); font-weight: 900; font-size: 26px;">خارج حدود أم قصر!</h2>
+            <p id="out-zone-desc1" style="color: #111827; font-size: 16px; font-weight: 800; line-height: 1.6; margin-bottom: 10px;">
                 هذا التطبيق يعمل <span style="color: var(--danger);">فقط</span> داخل حدود أم قصر.
             </p>
-            <p style="color: #6B7280; font-size: 14px; font-weight: 600; line-height: 1.6; margin: 0;">
+            <p id="out-zone-desc2" style="color: #6B7280; font-size: 14px; font-weight: 600; line-height: 1.6; margin: 0;">
                 البرنامج متوقف عندك لأن موقعك الحالي خارج نطاق التغطية والمناطق المسموحة.
             </p>
         </div>
@@ -347,21 +366,21 @@
     <div id="code-entry-modal">
         <div class="code-entry-container">
             <div class="code-entry-header">
-                <span>⚠️ تنبيه: إدخال كود التسليم</span>
+                <span id="code-entry-title">⚠️ تنبيه: إدخال كود التسليم</span>
                 <button class="close-code-entry-btn" onclick="document.getElementById('code-entry-modal').style.display='none'"><i class="fas fa-times"></i></button>
             </div>
             <div class="code-entry-content">
                 <i class="fas fa-exclamation-triangle" style="font-size: 50px; color: var(--danger);"></i>
-                <p class="code-entry-alert">يجب إدخال رمز تسليم الطلب السابق أولاً حتى تتمكن من حجز طلب جديد!</p>
+                <p id="code-entry-alert" class="code-entry-alert">يجب إدخال رمز تسليم الطلب السابق أولاً حتى تتمكن من حجز طلب جديد!</p>
                 <input type="number" id="forcedVerifyInput" placeholder="أدخل الكود هنا" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                <button class="send-btn ripple" style="margin-top: 5px;" onclick="processForcedVerifyCode()">تأكيد الكود</button>
+                <button id="code-entry-btn" class="send-btn ripple" style="margin-top: 5px;" onclick="processForcedVerifyCode()">تأكيد الكود</button>
             </div>
         </div>
     </div>
     <div id="map-modal">
         <div class="map-container">
             <div class="map-header">
-                <span>تحديد موقع النزول 📍</span>
+                <span id="map-modal-title">تحديد موقع النزول 📍</span>
                 <button class="close-map-btn" onclick="closeMapModal()"><i class="fas fa-times"></i></button>
             </div>
             <div style="position: relative;">
@@ -369,8 +388,8 @@
                 <i class="fas fa-map-marker-alt map-center-marker"></i>
             </div>
             <div class="map-footer">
-                <p style="margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--text-muted);">حرك الخريطة ليصير الدبوس على المكان المضبوط</p>
-                <button class="send-btn ripple" style="margin-top: 0; background: #10B981;" onclick="confirmMapLocation()">
+                <p id="map-modal-desc" style="margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--text-muted);">حرك الخريطة ليصير الدبوس على المكان المضبوط</p>
+                <button id="map-modal-btn" class="send-btn ripple" style="margin-top: 0; background: #10B981;" onclick="confirmMapLocation()">
                     تأكيد الموقع <i class="fas fa-check"></i>
                 </button>
             </div>
@@ -380,36 +399,36 @@
     <div id="prices-modal">
         <div class="prices-container">
             <div class="prices-header">
-                <span>أسعار التوصيل 🛵</span>
+                <span id="prices-modal-title">أسعار التوصيل 🛵</span>
                 <button class="close-prices-btn" onclick="closePricesModal()"><i class="fas fa-times"></i></button>
             </div>
             <div class="prices-content">
-               <div class="price-item"><span style="flex:1;">الخمسين</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">المشروع</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">حي المعلمين</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">شوارع</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">هندية جنوبية</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">الهندسة</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">شعبي</span><span class="price-val">1,500 د.ع</span></div>
+               <div class="price-item"><span id="loc1" style="flex:1;">الخمسين</span><span class="price-val">1,500 د.ع</span></div>
+               <div class="price-item"><span id="loc2" style="flex:1;">المشروع</span><span class="price-val">1,500 د.ع</span></div>
+               <div class="price-item"><span id="loc3" style="flex:1;">حي المعلمين</span><span class="price-val">1,500 د.ع</span></div>
+               <div class="price-item"><span id="loc4" style="flex:1;">شوارع</span><span class="price-val">1,500 د.ع</span></div>
+               <div class="price-item"><span id="loc5" style="flex:1;">هندية جنوبية</span><span class="price-val">1,500 د.ع</span></div>
+               <div class="price-item"><span id="loc6" style="flex:1;">الهندسة</span><span class="price-val">1,500 د.ع</span></div>
+               <div class="price-item"><span id="loc7" style="flex:1;">شعبي</span><span class="price-val">1,500 د.ع</span></div>
                
-               <div class="price-item"><span style="flex:1;">دور الظباط</span><span class="price-val">2,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">دور سمنت</span><span class="price-val">2,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">البهو</span><span class="price-val">2,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">صناعة</span><span class="price-val">2,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">هندية الشمالية</span><span class="price-val">2,000 د.ع</span></div>
+               <div class="price-item"><span id="loc8" style="flex:1;">دور الظباط</span><span class="price-val">2,000 د.ع</span></div>
+               <div class="price-item"><span id="loc9" style="flex:1;">دور سمنت</span><span class="price-val">2,000 د.ع</span></div>
+               <div class="price-item"><span id="loc10" style="flex:1;">البهو</span><span class="price-val">2,000 د.ع</span></div>
+               <div class="price-item"><span id="loc11" style="flex:1;">صناعة</span><span class="price-val">2,000 د.ع</span></div>
+               <div class="price-item"><span id="loc12" style="flex:1;">هندية الشمالية</span><span class="price-val">2,000 د.ع</span></div>
                
-               <div class="price-item"><span style="flex:1;">القاعدة</span><span class="price-val">3,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">هدامة</span><span class="price-val">3,000 د.ع</span></div>
+               <div class="price-item"><span id="loc13" style="flex:1;">القاعدة</span><span class="price-val">3,000 د.ع</span></div>
+               <div class="price-item"><span id="loc14" style="flex:1;">هدامة</span><span class="price-val">3,000 د.ع</span></div>
                
-               <div class="price-item"><span style="flex:1;">ميناء الجنوبي</span><span class="price-val">4,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">الارصفة العشرة</span><span class="price-val">4,000 د.ع</span></div>
+               <div class="price-item"><span id="loc15" style="flex:1;">ميناء الجنوبي</span><span class="price-val">4,000 د.ع</span></div>
+               <div class="price-item"><span id="loc16" style="flex:1;">الارصفة العشرة</span><span class="price-val">4,000 د.ع</span></div>
                
-               <div class="price-item"><span style="flex:1;">ميناء 27</span><span class="price-val">5,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">الترحيب</span><span class="price-val">5,000 د.ع</span></div>
+               <div class="price-item"><span id="loc17" style="flex:1;">ميناء 27</span><span class="price-val">5,000 د.ع</span></div>
+               <div class="price-item"><span id="loc18" style="flex:1;">الترحيب</span><span class="price-val">5,000 د.ع</span></div>
                
-               <div class="price-item"><span style="flex:1;">الصمود</span><span class="price-val">7,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">الستباقية</span><span class="price-val">7,000 د.ع</span></div>
-               <div class="price-item" style="border-bottom: none;"><span style="flex:1;">التحليات</span><span class="price-val">7,000 د.ع</span></div>
+               <div class="price-item"><span id="loc19" style="flex:1;">الصمود</span><span class="price-val">7,000 د.ع</span></div>
+               <div class="price-item"><span id="loc20" style="flex:1;">الستباقية</span><span class="price-val">7,000 د.ع</span></div>
+               <div class="price-item" style="border-bottom: none;"><span id="loc21" style="flex:1;">التحليات</span><span class="price-val">7,000 د.ع</span></div>
             </div>
         </div>
     </div>
@@ -417,36 +436,36 @@
     <div id="success-order-modal" style="display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0,0,0,0.85) !important; z-index: 9999999 !important; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; box-sizing: border-box; margin: 0;">
         <div style="width: 100%; max-width: 400px; background: var(--surface); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; text-align: center; padding: 35px 20px; border: 2px solid #10B981; position: relative;">
             <i class="fas fa-check-circle" style="font-size: 70px; color: #10B981; margin-bottom: 20px;"></i>
-            <h2 style="margin: 0 0 15px; color: #10B981; font-weight: 800; font-size: 24px;">تم إرسال طلبك بنجاح!</h2>
-            <p style="color: var(--text-main); font-size: 15px; font-weight: 700; line-height: 1.6; margin-bottom: 10px;">
+            <h2 id="success-title" style="margin: 0 0 15px; color: #10B981; font-weight: 800; font-size: 24px;">تم إرسال طلبك بنجاح!</h2>
+            <p id="success-desc1" style="color: var(--text-main); font-size: 15px; font-weight: 700; line-height: 1.6; margin-bottom: 10px;">
                 الرجاء الانتظار حتى يتم التواصل معك.
             </p>
-            <p style="color: #EF4444; font-size: 14px; font-weight: 800; margin-bottom: 25px;">
+            <p id="success-desc2" style="color: #EF4444; font-size: 14px; font-weight: 800; margin-bottom: 25px;">
                 ⚠️ لا تقوم بإرسال طلب آخر بالغلط لتجنب تكرار الطلب!
             </p>
-            <button class="ripple" style="margin: 0; background: #5A228B; color: white; width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 800; font-size: 18px; cursor: pointer;" onclick="document.getElementById('success-order-modal').style.display='none'">
-                رجوع <i class="fas fa-arrow-left"></i>
+            <button id="success-btn" class="ripple" style="margin: 0; background: #5A228B; color: white; width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 800; font-size: 18px; cursor: pointer;" onclick="document.getElementById('success-order-modal').style.display='none'">
+                رجوع <i class="fas fa-arrow-left" id="success-btn-icon"></i>
             </button>
         </div>
     </div>
 
     <div id="cancel-order-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100005; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;">
         <div class="form-card" style="width: 100%; max-width: 400px; background: var(--surface); padding: 20px;">
-            <div class="form-card-title" style="color: var(--danger); font-size: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;"><i class="fas fa-times-circle"></i> سبب إلغاء الطلب</div>
+            <div class="form-card-title" style="color: var(--danger); font-size: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;"><i class="fas fa-times-circle"></i> <span id="cancel-title">سبب إلغاء الطلب</span></div>
             <input type="hidden" id="cancelOrderId">
             <input type="hidden" id="cancelOrderPhone">
             
             <div class="form-group" style="text-align: right;">
-                <label style="font-weight: bold; margin-bottom: 10px; display: block; color: var(--text-main);">اختر السبب:</label>
+                <label id="cancel-label" style="font-weight: bold; margin-bottom: 10px; display: block; color: var(--text-main);">اختر السبب:</label>
                 <div style="display: flex; flex-direction: column; gap: 12px; background: var(--bg-color); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color);">
                     <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-main); font-weight: 700; cursor: pointer;">
-                        <input type="radio" name="cancelReason" value="الزبون ما يرد" style="width: 18px; height: 18px; accent-color: var(--danger);"> الزبون ما يرد
+                        <input type="radio" name="cancelReason" value="الزبون ما يرد" style="width: 18px; height: 18px; accent-color: var(--danger);"> <span class="cancel-r1">الزبون ما يرد</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-main); font-weight: 700; cursor: pointer;">
-                        <input type="radio" name="cancelReason" value="الطلب ما متوفر بالمطعم" style="width: 18px; height: 18px; accent-color: var(--danger);"> الطلب ما متوفر بالمطعم
+                        <input type="radio" name="cancelReason" value="الطلب ما متوفر بالمطعم" style="width: 18px; height: 18px; accent-color: var(--danger);"> <span class="cancel-r2">الطلب ما متوفر بالمطعم</span>
                     </label>
                     <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-main); font-weight: 700; cursor: pointer;">
-                        <input type="radio" name="cancelReason" value="مشكلة اخرى" style="width: 18px; height: 18px; accent-color: var(--danger);" onchange="toggleOtherReason(this)"> مشكلة اخرى
+                        <input type="radio" name="cancelReason" value="مشكلة اخرى" style="width: 18px; height: 18px; accent-color: var(--danger);" onchange="toggleOtherReason(this)"> <span class="cancel-r3">مشكلة اخرى</span>
                     </label>
                 </div>
             </div>
@@ -455,23 +474,23 @@
                 <input type="text" id="otherReasonText" placeholder="اكتب سبب الإلغاء هنا..." style="border-color: var(--danger);">
             </div>
             
-            <button class="send-btn ripple" style="background: var(--danger); margin-top: 20px; box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);" onclick="confirmCancelOrder()">تأكيد الإلغاء <i class="fas fa-check"></i></button>
-            <button class="resign-btn ripple-dark" style="margin-top: 10px; border-color: var(--text-muted); color: var(--text-muted);" onclick="closeCancelModal()">تراجع</button>
+            <button id="cancel-confirm-btn" class="send-btn ripple" style="background: var(--danger); margin-top: 20px; box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);" onclick="confirmCancelOrder()">تأكيد الإلغاء <i class="fas fa-check"></i></button>
+            <button id="cancel-back-btn" class="resign-btn ripple-dark" style="margin-top: 10px; border-color: var(--text-muted); color: var(--text-muted);" onclick="closeCancelModal()">تراجع</button>
         </div>
     </div>
 
     <div id="device-type-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100006; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;">
         <div class="prices-container">
             <div class="prices-header">
-                <span>ما نوع جهازك؟</span>
+                <span id="device-type-title">ما نوع جهازك؟</span>
                 <button class="close-prices-btn" onclick="document.getElementById('device-type-modal').style.display='none'"><i class="fas fa-times"></i></button>
             </div>
             <div class="prices-content" style="display: flex; gap: 15px; padding-top: 25px;">
                <a href="https://www.instagram.com/p/DWx_KZgCP-b/?igsh=MXdrdWk3dW83em95bA==" style="flex:1; text-align:center; background:#3DDC84; color:white; padding:15px; border-radius:15px; text-decoration:none; font-weight:bold; display:flex; flex-direction:column; align-items:center; gap:8px;" class="ripple">
-                   <i class="fab fa-android" style="font-size:30px;"></i> اندرويد
+                   <i class="fab fa-android" style="font-size:30px;"></i> <span id="device-android">اندرويد</span>
                </a>
                <a href="https://www.instagram.com/p/DWyAEmRiN5d/?igsh=NGQ0ZHYzaTBrdWxy" style="flex:1; text-align:center; background:#000000; color:white; padding:15px; border-radius:15px; text-decoration:none; font-weight:bold; display:flex; flex-direction:column; align-items:center; gap:8px;" class="ripple">
-                   <i class="fab fa-apple" style="font-size:30px;"></i> ايفون (iOS)
+                   <i class="fab fa-apple" style="font-size:30px;"></i> <span id="device-ios">ايفون (iOS)</span>
                </a>
             </div>
         </div>
@@ -512,16 +531,21 @@
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
            </div>
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">البندر</h3>
-            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.29</p>
+            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 2.0.30</p>
         </div>
         <div class="sidebar-item ripple-dark" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
             <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
         </div>
+        
+        <div class="sidebar-item ripple-dark" onclick="toggleLanguage(); closeSidebar();" id="sidebar-lang-btn">
+            <i class="fas fa-language" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-lang-text">English Language</span>
+        </div>
+
         <a id="side-support-link" href="https://wa.me/9647739470354" target="_blank" class="sidebar-item ripple-dark">
             <i class="fab fa-whatsapp" style="color: #25d366; font-size: 22px; width: 25px;"></i> <span id="side-support-text">مراسلة الدعم الفني</span>
         </a>
         <div class="sidebar-item ripple-dark" style="color: var(--danger); margin-top: 5px;" onclick="userLogout(); closeSidebar();">
-            <i class="fas fa-sign-out-alt" style="color: var(--danger); font-size: 20px; width: 25px;"></i> <span style="font-weight: 800;">تسجيل خروج</span>
+            <i class="fas fa-sign-out-alt" style="color: var(--danger); font-size: 20px; width: 25px;"></i> <span id="side-logout-text" style="font-weight: 800;">تسجيل خروج</span>
         </div>
     </div>
     <div class="bottom-nav" id="bottomNavigation">
@@ -564,52 +588,54 @@
       <div class="road-realistic"><div class="road-lines"></div></div>
       <div class="bike-box"><i class="fas fa-motorcycle"></i><div class="exhaust"><div class="smoke"></div><div class="smoke"></div><div class="smoke"></div></div></div>
     </div>
+    
     <div id="login-screen" class="screen container">
         <div style="text-align: center; margin-bottom: 30px;">
             <div style="width:100px; height:100px; background:rgba(90, 34, 139, 0.1); border-radius:30px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: var(--shadow-sm);">
                 <i class="fas fa-user-circle" style="font-size: 50px; color: var(--primary);"></i>
            </div>
-            <h2 style="margin: 0; font-weight: 800; font-size: 28px; color: var(--text-main);">أهلاً بيك في البندر</h2>
-            <p style="margin: 8px 0 0; color: var(--text-muted); font-size: 15px; font-weight: 600;">سجل دخولك بخطوتين بسيطة!</p>
+            <h2 id="login-h2" style="margin: 0; font-weight: 800; font-size: 28px; color: var(--text-main);">أهلاً بيك في البندر</h2>
+            <p id="login-p" style="margin: 8px 0 0; color: var(--text-muted); font-size: 15px; font-weight: 600;">سجل دخولك بخطوتين بسيطة!</p>
         </div>
 
         <div class="form-card" id="login-step-1" style="text-align: center; padding: 30px 20px;">
             <i class="fas fa-signature icon-pulse" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
-            <h3 style="margin-top: 0;">شنو اسمك الكريم؟</h3>
-            <p style="font-size: 14px; color: var(--text-muted); font-weight: bold; margin-bottom: 25px;">
+            <h3 id="login-s1-h3" style="margin-top: 0;">شنو اسمك الكريم؟</h3>
+            <p id="login-s1-p" style="font-size: 14px; color: var(--text-muted); font-weight: bold; margin-bottom: 25px;">
                 اكتب اسمك حتى نتعرف عليك ونخدمك بأفضل طريقة
             </p>
             <div class="form-group" style="text-align: right;">
                <input type="text" id="loginNameInput" placeholder="اكتب اسمك الثلاثي هنا..." style="text-align: center; font-size: 18px; font-weight: bold;">
            </div>
-            <button class="send-btn ripple" onclick="goToLoginStep2()">
-                التالي <i class="fas fa-arrow-left"></i>
+            <button id="login-s1-btn" class="send-btn ripple" onclick="goToLoginStep2()">
+                التالي <i class="fas fa-arrow-left" id="login-s1-icon"></i>
            </button>
         </div>
 
         <div class="form-card" id="login-step-2" style="display: none; text-align: center; padding: 30px 20px;">
             <i class="fas fa-mobile-alt icon-pulse" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
-            <h3 style="margin-top: 0;">تفعيل الحساب برقمك</h3>
-            <p style="font-size: 14px; color: var(--text-muted); font-weight: bold; margin-bottom: 25px;">
+            <h3 id="login-s2-h3" style="margin-top: 0;">تفعيل الحساب برقمك</h3>
+            <p id="login-s2-p" style="font-size: 14px; color: var(--text-muted); font-weight: bold; margin-bottom: 25px;">
                 اكتب رقمك العراقي (يبدأ بـ 07) حتى يكمل تسجيل الدخول!
             </p>
             
             <div class="form-group" style="text-align: right; margin-bottom: 20px;">
                <input type="tel" id="loginPhoneInput" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)" style="text-align: center; font-size: 18px; font-weight: bold;">
-               <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+               <span id="login-phone-err" class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
            </div>
 
             <button id="direct-login-btn" class="send-btn ripple" onclick="completeDirectLogin()">
                 <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
            </button>
             
-            <button class="resign-btn ripple-dark" style="margin-top: 15px; border: none; color: var(--text-muted);" onclick="backToLoginStep1()">
-                <i class="fas fa-arrow-right"></i> رجوع لتعديل الاسم
+            <button id="login-s2-back" class="resign-btn ripple-dark" style="margin-top: 15px; border: none; color: var(--text-muted);" onclick="backToLoginStep1()">
+                <i class="fas fa-arrow-right" id="login-s2-b-icon"></i> رجوع لتعديل الاسم
            </button>
         </div>
     </div>
+    
     <div id="admin-panel" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="adm-back-icon"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> <span id="adm-title">لوحة التحكم السرية</span></h2>
         <div class="form-card" style="text-align: center;">
             <p id="adm-status-desc" style="font-weight: 700; margin-bottom: 20px;">حالة استقبال الطلبات للزبائن</p>
@@ -626,6 +652,7 @@
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
+    
     <div id="home-screen" class="screen container active-screen">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
@@ -638,8 +665,8 @@
           <div class="select-card ripple" style="padding: 12px; display: flex; align-items: center; gap: 10px; border: 2px solid var(--danger); background: rgba(239, 68, 68, 0.1);">
               <i class="fas fa-clock" style="font-size: 24px; color: var(--danger);"></i>
               <div>
-                 <h4 style="margin: 0; font-size: 14px; font-weight: 800; color: var(--danger);">تنبيه النظام</h4>
-                 <small style="color: var(--text-main); font-weight: 600;">التطبيق يتوقف عن العمل من الساعة 2 ليلاً حتى 8 صباحاً.</small>
+                 <h4 id="sys-alert-title" style="margin: 0; font-size: 14px; font-weight: 800; color: var(--danger);">تنبيه النظام</h4>
+                 <small id="sys-alert-sub" style="color: var(--text-main); font-weight: 600;">التطبيق يتوقف عن العمل من الساعة 2 ليلاً حتى 8 صباحاً.</small>
              </div>
           </div>
       </div>
@@ -647,58 +674,58 @@
           <div class="rest-slider">
              <div class="rest-card ripple" onclick="openMenu('rken_estkana')">
                  <img src="Rken.jpg" alt="ركن استكانة">
-                 <h4>ركن استكانة</h4>
-                 <small>مشاوي، شرقي وغربي</small>
+                 <h4 id="rest-1-title">ركن استكانة</h4>
+                 <small id="rest-1-sub">مشاوي، شرقي وغربي</small>
              </div>
 
              <div class="rest-card ripple" onclick="openMenu('royal_food')">
                  <img src="Roealfod.jpg" alt="رويال فود">
-                 <h4>رويال فود</h4>
-                 <small>بركر، بيتزا ووجبات</small>
+                 <h4 id="rest-2-title">رويال فود</h4>
+                 <small id="rest-2-sub">بركر، بيتزا ووجبات</small>
              </div>
 
               <div class="rest-card ripple" onclick="openMenu('victoria')">
                  <img src="fktorea.jpg" alt="مطعم فيكتوريا">
-                 <h4>مطعم فيكتوريا</h4>
-                 <small>بركر وسندويجات</small>
+                 <h4 id="rest-3-title">مطعم فيكتوريا</h4>
+                 <small id="rest-3-sub">بركر وسندويجات</small>
              </div>
 
               <div id="klashe-restaurant" class="rest-card ripple" onclick="openMenu('klashe')" style="display: none;">
                  <img src="klashe.jpg" alt="كلاشي">
-                 <h4>كلاشي</h4>
-                 <small>عصائر ومشروبات</small>
+                 <h4 id="rest-4-title">كلاشي</h4>
+                 <small id="rest-4-sub">عصائر ومشروبات</small>
              </div>
 
               <div class="rest-card ripple" onclick="openMenu('haleg')">
                  <img src="Haleg.jpg" alt="مطعم الخليج">
-                 <h4>مطعم الخليج</h4>
-                 <small>أشهى المأكولات</small>
+                 <h4 id="rest-5-title">مطعم الخليج</h4>
+                 <small id="rest-5-sub">أشهى المأكولات</small>
              </div>
 
              <div class="rest-card ripple" onclick="openMenu('scozi')">
                  <img src="scoozi.jpg" alt="سكوزي">
-                 <h4>سكوزي</h4>
-                 <small>أشهى الوجبات</small>
+                 <h4 id="rest-6-title">سكوزي</h4>
+                 <small id="rest-6-sub">أشهى الوجبات</small>
              </div>
 
               <div class="rest-card ripple" onclick="openMenu('abo_hmode')">
                  <img src="Hmode.jpg.jpg" alt="بركر ابو حمودي">
-                 <h4>بركر ابو حمودي</h4>
-                 <small>الطعم الأصلي</small>
+                 <h4 id="rest-7-title">بركر ابو حمودي</h4>
+                 <small id="rest-7-sub">الطعم الأصلي</small>
              </div>
 
               <div class="rest-card ripple" onclick="openMenu('ali_salem')">
                  <img src="Burger.jpg.jpg" alt="برجر علي سالم">
-                 <h4>برجر علي سالم</h4>
-                 <small>أطيب برجر بأم قصر</small>
+                 <h4 id="rest-8-title">برجر علي سالم</h4>
+                 <small id="rest-8-sub">أطيب برجر بأم قصر</small>
              </div>
 
               <div class="rest-card" style="opacity: 0.6; cursor: default;">
                  <div style="width: 100%; height: 90px; border-radius: 15px; background: var(--border-color); display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
                      <i class="fas fa-utensils" style="font-size: 30px; color: var(--text-muted);"></i>
                  </div>
-                 <h4>مطعم جديد</h4>
-                 <small>قريباً...</small>
+                 <h4 id="rest-9-title">مطعم جديد</h4>
+                 <small id="rest-9-sub">قريباً...</small>
              </div>
           </div>
       </div>
@@ -708,8 +735,8 @@
               <div style="display: flex; align-items: center; gap: 15px;">
                  <div style="width: 45px; height: 45px; background: rgba(239, 68, 68, 0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--danger); font-size: 20px;"><i class="fas fa-exclamation-circle"></i></div>
                   <div>
-                     <h4 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--danger);">أسعار التوصيل (تنبيه)</h4>
-                     <small style="color: var(--text-muted); font-weight: 600;">تعرف على أسعار كل مناطق أم قصر</small>
+                     <h4 id="price-alert-title" style="margin: 0; font-size: 16px; font-weight: 800; color: var(--danger);">أسعار التوصيل (تنبيه)</h4>
+                     <small id="price-alert-sub" style="color: var(--text-muted); font-weight: 600;">تعرف على أسعار كل مناطق أم قصر</small>
                  </div>
              </div>
               <i class="fas fa-chevron-left" style="color: var(--danger); font-size: 14px;"></i>
@@ -757,21 +784,20 @@
           
           <div id="public-orders-btn" class="select-card card-half ripple-dark" style="display: none; border: 1px solid #F59E0B; background: rgba(245, 158, 11, 0.05);" onclick="showScreen('public-orders-screen')">
             <div class="icon-wrapper" style="background: rgba(245, 158, 11, 0.1); color: #F59E0B;"><i class="fas fa-list"></i></div>
-            <h3 style="font-size: 15px; color: #F59E0B; margin-top: 5px;">الطلبات العامة</h3>
+            <h3 id="pub-order-title" style="font-size: 15px; color: #F59E0B; margin-top: 5px;">الطلبات العامة</h3>
           </div>
           <div id="private-orders-btn" class="select-card card-half ripple-dark" style="display: none; border: 1px solid #10B981; background: rgba(16, 185, 129, 0.05);" onclick="showScreen('private-orders-screen')">
             <div class="icon-wrapper" style="background: rgba(16, 185, 129, 0.1); color: #10B981;"><i class="fas fa-box-open"></i></div>
-            <h3 style="font-size: 15px; color: #10B981; margin-top: 5px;">الطلبات المحجوزة</h3>
+            <h3 id="priv-order-title" style="font-size: 15px; color: #10B981; margin-top: 5px;">الطلبات المحجوزة</h3>
           </div>
-
       </div>
     </div>
     <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="rest-back-icon"></i></button>
         <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> <span id="restaurant-name-header">اسم المطعم</span></h2>
-        <p style="color: var(--text-muted); font-size: 14px; font-weight: 600; margin-bottom: 20px;">اختار طلبك وحدد الكمية، وراح نحسبلك المجموع مباشرة.</p>
+        <p id="rest-menu-desc" style="color: var(--text-muted); font-size: 14px; font-weight: 600; margin-bottom: 20px;">اختار طلبك وحدد الكمية، وراح نحسبلك المجموع مباشرة.</p>
         
-        <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+        <div id="rest-menu-note" class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
           ⚠تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور الطلب كامله. يرجى التأكد قبل تثبيت الطلب.
         </div>
         
@@ -780,19 +806,19 @@
         
         <div class="cart-bar" id="cartBar" style="display: none;">
             <div>
-               <span style="font-size: 13px; color: var(--text-muted); font-weight: bold;">المجموع الكلي للطلب:</span>
+               <span id="cart-total-lbl" style="font-size: 13px; color: var(--text-muted); font-weight: bold;">المجموع الكلي للطلب:</span>
                <span class="cart-bar-total" id="cartTotal">0 د.ع</span>
            </div>
-            <button class="send-btn ripple" style="width: auto; margin: 0; padding: 12px 25px; font-size: 16px; box-shadow: none;" onclick="checkoutRestaurant()">استمرار <i class="fas fa-arrow-left"></i></button>
+            <button id="cart-continue-btn" class="send-btn ripple" style="width: auto; margin: 0; padding: 12px 25px; font-size: 16px; box-shadow: none;" onclick="checkoutRestaurant()">استمرار <i class="fas fa-arrow-left" id="cart-cont-icon"></i></button>
         </div>
     </div>
     
     <div id="tuk-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="tuk-back-icon"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
-        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
+        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> <span id="tuk-loc-notice">ملاحظة: تم تحديد موقعك تلقائياً 📍</span></span>
         
-        <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+        <div id="tuk-warn-note" class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
             ⚠️تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
         </div>
         
@@ -801,13 +827,13 @@
             <div class="form-group">
                <label id="lbl-tuk-name">الاسم الكامل</label>
                <input type="text" id="tukName" placeholder="اكتب اسمك هنا">
-               <span class="step-number">خطوة رقم (1)</span>
+               <span id="tuk-step1" class="step-number">خطوة رقم (1)</span>
            </div>
             <div class="form-group">
                <label id="lbl-tuk-phone">رقم الموبايل</label>
                <input type="tel" id="tukPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
                 <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-               <span class="step-number">خطوة رقم (2)</span>
+               <span id="tuk-step2" class="step-number">خطوة رقم (2)</span>
            </div>
         </div>
 
@@ -817,25 +843,25 @@
                <label style="color:var(--danger);" id="lbl-tuk-drop">موقع التحصيل/التسليم (إجباري)</label>
                
                <div class="note" style="padding:12px; font-size:13px; margin-bottom:10px; background:rgba(16, 185, 129, 0.1); border-right-color:#10B981; color:var(--text-main);">
-                   💡هسه تگدر تحدد مكان النزول مباشرة من الخريطة داخل التطبيق بدون ما تطلع وتنسخ روابط! 🗺️
+                   <span id="tuk-map-hint">💡هسه تگدر تحدد مكان النزول مباشرة من الخريطة داخل التطبيق بدون ما تطلع وتنسخ روابط! 🗺️</span>
                </div>
                
-               <button type="button" class="location-btn ripple-dark" style="border: 2px dashed var(--primary); background: var(--surface); color: var(--primary);" onclick="openMapModal()">
+               <button id="tuk-map-btn" type="button" class="location-btn ripple-dark" style="border: 2px dashed var(--primary); background: var(--surface); color: var(--primary);" onclick="openMapModal()">
                    <i class="fas fa-map-marked-alt"></i> افتح الخريطة وحدد المكان 📍
                </button>
                
                <input type="hidden" id="tukDropoffLink" value="">
-                <p id="map-success-msg" style="display: none; color: #10B981; font-weight: 800; font-size: 14px; margin-top: 10px; text-align: center;"><i class="fas fa-check-circle"></i> تم تحديد المكان بنجاح!</p>
-               <span class="step-number">خطوة رقم (3)</span>
+                <p id="map-success-msg" style="display: none; color: #10B981; font-weight: 800; font-size: 14px; margin-top: 10px; text-align: center;"><i class="fas fa-check-circle"></i> <span id="tuk-map-success">تم تحديد المكان بنجاح!</span></p>
+               <span id="tuk-step3" class="step-number">خطوة رقم (3)</span>
            </div>
             <div class="form-group">
-               <label>أقرب نقطة دالة (اختياري)</label>
+               <label id="lbl-tuk-land">أقرب نقطة دالة (اختياري)</label>
                <input type="text" id="tukLandmark" placeholder="مدرسة، جامع، أو تقاطع...">
-               <span class="step-number">خطوة رقم (4)</span>
+               <span id="tuk-step4" class="step-number">خطوة رقم (4)</span>
            </div>
         </div>
 
-        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+        <div id="tuk-final-warn" class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
             <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
         </div>
 
@@ -843,71 +869,71 @@
     </div>
 
     <div id="mediator-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="med-back-icon"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> <span id="med-head">خدمة الوسيط</span></h2>
-        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
+        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> <span id="med-loc-notice">ملاحظة: تم تحديد موقعك تلقائياً 📍</span></span>
         
-        <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+        <div id="med-warn-note" class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
             ⚠️ تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
         </div>
 
         <div class="form-card" style="border-right: 4px solid #F97316;">
-            <div class="form-card-title"><i class="fas fa-info-circle" style="color: #F97316;"></i> أسعار خدمة الوسيط 🤝</div>
+            <div class="form-card-title"><i class="fas fa-info-circle" style="color: #F97316;"></i> <span id="med-prices-title">أسعار خدمة الوسيط 🤝</span></div>
             <div class="prices-content" style="padding: 0; max-height: 200px; overflow-y: auto;">
-               <div class="price-item"><span style="flex:1;">الخمسين</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">المشروع</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">حي المعلمين</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">شوارع</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">هندية جنوبية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">الهندسة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">شعبي</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">دور الظباط</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">دور سمنت</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">البهو</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">صناعة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">هندية الشمالية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">ميناء الجنوبي</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">الارصفة العشرة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">ميناء 27</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">الترحيب</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">القاعدة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">2,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">هدامة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">2,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">الصمود</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">4,000 د.ع</span></div>
-               <div class="price-item"><span style="flex:1;">الستباقية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">7,000 د.ع</span></div>
-               <div class="price-item" style="border-bottom: none;"><span style="flex:1;">التحليات</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">7,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc1" style="flex:1;">الخمسين</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc2" style="flex:1;">المشروع</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc3" style="flex:1;">حي المعلمين</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc4" style="flex:1;">شوارع</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc5" style="flex:1;">هندية جنوبية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc6" style="flex:1;">الهندسة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc7" style="flex:1;">شعبي</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc8" style="flex:1;">دور الظباط</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc9" style="flex:1;">دور سمنت</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc10" style="flex:1;">البهو</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc11" style="flex:1;">صناعة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc12" style="flex:1;">هندية الشمالية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc13" style="flex:1;">ميناء الجنوبي</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc14" style="flex:1;">الارصفة العشرة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc15" style="flex:1;">ميناء 27</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc16" style="flex:1;">الترحيب</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc17" style="flex:1;">القاعدة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">2,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc18" style="flex:1;">هدامة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">2,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc19" style="flex:1;">الصمود</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">4,000 د.ع</span></div>
+               <div class="price-item"><span id="mloc20" style="flex:1;">الستباقية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">7,000 د.ع</span></div>
+               <div class="price-item" style="border-bottom: none;"><span id="mloc21" style="flex:1;">التحليات</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">7,000 د.ع</span></div>
             </div>
         </div>
         
         <div class="form-card" id="med-user-card">
             <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="med-p-info">بيانات المرسل</span></div>
             <div class="form-group">
-               <label>الاسم الكامل</label>
+               <label id="lbl-med-name">الاسم الكامل</label>
                <input type="text" id="medName" placeholder="اكتب اسمك">
-               <span class="step-number">خطوة رقم (1)</span>
+               <span id="med-step1" class="step-number">خطوة رقم (1)</span>
            </div>
             <div class="form-group">
-               <label>رقم الموبايل</label>
+               <label id="lbl-med-phone">رقم الموبايل</label>
                <input type="tel" id="medPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-               <span class="step-number">خطوة رقم (2)</span>
+               <span id="med-step2" class="step-number">خطوة رقم (2)</span>
            </div>
             <div class="form-group">
-               <label>أقرب نقطة دالة لمكانك</label>
+               <label id="lbl-med-land">أقرب نقطة دالة لمكانك</label>
                <input type="text" id="medLandmark" placeholder="لتسهيل وصول المندوب">
-               <span class="step-number">خطوة رقم (3)</span>
+               <span id="med-step3" class="step-number">خطوة رقم (3)</span>
            </div>
         </div>
 
         <div class="form-card">
             <div class="form-card-title"><i class="fas fa-box-open"></i> <span id="med-o-info">تفاصيل الطلب</span></div>
             <div class="form-group">
-               <label>ما هو الغرض؟ وإلى أين؟</label>
+               <label id="lbl-med-order">ما هو الغرض؟ وإلى أين؟</label>
                <textarea id="medOrder" rows="4" placeholder="مثال: أريد توصيل مفاتيح من تقاطع الميناء إلى حي المهندسين..."></textarea>
-                <span class="step-number">خطوة رقم (4)</span>
+                <span id="med-step4" class="step-number">خطوة رقم (4)</span>
            </div>
         </div>
 
-        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+        <div id="med-final-warn" class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
             <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
         </div>
 
@@ -915,11 +941,11 @@
     </div>
 
     <div id="order-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="shop-back-icon"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-shopping-cart" style="color:var(--primary);"></i> <span id="shop-head">تسوق مسواكك</span></h2>
-        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> ملاحظة: تم تحديد موقعك تلقائياً 📍</span>
+        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> <span id="shop-loc-notice">ملاحظة: تم تحديد موقعك تلقائياً 📍</span></span>
         
-        <div class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+        <div id="shop-warn-note" class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
             ⚠️تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور الطلب كاملة. يرجى التأكد قبل تثبيت الطلب.
         </div>
         
@@ -932,20 +958,20 @@
         <div class="form-card" id="shop-user-card">
             <div class="form-card-title"><i class="fas fa-address-card"></i> <span id="shop-p-info">بيانات التوصيل</span></div>
             <div class="form-group">
-               <label>الاسم</label>
+               <label id="lbl-shop-name">الاسم</label>
                <input type="text" id="custName" placeholder="اسمك">
-               <span class="step-number">خطوة رقم (1)</span>
+               <span id="shop-step1" class="step-number">خطوة رقم (1)</span>
            </div>
             <div class="form-group">
-               <label>رقم الهاتف</label>
+               <label id="lbl-shop-phone">رقم الهاتف</label>
                <input type="tel" id="custPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); updateLoyaltyUI(); checkPhoneLive(this)" onblur="syncLoyaltyWithServer()">
                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-                <span class="step-number">خطوة رقم (2)</span>
+                <span id="shop-step2" class="step-number">خطوة رقم (2)</span>
            </div>
             <div class="form-group">
-               <label>نقطة دالة</label>
+               <label id="lbl-shop-land">نقطة دالة</label>
                <input type="text" id="custLandmark" placeholder="وصف سريع لمكانك">
-                <span class="step-number">خطوة رقم (3)</span>
+                <span id="shop-step3" class="step-number">خطوة رقم (3)</span>
            </div>
         </div>
 
@@ -953,11 +979,11 @@
             <div class="form-card-title"><i class="fas fa-list-ul"></i> <span id="shop-o-info">ماذا تريد أن نشتري لك؟</span></div>
             <div class="form-group">
                <textarea id="custOrder" rows="5" placeholder="اكتب طلباتك هنا بالتفصيل (أكل، مسواك، صيدلية)..."></textarea>
-               <span class="step-number">خطوة رقم (4)</span>
+               <span id="shop-step4" class="step-number">خطوة رقم (4)</span>
            </div>
         </div>
 
-        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+        <div id="shop-final-warn" class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
             <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل شراء المواد. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
         </div>
 
@@ -965,31 +991,31 @@
     </div>
 
     <div id="join-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> انضم ككابتن</h2>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="join-back-icon"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> <span id="join-head">انضم ككابتن</span></h2>
         
         <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-user-edit"></i> بيانات التسجيل</div>
+            <div class="form-card-title"><i class="fas fa-user-edit"></i> <span id="join-p-info">بيانات التسجيل</span></div>
             <div class="form-group">
-               <label>الاسم الثلاثي</label>
+               <label id="lbl-join-name">الاسم الثلاثي</label>
                <input type="text" id="driverJoinName" placeholder="اسمك الكامل">
-               <span class="step-number">خطوة رقم (1)</span>
+               <span id="join-step1" class="step-number">خطوة رقم (1)</span>
            </div>
             <div class="form-group">
-               <label>رقم الهاتف</label>
+               <label id="lbl-join-phone">رقم الهاتف</label>
                <input type="tel" id="driverJoinPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-               <span class="step-number">خطوة رقم (2)</span>
+               <span id="join-step2" class="step-number">خطوة رقم (2)</span>
            </div>
             <div class="form-group">
-               <label>نوع المركبة</label>
+               <label id="lbl-join-bike">نوع المركبة</label>
                 <select id="bikeType">
-                   <option value="" disabled selected>اختر النوع...</option>
-                   <option value="ايراني">دراجة ايراني</option>
-                   <option value="بوكسر">دراجة بوكسر</option>
-                   <option value="تكتك">تكتك</option>
+                   <option id="opt-bike-def" value="" disabled selected>اختر النوع...</option>
+                   <option id="opt-bike-1" value="ايراني">دراجة ايراني</option>
+                   <option id="opt-bike-2" value="بوكسر">دراجة بوكسر</option>
+                   <option id="opt-bike-3" value="تكتك">تكتك</option>
                </select>
-               <span class="step-number">خطوة رقم (3)</span>
+               <span id="join-step3" class="step-number">خطوة رقم (3)</span>
            </div>
         </div>
         <button class="send-btn ripple" id="joinSendBtn" onclick="submitJoinRequest()">إرسال طلب الانضمام</button>
@@ -999,50 +1025,50 @@
         <div class="form-card" style="text-align:center; padding: 40px 20px;">
             <i class="fas fa-clock" style="font-size:50px; margin-bottom:20px; color:var(--gold);"></i>
             <h3 id="wait-title" style="margin:0 0 10px;">طلبك قيد المراجعة</h3>
-            <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px; font-weight:700;">سوف يصلك الكود في حال تمت الموافقة عليك اذا لم يتم الرد اتصل على هذا الرقم 07739470354</p>
+            <p id="wait-desc" style="color:var(--text-muted); font-size:14px; margin-bottom:20px; font-weight:700;">سوف يصلك الكود في حال تمت الموافقة عليك اذا لم يتم الرد اتصل على هذا الرقم 07739470354</p>
             <div class="form-group">
                <input type="number" id="activationCodeInput" placeholder="أدخل الكود هنا..." style="text-align:center; font-size:20px; letter-spacing:4px; font-weight:bold;">
-               <span class="step-number">خطوة رقم (1)</span>
+               <span id="act-step1" class="step-number">خطوة رقم (1)</span>
            </div>
-            <button class="send-btn ripple" onclick="verifyActivationCode()">تفعيل الحساب</button>
-            <button class="send-btn ripple" style="background: var(--bg-color); color: var(--primary); border: 2px solid var(--primary); margin-top: 15px; box-shadow: none;" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i> العودة للشاشة الرئيسية</button>
-            <button class="resign-btn ripple-dark" onclick="cancelJoinRequest()" style="margin-top:15px;">إلغاء الطلب</button>
+            <button id="act-btn1" class="send-btn ripple" onclick="verifyActivationCode()">تفعيل الحساب</button>
+            <button id="act-btn2" class="send-btn ripple" style="background: var(--bg-color); color: var(--primary); border: 2px solid var(--primary); margin-top: 15px; box-shadow: none;" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="act-icon-back"></i> العودة للشاشة الرئيسية</button>
+            <button id="act-btn3" class="resign-btn ripple-dark" onclick="cancelJoinRequest()" style="margin-top:15px;">إلغاء الطلب</button>
         </div>
     </div>
     
     <div id="public-orders-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-list" style="color:#F59E0B;"></i> الطلبات العامة</h2>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="pub-back-icon"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-list" style="color:#F59E0B;"></i> <span id="pub-head">الطلبات العامة</span></h2>
         <div class="form-card" id="available-orders-section">
-            <div class="form-card-title"><i class="fas fa-motorcycle" style="color: #F59E0B;"></i> حجز الطلبات المتاحة</div>
+            <div class="form-card-title"><i class="fas fa-motorcycle" style="color: #F59E0B;"></i> <span id="pub-card-title">حجز الطلبات المتاحة</span></div>
             <div id="available-orders-container" style="display: flex; flex-direction: column; gap: 10px;">
-                <p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات متاحة حالياً</p>
+                <p id="pub-empty" style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات متاحة حالياً</p>
             </div>
         </div>
     </div>
 
     <div id="private-orders-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-box-open" style="color:#10B981;"></i> الطلبات المحجوزة</h2>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="priv-back-icon"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-box-open" style="color:#10B981;"></i> <span id="priv-head">الطلبات المحجوزة</span></h2>
         
         <div class="note" style="background: rgba(16, 185, 129, 0.1); border-right-color: #10B981; color: #065F46; font-size: 14px; font-weight: 800; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
             <i class="fas fa-bullhorn" style="font-size: 20px; color: #10B981;"></i> 
-            <span style="display: block; margin-top: 5px;">ملاحظة للكابتن: 500 دينار من أجرة كل طلب تعود لصاحب التطبيق.</span>
+            <span id="priv-admin-note" style="display: block; margin-top: 5px;">ملاحظة للكابتن: 500 دينار من أجرة كل طلب تعود لصاحب التطبيق.</span>
         </div>
 
         <div class="form-card" id="my-active-orders-section">
-            <div class="form-card-title"><i class="fas fa-box-open" style="color: #10B981;"></i> طلباتي الحالية</div>
+            <div class="form-card-title"><i class="fas fa-box-open" style="color: #10B981;"></i> <span id="priv-card-title">طلباتي الحالية</span></div>
             <div id="my-active-orders-container" style="display: flex; flex-direction: column; gap: 10px;">
-                <p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات محجوزة لك حالياً</p>
+                <p id="priv-empty" style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات محجوزة لك حالياً</p>
             </div>
         </div>
     </div>
 
     <div id="plaza-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-briefcase" style="color:#8B5CF6;"></i> لوحة الكابتن</h2>
+        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="plaza-back-icon"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-briefcase" style="color:#8B5CF6;"></i> <span id="plaza-head">لوحة الكابتن</span></h2>
 
-        <div class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 14px; font-weight: 800; margin-bottom: 20px;">
+        <div id="plaza-rule-note" class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 14px; font-weight: 800; margin-bottom: 20px;">
             <i class="fas fa-exclamation-circle" style="font-size: 20px;"></i> 
             <span style="display: block; margin-top: 5px;">قانون صارم: ممنوع تشتري أي مسواك أو تتحرك قبل ما تتصل بالزبون وتتأكد منه! إذا الزبون ما جاوب، الغي الطلب فوراً. المندوب اللي يخالف ويشتري بدون اتصال يتحمل الخسارة.</span>
         </div>
@@ -1056,55 +1082,55 @@
                 <i class="fas fa-bell-slash"></i> جرس الطلبات: معطل
            </button>
             
-            <button class="send-btn ripple" style="background: var(--bg-color); color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; box-shadow: none;" onclick="showScreen('log-screen')">
+            <button id="plaza-log-btn" class="send-btn ripple" style="background: var(--bg-color); color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; box-shadow: none;" onclick="showScreen('log-screen')">
                 <i class="fas fa-list-alt"></i> سجل الطلبات (المنجزة والملغية)
            </button>
         </div>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
             <div class="form-card" style="background: linear-gradient(135deg, var(--primary) 0%, #818CF8 100%); color:white; border:none; margin: 0; padding: 15px; text-align: center;">
-                <h4 style="color:rgba(255,255,255,0.8); margin:0; font-size:14px;">المنجزة 📦</h4>
+                <h4 id="plaza-stat-1" style="color:rgba(255,255,255,0.8); margin:0; font-size:14px;">المنجزة ✅</h4>
                 <p id="stat-count" style="font-size: 35px; font-weight:800; color:white; margin:5px 0 0;">0</p>
                 <div style="display:none;"><span id="stat-driver">0</span><span id="stat-admin">0</span></div>
             </div>
             
             <div class="form-card" style="background: linear-gradient(135deg, #EF4444 0%, #FCA5A5 100%); color:white; border:none; margin: 0; padding: 15px; text-align: center;">
-                <h4 style="color:rgba(255,255,255,0.8); margin:0; font-size:14px;">الطلبات الملغية 🚫</h4>
+                <h4 id="plaza-stat-2" style="color:rgba(255,255,255,0.8); margin:0; font-size:14px;">الطلبات الملغية 🚫</h4>
                 <p id="stat-canceled-count" style="font-size: 35px; font-weight:800; color:white; margin:5px 0 0;">0</p>
             </div>
         </div>
 
         <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-qrcode"></i> تأكيد تسليم/تحصيل جديد</div>
+            <div class="form-card-title"><i class="fas fa-qrcode"></i> <span id="plaza-verify-title">تأكيد تسليم/تحصيل جديد</span></div>
             <div class="form-group">
-               <label>رقم هاتف الزبون</label>
+               <label id="lbl-plaza-phone">رقم هاتف الزبون</label>
                <input type="tel" id="driverVerifyPhoneInput" placeholder="مثال: 07700000000" style="text-align:center;" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
-               <span class="step-number">خطوة رقم (1)</span>
+               <span id="plaza-step1" class="step-number">خطوة رقم (1)</span>
            </div>
             <div class="form-group">
-               <label>كود التأكيد (من الزبون)</label>
+               <label id="lbl-plaza-code">كود التأكيد (من الزبون)</label>
                <input type="number" id="driverVerifyInput" placeholder="مثال: 1234" style="text-align:center; font-size:22px; letter-spacing:4px; font-weight:bold;">
-               <span class="step-number">خطوة رقم (2)</span>
+               <span id="plaza-step2" class="step-number">خطوة رقم (2)</span>
            </div>
-            <button class="send-btn ripple" style="background: #10B981; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); margin-top:5px;" onclick="processVerifyCode()"><i class="fas fa-check-circle"></i> تأكيد العملية</button>
+            <button id="plaza-verify-btn" class="send-btn ripple" style="background: #10B981; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); margin-top:5px;" onclick="processVerifyCode()"><i class="fas fa-check-circle"></i> تأكيد العملية</button>
         </div>
 
         <div class="leaderboard-card">
-            <div class="form-card-title" style="justify-content:center;"><i class="fas fa-trophy"></i> دوري الأبطال</div>
+            <div class="form-card-title" style="justify-content:center;"><i class="fas fa-trophy"></i> <span id="plaza-league-title">دوري الأبطال</span></div>
             <div id="leaderboard-list">
-                <p style="text-align: center; color: var(--text-muted);">جاري تحميل الترتيب...</p>
+                <p id="plaza-league-load" style="text-align: center; color: var(--text-muted);">جاري تحميل الترتيب...</p>
            </div>
-            <small style="display: block; text-align: center; margin-top: 15px; color: var(--text-muted); font-weight:600;">المنافسة مستمرة🏆</small>
+            <small id="plaza-league-sub" style="display: block; text-align: center; margin-top: 15px; color: var(--text-muted); font-weight:600;">المنافسة مستمرة🏆</small>
         </div>
 
         <p id="driver-display-name" style="text-align: center; font-weight: 700; color: var(--text-muted); margin-top:30px;"></p>
-        <button class="resign-btn ripple-dark" onclick="resignDriver()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج / استقالة</button>
+        <button id="plaza-logout-btn" class="resign-btn ripple-dark" onclick="resignDriver()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج / استقالة</button>
     </div>
 
     <div id="log-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('plaza-screen')"><i class="fas fa-arrow-right"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> سجل الكابتن</h2>
+        <button class="back-btn ripple-dark" onclick="showScreen('plaza-screen')"><i class="fas fa-arrow-right" id="log-back-icon"></i></button>
+        <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> <span id="log-head">سجل الكابتن</span></h2>
         
         <div style="display: flex; gap: 10px; margin-bottom: 20px;">
             <button id="tab-completed" class="send-btn ripple" style="margin: 0; background: var(--primary); box-shadow: none; font-size: 14px; border-radius: 12px;" onclick="switchLogTab('completed')">المنجزة ✅</button>
@@ -1139,17 +1165,243 @@
       const SCOZI_CHAT_ID = "-1003315608193";
       const ROYAL_FOOD_CHAT_ID = "-1003798976901";
 
+      // -----------------------------------------------------------
+      // نظام الترجمة واللغة (Language Translation System)
+      // -----------------------------------------------------------
+      const translations = {
+          en: {
+              'side-lang-text': 'التبديل للعربية',
+              'side-dark-text': 'Toggle Dark Mode',
+              'side-support-text': 'Contact Support',
+              'side-logout-text': 'Logout',
+              'side-name': 'Al-Bandar',
+              'nav-home-text': 'Home',
+              'nav-shop-text': 'Groceries',
+              'nav-tuk-text': 'TukTuk',
+              'nav-med-text': 'Mediator',
+              'nav-acc-text': 'Account',
+              'main-title': 'Al-Bandar',
+              'main-sub': 'What are you craving today?',
+              'sys-alert-title': 'System Alert',
+              'sys-alert-sub': 'App is offline from 2 AM to 8 AM.',
+              'price-alert-title': 'Delivery Prices (Notice)',
+              'price-alert-sub': 'Check prices for all Um Qasr areas',
+              'srv-shop-title': 'Grocery Shopping',
+              'srv-shop-sub': 'Order anything, we deliver',
+              'srv-tuk-title': 'TukTuk Ride',
+              'srv-tuk-sub': 'Fast & safe pickups',
+              'srv-med-title': 'Mediator',
+              'srv-med-sub': 'Transfer items between people',
+              'srv-share-title': 'Share & Win Free Delivery',
+              'srv-share-sub': 'Send your link to friends 🎁',
+              'srv-join-title': 'Join as Captain',
+              'srv-join-sub': 'Register and start earning',
+              'srv-plaza-title': 'Captain Dashboard',
+              'srv-plaza-sub': 'Orders & Statistics',
+              'pub-order-title': 'Public Orders',
+              'priv-order-title': 'Reserved Orders',
+              
+              // Login Screen
+              'login-h2': 'Welcome to Al-Bandar',
+              'login-p': 'Login in two simple steps!',
+              'login-s1-h3': 'What is your name?',
+              'login-s1-p': 'Enter your name so we can serve you better',
+              'login-s2-h3': 'Verify with your number',
+              'login-s2-p': 'Enter your Iraqi number (starts with 07)',
+              
+              // TukTuk Screen
+              'tuk-head': 'TukTuk Ride',
+              'tuk-loc-notice': 'Note: Your location is detected automatically 📍',
+              'tuk-p-info': 'Customer Details',
+              'lbl-tuk-name': 'Full Name',
+              'lbl-tuk-phone': 'Phone Number',
+              'tuk-r-info': 'Ride Details',
+              'lbl-tuk-drop': 'Drop-off Location (Required)',
+              'tuk-map-hint': '💡 You can pick the location directly from the map now! 🗺️',
+              'tuk-map-success': 'Location picked successfully!',
+              'lbl-tuk-land': 'Nearest Landmark (Optional)',
+              'tuk-final-btn': 'Request TukTuk',
+              
+              // Mediator Screen
+              'med-head': 'Mediator Service',
+              'med-loc-notice': 'Note: Your location is detected automatically 📍',
+              'med-prices-title': 'Mediator Service Prices 🤝',
+              'med-p-info': 'Sender Details',
+              'lbl-med-name': 'Full Name',
+              'lbl-med-phone': 'Phone Number',
+              'lbl-med-land': 'Nearest Landmark',
+              'med-o-info': 'Order Details',
+              'lbl-med-order': 'What is the item? And where to?',
+              'med-final-btn': 'Confirm Mediator Order',
+              
+              // Shop Screen
+              'shop-head': 'Grocery Shopping',
+              'shop-loc-notice': 'Note: Your location is detected automatically 📍',
+              'loy-txt': 'Your Order No.',
+              'shop-p-info': 'Delivery Details',
+              'lbl-shop-name': 'Name',
+              'lbl-shop-phone': 'Phone Number',
+              'lbl-shop-land': 'Landmark',
+              'shop-o-info': 'What do you need us to buy?',
+              'shop-final-btn': 'Send Order Now',
+              
+              // Join Screen
+              'join-head': 'Join as Captain',
+              'join-p-info': 'Registration Details',
+              'lbl-join-name': 'Full Name',
+              'lbl-join-phone': 'Phone Number',
+              'lbl-join-bike': 'Vehicle Type',
+              'opt-bike-def': 'Select type...',
+              'opt-bike-1': 'Iranian Bike',
+              'opt-bike-2': 'Boxer Bike',
+              'opt-bike-3': 'TukTuk',
+              
+              // Captain Plaza & Orders
+              'plaza-head': 'Captain Dashboard',
+              'plaza-stat-1': 'Completed ✅',
+              'plaza-stat-2': 'Canceled 🚫',
+              'plaza-verify-title': 'Confirm New Delivery',
+              'lbl-plaza-phone': 'Customer Phone',
+              'lbl-plaza-code': 'Confirmation Code',
+              'plaza-league-title': 'Champions League',
+              'plaza-league-sub': 'The competition is ongoing 🏆',
+              'log-head': 'Captain Log',
+              'tab-completed': 'Completed ✅',
+              'tab-canceled': 'Canceled 🚫',
+              'pub-head': 'Public Orders',
+              'pub-card-title': 'Available Orders',
+              'priv-head': 'Reserved Orders',
+              'priv-card-title': 'My Active Orders',
+              
+              // Modals & Alerts
+              'out-zone-title': 'Outside Um Qasr Boundaries!',
+              'out-zone-desc1': 'This app works <span style="color: var(--danger);">ONLY</span> inside Um Qasr.',
+              'out-zone-desc2': 'The app is stopped because your current location is out of coverage.',
+              'map-modal-title': 'Select Drop-off 📍',
+              'map-modal-desc': 'Move the map to place the pin on the exact location',
+              'prices-modal-title': 'Delivery Prices 🛵',
+              'success-title': 'Order Sent Successfully!',
+              'success-desc1': 'Please wait until we contact you.',
+              'success-desc2': '⚠️ Do not send another order by mistake to avoid duplication!',
+              'cancel-title': 'Reason for Cancellation',
+              'cancel-label': 'Choose a reason:',
+              'device-type-title': 'What is your device?',
+              'device-android': 'Android',
+              'device-ios': 'iPhone (iOS)',
+              'off-title': 'No Internet Connection',
+              'off-text': 'Please connect to the internet to continue.',
+              
+              // Static Restaurant Names translation on Home (optional, but good for full English)
+              'rest-1-title': 'Ruken Estkana', 'rest-1-sub': 'Grills, Oriental & Western',
+              'rest-2-title': 'Royal Food', 'rest-2-sub': 'Burger, Pizza & Meals',
+              'rest-3-title': 'Victoria', 'rest-3-sub': 'Burger & Sandwiches',
+              'rest-4-title': 'Klashe', 'rest-4-sub': 'Juices & Drinks',
+              'rest-5-title': 'Al Khaleej', 'rest-5-sub': 'Delicious Food',
+              'rest-6-title': 'Scoozi', 'rest-6-sub': 'Tasty Meals',
+              'rest-7-title': 'Abo Hamoody', 'rest-7-sub': 'Original Taste',
+              'rest-8-title': 'Ali Salem', 'rest-8-sub': 'Best Burger in Um Qasr',
+              'rest-9-title': 'New Restaurant', 'rest-9-sub': 'Coming Soon...'
+          }
+      };
+
+      let currentLang = localStorage.getItem('app_lang') || 'ar';
+
+      function toggleLanguage() {
+          currentLang = currentLang === 'ar' ? 'en' : 'ar';
+          localStorage.setItem('app_lang', currentLang);
+          location.reload(); // إعادة تحميل الصفحة لتطبيق الترجمة على كل شيء بما فيها القوائم الديناميكية
+      }
+
+      function applyLanguage() {
+          document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+          document.documentElement.lang = currentLang;
+          
+          if (currentLang === 'en') {
+              // تغيير النصوص بناءً على القاموس
+              for (const [id, text] of Object.entries(translations.en)) {
+                  const el = document.getElementById(id);
+                  if (el) el.innerHTML = text;
+              }
+              
+              // تغيير العناصر التي لا تحتوي ID مباشر أو معقدة
+              const loginBtn = document.getElementById('direct-login-btn');
+              if(loginBtn) loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+              
+              const s1Btn = document.getElementById('login-s1-btn');
+              if(s1Btn) s1Btn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+              
+              const joinBtn = document.getElementById('joinSendBtn');
+              if(joinBtn) joinBtn.innerHTML = 'Submit Join Request';
+              
+              const actBtn1 = document.getElementById('act-btn1');
+              if(actBtn1) actBtn1.innerHTML = 'Activate Account';
+              
+              const mapBtn = document.getElementById('map-modal-btn');
+              if(mapBtn) mapBtn.innerHTML = 'Confirm Location <i class="fas fa-check"></i>';
+              
+              const cancelBtn = document.getElementById('cancel-confirm-btn');
+              if(cancelBtn) cancelBtn.innerHTML = 'Confirm Cancel <i class="fas fa-check"></i>';
+
+              const offBtnW = document.getElementById('off-btn-wifi');
+              if(offBtnW) offBtnW.innerHTML = 'Connect via WiFi';
+              
+              const offBtnD = document.getElementById('off-btn-data');
+              if(offBtnD) offBtnD.innerHTML = 'Connect via Mobile Data';
+              
+              const cartBtn = document.getElementById('cart-continue-btn');
+              if(cartBtn) cartBtn.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
+
+              // ترجمة الـ Placeholders
+              const pMap = {
+                  'loginNameInput': 'Enter your full name...',
+                  'loginPhoneInput': 'Example: 07700000000',
+                  'tukName': 'Enter your name here',
+                  'tukPhone': 'Example: 07700000000',
+                  'tukLandmark': 'School, Mosque, or intersection...',
+                  'medName': 'Enter your name',
+                  'medPhone': 'Example: 07700000000',
+                  'medLandmark': 'To help the captain find you',
+                  'medOrder': 'Example: I want to transfer keys from port intersection to Engineers neighborhood...',
+                  'custName': 'Your name',
+                  'custPhone': 'Example: 07700000000',
+                  'custLandmark': 'Quick description of your location',
+                  'custOrder': 'Write your order details here (food, groceries, pharmacy)...',
+                  'driverJoinName': 'Your full name',
+                  'driverJoinPhone': 'Example: 07700000000',
+                  'driverVerifyPhoneInput': 'Example: 07700000000',
+                  'driverVerifyInput': 'Example: 1234',
+                  'activationCodeInput': 'Enter code here...',
+                  'forcedVerifyInput': 'Enter code here'
+              };
+              for (const [id, ph] of Object.entries(pMap)) {
+                  const el = document.getElementById(id);
+                  if (el) el.placeholder = ph;
+              }
+              
+              // ترجمة التنبيهات والأخطاء الشائعة
+              document.querySelectorAll('.phone-error').forEach(el => el.innerHTML = '⚠️ Invalid number (must be 11 digits starting with 07)');
+              document.querySelectorAll('.step-number').forEach((el, index) => el.innerHTML = `Step (${index + 1})`);
+          }
+      }
+      
+      // تشغيل الترجمة فوراً عند بدء السكريبت
+      applyLanguage();
+
+      // -----------------------------------------------------------
+      // المتغيرات العامة الأساسية
+      // -----------------------------------------------------------
       let userCoords = ""; 
       let driverActiveOrders = 0; 
       let forcedVerifyCustomerPhone = ""; 
       let currentLogTab = 'completed'; 
 
-      const CURRENT_VERSION = "2.0.26"; 
+      const CURRENT_VERSION = "2.0.29"; // تم تحديث النسخة
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
-          window.location.reload(true); 
+          // window.location.reload(true); 
       }
 
+      // إحداثيات مدينة أم قصر
       const umQasrPolygon = [
           { lat: 30.0800, lng: 47.9600 }, 
           { lat: 30.0800, lng: 47.8800 }, 
@@ -1200,112 +1452,7 @@
               }
           }, 3000); 
       });
-
-      function applyDeliveryDiscount() {
-          try {
-              const today = new Date();
-              const offerStart = new Date(2026, 3, 12); 
-              const offerEnd = new Date(2026, 3, 19, 23, 59, 59); 
-
-              if (today >= offerStart && today <= offerEnd) {
-                  const deliveryPrices = document.querySelectorAll('#prices-modal .price-item');
-                  
-                  deliveryPrices.forEach(item => {
-                      const valSpan = item.querySelector('.price-val');
-                      if (valSpan) {
-                          let currentText = valSpan.innerText;
-                          let numericValue = parseInt(currentText.replace(/[^0-9]/g, ''));
-                          
-                          if (!isNaN(numericValue) && numericValue >= 500) {
-                              let newPrice = numericValue - 500;
-                              valSpan.innerHTML = `<s style="color:var(--text-muted); font-size:12px; margin-left:5px;">${numericValue.toLocaleString()}</s> <span style="color:var(--danger); font-weight:900;">${newPrice.toLocaleString()} د.ع</span>`;
-                          }
-                      }
-                  });
-                  
-                  let homeScreen = document.querySelector('#home-screen .services-grid');
-                  if(homeScreen && !document.getElementById('discount-banner')) {
-                      let banner = document.createElement('div');
-                      banner.id = 'discount-banner';
-                      banner.className = 'select-card card-full ripple';
-                      banner.style = 'background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%); color: white; border: none; margin-bottom: 5px; animation: scaleIn 0.5s ease;';
-                      banner.innerHTML = `
-                          <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-percent"></i></div>
-                          <div class="card-text">
-                              <h3 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800;">عرض الأسبوع المذهل! 🎉</h3>
-                              <small style="color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 600;">خصم 500 دينار على أسعار التوصيل لكل المناطق</small>
-                          </div>
-                      `;
-                      homeScreen.insertBefore(banner, homeScreen.firstChild);
-                  }
-              }
-          } catch (error) {
-              console.log("خطأ في تطبيق الخصم تم تجاوزه", error);
-          }
-      }
-
-      function checkTimeLock() {
-          const now = new Date();
-          const hour = now.getHours();
-          const lockScreen = document.getElementById('global-lock-screen');
-          const lockTitle = document.getElementById('lock-h2');
-          const lockDesc = document.getElementById('lock-p');
-          const isAdmin = localStorage.getItem('isAdmin') === 'true';
-
-         if (hour >= 2 && hour < 8) {
-              appIsActive = false;
-              if (lockScreen && !isAdmin) {
-                  lockScreen.style.display = 'flex';
-                  if(lockTitle) lockTitle.innerText = "وقت الراحة 😴";
-                  if(lockDesc) lockDesc.innerText = "التطبيق مغلق حالياً، نرجع نستقبل طلباتكم الساعة 8 صباحاً. تصبحون على خير!";
-              }
-              return true; 
-          }
-          
-          if(lockTitle && lockTitle.innerText === "وقت الراحة 😴") {
-              lockTitle.innerText = "التطبيق مغلق للصيانة 🛠️";
-              lockDesc.innerText = "نعتذر منكم عيني، دا نسوي شوية تحديثات وتطوير للتطبيق. نرجع نستقبل طلباتكم بأقرب وقت!";
-          }
-          
-          return false; 
-      }
-
-      function checkPhoneLive(input) {
-          let errorSpan = input.parentNode.querySelector('.phone-error');
-          if (!errorSpan) return;
-          if (input.value.length === 0) {
-             errorSpan.style.display = 'none';
-             input.style.borderColor = '';
-          } else if (!/^07[0-9]{9}$/.test(input.value)) {
-             errorSpan.style.display = 'block';
-             input.style.borderColor = 'var(--danger)';
-          } else {
-             errorSpan.style.display = 'none';
-             input.style.borderColor = '#10B981'; 
-          }
-      }
-
-      function toggleOrderSound() {
-         isSoundEnabled = !isSoundEnabled;
-         localStorage.setItem('sound_enabled', isSoundEnabled); 
-          const btn = document.getElementById('soundToggleBtn');
-          if (isSoundEnabled) {
-             btn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل';
-              btn.style.background = '#F59E0B'; 
-             btn.style.color = 'white';
-             newOrderAudio.play().catch(e => {}); 
-             startOrderPolling();
-             showToast("🔔 تم تفعيل جرس تنبيه الطلبات!");
-          } else {
-              btn.innerHTML = '<i class="fas fa-bell-slash"></i> جرس الطلبات: معطل';
-             btn.style.background = 'var(--text-muted)';
-             btn.style.color = 'white';
-             clearInterval(orderPollInterval);
-             showToast("تم إيقاف الجرس 🔕");
-          }
-      }
-      
-      async function checkNewOrdersForSound() {
+        async function checkNewOrdersForSound() {
          if(!isSoundEnabled || !navigator.onLine) return;
           try {
               const resp = await fetch(`${GS_URL}?action=checkNewOrders&t=${new Date().getTime()}`);
@@ -1313,7 +1460,7 @@
              if(!isNaN(currentCount)) {
                  if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
                      newOrderAudio.play().catch(e=>{});
-                      showToast("🔔طلب جديد نزل بالساحة!");
+                      showToast(currentLang === 'en' ? "🔔 New order available!" : "🔔طلب جديد نزل بالساحة!");
                      if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
                   }
                  lastOrderCount = currentCount;
@@ -1331,7 +1478,7 @@
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
                  (position) => {
-                     userCoords = `https://www.google.com/maps?q=$${position.coords.latitude},${position.coords.longitude}`;
+                     userCoords = `https://www.google.com/maps?q=$$${position.coords.latitude},${position.coords.longitude}`;
                      checkAppAccess(position.coords.latitude, position.coords.longitude);
                   },
                  (error) => { console.warn("GPS Denied on load"); },
@@ -1344,7 +1491,7 @@
          secretCounter++;
           if (secretCounter === 5) {
              secretCounter = 0;
-              let pass = prompt("أدخل الرمز السري:");
+              let pass = prompt(currentLang === 'en' ? "Enter Secret Code:" : "أدخل الرمز السري:");
               if (pass === "2006") {
                  localStorage.setItem('isAdmin', 'true'); 
                  
@@ -1352,9 +1499,9 @@
                  if (adminCard && !document.getElementById('btn-unblock-order')) {
                      let unblockHtml = `
                      <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                         <p style="font-weight: 700; margin-bottom: 10px; color: var(--primary);">صلاحيات الكابتن</p>
+                         <p style="font-weight: 700; margin-bottom: 10px; color: var(--primary);">${currentLang === 'en' ? 'Captain Privileges' : 'صلاحيات الكابتن'}</p>
                          <button id="btn-unblock-order" class="send-btn ripple" style="background: #3B82F6; margin-top: 0; box-shadow: none;" onclick="unlockSecondOrder()">
-                             <i class="fas fa-unlock-alt"></i> فك حظر الطلب الثاني
+                             <i class="fas fa-unlock-alt"></i> ${currentLang === 'en' ? 'Unblock Second Order' : 'فك حظر الطلب الثاني'}
                          </button>
                      </div>`;
                      adminCard.insertAdjacentHTML('beforeend', unblockHtml);
@@ -1363,21 +1510,21 @@
                  showScreen('admin-panel');
                  checkGlobalStatusFromServer(); 
               } else if (pass !== null) {
-                 showToast("الرمز خطأ ❌");
+                 showToast(currentLang === 'en' ? "Wrong Code ❌" : "الرمز خطأ ❌");
               }
           }
       }
 
       function unlockSecondOrder() {
           localStorage.setItem('allow_second_order', 'true');
-          showToast("تم فك الحظر بنجاح! تكدر هسه تحجز طلب ثاني. 🔓");
+          showToast(currentLang === 'en' ? "Unblocked successfully! You can book a second order now. 🔓" : "تم فك الحظر بنجاح! تكدر هسه تحجز طلب ثاني. 🔓");
       }
 
       function handleLockScreenSecret() {
          lockSecretCounter++;
           if (lockSecretCounter === 5) {
              lockSecretCounter = 0;
-              let pass = prompt("أدخل الرمز السري:");
+              let pass = prompt(currentLang === 'en' ? "Enter Secret Code:" : "أدخل الرمز السري:");
               if (pass === "2006") {
                  localStorage.setItem('isAdmin', 'true'); 
                  
@@ -1385,9 +1532,9 @@
                  if (adminCard && !document.getElementById('btn-unblock-order')) {
                      let unblockHtml = `
                      <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                         <p style="font-weight: 700; margin-bottom: 10px; color: var(--primary);">صلاحيات الكابتن</p>
+                         <p style="font-weight: 700; margin-bottom: 10px; color: var(--primary);">${currentLang === 'en' ? 'Captain Privileges' : 'صلاحيات الكابتن'}</p>
                          <button id="btn-unblock-order" class="send-btn ripple" style="background: #3B82F6; margin-top: 0; box-shadow: none;" onclick="unlockSecondOrder()">
-                             <i class="fas fa-unlock-alt"></i> فك حظر الطلب الثاني
+                             <i class="fas fa-unlock-alt"></i> ${currentLang === 'en' ? 'Unblock Second Order' : 'فك حظر الطلب الثاني'}
                          </button>
                      </div>`;
                      adminCard.insertAdjacentHTML('beforeend', unblockHtml);
@@ -1396,7 +1543,7 @@
                  document.getElementById('global-lock-screen').style.display = 'none';
                  showScreen('admin-panel');
               } else if (pass !== null) {
-                  showToast("الرمز خطأ ❌");
+                  showToast(currentLang === 'en' ? "Wrong Code ❌" : "الرمز خطأ ❌");
               }
           }
       }
@@ -1411,13 +1558,13 @@
           try {
               if(typeof db !== 'undefined') {
                   await db.ref('settings/app_status').set(newStatus);
-                  showToast(newStatus === "online" ? "تم فتح التطبيق للجميع ✅" : "تم إغلاق التطبيق 🔴");
+                  showToast(newStatus === "online" ? (currentLang === 'en' ? "App opened for all ✅" : "تم فتح التطبيق للجميع ✅") : (currentLang === 'en' ? "App closed 🔴" : "تم إغلاق التطبيق 🔴"));
               }
           } catch(e) {
-              showToast("حدث خطأ في الاتصال ❌");
+              showToast(currentLang === 'en' ? "Connection Error ❌" : "حدث خطأ في الاتصال ❌");
           } finally { 
-              btnOpen.innerHTML = '<i class="fas fa-unlock"></i> فتح التطبيق';
-              btnClose.innerHTML = '<i class="fas fa-lock"></i> إغلاق التطبيق';
+              btnOpen.innerHTML = currentLang === 'en' ? '<i class="fas fa-unlock"></i> Open App' : '<i class="fas fa-unlock"></i> فتح التطبيق';
+              btnClose.innerHTML = currentLang === 'en' ? '<i class="fas fa-lock"></i> Close App' : '<i class="fas fa-lock"></i> إغلاق التطبيق';
               btnOpen.disabled = false; btnClose.disabled = false;
           }
       }
@@ -1492,24 +1639,25 @@
           const orderButtons = document.querySelectorAll('.order-btn-logic');
           const isAdmin = localStorage.getItem('isAdmin') === 'true';
           if (!appIsActive) {
-             badge.style.display = 'block'; 
+             badge.style.display = 'block';
+             badge.innerText = currentLang === 'en' ? 'Service is currently unavailable 🔴' : 'الخدمة متوقفة حالياً🔴';
               if (!isAdmin) {
                  orderButtons.forEach(btn => {
                      btn.disabled = true;
-                     btn.innerHTML = '<i class="fas fa-lock"></i> مغلق حالياً';
+                     btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-lock"></i> Closed Now' : '<i class="fas fa-lock"></i> مغلق حالياً';
                   });
               } else { orderButtons.forEach(btn => btn.disabled = false); }
           } else {
              badge.style.display = 'none';
-             document.getElementById('tukSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> طلب تكتك توصيلة';
-             document.getElementById('medSendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
-             document.getElementById('sendBtn').innerHTML = '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
+             document.getElementById('tukSendBtn').innerHTML = currentLang === 'en' ? '<i class="fas fa-paper-plane"></i> Request TukTuk' : '<i class="fas fa-paper-plane"></i> طلب تكتك توصيلة';
+             document.getElementById('medSendBtn').innerHTML = currentLang === 'en' ? '<i class="fas fa-paper-plane"></i> Confirm Mediator Order' : '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
+             document.getElementById('sendBtn').innerHTML = currentLang === 'en' ? '<i class="fas fa-paper-plane"></i> Send Order Now' : '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
              orderButtons.forEach(btn => btn.disabled = false);
           }
       }
 
       function userLogout() {
-          if (confirm("هل أنت متأكد من تسجيل الخروج من التطبيق؟")) {
+          if (confirm(currentLang === 'en' ? "Are you sure you want to logout?" : "هل أنت متأكد من تسجيل الخروج من التطبيق؟")) {
              localStorage.clear();
              window.location.replace(window.location.href.split('?')[0]);
           }
@@ -1534,7 +1682,7 @@
       function checkConnection() {
          document.getElementById('offline-screen').style.display = navigator.onLine ? 'none' : 'flex';
       }
-        window.addEventListener('offline', checkConnection);
+      window.addEventListener('offline', checkConnection);
       window.addEventListener('online', checkConnection);
       function openWiFiSettings() { window.location.href = "intent:#Intent;action=android.settings.WIFI_SETTINGS;end"; }
       function openDataSettings() { window.location.href = "intent:#Intent;action=android.settings.WIRELESS_SETTINGS;end"; }
@@ -1569,7 +1717,7 @@
       
       function goToLoginStep2() {
           const nameInput = document.getElementById('loginNameInput').value.trim();
-         if(!nameInput) return showToast("يرجى كتابة اسمك أولاً ⚠️");
+         if(!nameInput) return showToast(currentLang === 'en' ? "Please write your name first ⚠️" : "يرجى كتابة اسمك أولاً ⚠️");
          document.getElementById('login-step-1').style.display = 'none';
          document.getElementById('login-step-2').style.display = 'block';
       }
@@ -1578,15 +1726,15 @@
          document.getElementById('login-step-2').style.display = 'none';
          document.getElementById('login-step-1').style.display = 'block';
       }
-        function completeDirectLogin() {
+      function completeDirectLogin() {
           const userName = document.getElementById('loginNameInput').value.trim();
           const userPhone = document.getElementById('loginPhoneInput').value.trim();
 
-          if(!userName) return showToast("يرجى كتابة اسمك ⚠️");
-          if(!validateIraqiPhone(userPhone)) return showToast("يرجى كتابة رقم عراقي صحيح ⚠️");
+          if(!userName) return showToast(currentLang === 'en' ? "Please write your name ⚠️" : "يرجى كتابة اسمك ⚠️");
+          if(!validateIraqiPhone(userPhone)) return showToast(currentLang === 'en' ? "Please write a valid Iraqi number ⚠️" : "يرجى كتابة رقم عراقي صحيح ⚠️");
 
           const btn = document.getElementById('direct-login-btn');
-          btn.innerHTML = '<span class="baly-spinner"></span> جاري الدخول...';
+          btn.innerHTML = currentLang === 'en' ? '<span class="baly-spinner"></span> Logging in...' : '<span class="baly-spinner"></span> جاري الدخول...';
           btn.disabled = true;
 
           setTimeout(async () => {
@@ -1605,9 +1753,9 @@
               }
 
               showScreen('home-screen'); 
-              showToast("هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
+              showToast(currentLang === 'en' ? "Welcome to Al-Bandar! Logged in successfully 🎉" : "هلا بيك نورت البندر! تم تسجيل الدخول بنجاح 🎉");
               
-              btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
+              btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-sign-in-alt"></i> Login' : '<i class="fas fa-sign-in-alt"></i> تسجيل الدخول';
               btn.disabled = false;
               document.getElementById('login-step-2').style.display = 'none'; 
               document.getElementById('login-step-1').style.display = 'block';
@@ -1667,7 +1815,7 @@
       }
 
       function toggleOtherReason(radio) {
-          if(radio.value === 'مشكلة اخرى') {
+          if(radio.value === 'مشكلة اخرى' || radio.value === 'Other issue') {
               document.getElementById('otherReasonDiv').style.display = 'block';
           } else {
               document.getElementById('otherReasonDiv').style.display = 'none';
@@ -1675,7 +1823,7 @@
       }
 
       async function confirmCancelOrder() {
-          if (!navigator.onLine) return showToast("لا يوجد اتصال بالانترنت ❌");
+          if (!navigator.onLine) return showToast(currentLang === 'en' ? "No Internet Connection ❌" : "لا يوجد اتصال بالانترنت ❌");
           
           const orderId = document.getElementById('cancelOrderId').value;
           const phone = document.getElementById('cancelOrderPhone').value;
@@ -1689,11 +1837,11 @@
               }
           }
 
-          if(reason === 'مشكلة اخرى') {
+          if(reason === 'مشكلة اخرى' || reason === 'Other issue') {
               reason = document.getElementById('otherReasonText').value.trim();
-              if(!reason) return showToast("يرجى كتابة سبب الإلغاء ⚠️");
+              if(!reason) return showToast(currentLang === 'en' ? "Please write the cancellation reason ⚠️" : "يرجى كتابة سبب الإلغاء ⚠️");
           } else if (!reason) {
-              return showToast("يرجى اختيار سبب الإلغاء ⚠️");
+              return showToast(currentLang === 'en' ? "Please select a reason ⚠️" : "يرجى اختيار سبب الإلغاء ⚠️");
           }
 
           const btn = document.querySelector('#cancel-order-modal .send-btn');
@@ -1722,11 +1870,11 @@
               const cancelMsg = `🚫 **طلب ملغي**\nالكابتن: ${dName}\nرقم الزبون: ${phone}\nرقم الطلب: ${orderId}\nسبب الإلغاء: ${reason}`;
               sendToPrivateDiscord(cancelMsg);
 
-              showToast("تم إلغاء الطلب وحذفه من قائمتك 🚫");
+              showToast(currentLang === 'en' ? "Order canceled and removed 🚫" : "تم إلغاء الطلب وحذفه من قائمتك 🚫");
               closeCancelModal();
               
           } catch(e) {
-              showToast("حدث خطأ أثناء الإلغاء ❌");
+              showToast(currentLang === 'en' ? "Error canceling order ❌" : "حدث خطأ أثناء الإلغاء ❌");
           } finally {
               btn.innerHTML = oldText;
               btn.disabled = false;
@@ -1751,34 +1899,34 @@
           if(currentLogTab === 'completed') {
               let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
               if(logs.length === 0) {
-                  container.innerHTML = '<div class="form-card" style="text-align:center;"><i class="fas fa-box-open" style="font-size:40px; color:var(--border-color); margin-bottom:10px;"></i><p style="color:var(--text-muted); font-weight:bold; margin:0;">سجل الطلبات المنجزة فارغ حالياً.</p></div>';
+                  container.innerHTML = `<div class="form-card" style="text-align:center;"><i class="fas fa-box-open" style="font-size:40px; color:var(--border-color); margin-bottom:10px;"></i><p style="color:var(--text-muted); font-weight:bold; margin:0;">${currentLang === 'en' ? 'Completed log is empty.' : 'سجل الطلبات المنجزة فارغ حالياً.'}</p></div>`;
                   return;
               }
               container.innerHTML = logs.map((log, i) => `
-                  <div class="form-card" style="border-right: 4px solid var(--primary); padding: 15px;">
+                  <div class="form-card" style="border-right: ${currentLang === 'en' ? 'none' : '4px solid var(--primary)'}; border-left: ${currentLang === 'en' ? '4px solid var(--primary)' : 'none'}; padding: 15px;">
                      <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-color); padding-bottom:8px; margin-bottom:8px;">
-                         <span style="font-weight:800; color:var(--primary);">الطلب #${logs.length - i}</span>
+                         <span style="font-weight:800; color:var(--primary);">${currentLang === 'en' ? 'Order #' : 'الطلب #'}${logs.length - i}</span>
                          <span style="font-size:12px; color:var(--text-muted);" dir="ltr">${log.date}</span>
                      </div>
-                     <div style="font-size:14px; margin-bottom:5px;"><i class="fas fa-phone-alt" style="color:var(--text-muted); width:20px;"></i> هاتف الزبون: <strong>${log.phone}</strong></div>
-                     <div style="font-size:14px;"><i class="fas fa-map-marker-alt" style="color:var(--danger); width:20px;"></i> الموقع: <strong>أم قصر</strong></div>
-                     <div style="font-size:14px;"><i class="fas fa-money-bill-wave" style="color:var(--gold); width:20px;"></i> أجرة التوصيل: <strong>${log.price}</strong></div>
+                     <div style="font-size:14px; margin-bottom:5px;"><i class="fas fa-phone-alt" style="color:var(--text-muted); width:20px;"></i> ${currentLang === 'en' ? 'Cust Phone:' : 'هاتف الزبون:'} <strong>${log.phone}</strong></div>
+                     <div style="font-size:14px;"><i class="fas fa-map-marker-alt" style="color:var(--danger); width:20px;"></i> ${currentLang === 'en' ? 'Location:' : 'الموقع:'} <strong>${currentLang === 'en' ? 'Um Qasr' : 'أم قصر'}</strong></div>
+                     <div style="font-size:14px;"><i class="fas fa-money-bill-wave" style="color:var(--gold); width:20px;"></i> ${currentLang === 'en' ? 'Delivery Fee:' : 'أجرة التوصيل:'} <strong>${log.price}</strong></div>
                   </div>
               `).join('');
           } else {
               let cLogs = JSON.parse(localStorage.getItem('canceled_logs') || '[]');
               if(cLogs.length === 0) {
-                  container.innerHTML = '<div class="form-card" style="text-align:center;"><i class="fas fa-times-circle" style="font-size:40px; color:var(--border-color); margin-bottom:10px;"></i><p style="color:var(--text-muted); font-weight:bold; margin:0;">لا توجد طلبات ملغية.</p></div>';
+                  container.innerHTML = `<div class="form-card" style="text-align:center;"><i class="fas fa-times-circle" style="font-size:40px; color:var(--border-color); margin-bottom:10px;"></i><p style="color:var(--text-muted); font-weight:bold; margin:0;">${currentLang === 'en' ? 'No canceled orders.' : 'لا توجد طلبات ملغية.'}</p></div>`;
                   return;
               }
-              container.innerHTML = `<div style="text-align:center; margin-bottom: 15px; color: var(--danger); font-weight: bold;">إجمالي الطلبات الملغية: ${cLogs.length}</div>` + cLogs.map((log, i) => `
-                  <div class="form-card" style="border-right: 4px solid var(--danger); padding: 15px; background: rgba(239, 68, 68, 0.05);">
+              container.innerHTML = `<div style="text-align:center; margin-bottom: 15px; color: var(--danger); font-weight: bold;">${currentLang === 'en' ? 'Total Canceled:' : 'إجمالي الطلبات الملغية:'} ${cLogs.length}</div>` + cLogs.map((log, i) => `
+                  <div class="form-card" style="border-right: ${currentLang === 'en' ? 'none' : '4px solid var(--danger)'}; border-left: ${currentLang === 'en' ? '4px solid var(--danger)' : 'none'}; padding: 15px; background: rgba(239, 68, 68, 0.05);">
                      <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--danger); padding-bottom:8px; margin-bottom:8px;">
-                         <span style="font-weight:800; color:var(--danger);">ملغي #${cLogs.length - i}</span>
+                         <span style="font-weight:800; color:var(--danger);">${currentLang === 'en' ? 'Canceled #' : 'ملغي #'}${cLogs.length - i}</span>
                          <span style="font-size:12px; color:var(--text-muted);" dir="ltr">${log.date}</span>
                      </div>
-                     <div style="font-size:14px; margin-bottom:5px; color: var(--text-main);"><i class="fas fa-phone-alt" style="color:var(--text-muted); width:20px;"></i> هاتف الزبون: <strong>${log.phone}</strong></div>
-                     <div style="font-size:14px; color: var(--danger); font-weight: bold;"><i class="fas fa-exclamation-circle" style="width:20px;"></i> سبب الإلغاء: ${log.reason}</div>
+                     <div style="font-size:14px; margin-bottom:5px; color: var(--text-main);"><i class="fas fa-phone-alt" style="color:var(--text-muted); width:20px;"></i> ${currentLang === 'en' ? 'Cust Phone:' : 'هاتف الزبون:'} <strong>${log.phone}</strong></div>
+                     <div style="font-size:14px; color: var(--danger); font-weight: bold;"><i class="fas fa-exclamation-circle" style="width:20px;"></i> ${currentLang === 'en' ? 'Reason:' : 'سبب الإلغاء:'} ${log.reason}</div>
                   </div>
               `).join('');
           }
@@ -1815,11 +1963,11 @@
                   if(order.status === 'pending_driver' || order.status === 'pending_restaurant') {
                       hasAvailable = true;
                       availableContainer.innerHTML += `
-                          <div class="form-card" style="padding: 15px; border-right: 4px solid var(--secondary); margin-bottom: 10px; background: var(--surface); border-radius: var(--radius-md); text-align: right; box-shadow: var(--shadow-sm);">
-                              <p style="margin: 0 0 5px; font-weight: 800; color: var(--primary);">نوع الطلب: ${order.restaurant || 'عام'}</p>
-                              <p style="margin: 0 0 15px; font-size: 13px; color: var(--text-main); line-height: 1.5;">التفاصيل: ${displayItems}</p>
+                          <div class="form-card" style="padding: 15px; border-right: ${currentLang === 'en' ? 'none' : '4px solid var(--secondary)'}; border-left: ${currentLang === 'en' ? '4px solid var(--secondary)' : 'none'}; margin-bottom: 10px; background: var(--surface); border-radius: var(--radius-md); text-align: ${currentLang === 'en' ? 'left' : 'right'}; box-shadow: var(--shadow-sm);">
+                              <p style="margin: 0 0 5px; font-weight: 800; color: var(--primary);">${currentLang === 'en' ? 'Type:' : 'نوع الطلب:'} ${order.restaurant || 'عام'}</p>
+                              <p style="margin: 0 0 15px; font-size: 13px; color: var(--text-main); line-height: 1.5;">${currentLang === 'en' ? 'Details:' : 'التفاصيل:'} ${displayItems}</p>
                               <button class="send-btn ripple" style="padding: 12px; font-size: 14px; background: var(--secondary); color: #000; box-shadow: none; margin-top: 0;" onclick="claimOrder('${order.id}', '${order.customer}', '${order.discordMsgId || ''}', '${order.phone}', '${order.location || ''}', '${safeItems}', '${safeLand}', '${safeLoyalty}', '${safeRestNum}', '${safePrice}', '${safeType}')">
-                                  <i class="fas fa-hand-paper"></i> حجز الطلب لي
+                                  <i class="fas fa-hand-paper"></i> ${currentLang === 'en' ? 'Claim Order' : 'حجز الطلب لي'}
                               </button>
                           </div>
                       `;
@@ -1829,58 +1977,59 @@
                       driverActiveOrders++;
                       
                       let locationButtonsHTML = '';
-                      if (order.type === 'توصيلة' || order.type === 'تكتك توصيلة') {
+                      if (order.type === 'توصيلة' || order.type === 'تكتك توصيلة' || order.type === 'TukTuk Ride') {
                           let dropLinkMatch = order.items ? order.items.match(/(http[s]?:\/\/[^\s]+)/) : null;
                           let dropLink = dropLinkMatch ? dropLinkMatch[0] : '';
                           
                           locationButtonsHTML = `
                               <div style="display: flex; gap: 10px; margin-bottom: 5px; margin-top: 10px;">
-                                  ${order.location && order.location.includes('http') ? `<a href="${order.location}" target="_blank" class="location-btn ripple" style="flex:1; background: #3B82F6; color: white; text-decoration: none; padding: 10px; border: none; font-size: 13px;"><i class="fas fa-map-marker-alt"></i> موقع الصعود</a>` : '<p style="flex:1; font-size: 12px; color: var(--text-muted); text-align:center;">موقع الصعود غير متوفر</p>'}
-                                  ${dropLink ? `<a href="${dropLink}" target="_blank" class="location-btn ripple" style="flex:1; background: #10B981; color: white; text-decoration: none; padding: 10px; border: none; font-size: 13px;"><i class="fas fa-flag-checkered"></i> موقع النزول</a>` : ''}
+                                  ${order.location && order.location.includes('http') ? `<a href="${order.location}" target="_blank" class="location-btn ripple" style="flex:1; background: #3B82F6; color: white; text-decoration: none; padding: 10px; border: none; font-size: 13px;"><i class="fas fa-map-marker-alt"></i> ${currentLang === 'en' ? 'Pickup' : 'موقع الصعود'}</a>` : `<p style="flex:1; font-size: 12px; color: var(--text-muted); text-align:center;">${currentLang === 'en' ? 'Pickup Unavailable' : 'موقع الصعود غير متوفر'}</p>`}
+                                  ${dropLink ? `<a href="${dropLink}" target="_blank" class="location-btn ripple" style="flex:1; background: #10B981; color: white; text-decoration: none; padding: 10px; border: none; font-size: 13px;"><i class="fas fa-flag-checkered"></i> ${currentLang === 'en' ? 'Drop-off' : 'موقع النزول'}</a>` : ''}
                               </div>
                           `;
                       } else {
                           locationButtonsHTML = `
-                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 800; color: var(--text-main);">📍 الموقع:</p>
-                              ${order.location && order.location.includes('http') ? `<a href="${order.location}" target="_blank" class="location-btn ripple" style="background: #10B981; color: white; text-decoration: none; padding: 10px; border: none; margin-bottom: 5px;"><i class="fas fa-map-marker-alt"></i> فتح موقع الزبون بالخريطة</a>` : '<p style="font-size: 13px; color: var(--text-muted);">الموقع غير متوفر</p>'}
+                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 800; color: var(--text-main);">📍 ${currentLang === 'en' ? 'Location:' : 'الموقع:'}</p>
+                              ${order.location && order.location.includes('http') ? `<a href="${order.location}" target="_blank" class="location-btn ripple" style="background: #10B981; color: white; text-decoration: none; padding: 10px; border: none; margin-bottom: 5px;"><i class="fas fa-map-marker-alt"></i> ${currentLang === 'en' ? 'Open Customer Location' : 'فتح موقع الزبون بالخريطة'}</a>` : `<p style="font-size: 13px; color: var(--text-muted);">${currentLang === 'en' ? 'Location Unavailable' : 'الموقع غير متوفر'}</p>`}
                           `;
                       }
 
                       myOrdersContainer.innerHTML += `
-                          <div class="form-card" style="padding: 15px; border-right: 4px solid #10B981; margin-bottom: 10px; background: var(--surface); border-radius: var(--radius-md); text-align: right; box-shadow: var(--shadow-sm);">
+                          <div class="form-card" style="padding: 15px; border-right: ${currentLang === 'en' ? 'none' : '4px solid #10B981'}; border-left: ${currentLang === 'en' ? '4px solid #10B981' : 'none'}; margin-bottom: 10px; background: var(--surface); border-radius: var(--radius-md); text-align: ${currentLang === 'en' ? 'left' : 'right'}; box-shadow: var(--shadow-sm);">
                               <div style="text-align: center; margin-bottom: 15px;">
-                                  <span style="background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid #10B981; padding: 5px 15px; border-radius: 20px; font-weight: 800; font-size: 15px;">✅ تم حجز الطلب بنجاح</span>
+                                  <span style="background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid #10B981; padding: 5px 15px; border-radius: 20px; font-weight: 800; font-size: 15px;">✅ ${currentLang === 'en' ? 'Claimed Successfully' : 'تم حجز الطلب بنجاح'}</span>
                               </div>
-                              <p style="margin: 0 0 10px; font-weight: 800; color: var(--danger); font-size: 16px; text-align: center;">🔑 كود التأكيد: <span style="letter-spacing: 2px;">${key}</span></p>
+                              <p style="margin: 0 0 10px; font-weight: 800; color: var(--danger); font-size: 16px; text-align: center;">🔑 ${currentLang === 'en' ? 'Confirm Code:' : 'كود التأكيد:'} <span style="letter-spacing: 2px;">${key}</span></p>
                               
                               <div style="background: var(--bg-color); padding: 12px; border-radius: 12px; margin-bottom: 12px; border: 1px dashed #10B981;">
-                                  <p style="margin: 0 0 8px; font-size: 15px; font-weight: 800; color: var(--text-main);">👤 الزبون: <span style="color: var(--primary);">${order.customer}</span></p>
-                                  <p style="margin: 0 0 8px; font-size: 15px; font-weight: 800; color: var(--text-main);">📞 الهاتف: <a href="tel:${order.phone}" style="color: #3B82F6; text-decoration: none; font-size: 16px;">${order.phone}</a></p>
-                                  <p style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-main);">📌 الدالة: <span style="color: var(--danger);">${order.land || '-'}</span></p>
+                                  <p style="margin: 0 0 8px; font-size: 15px; font-weight: 800; color: var(--text-main);">👤 ${currentLang === 'en' ? 'Customer:' : 'الزبون:'} <span style="color: var(--primary);">${order.customer}</span></p>
+                                  <p style="margin: 0 0 8px; font-size: 15px; font-weight: 800; color: var(--text-main);">📞 ${currentLang === 'en' ? 'Phone:' : 'الهاتف:'} <a href="tel:${order.phone}" style="color: #3B82F6; text-decoration: none; font-size: 16px;">${order.phone}</a></p>
+                                  <p style="margin: 0; font-size: 15px; font-weight: 800; color: var(--text-main);">📌 ${currentLang === 'en' ? 'Landmark:' : 'الدالة:'} <span style="color: var(--danger);">${order.land || '-'}</span></p>
                               </div>
 
-                              <p style="margin: 0 0 8px; font-weight: 800; color: var(--primary);">📦 تفاصيل الطلب:</p>
-                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 700; color: var(--text-main);">🔵 نوع الطلب: ${order.type || 'مسواك'}</p>
-                              <p style="margin: 0 0 8px; font-size: 14px; font-weight: 700; line-height: 1.5; color: var(--text-main);">📝 الطلب:<br><span style="font-weight: 600; color: var(--text-muted);">${displayItems}</span></p>
-                              <p style="margin: 0 0 10px; font-size: 14px; font-weight: 700; color: var(--text-main);">🔢 تسلسل العميل: <span style="color: #F59E0B;">${order.loyaltyMsg || '-'}</span></p>
+                              <p style="margin: 0 0 8px; font-weight: 800; color: var(--primary);">📦 ${currentLang === 'en' ? 'Order Details:' : 'تفاصيل الطلب:'}</p>
+                              <p style="margin: 0 0 5px; font-size: 14px; font-weight: 700; color: var(--text-main);">🔵 ${currentLang === 'en' ? 'Type:' : 'نوع الطلب:'} ${order.type || 'مسواك'}</p>
+                              <p style="margin: 0 0 8px; font-size: 14px; font-weight: 700; line-height: 1.5; color: var(--text-main);">📝 ${currentLang === 'en' ? 'Items:' : 'الطلب:'}<br><span style="font-weight: 600; color: var(--text-muted);">${displayItems}</span></p>
+                              <p style="margin: 0 0 10px; font-size: 14px; font-weight: 700; color: var(--text-main);">🔢 ${currentLang === 'en' ? 'Seq:' : 'تسلسل العميل:'} <span style="color: #F59E0B;">${order.loyaltyMsg || '-'}</span></p>
                               
                               ${locationButtonsHTML}
 
-                              <a href="tel:${order.phone}" class="send-btn ripple" style="background: #3B82F6; color: white; text-decoration: none; padding: 10px; display: block; text-align: center; margin-top: 10px;"><i class="fas fa-phone-alt"></i> اتصال بالزبون</a>
+                              <a href="tel:${order.phone}" class="send-btn ripple" style="background: #3B82F6; color: white; text-decoration: none; padding: 10px; display: block; text-align: center; margin-top: 10px;"><i class="fas fa-phone-alt"></i> ${currentLang === 'en' ? 'Call Customer' : 'اتصال بالزبون'}</a>
                               
                               <button class="send-btn ripple" style="background: var(--danger); color: white; padding: 10px; margin-top: 10px; box-shadow: none; border-radius: 12px;" onclick="cancelOrderPrompt('${key}', '${order.phone}')">
-                                  <i class="fas fa-times-circle"></i> إلغاء الطلب 
+                                  <i class="fas fa-times-circle"></i> ${currentLang === 'en' ? 'Cancel Order' : 'إلغاء الطلب'} 
                               </button>
                           </div>
                       `;
                   }
               }
               
-              if(!hasAvailable) availableContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات متاحة حالياً</p>';
-              if(!hasMyOrders) myOrdersContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات محجوزة لك حالياً</p>';
+              if(!hasAvailable) availableContainer.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">${currentLang === 'en' ? 'No available orders currently' : 'لا توجد طلبات متاحة حالياً'}</p>`;
+              if(!hasMyOrders) myOrdersContainer.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">${currentLang === 'en' ? 'No active orders for you currently' : 'لا توجد طلبات محجوزة لك حالياً'}</p>`;
           });
       }
-                async function claimOrder(orderId, customerName, discordMsgId, phone, location, items, land, loyaltyMsg, restOrderNumbers, price, type) {
+      
+      async function claimOrder(orderId, customerName, discordMsgId, phone, location, items, land, loyaltyMsg, restOrderNumbers, price, type) {
           let limit = localStorage.getItem('allow_second_order') === 'true' ? 2 : 1;
           
           if (driverActiveOrders >= limit) {
@@ -1888,7 +2037,7 @@
               return; 
           }
 
-          const driverName = localStorage.getItem('driver_name') || 'كابتن غير معروف';
+          const driverName = localStorage.getItem('driver_name') || (currentLang === 'en' ? 'Unknown Captain' : 'كابتن غير معروف');
           const driverPhone = localStorage.getItem('driver_phone') || '';
           
           if(typeof db !== 'undefined') {
@@ -1908,7 +2057,7 @@
           
           sendToPrivateDiscord(privateMsg);
           
-          showToast("تم حجز الطلب بنجاح! راجع الطلبات المحجوزة.");
+          showToast(currentLang === 'en' ? "Order Claimed! Check My Orders." : "تم حجز الطلب بنجاح! راجع الطلبات المحجوزة.");
       }
 
       async function fetchDynamicMenus() {
@@ -1975,7 +2124,7 @@
              container.classList.remove('menu-grid-view');
               const grouped = {};
               items.forEach(item => {
-                 const cat = item.category || 'أخرى';
+                 const cat = item.category || (currentLang === 'en' ? 'Others' : 'أخرى');
                   if (!grouped[cat]) grouped[cat] = [];
                  grouped[cat].push(item);
               });
@@ -1993,9 +2142,9 @@
                              currentCart[item.id] = currentCart[item.id] || 0;
                              return `
                              <div class="menu-item" style="display: flex; flex-direction: row;">
-                                 <div class="menu-item-info" style="flex: 1; text-align: right;">
+                                 <div class="menu-item-info" style="flex: 1; text-align: ${currentLang === 'en' ? 'left' : 'right'};">
                                      <h4>${item.name}</h4>
-                                     <span>${item.price.toLocaleString()} د.ع</span>
+                                     <span>${item.price.toLocaleString()} ${currentLang === 'en' ? 'IQD' : 'د.ع'}</span>
                                      ${item.desc ? `<p style="font-size: 11px; color: var(--text-muted); margin: 5px 0 0 0; line-height: 1.4;">${item.desc}</p>` : ''}
                                  </div>
                                  <div class="qty-controls" style="flex-shrink: 0;">
@@ -2020,7 +2169,7 @@
                  <div class="menu-item">
                      <div class="menu-item-info">
                          <h4>${item.name}</h4>
-                         <span>${item.price.toLocaleString()} د.ع</span>
+                         <span>${item.price.toLocaleString()} ${currentLang === 'en' ? 'IQD' : 'د.ع'}</span>
                          ${item.desc ? `<p style="font-size: 11px; color: var(--text-muted); margin: 5px 0 0 0; line-height: 1.4;">${item.desc}</p>` : ''}
                      </div>
                      <div class="qty-controls">
@@ -2046,26 +2195,26 @@
           const items = menus[currentRestaurantId].items;
          items.forEach(item => { total += currentCart[item.id] * item.price; totalItems += currentCart[item.id]; });
          const cartBar = document.getElementById('cartBar');
-          if (totalItems > 0) { cartBar.style.display = 'flex'; document.getElementById('cartTotal').innerText = total.toLocaleString() + ' د.ع'; } 
+          if (totalItems > 0) { cartBar.style.display = 'flex'; document.getElementById('cartTotal').innerText = total.toLocaleString() + (currentLang === 'en' ? ' IQD' : ' د.ع'); } 
           else { cartBar.style.display = 'none'; }
       }
 
       function checkoutRestaurant() {
           let restaurantName = menus[currentRestaurantId].name;
-          let orderDetails = `طلب من ${restaurantName}:\n\n`;
+          let orderDetails = currentLang === 'en' ? `Order from ${restaurantName}:\n\n` : `طلب من ${restaurantName}:\n\n`;
           let total = 0;
           const items = menus[currentRestaurantId].items;
          items.forEach(item => {
               if (currentCart[item.id] > 0) {
                   let lineTotal = currentCart[item.id] * item.price;
-                 orderDetails += `🔸 ${currentCart[item.id]}x ${item.name} = ${lineTotal.toLocaleString()} د.ع\n`;
+                 orderDetails += `🔸 ${currentCart[item.id]}x ${item.name} = ${lineTotal.toLocaleString()} ${currentLang === 'en' ? 'IQD' : 'د.ع'}\n`;
                  total += lineTotal;
               }
           });
-          orderDetails += `\n💵 المجموع الكلي: ${total.toLocaleString()} د.ع (بدون أجرة التوصيل)`;
+          orderDetails += currentLang === 'en' ? `\n💵 Total: ${total.toLocaleString()} IQD (Without Delivery)` : `\n💵 المجموع الكلي: ${total.toLocaleString()} د.ع (بدون أجرة التوصيل)`;
          document.getElementById('custOrder').value = orderDetails;
           showScreen('order-screen');
-         showToast("تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
+         showToast(currentLang === 'en' ? "Order Prepared! 📝 Write your address and send." : "تم تحضير الطلب! 📝 اكتب عنوانك وأرسل.");
       }
 
       function checkStatus() {
@@ -2088,7 +2237,7 @@
              if(accBtn) {
                  accBtn.setAttribute('onclick', "showScreen('plaza-screen'); updateNav(this)");
                  document.getElementById('nav-acc-icon').className = 'fas fa-briefcase';
-                 document.getElementById('nav-acc-text').innerText = 'المندوبين';
+                 document.getElementById('nav-acc-text').innerText = currentLang === 'en' ? 'Captains' : 'المندوبين';
               }
              initDriverStatus(); setInterval(checkRemoteReset, 15000); setInterval(refreshLeaderboard, 30000);
              listenToOrders();
@@ -2105,7 +2254,7 @@
       document.addEventListener('DOMContentLoaded', () => {
          checkStatus();
          initAutoLocation(); 
-         applyDeliveryDiscount(); // تشغيل دالة خصم التوصيل بشكل تلقائي
+         applyDeliveryDiscount(); 
 
          setInterval(() => {
              if (checkTimeLock()) applyGlobalStatus();
@@ -2120,10 +2269,11 @@
 
       function shareApp() {
           let myPhone = localStorage.getItem('saved_customer_phone');
-          if (!myPhone) return showToast("لازم تسجل رقمك أولاً! ⚠️");
+          if (!myPhone) return showToast(currentLang === 'en' ? "Register your number first! ⚠️" : "لازم تسجل رقمك أولاً! ⚠️");
           let link = window.location.href.split('?')[0] + "?ref=" + myPhone;
-          if (navigator.share) { navigator.share({ title: 'البندر', text: 'نزل التطبيق واطلب وهذا كود الدعوة مالتي! 🎁', url: link }).catch(console.error); } 
-          else { showToast("تم نسخ الرابط! دزه لأصدقائك 🔗"); }
+          let textShare = currentLang === 'en' ? 'Download the app and use my code! 🎁' : 'نزل التطبيق واطلب وهذا كود الدعوة مالتي! 🎁';
+          if (navigator.share) { navigator.share({ title: currentLang === 'en' ? 'Al-Bandar' : 'البندر', text: textShare, url: link }).catch(console.error); } 
+          else { showToast(currentLang === 'en' ? "Link copied! Share it 🔗" : "تم نسخ الرابط! دزه لأصدقائك 🔗"); }
       }
 
       function saveCustomerData(name, phone) { localStorage.setItem('saved_customer_name', name); localStorage.setItem('saved_customer_phone', phone); }
@@ -2168,7 +2318,7 @@
           const name = document.getElementById('driverJoinName').value.trim();
           const phone = document.getElementById('driverJoinPhone').value.trim();
           const bike = document.getElementById('bikeType').value;
-          if(!name || !validateIraqiPhone(phone) || !bike) return showToast("أكمل البيانات بشكل صحيح 📝");
+          if(!name || !validateIraqiPhone(phone) || !bike) return showToast(currentLang === 'en' ? "Complete the form correctly 📝" : "أكمل البيانات بشكل صحيح 📝");
           const btn = document.getElementById('joinSendBtn');
           const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
           try {
@@ -2195,17 +2345,17 @@
              document.getElementById('welcome-overlay').style.display = 'flex';
              confetti({ particleCount: 200, spread: 90, origin: { y: 0.5 } });
              setTimeout(() => { location.reload(); }, 3500);
-          } else { showToast("رمز التفعيل غير صحيح ❌"); }
+          } else { showToast(currentLang === 'en' ? "Invalid Code ❌" : "رمز التفعيل غير صحيح ❌"); }
       }
 
-      function cancelJoinRequest() { if(confirm("تأكيد الإلغاء؟")) { localStorage.clear(); location.reload(); } }
+      function cancelJoinRequest() { if(confirm(currentLang === 'en' ? "Confirm cancel?" : "تأكيد الإلغاء؟")) { localStorage.clear(); location.reload(); } }
       
       async function resignDriver() { 
-          if (confirm("هل أنت متأكد من تسجيل الخروج والاستقالة؟")) { 
+          if (confirm(currentLang === 'en' ? "Are you sure you want to resign/logout?" : "هل أنت متأكد من تسجيل الخروج والاستقالة؟")) { 
               const dName = localStorage.getItem('driver_name') || "غير معروف";
               const dPhone = localStorage.getItem('driver_phone') || "غير معروف";
               const btn = document.querySelector('.resign-btn');
-              if(btn) btn.innerHTML = '<span class="baly-spinner" style="border-top-color:var(--danger);"></span> جاري الخروج...';
+              if(btn) btn.innerHTML = '<span class="baly-spinner" style="border-top-color:var(--danger);"></span> ' + (currentLang === 'en' ? 'Logging out...' : 'جاري الخروج...');
               try {
                  const msg = `❌ استقالة / تسجيل خروج كابتن:\n👤 الاسم: ${dName}\n📞 الهاتف: ${dPhone}`;
                  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) });
@@ -2222,7 +2372,7 @@
           const bottomNav = document.getElementById('bottomNavigation');
          if(bottomNav) bottomNav.style.display = (id === 'login-screen' || id === 'activation-screen' || id === 'admin-panel' || id === 'restaurant-menu-screen') ? 'none' : 'flex';
          
-          if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = "الكابتن: " + localStorage.getItem('driver_name'); }
+          if(id === 'plaza-screen') { updateStatsUI(); refreshLeaderboard(); document.getElementById('driver-display-name').innerText = (currentLang === 'en' ? "Captain: " : "الكابتن: ") + localStorage.getItem('driver_name'); }
           if(id === 'log-screen') { renderDriverLog(); } 
           if(id === 'order-screen' || id === 'tuk-screen' || id === 'mediator-screen') { loadSavedCustomerData(); }
           if(id === 'order-screen') updateLoyaltyUI();
@@ -2230,18 +2380,18 @@
       }
 
       async function sendTukOrder() {
-          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          if (!navigator.onLine) return showToast(currentLang === 'en' ? "No Internet ❌" : "لا يوجد إنترنت ❌");
           const name = document.getElementById('tukName').value.trim(); const phone = document.getElementById('tukPhone').value.trim();
           const land = document.getElementById('tukLandmark').value.trim(); const dropLink = document.getElementById('tukDropoffLink').value.trim(); 
-          if(!name || !validateIraqiPhone(phone) || !dropLink) return showToast("أكمل البيانات وحدد موقع النزول 📍");
+          if(!name || !validateIraqiPhone(phone) || !dropLink) return showToast(currentLang === 'en' ? "Complete all required fields and pick a location 📍" : "أكمل البيانات وحدد موقع النزول 📍");
          if(!userCoords) {
-             showToast("جاري تحديد موقعك الحالي للطلب...📍");
+             showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
-                     (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
+                     (pos) => { userCoords = `https://www.google.com/maps?q=$$${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
+                     (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
-              } else { showToast("جهازك لا يدعم تحديد الموقع ❌"); }
+              } else { showToast(currentLang === 'en' ? "GPS Not Supported ❌" : "جهازك لا يدعم تحديد الموقع ❌"); }
               return;
           }
           const btn = document.getElementById('tukSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
@@ -2250,7 +2400,7 @@
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`);
              localStorage.removeItem('referred_by'); 
 
-              const type = 'توصيلة';
+              const type = currentLang === 'en' ? 'TukTuk Ride' : 'توصيلة';
               const loyaltyMsg = '-';
               const restOrderNumbers = '-';
 
@@ -2281,16 +2431,16 @@
       }
 
       async function sendMedFinal() {
-          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          if (!navigator.onLine) return showToast(currentLang === 'en' ? "No Internet ❌" : "لا يوجد إنترنت ❌");
           const name = document.getElementById('medName').value.trim(); const phone = document.getElementById('medPhone').value.trim(); const order = document.getElementById('medOrder').value.trim();
           const land = document.getElementById('medLandmark').value.trim();
-          if(!name || !validateIraqiPhone(phone) || !order) return showToast("أكمل البيانات بشكل صحيح 📝");
+          if(!name || !validateIraqiPhone(phone) || !order) return showToast(currentLang === 'en' ? "Complete the form correctly 📝" : "أكمل البيانات بشكل صحيح 📝");
          if(!userCoords) {
-             showToast("جاري تحديد موقعك الحالي للطلب...📍");
+             showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
-                     (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
+                     (pos) => { userCoords = `https://www.google.com/maps?q=$$${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
+                     (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
               return;
@@ -2300,7 +2450,7 @@
              saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
               await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`); localStorage.removeItem('referred_by');
 
-              const type = 'وسيط';
+              const type = currentLang === 'en' ? 'Mediator' : 'وسيط';
               const loyaltyMsg = '-';
               const restOrderNumbers = '-';
 
@@ -2331,18 +2481,18 @@
       }
 
       async function sendFinal() {
-          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          if (!navigator.onLine) return showToast(currentLang === 'en' ? "No Internet ❌" : "لا يوجد إنترنت ❌");
           const name = document.getElementById('custName').value.trim(); 
           const phone = document.getElementById('custPhone').value.trim();
           const order = document.getElementById('custOrder').value.trim(); 
           const land = document.getElementById('custLandmark').value.trim();
-          if(!name || !validateIraqiPhone(phone) || (!order)) return showToast("أكمل البيانات من فضلك 📝");
+          if(!name || !validateIraqiPhone(phone) || (!order)) return showToast(currentLang === 'en' ? "Complete the form please 📝" : "أكمل البيانات من فضلك 📝");
          if(!userCoords) {
-             showToast("جاري تحديد موقعك الحالي للطلب...📍");
+             showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
-                     (err) => { showToast("يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
+                     (pos) => { userCoords = `https://www.google.com/maps?q=$$${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
+                     (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
               return;
@@ -2387,7 +2537,7 @@
                       }).catch(e => {});
                   }
               }
-              const type = 'مسواك';
+              const type = currentLang === 'en' ? 'Groceries/Food' : 'مسواك';
               if(typeof db !== 'undefined') {
                   db.ref('orders/' + vc).set({
                       id: vc, customer: name, phone: phone, items: msgContent, land: land, type: type,
@@ -2402,14 +2552,14 @@
              document.getElementById('custOrder').value = ""; 
              document.getElementById('custLandmark').value = ""; 
              loadSavedCustomerData();
-          } catch (e) { showToast("حدث خطأ أثناء الإرسال ❌"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
+          } catch (e) { showToast(currentLang === 'en' ? "Error sending order ❌" : "حدث خطأ أثناء الإرسال ❌"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
       
       async function processVerifyCode() {
-          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          if (!navigator.onLine) return showToast(currentLang === 'en' ? "No Internet ❌" : "لا يوجد إنترنت ❌");
           const code = document.getElementById('driverVerifyInput').value.trim(); 
           const custPhone = document.getElementById('driverVerifyPhoneInput').value.trim();
-          if(!validateIraqiPhone(custPhone) || !code) return showToast("أدخل بيانات صحيحة ⚠️");
+          if(!validateIraqiPhone(custPhone) || !code) return showToast(currentLang === 'en' ? "Enter valid details ⚠️" : "أدخل بيانات صحيحة ⚠️");
           const btn = document.querySelector('#plaza-screen .send-btn'); 
           const oldText = btn.innerHTML; 
           btn.innerHTML = '<span class="baly-spinner"></span>'; 
@@ -2433,16 +2583,16 @@
                   let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
                   fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
                   syncLoyaltyWithServer(); 
-                  showToast(`تم تأكيد العملية بنجاح! عاشت ايدك 👏`); refreshLeaderboard();
+                  showToast(currentLang === 'en' ? `Process confirmed successfully! Great job 👏` : `تم تأكيد العملية بنجاح! عاشت ايدك 👏`); refreshLeaderboard();
                   document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
-              } else { showToast("الكود غير صحيح ❌"); }
+              } else { showToast(currentLang === 'en' ? "Wrong Code ❌" : "الكود غير صحيح ❌"); }
           } catch(e) {} finally { btn.innerHTML = oldText; btn.disabled = false; }
       }
 
       async function processForcedVerifyCode() {
-          if (!navigator.onLine) return showToast("لا يوجد إنترنت ❌");
+          if (!navigator.onLine) return showToast(currentLang === 'en' ? "No Internet ❌" : "لا يوجد إنترنت ❌");
           const code = document.getElementById('forcedVerifyInput').value.trim();
-          if(!code) return showToast("أدخل الكود أولاً ⚠️");
+          if(!code) return showToast(currentLang === 'en' ? "Enter code first ⚠️" : "أدخل الكود أولاً ⚠️");
 
           const btn = document.querySelector('#code-entry-modal .send-btn');
           const oldText = btn.innerHTML;
@@ -2476,15 +2626,15 @@
                   let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
                   fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
                   
-                  showToast(`تم تأكيد تسليم الطلب بنجاح! تكدر تحجز طلب جديد هسه 👏`); 
+                  showToast(currentLang === 'en' ? `Order delivery confirmed! You can book a new one now 👏` : `تم تأكيد تسليم الطلب بنجاح! تكدر تحجز طلب جديد هسه 👏`); 
                   refreshLeaderboard();
                   document.getElementById('forcedVerifyInput').value = ""; 
                   document.getElementById('code-entry-modal').style.display = 'none';
               } else {
-                  showToast("الكود غير صحيح أو لا يعود لطلبك الحالي ❌");
+                  showToast(currentLang === 'en' ? "Code is incorrect or not related to your current order ❌" : "الكود غير صحيح أو لا يعود لطلبك الحالي ❌");
               }
           } catch(e) {
-              showToast("حدث خطأ في التأكيد");
+              showToast(currentLang === 'en' ? "Error confirming" : "حدث خطأ في التأكيد");
           } finally {
               btn.innerHTML = oldText;
               btn.disabled = false;
@@ -2507,16 +2657,16 @@
               const response = await fetch(`${GS_URL}?action=getAllDriverStats`); const drivers = await response.json();
              drivers.sort((a, b) => (parseInt(b.leagueCount) || 0) - (parseInt(a.leagueCount) || 0));
              listDiv.innerHTML = "";
-             if(drivers.length === 0) { listDiv.innerHTML = '<p style="text-align: center; color: var(--text-muted);">لا يوجد كباتن حالياً</p>'; return; }
+             if(drivers.length === 0) { listDiv.innerHTML = `<p style="text-align: center; color: var(--text-muted);">${currentLang === 'en' ? 'No captains currently' : 'لا يوجد كباتن حالياً'}</p>`; return; }
              drivers.forEach((d, index) => {
                   let medal = (index === 0) ? "🥇" : (index === 1) ? "🥈" : (index === 2) ? "🥉" : `<span style="font-size:16px; color:var(--text-muted);">${index + 1}</span>`;
-                  let isMe = d.phone === localStorage.getItem('driver_phone') ? " (أنت)" : "";
+                  let isMe = d.phone === localStorage.getItem('driver_phone') ? (currentLang === 'en' ? " (You)" : " (أنت)") : "";
                   let bgColor = isMe ? "background: var(--bg-color); border: 1px solid var(--primary);" : "";
                  const div = document.createElement('div'); div.className = "driver-rank"; div.style = bgColor;
                  div.innerHTML = `<div class="rank-info"><span class="rank-medal">${medal}</span> <span>${d.name}${isMe}</span></div><span class="rank-score">${d.leagueCount || 0}</span>`;
                  listDiv.appendChild(div);
               });
-          } catch (e) { listDiv.innerHTML = '<p style="text-align: center; color: var(--danger);">فشل التحميل</p>'; }
+          } catch (e) { listDiv.innerHTML = `<p style="text-align: center; color: var(--danger);">${currentLang === 'en' ? 'Failed to load' : 'فشل التحميل'}</p>`; }
       }
 
       function updateNav(element) { document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); element.classList.add('active'); }
@@ -2529,8 +2679,8 @@
           let currentCount = parseInt(loyaltyCount % 10); 
          if(displayCount) displayCount.innerText = currentCount;
          if(progressBar) progressBar.style.width = (currentCount / 10 * 100) + "%";
-         if(currentCount === 9) { if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i> اطلب الآن! هذا طلب المجاني 🎁"; giftMsg.style.color = "var(--secondary)"; } if(progressBar) progressBar.style.background = "var(--secondary)"; } 
-          else { if(giftMsg) { giftMsg.innerHTML = "<i class='fas fa-gift'></i>أوصل للطلب 10 وكروتك مجانية"; giftMsg.style.color = "var(--primary)"; } if(progressBar) progressBar.style.background = "var(--gold)"; }
+         if(currentCount === 9) { if(giftMsg) { giftMsg.innerHTML = currentLang === 'en' ? "<i class='fas fa-gift'></i> Order now! Your next order is FREE 🎁" : "<i class='fas fa-gift'></i> اطلب الآن! هذا طلب المجاني 🎁"; giftMsg.style.color = "var(--secondary)"; } if(progressBar) progressBar.style.background = "var(--secondary)"; } 
+          else { if(giftMsg) { giftMsg.innerHTML = currentLang === 'en' ? "<i class='fas fa-gift'></i> Reach 10 orders for a free delivery" : "<i class='fas fa-gift'></i>أوصل للطلب 10 وكروتك مجانية"; giftMsg.style.color = "var(--primary)"; } if(progressBar) progressBar.style.background = "var(--gold)"; }
       }
       function updateLoyaltyUI() { updateLocalLoyaltyUI(); } updateLocalLoyaltyUI();
 
@@ -2538,22 +2688,22 @@
           const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
           let current = localStorage.getItem('driver_status') || 'available';
           if(current === 'available') {
-             localStorage.setItem('driver_status', 'busy'); btn.style.background = 'var(--danger)'; btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً';
-             if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; }
+             localStorage.setItem('driver_status', 'busy'); btn.style.background = 'var(--danger)'; btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-minus-circle"></i> I am Busy Now' : '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً';
+             if(badge) { badge.innerText = currentLang === 'en' ? 'You are busy 🔴' : 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; }
           } else {
-             localStorage.setItem('driver_status', 'available'); btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل';
-             if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; }
+             localStorage.setItem('driver_status', 'available'); btn.style.background = 'var(--secondary)'; btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-check-circle"></i> I am Available' : '<i class="fas fa-check-circle"></i> أنا متاح للعمل';
+             if(badge) { badge.innerText = currentLang === 'en' ? 'You are active now 🟢' : 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; }
           }
       }
 
       function initDriverStatus() {
           let current = localStorage.getItem('driver_status') || 'available';
           const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
-          if(current === 'busy') { if(btn) { btn.style.background = 'var(--danger)'; btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً'; } if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; } } 
-          else { if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; } if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; } }
+          if(current === 'busy') { if(btn) { btn.style.background = 'var(--danger)'; btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-minus-circle"></i> I am Busy Now' : '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً'; } if(badge) { badge.innerText = currentLang === 'en' ? 'You are busy 🔴' : 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; } } 
+          else { if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-check-circle"></i> I am Available' : '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; } if(badge) { badge.innerText = currentLang === 'en' ? 'You are active now 🟢' : 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; } }
           const soundBtn = document.getElementById('soundToggleBtn');
          if(isSoundEnabled) {
-             if(soundBtn) { soundBtn.innerHTML = '<i class="fas fa-bell"></i> جرس الطلبات: مفعل'; soundBtn.style.background = '#F59E0B'; soundBtn.style.color = 'white'; }
+             if(soundBtn) { soundBtn.innerHTML = currentLang === 'en' ? '<i class="fas fa-bell"></i> Order Bell: ON' : '<i class="fas fa-bell"></i> جرس الطلبات: مفعل'; soundBtn.style.background = '#F59E0B'; soundBtn.style.color = 'white'; }
              startOrderPolling();
           }
       }
@@ -2571,7 +2721,7 @@
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
       function confirmMapLocation() {
           const center = appMap.getCenter();
-          const googleMapsLink = `https://www.google.com/maps?q=$${center.lat},${center.lng}`;
+          const googleMapsLink = `https://www.google.com/maps?q=$$${center.lat},${center.lng}`;
          document.getElementById('tukDropoffLink').value = googleMapsLink;
          document.getElementById('map-success-msg').style.display = 'block';
          closeMapModal();
@@ -2580,7 +2730,7 @@
       function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
       const menus = {
           'rken_estkana': {
-              name: 'ركن استكانة',
+              name: currentLang === 'en' ? 'Ruken Estkana' : 'ركن استكانة',
               items: [
                   { id: 'rk1', name: 'كيلو كباب لحم', price: 24000, category: '🥩 قسم أكلات المشاوي', desc: '16 شيش كباب، خبز، سلطة، طرشي، وشطة' },
                   { id: 'rk2', name: 'نفر كباب لحم', price: 6000, category: '🥩 قسم أكلات المشاوي', desc: '4 شيش دبل، 3 خبزات، سلطة، طرشي، وشطة' },
@@ -2734,7 +2884,7 @@
               ]
           },
           'royal_food': {
-              name: 'رويال فود',
+              name: currentLang === 'en' ? 'Royal Food' : 'رويال فود',
               items: [
                   { id: 'rf1', name: 'بركر كلاسيك', price: 2500, category: 'بركر اللحم' },
                   { id: 'rf2', name: 'بركر بالجبن', price: 3000, category: 'بركر اللحم' },
@@ -2830,7 +2980,7 @@
               ]
           },
           'victoria': {
-              name: 'مطعم فيكتوريا',
+              name: currentLang === 'en' ? 'Victoria' : 'مطعم فيكتوريا',
               items: [
                   { id: 'v1', name: 'برجر كلاسيك', price: 2500, category: 'قسم البرجر', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو' },
                   { id: 'v2', name: 'برجر جبن', price: 3000, category: 'قسم البرجر', desc: 'قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو + صوص الجبن' },
@@ -2897,7 +3047,7 @@
               ]
           },
           'klashe': {
-              name: 'كلاشي',
+              name: currentLang === 'en' ? 'Klashe' : 'كلاشي',
               items: [
                   { id: 'k1', name: 'عصير برتقال', price: 1000, category: 'قسم العصائر', desc: '' },
                   { id: 'k2', name: 'عصير ليمون', price: 1000, category: 'قسم العصائر', desc: '' },
@@ -2941,7 +3091,7 @@
               ]
           },
           'haleg': {
-              name: 'مطعم الخليج',
+              name: currentLang === 'en' ? 'Al Khaleej' : 'مطعم الخليج',
               items: [
                   { id: 'hal1', name: 'ربع دجاجة', price: 5000, category: 'قسم الدجاج', desc: 'ذبح فرش مع نصف كيلو تمن مع شطة وطرشي ومرق' },
                   { id: 'hal2', name: 'نصف دجاجة', price: 10000, category: 'قسم الدجاج', desc: 'ذبح فرش مع كيلو تمن مع شطة وطرشي ومرق' },
@@ -2970,7 +3120,7 @@
               ]
           },
           'scozi': {
-              name: 'مطعم سكوزي',
+              name: currentLang === 'en' ? 'Scoozi' : 'مطعم سكوزي',
               items: [
                   { id: 'sc1', name: 'وجبة كرسبي', price: 6000, category: 'الوجبات والريزو', desc: '' },
                   { id: 'sc2', name: 'نص وجبة كرسبي', price: 4000, category: 'الوجبات والريزو', desc: '' },
@@ -2997,7 +3147,7 @@
               ]
           },
           'abo_hmode': {
-              name: 'مطعم بركر ابو حمودي',
+              name: currentLang === 'en' ? 'Abo Hamoody Burger' : 'مطعم بركر ابو حمودي',
               items: [
                   { id: 'h1', name: 'بركر كلاسيك', price: 1000 }, { id: 'h2', name: 'بركر جبن', price: 1250 }, { id: 'h3', name: 'بركر مكسيكي', price: 1500 },
                   { id: 'h4', name: 'بركر كرانشي', price: 3000 }, { id: 'h5', name: 'بركر دبل لحم دبل جبن', price: 2500 }, { id: 'h6', name: 'ريزو كلاسيك', price: 3000 },
@@ -3008,7 +3158,7 @@
               ]
           },
           'ali_salem': {
-              name: 'مطعم برجر علي سالم',
+              name: currentLang === 'en' ? 'Ali Salem Burger' : 'مطعم برجر علي سالم',
               items: [
                   { id: 'm1', name: 'برجر', price: 1000 }, { id: 'm2', name: 'برجر جبن', price: 1500 }, { id: 'm3', name: 'ريزو دجاج', price: 3000 },
                   { id: 'm4', name: 'لبن بطل صغير', price: 750 }, { id: 'm5', name: 'لبن بطل كبير', price: 2000 }, { id: 'm6', name: 'بيبسي', price: 500 }, { id: 'm7', name: 'ديو', price: 500 }
