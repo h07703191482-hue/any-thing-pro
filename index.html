@@ -531,7 +531,7 @@
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
            </div>
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">البندر</h3>
-            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">الإصدار 3.1.0.0</p>
+            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">2010/5/25🙁</p>
         </div>
         <div class="sidebar-item ripple-dark" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
             <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
@@ -1531,7 +1531,7 @@
       function initAutoLocation() {
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
-                 (position) => { userCoords = `https://www.google.com/maps?q=$$${position.coords.latitude},${position.coords.longitude}`; checkAppAccess(position.coords.latitude, position.coords.longitude); },
+                 (position) => { userCoords = `https://www.google.com/maps?q=$$${position.coords.latitude},0{position.coords.longitude}`; checkAppAccess(position.coords.latitude, position.coords.longitude); },
                  (error) => { console.warn("GPS Denied"); }, { enableHighAccuracy: true }
               );
           }
@@ -1660,7 +1660,7 @@
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
                  (position) => {
-                     userCoords = `https://www.google.com/maps?q=$$${position.coords.latitude},${position.coords.longitude}`;
+                     userCoords = `https://www.google.com/maps?q=0{position.coords.latitude},${position.coords.longitude}`;
                      checkAppAccess(position.coords.latitude, position.coords.longitude);
                   },
                  (error) => { console.warn("GPS Denied on load"); },
@@ -2570,7 +2570,7 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=$$${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=0{pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               } else { showToast(currentLang === 'en' ? "GPS Not Supported ❌" : "جهازك لا يدعم تحديد الموقع ❌"); }
@@ -2621,7 +2621,7 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=$$${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=0{pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -2673,7 +2673,7 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=$$${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=0{pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -2903,7 +2903,7 @@
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
       function confirmMapLocation() {
           const center = appMap.getCenter();
-          const googleMapsLink = `https://www.google.com/maps?q=$$${center.lat},${center.lng}`;
+          const googleMapsLink = `https://www.google.com/maps?q=0{center.lat},${center.lng}`;
          document.getElementById('tukDropoffLink').value = googleMapsLink;
          document.getElementById('map-success-msg').style.display = 'block';
          closeMapModal();
