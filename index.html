@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#1D4ED8">
+    <meta name="theme-color" content="#5A228B">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
@@ -39,6 +39,18 @@
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('sw.js').then(function(registration) {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, function(err) {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+    </script>
 
     <script>
       const firebaseConfig = {
@@ -106,8 +118,8 @@
 }
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
       body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); margin: 0; padding: 0; color: var(--text-main); min-height: 100vh; line-height: 1.6; overflow-x: hidden; transition: background-color 0.4s ease, color 0.4s ease; }
-      body::before { content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.03) 0%, transparent 50%); z-index: -1; pointer-events: none; }
-     body.dark-mode::before { background: radial-gradient(circle at 50% 0%, rgba(59, 130, 246, 0.08) 0%, transparent 50%); }
+      body::before { content: ""; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at 50% 50%, rgba(90, 34, 139, 0.03) 0%, transparent 50%); z-index: -1; pointer-events: none; }
+     body.dark-mode::before { background: radial-gradient(circle at 50% 0%, rgba(90, 34, 139, 0.08) 0%, transparent 50%); }
       
       .ripple { position: relative; overflow: hidden; }
       .ripple::after { content: ""; position: absolute; top: 50%; left: 50%; width: 150%; padding-top: 150%; background: rgba(255, 255, 255, 0.3); border-radius: 50%; transform: translate(-50%, -50%) scale(0); opacity: 0; transition: transform 0.4s, opacity 0.4s; pointer-events: none; }
@@ -194,13 +206,13 @@
       .form-group label { display: block; font-size: 13px; color: var(--text-muted); font-weight: 700; margin-bottom: 8px; }
       input, textarea, select { width: 100%; padding: 16px 20px; border: 1.5px solid var(--border-color); border-radius: var(--radius-md); font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-main); background: var(--bg-color); transition: all 0.3s ease; appearance: none; }
      input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 0.7; font-weight: 500;}
-      input:focus, textarea:focus, select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); outline: none; }
+      input:focus, textarea:focus, select:focus { border-color: var(--primary); background: var(--surface); box-shadow: 0 0 0 4px rgba(90, 34, 139, 0.1); outline: none; }
       .location-btn { background: var(--bg-color); color: var(--primary); border: 2px dashed var(--primary); padding: 14px; border-radius: var(--radius-md); width: 100%; font-family: 'Cairo'; font-size: 15px; font-weight: 700; cursor: pointer; margin-bottom: 12px; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 10px; }
      .location-btn:active { transform: scale(0.96); }
      .location-btn.success { background: rgba(16, 185, 129, 0.1); color: #10B981; border-color: #10B981; border-style: solid; }
       .phone-note { color: var(--danger); font-size: 12px; font-weight: 600; margin-top: 6px; display: block; text-align: right; padding-right: 5px; }
-      .send-btn { background: linear-gradient(135deg, var(--primary) 0%, #1E3A8A 100%); color: white; width: 100%; padding: 18px; border-radius: var(--radius-md); border: none; font-weight: 800; font-size: 18px; letter-spacing: 0.5px; cursor: pointer; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); margin-top: 10px; transition: all 0.3s ease; }
-      .send-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2); }
+      .send-btn { background: linear-gradient(135deg, var(--primary) 0%, #1E3A8A 100%); color: white; width: 100%; padding: 18px; border-radius: var(--radius-md); border: none; font-weight: 800; font-size: 18px; letter-spacing: 0.5px; cursor: pointer; box-shadow: 0 8px 20px rgba(90, 34, 139, 0.3); margin-top: 10px; transition: all 0.3s ease; }
+      .send-btn:active { transform: scale(0.96); box-shadow: 0 4px 10px rgba(90, 34, 139, 0.2); }
      .send-btn:disabled { background: var(--border-color) !important; color: var(--text-muted) !important; cursor: not-allowed; box-shadow: none !important; transform: none !important; }
       .back-btn { background: var(--surface); border: 1px solid var(--border-color); font-size: 18px; color: var(--text-main); width: 45px; height: 45px; border-radius: 14px; margin-bottom: 25px; box-shadow: var(--shadow-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
       .back-btn:active { transform: translateX(5px); }
@@ -216,7 +228,7 @@
       body.dark-mode .bottom-nav { background: rgba(30, 41, 59, 0.9); border-color: rgba(255,255,255,0.05); }
       .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 15px; color: var(--text-muted); text-decoration: none; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; border-radius: var(--radius-pill); position: relative; }
       .nav-item i { font-size: 20px; transition: transform 0.3s; }
-      .nav-item.active { color: var(--primary); background: rgba(37, 99, 235, 0.1); }
+      .nav-item.active { color: var(--primary); background: rgba(90, 34, 139, 0.1); }
       .nav-item.active i { transform: translateY(-2px); }
       #toast-container { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 100000; display: flex; flex-direction: column; gap: 10px; width: 90%; max-width: 350px; }
       .toast { background: rgba(17, 24, 39, 0.95); color: white; padding: 16px 20px; border-radius: var(--radius-lg); box-shadow: var(--shadow-floating); font-family: 'Cairo', sans-serif; font-size: 14px; font-weight: 700; animation: slideDownToast 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards, fadeOutToast 0.4s ease forwards 3s; display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px); }
@@ -249,7 +261,7 @@
       .sidebar-close { align-self: flex-start; font-size: 15px; color: var(--text-muted); cursor: pointer; background: var(--bg-color); padding: 10px 20px; border-radius: var(--radius-pill); display: flex; align-items: center; gap: 8px; transition: 0.3s; font-weight: 700; margin-bottom: 20px; }
       #welcome-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--surface); z-index: 10000; display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--text-main); text-align: center; padding: 20px; }
       
-      .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(37, 99, 235, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
+      .step-number { font-size: 11px; font-weight: 800; color: var(--primary); background: rgba(90, 34, 139, 0.1); padding: 4px 10px; border-radius: 10px; display: inline-block; margin-top: 8px; }
       .location-notice { font-size: 13px; font-weight: 700; color: #10B981; text-align: center; margin-bottom: 15px; display: block; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: var(--radius-md); border: 1px dashed #10B981;}
 
       .rest-slider { display: grid; grid-template-rows: repeat(2, 1fr); grid-auto-flow: column; grid-auto-columns: 120px; overflow-x: auto; gap: 15px; padding: 0 20px 20px; scroll-snap-type: x mandatory; }
@@ -529,7 +541,7 @@
         <div style="text-align: center; margin-bottom: 30px;">
             <div style="width:80px; height:80px; background:rgba(37, 99, 235, 0.1); border-radius:24px; display:flex; align-items:center; justify-content:center; margin: 0 auto 15px;">
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
-           </div>
+            </div>
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">البندر</h3>
             <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">2010/5/25🙁</p>
         </div>
@@ -593,7 +605,7 @@
         <div style="text-align: center; margin-bottom: 30px;">
             <div style="width:100px; height:100px; background:rgba(90, 34, 139, 0.1); border-radius:30px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: var(--shadow-sm);">
                 <i class="fas fa-user-circle" style="font-size: 50px; color: var(--primary);"></i>
-           </div>
+            </div>
             <h2 id="login-h2" style="margin: 0; font-weight: 800; font-size: 28px; color: var(--text-main);">أهلاً بيك في البندر</h2>
             <p id="login-p" style="margin: 8px 0 0; color: var(--text-muted); font-size: 15px; font-weight: 600;">سجل دخولك بخطوتين بسيطة!</p>
         </div>
@@ -652,7 +664,6 @@
             <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
         </div>
     </div>
-    
     <div id="home-screen" class="screen container active-screen">
       <div class="header-main">
         <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
@@ -898,6 +909,7 @@
                <div class="price-item"><span id="mloc16" style="flex:1;">الترحيب</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
                <div class="price-item"><span id="mloc17" style="flex:1;">القاعدة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">2,000 د.ع</span></div>
                <div class="price-item"><span id="mloc18" style="flex:1;">هدامة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">2,000 د.ع</span></div>
+                <div class="price-item"><span id="mloc18" style="flex:1;">المجمع الكوبتي</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">2,000 د.ع</span></div>
                <div class="price-item"><span id="mloc19" style="flex:1;">الصمود</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">4,000 د.ع</span></div>
                <div class="price-item"><span id="mloc20" style="flex:1;">الستباقية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">7,000 د.ع</span></div>
                <div class="price-item" style="border-bottom: none;"><span id="mloc21" style="flex:1;">التحليات</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">7,000 د.ع</span></div>
@@ -1119,27 +1131,7 @@
         <div class="leaderboard-card">
             <div class="form-card-title" style="justify-content:center;"><i class="fas fa-trophy"></i> <span id="plaza-league-title">دوري الأبطال</span></div>
             <div id="leaderboard-list">
-                <p id="plaza-league-load" style="text-align: center; color: var(--text-muted);">جاري تحميل الترتيب...</p>
-           </div>
-            <small id="plaza-league-sub" style="display: block; text-align: center; margin-top: 15px; color: var(--text-muted); font-weight:600;">المنافسة مستمرة🏆</small>
-        </div>
-
-        <p id="driver-display-name" style="text-align: center; font-weight: 700; color: var(--text-muted); margin-top:30px;"></p>
-        <button id="plaza-logout-btn" class="resign-btn ripple-dark" onclick="resignDriver()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج / استقالة</button>
-    </div>
-
-    <div id="log-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('plaza-screen')"><i class="fas fa-arrow-right" id="log-back-icon"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> <span id="log-head">سجل الكابتن</span></h2>
-        
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <button id="tab-completed" class="send-btn ripple" style="margin: 0; background: var(--primary); box-shadow: none; font-size: 14px; border-radius: 12px;" onclick="switchLogTab('completed')">المنجزة ✅</button>
-            <button id="tab-canceled" class="send-btn ripple" style="margin: 0; background: var(--surface); color: var(--text-main); border: 1px solid var(--border-color); box-shadow: none; font-size: 14px; border-radius: 12px;" onclick="switchLogTab('canceled')">الملغية 🚫</button>
-        </div>
-
-        <div id="driver-log-container"></div>
-    </div>
-    <script>
+                <p id="plaza-league-load" style="text-align: center; color: var(<script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser"; 
       const ADMIN_CHAT_ID = "7479342799"; 
@@ -1166,14 +1158,10 @@
 
       let currentLang = localStorage.getItem('app_lang') || 'ar';
       
-      // دالة سحرية لترجمة النصوص المباشرة في القوائم
       function t(arText, enText) {
           return currentLang === 'en' ? enText : arText;
       }
 
-      // -----------------------------------------------------------
-      // نظام الترجمة واللغة (Language Translation System)
-      // -----------------------------------------------------------
       const translations = {
           en: {
               'side-lang-text': 'التبديل للعربية',
@@ -1207,7 +1195,6 @@
               'pub-order-title': 'Public Orders',
               'priv-order-title': 'Reserved Orders',
               
-              // المناطق الجغرافية (Modal الأسعار والوسيط)
               'loc1': 'Al-Khamsin', 'mloc1': 'Al-Khamsin',
               'loc2': 'Al-Mashrou', 'mloc2': 'Al-Mashrou',
               'loc3': 'Teachers Qtr', 'mloc3': 'Teachers Qtr',
@@ -1230,7 +1217,6 @@
               'loc20': 'Istibaqiya', 'mloc20': 'Istibaqiya',
               'loc21': 'Tahliyat', 'mloc21': 'Tahliyat',
 
-              // الملاحظات والتحذيرات
               'rest-menu-note': '⚠️ Warning: If the order is canceled after the captain departs, you must pay the full fee. Please confirm before ordering.',
               'tuk-warn-note': '⚠️ Warning: If the ride is canceled after the captain departs, you must pay the full fee.',
               'med-warn-note': '⚠️ Warning: If the service is canceled after the captain departs, you must pay the full fee.',
@@ -1241,7 +1227,6 @@
               'plaza-rule-note': '🚫 Strict Rule: Do not buy items without calling the customer first! If no answer, cancel immediately.',
               'priv-admin-note': '📣 Captain Note: 500 IQD from each order fee goes to the app owner.',
               
-              // باقي النصوص
               'login-h2': 'Welcome to Al-Bandar',
               'login-p': 'Login in two simple steps!',
               'login-s1-h3': 'What is your name?',
@@ -1346,7 +1331,6 @@
                   if (el) el.innerHTML = text;
               }
               
-              // الأزرار الخاصة والخريطة
               const loginBtn = document.getElementById('direct-login-btn');
               if(loginBtn) loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
               const s1Btn = document.getElementById('login-s1-btn');
@@ -1366,7 +1350,6 @@
               const cartBtn = document.getElementById('cart-continue-btn');
               if(cartBtn) cartBtn.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
               
-              // زر "افتح الخريطة وحدد المكان"
               const tukMapBtn = document.getElementById('tuk-map-btn');
               if (tukMapBtn) tukMapBtn.innerHTML = '<i class="fas fa-map-marked-alt"></i> Open Map & Pin Location 📍';
 
@@ -1493,34 +1476,65 @@
           else { errorSpan.style.display = 'none'; input.style.borderColor = '#10B981'; }
       }
 
+      // دالة إظهار الإشعارات المنبثقة
+      function showPushNotification(title, body) {
+          if ('Notification' in window && Notification.permission === 'granted') {
+              if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
+                  navigator.serviceWorker.ready.then(function(registration) {
+                      registration.showNotification(title, {
+                          body: body,
+                          icon: 'android-chrome-192x192.png',
+                          vibrate: [200, 100, 200, 100, 200],
+                          tag: 'new-order',
+                          renotify: true,
+                          requireInteraction: true
+                      });
+                  });
+              } else {
+                  new Notification(title, { body: body, icon: 'android-chrome-192x192.png' });
+              }
+          }
+      }
+
       function toggleOrderSound() {
          isSoundEnabled = !isSoundEnabled; localStorage.setItem('sound_enabled', isSoundEnabled); 
-          const btn = document.getElementById('soundToggleBtn');
-          if (isSoundEnabled) {
+         const btn = document.getElementById('soundToggleBtn');
+         if (isSoundEnabled) {
+             // طلب صلاحية الإشعارات من المستخدم
+             if ('Notification' in window && Notification.permission !== 'granted') {
+                 Notification.requestPermission();
+             }
              btn.innerHTML = t('<i class="fas fa-bell"></i> جرس الطلبات: مفعل', '<i class="fas fa-bell"></i> Order Bell: ON');
-              btn.style.background = '#F59E0B'; btn.style.color = 'white';
+             btn.style.background = '#F59E0B'; btn.style.color = 'white';
              newOrderAudio.play().catch(e => {}); startOrderPolling();
              showToast(t("🔔 تم تفعيل جرس تنبيه الطلبات!", "🔔 Order alert sound enabled!"));
-          } else {
-              btn.innerHTML = t('<i class="fas fa-bell-slash"></i> جرس الطلبات: معطل', '<i class="fas fa-bell-slash"></i> Order Bell: OFF');
+         } else {
+             btn.innerHTML = t('<i class="fas fa-bell-slash"></i> جرس الطلبات: معطل', '<i class="fas fa-bell-slash"></i> Order Bell: OFF');
              btn.style.background = 'var(--text-muted)'; btn.style.color = 'white';
              clearInterval(orderPollInterval); showToast(t("تم إيقاف الجرس 🔕", "Sound disabled 🔕"));
-          }
+         }
       }
       
       async function checkNewOrdersForSound() {
          if(!isSoundEnabled || !navigator.onLine) return;
-          try {
-              const resp = await fetch(`${GS_URL}?action=checkNewOrders&t=${new Date().getTime()}`);
-              const currentCount = parseInt(await resp.text());
+         try {
+             const resp = await fetch(`${GS_URL}?action=checkNewOrders&t=${new Date().getTime()}`);
+             const currentCount = parseInt(await resp.text());
              if(!isNaN(currentCount)) {
                  if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
-                     newOrderAudio.play().catch(e=>{}); showToast(t("🔔طلب جديد نزل بالساحة!", "🔔 New order available!"));
+                     newOrderAudio.play().catch(e=>{}); 
+                     showToast(currentLang === 'en' ? "🔔 New order available!" : "🔔طلب جديد نزل بالساحة!");
                      if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                  }
+                     
+                     // إرسال الإشعار المنبثق
+                     showPushNotification(
+                         currentLang === 'en' ? 'New Order! 🚀' : 'طلب جديد بالساحة! 🚀',
+                         currentLang === 'en' ? 'A new order is available. Open the app to claim it.' : 'اكو طلب جديد نزل، ادخل للتطبيق حتى تحجزه قبل لا يروح عليك!'
+                     );
+                 }
                  lastOrderCount = currentCount;
-              }
-          } catch(e) {}
+             }
+         } catch(e) {}
       }
 
       function startOrderPolling() {
@@ -1531,7 +1545,7 @@
       function initAutoLocation() {
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
-                 (position) => { userCoords = `https://www.google.com/maps?q=${position.coords.latitude},0{position.coords.longitude}`; checkAppAccess(position.coords.latitude, position.coords.longitude); },
+                 (position) => { userCoords = `https://www.google.com/maps?q=$${position.coords.latitude},${position.coords.longitude}`; checkAppAccess(position.coords.latitude, position.coords.longitude); },
                  (error) => { console.warn("GPS Denied"); }, { enableHighAccuracy: true }
               );
           }
@@ -1632,216 +1646,6 @@
       function userLogout() {
           if (confirm(t("هل أنت متأكد من تسجيل الخروج من التطبيق؟", "Are you sure you want to logout?"))) {
              localStorage.clear(); window.location.replace(window.location.href.split('?')[0]);
-          }
-      }
-        async function checkNewOrdersForSound() {
-         if(!isSoundEnabled || !navigator.onLine) return;
-          try {
-              const resp = await fetch(`${GS_URL}?action=checkNewOrders&t=${new Date().getTime()}`);
-              const currentCount = parseInt(await resp.text());
-             if(!isNaN(currentCount)) {
-                 if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
-                     newOrderAudio.play().catch(e=>{});
-                      showToast(currentLang === 'en' ? "🔔 New order available!" : "🔔طلب جديد نزل بالساحة!");
-                     if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                  }
-                 lastOrderCount = currentCount;
-              }
-          } catch(e) {}
-      }
-
-      function startOrderPolling() {
-         if(orderPollInterval) clearInterval(orderPollInterval);
-         checkNewOrdersForSound(); 
-         orderPollInterval = setInterval(checkNewOrdersForSound, 10000); 
-      }
-
-      function initAutoLocation() {
-          if (navigator.geolocation) {
-             navigator.geolocation.getCurrentPosition(
-                 (position) => {
-                     userCoords = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
-                     checkAppAccess(position.coords.latitude, position.coords.longitude);
-                  },
-                 (error) => { console.warn("GPS Denied on load"); },
-                  { enableHighAccuracy: true }
-              );
-          }
-      }
-
-      function handleSecretClick() {
-         secretCounter++;
-          if (secretCounter === 5) {
-             secretCounter = 0;
-              let pass = prompt(currentLang === 'en' ? "Enter Secret Code:" : "أدخل الرمز السري:");
-              if (pass === "2006") {
-                 localStorage.setItem('isAdmin', 'true'); 
-                 
-                 let adminCard = document.querySelector('#admin-panel .form-card');
-                 if (adminCard && !document.getElementById('btn-unblock-order')) {
-                     let unblockHtml = `
-                     <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                         <p style="font-weight: 700; margin-bottom: 10px; color: var(--primary);">${currentLang === 'en' ? 'Captain Privileges' : 'صلاحيات الكابتن'}</p>
-                         <button id="btn-unblock-order" class="send-btn ripple" style="background: #3B82F6; margin-top: 0; box-shadow: none;" onclick="unlockSecondOrder()">
-                             <i class="fas fa-unlock-alt"></i> ${currentLang === 'en' ? 'Unblock Second Order' : 'فك حظر الطلب الثاني'}
-                         </button>
-                     </div>`;
-                     adminCard.insertAdjacentHTML('beforeend', unblockHtml);
-                 }
-
-                 showScreen('admin-panel');
-                 checkGlobalStatusFromServer(); 
-              } else if (pass !== null) {
-                 showToast(currentLang === 'en' ? "Wrong Code ❌" : "الرمز خطأ ❌");
-              }
-          }
-      }
-
-      function unlockSecondOrder() {
-          localStorage.setItem('allow_second_order', 'true');
-          showToast(currentLang === 'en' ? "Unblocked successfully! You can book a second order now. 🔓" : "تم فك الحظر بنجاح! تكدر هسه تحجز طلب ثاني. 🔓");
-      }
-
-      function handleLockScreenSecret() {
-         lockSecretCounter++;
-          if (lockSecretCounter === 5) {
-             lockSecretCounter = 0;
-              let pass = prompt(currentLang === 'en' ? "Enter Secret Code:" : "أدخل الرمز السري:");
-              if (pass === "2006") {
-                 localStorage.setItem('isAdmin', 'true'); 
-                 
-                 let adminCard = document.querySelector('#admin-panel .form-card');
-                 if (adminCard && !document.getElementById('btn-unblock-order')) {
-                     let unblockHtml = `
-                     <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                         <p style="font-weight: 700; margin-bottom: 10px; color: var(--primary);">${currentLang === 'en' ? 'Captain Privileges' : 'صلاحيات الكابتن'}</p>
-                         <button id="btn-unblock-order" class="send-btn ripple" style="background: #3B82F6; margin-top: 0; box-shadow: none;" onclick="unlockSecondOrder()">
-                             <i class="fas fa-unlock-alt"></i> ${currentLang === 'en' ? 'Unblock Second Order' : 'فك حظر الطلب الثاني'}
-                         </button>
-                     </div>`;
-                     adminCard.insertAdjacentHTML('beforeend', unblockHtml);
-                 }
-
-                 document.getElementById('global-lock-screen').style.display = 'none';
-                 showScreen('admin-panel');
-              } else if (pass !== null) {
-                  showToast(currentLang === 'en' ? "Wrong Code ❌" : "الرمز خطأ ❌");
-              }
-          }
-      }
-      
-      async function setGlobalAppStatus(newStatus) {
-          const btnOpen = document.getElementById('btn-open-app');
-          const btnClose = document.getElementById('btn-close-app');
-          if(newStatus === 'online') { btnOpen.innerHTML = '<span class="baly-spinner"></span>'; } 
-          else { btnClose.innerHTML = '<span class="baly-spinner"></span>'; }
-          btnOpen.disabled = true; btnClose.disabled = true;
-          
-          try {
-              if(typeof db !== 'undefined') {
-                  await db.ref('settings/app_status').set(newStatus);
-                  showToast(newStatus === "online" ? (currentLang === 'en' ? "App opened for all ✅" : "تم فتح التطبيق للجميع ✅") : (currentLang === 'en' ? "App closed 🔴" : "تم إغلاق التطبيق 🔴"));
-              }
-          } catch(e) {
-              showToast(currentLang === 'en' ? "Connection Error ❌" : "حدث خطأ في الاتصال ❌");
-          } finally { 
-              btnOpen.innerHTML = currentLang === 'en' ? '<i class="fas fa-unlock"></i> Open App' : '<i class="fas fa-unlock"></i> فتح التطبيق';
-              btnClose.innerHTML = currentLang === 'en' ? '<i class="fas fa-lock"></i> Close App' : '<i class="fas fa-lock"></i> إغلاق التطبيق';
-              btnOpen.disabled = false; btnClose.disabled = false;
-          }
-      }
-
-      function listenToGlobalStatus() {
-          if(typeof db === 'undefined') return;
-          
-          db.ref('settings/app_status').on('value', (snapshot) => {
-              if (checkTimeLock()) {
-                  applyGlobalStatus();
-                  hideSplash();
-                  return; 
-              }
-
-              const status = snapshot.val() || 'online'; 
-              const lockScreen = document.getElementById('global-lock-screen');
-              const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
-              
-              if (status === "offline") {
-                 appIsActive = false;
-                 if(lockScreen && !isAdmin) lockScreen.style.display = 'flex'; 
-                 else if(lockScreen && isAdmin) lockScreen.style.display = 'none';
-              } else {
-                 appIsActive = true;
-                 if(lockScreen) lockScreen.style.display = 'none'; 
-              }
-              applyGlobalStatus();
-              hideSplash();
-          });
-      }
-
-      function hideSplash() {
-          const splash = document.getElementById('splash-screen');
-          if(splash && splash.style.display !== 'none') { 
-              splash.style.opacity = '0'; 
-              setTimeout(() => splash.style.display = 'none', 500); 
-          }
-      }
-
-      async function checkGlobalStatusFromServer() {
-          try {
-              if (checkTimeLock()) {
-                  applyGlobalStatus();
-                  return; 
-              }
-
-              const resp = await fetch(`${GS_URL}?action=getAppStatus&t=${new Date().getTime()}`);
-              const status = await resp.text();
-              const lockScreen = document.getElementById('global-lock-screen');
-              const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
-              if (status === "offline") {
-                 appIsActive = false;
-                 if(lockScreen && !isAdmin) lockScreen.style.display = 'flex'; 
-                  else if(lockScreen && isAdmin) lockScreen.style.display = 'none';
-              } else {
-                 appIsActive = true;
-                 if(lockScreen) lockScreen.style.display = 'none'; 
-              }
-              applyGlobalStatus();
-          } catch(e) {
-          } finally {
-              const splash = document.getElementById('splash-screen');
-             if(splash && splash.style.display !== 'none') { 
-                 splash.style.opacity = '0'; 
-                 setTimeout(() => splash.style.display = 'none', 500); 
-              }
-          }
-      }
-
-      function applyGlobalStatus() {
-          const badge = document.getElementById('admin-status-badge');
-          const orderButtons = document.querySelectorAll('.order-btn-logic');
-          const isAdmin = localStorage.getItem('isAdmin') === 'true';
-          if (!appIsActive) {
-             badge.style.display = 'block';
-             badge.innerText = currentLang === 'en' ? 'Service is currently unavailable 🔴' : 'الخدمة متوقفة حالياً🔴';
-              if (!isAdmin) {
-                 orderButtons.forEach(btn => {
-                     btn.disabled = true;
-                     btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-lock"></i> Closed Now' : '<i class="fas fa-lock"></i> مغلق حالياً';
-                  });
-              } else { orderButtons.forEach(btn => btn.disabled = false); }
-          } else {
-             badge.style.display = 'none';
-             document.getElementById('tukSendBtn').innerHTML = currentLang === 'en' ? '<i class="fas fa-paper-plane"></i> Request TukTuk' : '<i class="fas fa-paper-plane"></i> طلب تكتك توصيلة';
-             document.getElementById('medSendBtn').innerHTML = currentLang === 'en' ? '<i class="fas fa-paper-plane"></i> Confirm Mediator Order' : '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
-             document.getElementById('sendBtn').innerHTML = currentLang === 'en' ? '<i class="fas fa-paper-plane"></i> Send Order Now' : '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
-             orderButtons.forEach(btn => btn.disabled = false);
-          }
-      }
-
-      function userLogout() {
-          if (confirm(currentLang === 'en' ? "Are you sure you want to logout?" : "هل أنت متأكد من تسجيل الخروج من التطبيق؟")) {
-             localStorage.clear();
-             window.location.replace(window.location.href.split('?')[0]);
           }
       }
       
@@ -2570,7 +2374,7 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=${pos.coords.latitude},{pos.coords.longitude}`; sendTukOrder(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               } else { showToast(currentLang === 'en' ? "GPS Not Supported ❌" : "جهازك لا يدعم تحديد الموقع ❌"); }
@@ -2621,7 +2425,7 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=${pos.coords.latitude},{pos.coords.longitude}`; sendMedFinal(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -2673,7 +2477,7 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -2873,6 +2677,10 @@
              localStorage.setItem('driver_status', 'busy'); btn.style.background = 'var(--danger)'; btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-minus-circle"></i> I am Busy Now' : '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً';
              if(badge) { badge.innerText = currentLang === 'en' ? 'You are busy 🔴' : 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; }
           } else {
+             // طلب صلاحية الإشعارات بمجرد فتح التوفر
+             if ('Notification' in window && Notification.permission !== 'granted') {
+                 Notification.requestPermission();
+             }
              localStorage.setItem('driver_status', 'available'); btn.style.background = 'var(--secondary)'; btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-check-circle"></i> I am Available' : '<i class="fas fa-check-circle"></i> أنا متاح للعمل';
              if(badge) { badge.innerText = currentLang === 'en' ? 'You are active now 🟢' : 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; }
           }
@@ -2903,7 +2711,7 @@
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
       function confirmMapLocation() {
           const center = appMap.getCenter();
-          const googleMapsLink = `https://www.google.com/maps?q=${center.lat},${center.lng}`;
+          const googleMapsLink = `https://www.google.com/maps?q=$${center.lat},${center.lng}`;
          document.getElementById('tukDropoffLink').value = googleMapsLink;
          document.getElementById('map-success-msg').style.display = 'block';
          closeMapModal();
@@ -2911,9 +2719,6 @@
       function openPricesModal() { document.getElementById('prices-modal').style.display = 'flex'; }
       function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
       
-      // ==========================================
-      // قائمة المطاعم والأكلات (مترجمة بالكامل)
-      // ==========================================
       const menus = {
           'rken_estkana': {
               name: t('ركن استكانة', 'Ruken Estkana'),
@@ -2974,7 +2779,7 @@
                   { id: 'rk53', name: t('بيتزا خضروات (كبير)', 'Veggie Pizza (Large)'), price: 9000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
                   { id: 'rk54', name: t('بيتزا خضروات (عائلي)', 'Veggie Pizza (Family)'), price: 12000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
 
-                  { id: 'rk55', name: t('برجر استكانة (عادي)', 'Estkana Burger (Regular)'), price: 4000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
+                 { id: 'rk55', name: t('برجر استكانة (عادي)', 'Estkana Burger (Regular)'), price: 4000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
                   { id: 'rk56', name: t('برجر استكانة (مع جبن)', 'Estkana Burger (Cheese)'), price: 5000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
                   { id: 'rk57', name: t('برجر استكانة (دبل)', 'Estkana Burger (Double)'), price: 7000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
                   { id: 'rk58', name: t('برجر سماش (عادي)', 'Smash Burger (Regular)'), price: 4000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
