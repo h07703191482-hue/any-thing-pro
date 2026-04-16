@@ -36,6 +36,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -55,6 +56,12 @@
           firebase.initializeApp(firebaseConfig);
       }
       const db = firebase.database();
+      let messaging;
+      try {
+        messaging = firebase.messaging();
+      } catch (e) {
+        console.warn("إشعارات الخلفية غير مدعومة في هذا المتصفح");
+      }
     </script>
 
     <style>
@@ -88,8 +95,7 @@
       .price-item i { color: var(--gold); margin-left: 8px; width: 20px; text-align: center;}
       .price-val { color: var(--primary); font-weight: 900; background: rgba(90, 34, 139, 0.1); padding: 4px 12px; border-radius: var(--radius-pill); font-size: 14px;}
       body.dark-mode .price-val { background: rgba(255, 255, 255, 0.1); color: var(--gold); }
-
-      #success-order-modal { display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0,0,0,0.85) !important; z-index: 9999999 !important; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; box-sizing: border-box; margin: 0; }
+        #success-order-modal { display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0,0,0,0.85) !important; z-index: 9999999 !important; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; box-sizing: border-box; margin: 0; }
       #success-order-modal > div { width: 100%; max-width: 400px; background: var(--surface); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; text-align: center; padding: 35px 20px; border: 2px solid #10B981; position: relative; animation: scaleIn 0.3s ease-out; }
 
    :root { 
@@ -350,795 +356,491 @@
     </style>
 </head>
 <body>
-    <div id="out-of-zone-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--danger); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;">
-        <div class="out-zone-card" style="background: white; border: none; border-radius: 24px; max-width: 400px; width: 95%; padding: 35px 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
-            <i class="fas fa-map-marker-slash" style="font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: bouncePin 1s infinite alternate;"></i>
-            <h2 id="out-zone-title" style="margin: 0 0 15px; color: var(--danger); font-weight: 900; font-size: 26px;">خارج حدود أم قصر!</h2>
-            <p id="out-zone-desc1" style="color: #111827; font-size: 16px; font-weight: 800; line-height: 1.6; margin-bottom: 10px;">
-                هذا التطبيق يعمل <span style="color: var(--danger);">فقط</span> داخل حدود أم قصر.
-            </p>
-            <p id="out-zone-desc2" style="color: #6B7280; font-size: 14px; font-weight: 600; line-height: 1.6; margin: 0;">
-                البرنامج متوقف عندك لأن موقعك الحالي خارج نطاق التغطية والمناطق المسموحة.
-            </p>
-        </div>
-    </div>
+    <div id="home-screen" class="screen container active-screen">
+          <div class="header-main">
+            <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
+            <div id="driver-status-badge" class="driver-status-bar">أنت الآن في وضع العمل النشط 🟢</div>
+            <h1 id="main-title" onclick="handleSecretClick()">البندر</h1>
+            <p id="main-sub">شنو مشتهين اليوم؟</p>
+          </div>
 
-    <div id="code-entry-modal">
-        <div class="code-entry-container">
-            <div class="code-entry-header">
-                <span id="code-entry-title">⚠️ تنبيه: إدخال كود التسليم</span>
-                <button class="close-code-entry-btn" onclick="document.getElementById('code-entry-modal').style.display='none'"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="code-entry-content">
-                <i class="fas fa-exclamation-triangle" style="font-size: 50px; color: var(--danger);"></i>
-                <p id="code-entry-alert" class="code-entry-alert">يجب إدخال رمز تسليم الطلب السابق أولاً حتى تتمكن من حجز طلب جديد!</p>
-                <input type="number" id="forcedVerifyInput" placeholder="أدخل الكود هنا" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-                <button id="code-entry-btn" class="send-btn ripple" style="margin-top: 5px;" onclick="processForcedVerifyCode()">تأكيد الكود</button>
-            </div>
-        </div>
-    </div>
-    <div id="map-modal">
-        <div class="map-container">
-            <div class="map-header">
-                <span id="map-modal-title">تحديد موقع النزول 📍</span>
-                <button class="close-map-btn" onclick="closeMapModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="position: relative;">
-               <div id="map-view"></div>
-                <i class="fas fa-map-marker-alt map-center-marker"></i>
-            </div>
-            <div class="map-footer">
-                <p id="map-modal-desc" style="margin: 0 0 10px; font-size: 13px; font-weight: 600; color: var(--text-muted);">حرك الخريطة ليصير الدبوس على المكان المضبوط</p>
-                <button id="map-modal-btn" class="send-btn ripple" style="margin-top: 0; background: #10B981;" onclick="confirmMapLocation()">
-                    تأكيد الموقع <i class="fas fa-check"></i>
-                </button>
-            </div>
-        </div>
-    </div>
+          <div style="padding: 0 5px; position: relative; z-index: 5; margin-top: -30px; margin-bottom: 15px;">
+              <div class="select-card ripple" style="padding: 12px; display: flex; align-items: center; gap: 10px; border: 2px solid var(--danger); background: rgba(239, 68, 68, 0.1);">
+                  <i class="fas fa-clock" style="font-size: 24px; color: var(--danger);"></i>
+                  <div>
+                     <h4 id="sys-alert-title" style="margin: 0; font-size: 14px; font-weight: 800; color: var(--danger);">تنبيه النظام</h4>
+                     <small id="sys-alert-sub" style="color: var(--text-main); font-weight: 600;">التطبيق يتوقف عن العمل من الساعة 2 ليلاً حتى 8 صباحاً.</small>
+                 </div>
+              </div>
+          </div>
+          <div style="position: relative; z-index: 5;">
+              <div class="rest-slider">
+                 <div class="rest-card ripple" onclick="openMenu('rken_estkana')">
+                     <img src="Rken.jpg" alt="ركن استكانة">
+                     <h4 id="rest-1-title">ركن استكانة</h4>
+                     <small id="rest-1-sub">مشاوي، شرقي وغربي</small>
+                 </div>
 
-    <div id="prices-modal">
-        <div class="prices-container">
-            <div class="prices-header">
-                <span id="prices-modal-title">أسعار التوصيل 🛵</span>
-                <button class="close-prices-btn" onclick="closePricesModal()"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="prices-content">
-               <div class="price-item"><span id="loc1" style="flex:1;">الخمسين</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span id="loc2" style="flex:1;">المشروع</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span id="loc3" style="flex:1;">حي المعلمين</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span id="loc4" style="flex:1;">شوارع</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span id="loc5" style="flex:1;">هندية جنوبية</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span id="loc6" style="flex:1;">الهندسة</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span id="loc7" style="flex:1;">شعبي</span><span class="price-val">1,500 د.ع</span></div>
-               
-               <div class="price-item"><span id="loc8" style="flex:1;">دور الظباط</span><span class="price-val">2,000 د.ع</span></div>
-               <div class="price-item"><span id="loc9" style="flex:1;">دور سمنت</span><span class="price-val">2,000 د.ع</span></div>
-               <div class="price-item"><span id="loc10" style="flex:1;">البهو</span><span class="price-val">2,000 د.ع</span></div>
-               <div class="price-item"><span id="loc11" style="flex:1;">صناعة</span><span class="price-val">2,000 د.ع</span></div>
-               <div class="price-item"><span id="loc12" style="flex:1;">هندية الشمالية</span><span class="price-val">2,000 د.ع</span></div>
-               
-               <div class="price-item"><span id="loc13" style="flex:1;">القاعدة</span><span class="price-val">3,000 د.ع</span></div>
-               <div class="price-item"><span id="loc14" style="flex:1;">هدامة</span><span class="price-val">3,000 د.ع</span></div>
-               
-               <div class="price-item"><span id="loc15" style="flex:1;">ميناء الجنوبي</span><span class="price-val">4,000 د.ع</span></div>
-               <div class="price-item"><span id="loc16" style="flex:1;">الارصفة العشرة</span><span class="price-val">4,000 د.ع</span></div>
-               
-               <div class="price-item"><span id="loc17" style="flex:1;">ميناء 27</span><span class="price-val">5,000 د.ع</span></div>
-               <div class="price-item"><span id="loc18" style="flex:1;">الترحيب</span><span class="price-val">5,000 د.ع</span></div>
-               
-               <div class="price-item"><span id="loc19" style="flex:1;">الصمود</span><span class="price-val">7,000 د.ع</span></div>
-               <div class="price-item"><span id="loc20" style="flex:1;">الستباقية</span><span class="price-val">7,000 د.ع</span></div>
-               <div class="price-item" style="border-bottom: none;"><span id="loc21" style="flex:1;">التحليات</span><span class="price-val">7,000 د.ع</span></div>
-            </div>
-        </div>
-    </div>
+                 <div class="rest-card ripple" onclick="openMenu('royal_food')">
+                     <img src="Roealfod.jpg" alt="رويال فود">
+                     <h4 id="rest-2-title">رويال فود</h4>
+                     <small id="rest-2-sub">بركر، بيتزا ووجبات</small>
+                 </div>
 
-    <div id="success-order-modal" style="display: none; position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important; background-color: rgba(0,0,0,0.85) !important; z-index: 9999999 !important; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px; box-sizing: border-box; margin: 0;">
-        <div style="width: 100%; max-width: 400px; background: var(--surface); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; text-align: center; padding: 35px 20px; border: 2px solid #10B981; position: relative;">
-            <i class="fas fa-check-circle" style="font-size: 70px; color: #10B981; margin-bottom: 20px;"></i>
-            <h2 id="success-title" style="margin: 0 0 15px; color: #10B981; font-weight: 800; font-size: 24px;">تم إرسال طلبك بنجاح!</h2>
-            <p id="success-desc1" style="color: var(--text-main); font-size: 15px; font-weight: 700; line-height: 1.6; margin-bottom: 10px;">
-                الرجاء الانتظار حتى يتم التواصل معك.
-            </p>
-            <p id="success-desc2" style="color: #EF4444; font-size: 14px; font-weight: 800; margin-bottom: 25px;">
-                ⚠️ لا تقوم بإرسال طلب آخر بالغلط لتجنب تكرار الطلب!
-            </p>
-            <button id="success-btn" class="ripple" style="margin: 0; background: #5A228B; color: white; width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 800; font-size: 18px; cursor: pointer;" onclick="document.getElementById('success-order-modal').style.display='none'">
-                رجوع <i class="fas fa-arrow-left" id="success-btn-icon"></i>
-            </button>
-        </div>
-    </div>
+                  <div class="rest-card ripple" onclick="openMenu('victoria')">
+                     <img src="fktorea.jpg" alt="مطعم فيكتوريا">
+                     <h4 id="rest-3-title">مطعم فيكتوريا</h4>
+                     <small id="rest-3-sub">بركر وسندويجات</small>
+                 </div>
 
-    <div id="cancel-order-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100005; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;">
-        <div class="form-card" style="width: 100%; max-width: 400px; background: var(--surface); padding: 20px;">
-            <div class="form-card-title" style="color: var(--danger); font-size: 18px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px;"><i class="fas fa-times-circle"></i> <span id="cancel-title">سبب إلغاء الطلب</span></div>
-            <input type="hidden" id="cancelOrderId">
-            <input type="hidden" id="cancelOrderPhone">
+                  <div id="klashe-restaurant" class="rest-card ripple" onclick="openMenu('klashe')" style="display: none;">
+                     <img src="klashe.jpg" alt="كلاشي">
+                     <h4 id="rest-4-title">كلاشي</h4>
+                     <small id="rest-4-sub">عصائر ومشروبات</small>
+                 </div>
+
+                  <div class="rest-card ripple" onclick="openMenu('haleg')">
+                     <img src="Haleg.jpg" alt="مطعم الخليج">
+                     <h4 id="rest-5-title">مطعم الخليج</h4>
+                     <small id="rest-5-sub">أشهى المأكولات</small>
+                 </div>
+
+                 <div class="rest-card ripple" onclick="openMenu('scozi')">
+                     <img src="scoozi.jpg" alt="سكوزي">
+                     <h4 id="rest-6-title">سكوزي</h4>
+                     <small id="rest-6-sub">أشهى الوجبات</small>
+                 </div>
+
+                  <div class="rest-card ripple" onclick="openMenu('abo_hmode')">
+                     <img src="Hmode.jpg.jpg" alt="بركر ابو حمودي">
+                     <h4 id="rest-7-title">بركر ابو حمودي</h4>
+                     <small id="rest-7-sub">الطعم الأصلي</small>
+                 </div>
+
+                  <div class="rest-card ripple" onclick="openMenu('ali_salem')">
+                     <img src="Burger.jpg.jpg" alt="برجر علي سالم">
+                     <h4 id="rest-8-title">برجر علي سالم</h4>
+                     <small id="rest-8-sub">أطيب برجر بأم قصر</small>
+                 </div>
+
+                  <div class="rest-card" style="opacity: 0.6; cursor: default;">
+                     <div style="width: 100%; height: 90px; border-radius: 15px; background: var(--border-color); display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+                         <i class="fas fa-utensils" style="font-size: 30px; color: var(--text-muted);"></i>
+                     </div>
+                     <h4 id="rest-9-title">مطعم جديد</h4>
+                     <small id="rest-9-sub">قريباً...</small>
+                 </div>
+              </div>
+          </div>
+
+          <div style="padding: 0 5px 15px; position: relative; z-index: 5;">
+              <div class="select-card ripple-dark" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--danger); background: rgba(239, 68, 68, 0.05);" onclick="openPricesModal()">
+                  <div style="display: flex; align-items: center; gap: 15px;">
+                     <div style="width: 45px; height: 45px; background: rgba(239, 68, 68, 0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--danger); font-size: 20px;"><i class="fas fa-exclamation-circle"></i></div>
+                      <div>
+                         <h4 id="price-alert-title" style="margin: 0; font-size: 16px; font-weight: 800; color: var(--danger);">أسعار التوصيل (تنبيه)</h4>
+                         <small id="price-alert-sub" style="color: var(--text-muted); font-weight: 600;">تعرف على أسعار كل مناطق أم قصر</small>
+                     </div>
+                 </div>
+                  <i class="fas fa-chevron-left" style="color: var(--danger); font-size: 14px;"></i>
+              </div>
+          </div>
+
+          <div class="services-grid">
+              <div class="select-card card-full card-cart ripple-dark" onclick="showScreen('order-screen')">
+                <div class="icon-wrapper icon-pulse"><i class="fas fa-shopping-cart"></i></div>
+                <div class="card-text"><h3 id="srv-shop-title">تسوق مسواكك</h3><small id="srv-shop-sub">أطلب أي شي ونوصله الك</small></div>
+                <i class="fas fa-chevron-left arrow-icon"></i>
+              </div>
+              
+              <div class="select-card card-half card-tuk ripple-dark" onclick="showScreen('tuk-screen')">
+                <div class="icon-wrapper icon-pulse"><i class="fas fa-money-bill-wave"></i></div>
+                <h3 id="srv-tuk-title">تكتك توصيلة</h3>
+                <small id="srv-tuk-sub">خدمات تحصيل<br>سريعة وآمنة</small>
+              </div>
+              
+              <div class="select-card card-half card-med ripple-dark" onclick="showScreen('mediator-screen')">
+                <div class="icon-wrapper icon-pulse"><i class="fas fa-handshake"></i></div>
+                <h3 id="srv-med-title">الوسيط</h3>
+                <small id="srv-med-sub">نقل الأغراض<br>بين شخصين</small>
+              </div>
+
+              <div class="select-card card-full ripple" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; margin-bottom: 5px;" onclick="shareApp()">
+                <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-gift"></i></div>
+                <div class="card-text">
+                    <h3 id="srv-share-title">شارك واربح توصيل مجاني</h3>
+                   <small id="srv-share-sub">انسخ رابطك ودزه لأصدقائك 🎁</small>
+               </div>
+              </div>
+              
+              <div id="join-driver-card" class="select-card card-full card-join ripple-dark" onclick="openJoinScreen()">
+                <div class="icon-wrapper"><i class="fas fa-id-card"></i></div>
+                <div class="card-text"><h3 id="srv-join-title">انضم ككابتن</h3><small id="srv-join-sub">سجل معنا وابدأ بتحقيق الدخل</small></div>
+                <i class="fas fa-chevron-left arrow-icon"></i>
+              </div>
+              
+              <div id="driver-plaza-card" class="select-card card-full card-plaza ripple-dark" style="display: none;" onclick="showScreen('plaza-screen')">
+                <div class="icon-wrapper"><i class="fas fa-briefcase"></i></div>
+                <div class="card-text"><h3 id="srv-plaza-title">لوحة الكابتن</h3><small id="srv-plaza-sub">تسليم الطلبات والإحصائيات</small></div>
+                <i class="fas fa-chevron-left arrow-icon"></i>
+              </div>
+              
+              <div id="public-orders-btn" class="select-card card-half ripple-dark" style="display: none; border: 1px solid #F59E0B; background: rgba(245, 158, 11, 0.05);" onclick="showScreen('public-orders-screen')">
+                <div class="icon-wrapper" style="background: rgba(245, 158, 11, 0.1); color: #F59E0B;"><i class="fas fa-list"></i></div>
+                <h3 id="pub-order-title" style="font-size: 15px; color: #F59E0B; margin-top: 5px;">الطلبات العامة</h3>
+              </div>
+              <div id="private-orders-btn" class="select-card card-half ripple-dark" style="display: none; border: 1px solid #10B981; background: rgba(16, 185, 129, 0.05);" onclick="showScreen('private-orders-screen')">
+                <div class="icon-wrapper" style="background: rgba(16, 185, 129, 0.1); color: #10B981;"><i class="fas fa-box-open"></i></div>
+                <h3 id="priv-order-title" style="font-size: 15px; color: #10B981; margin-top: 5px;">الطلبات المحجوزة</h3>
+              </div>
+          </div>
+        </div>
+        <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
+            <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="rest-back-icon"></i></button>
+            <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> <span id="restaurant-name-header">اسم المطعم</span></h2>
+            <p id="rest-menu-desc" style="color: var(--text-muted); font-size: 14px; font-weight: 600; margin-bottom: 20px;">اختار طلبك وحدد الكمية، وراح نحسبلك المجموع مباشرة.</p>
             
-            <div class="form-group" style="text-align: right;">
-                <label id="cancel-label" style="font-weight: bold; margin-bottom: 10px; display: block; color: var(--text-main);">اختر السبب:</label>
-                <div style="display: flex; flex-direction: column; gap: 12px; background: var(--bg-color); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color);">
-                    <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-main); font-weight: 700; cursor: pointer;">
-                        <input type="radio" name="cancelReason" value="الزبون ما يرد" style="width: 18px; height: 18px; accent-color: var(--danger);"> <span class="cancel-r1">الزبون ما يرد</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-main); font-weight: 700; cursor: pointer;">
-                        <input type="radio" name="cancelReason" value="الطلب ما متوفر بالمطعم" style="width: 18px; height: 18px; accent-color: var(--danger);"> <span class="cancel-r2">الطلب ما متوفر بالمطعم</span>
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-main); font-weight: 700; cursor: pointer;">
-                        <input type="radio" name="cancelReason" value="مشكلة اخرى" style="width: 18px; height: 18px; accent-color: var(--danger);" onchange="toggleOtherReason(this)"> <span class="cancel-r3">مشكلة اخرى</span>
-                    </label>
+            <div id="rest-menu-note" class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+              ⚠تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور الطلب كامله. يرجى التأكد قبل تثبيت الطلب.
+            </div>
+            
+            <div class="form-card" style="padding: 0; overflow: hidden; background: transparent; border: none; box-shadow: none;" id="menu-items-container">
+            </div>
+            
+            <div class="cart-bar" id="cartBar" style="display: none;">
+                <div>
+                   <span id="cart-total-lbl" style="font-size: 13px; color: var(--text-muted); font-weight: bold;">المجموع الكلي للطلب:</span>
+                   <span class="cart-bar-total" id="cartTotal">0 د.ع</span>
+               </div>
+                <button id="cart-continue-btn" class="send-btn ripple" style="width: auto; margin: 0; padding: 12px 25px; font-size: 16px; box-shadow: none;" onclick="checkoutRestaurant()">استمرار <i class="fas fa-arrow-left" id="cart-cont-icon"></i></button>
+            </div>
+        </div>
+        
+        <div id="tuk-screen" class="screen container">
+            <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="tuk-back-icon"></i></button>
+            <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
+            <span class="location-notice"><i class="fas fa-map-marker-alt"></i> <span id="tuk-loc-notice">ملاحظة: تم تحديد موقعك تلقائياً 📍</span></span>
+            
+            <div id="tuk-warn-note" class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+                ⚠️تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
+            </div>
+            
+            <div class="form-card" id="tuk-user-card">
+                <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="tuk-p-info">بيانات العميل</span></div>
+                <div class="form-group">
+                   <label id="lbl-tuk-name">الاسم الكامل</label>
+                   <input type="text" id="tukName" placeholder="اكتب اسمك هنا">
+                   <span id="tuk-step1" class="step-number">خطوة رقم (1)</span>
+               </div>
+                <div class="form-group">
+                   <label id="lbl-tuk-phone">رقم الموبايل</label>
+                   <input type="tel" id="tukPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                   <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                   <span id="tuk-step2" class="step-number">خطوة رقم (2)</span>
+               </div>
+            </div>
+
+            <div class="form-card">
+                <div class="form-card-title"><i class="fas fa-route"></i> <span id="tuk-r-info">تفاصيل العملية</span></div>
+                <div class="form-group">
+                   <label style="color:var(--danger);" id="lbl-tuk-drop">موقع التحصيل/التسليم (إجباري)</label>
+                   
+                   <div class="note" style="padding:12px; font-size:13px; margin-bottom:10px; background:rgba(16, 185, 129, 0.1); border-right-color:#10B981; color:var(--text-main);">
+                       <span id="tuk-map-hint">💡هسه تگدر تحدد مكان النزول مباشرة من الخريطة داخل التطبيق بدون ما تطلع وتنسخ روابط! 🗺️</span>
+                   </div>
+                   
+                   <button id="tuk-map-btn" type="button" class="location-btn ripple-dark" style="border: 2px dashed var(--primary); background: var(--surface); color: var(--primary);" onclick="openMapModal()">
+                       <i class="fas fa-map-marked-alt"></i> افتح الخريطة وحدد المكان 📍
+                   </button>
+                   
+                   <input type="hidden" id="tukDropoffLink" value="">
+                   <p id="map-success-msg" style="display: none; color: #10B981; font-weight: 800; font-size: 14px; margin-top: 10px; text-align: center;"><i class="fas fa-check-circle"></i> <span id="tuk-map-success">تم تحديد المكان بنجاح!</span></p>
+                   <span id="tuk-step3" class="step-number">خطوة رقم (3)</span>
+               </div>
+                <div class="form-group">
+                   <label id="lbl-tuk-land">أقرب نقطة دالة (اختياري)</label>
+                   <input type="text" id="tukLandmark" placeholder="مدرسة، جامع، أو تقاطع...">
+                   <span id="tuk-step4" class="step-number">خطوة رقم (4)</span>
+               </div>
+            </div>
+
+            <div id="tuk-final-warn" class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+                <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
+            </div>
+
+            <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">طلب تكتك توصيلة</span></button>
+        </div>
+
+        <div id="mediator-screen" class="screen container">
+            <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="med-back-icon"></i></button>
+            <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> <span id="med-head">خدمة الوسيط</span></h2>
+            <span class="location-notice"><i class="fas fa-map-marker-alt"></i> <span id="med-loc-notice">ملاحظة: تم تحديد موقعك تلقائياً 📍</span></span>
+            
+            <div id="med-warn-note" class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+                ⚠️ تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
+            </div>
+
+            <div class="form-card" style="border-right: 4px solid #F97316;">
+                <div class="form-card-title"><i class="fas fa-info-circle" style="color: #F97316;"></i> <span id="med-prices-title">أسعار خدمة الوسيط 🤝</span></div>
+                <div class="prices-content" style="padding: 0; max-height: 200px; overflow-y: auto;">
+                   <div class="price-item"><span id="mloc1" style="flex:1;">الخمسين</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc2" style="flex:1;">المشروع</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc3" style="flex:1;">حي المعلمين</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc4" style="flex:1;">شوارع</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc5" style="flex:1;">هندية جنوبية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc6" style="flex:1;">الهندسة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc7" style="flex:1;">شعبي</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc8" style="flex:1;">دور الظباط</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc9" style="flex:1;">دور سمنت</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc10" style="flex:1;">البهو</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc11" style="flex:1;">صناعة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc12" style="flex:1;">هندية الشمالية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc13" style="flex:1;">ميناء الجنوبي</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc14" style="flex:1;">الارصفة العشرة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc15" style="flex:1;">ميناء 27</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc16" style="flex:1;">الترحيب</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc17" style="flex:1;">القاعدة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">2,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc18" style="flex:1;">هدامة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">2,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc19" style="flex:1;">الصمود</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">4,000 د.ع</span></div>
+                   <div class="price-item"><span id="mloc20" style="flex:1;">الستباقية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">7,000 د.ع</span></div>
+                   <div class="price-item" style="border-bottom: none;"><span id="mloc21" style="flex:1;">التحليات</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">7,000 د.ع</span></div>
                 </div>
             </div>
             
-            <div class="form-group" id="otherReasonDiv" style="display: none; margin-top: 15px;">
-                <input type="text" id="otherReasonText" placeholder="اكتب سبب الإلغاء هنا..." style="border-color: var(--danger);">
-            </div>
-            
-            <button id="cancel-confirm-btn" class="send-btn ripple" style="background: var(--danger); margin-top: 20px; box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);" onclick="confirmCancelOrder()">تأكيد الإلغاء <i class="fas fa-check"></i></button>
-            <button id="cancel-back-btn" class="resign-btn ripple-dark" style="margin-top: 10px; border-color: var(--text-muted); color: var(--text-muted);" onclick="closeCancelModal()">تراجع</button>
-        </div>
-    </div>
-
-    <div id="device-type-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100006; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;">
-        <div class="prices-container">
-            <div class="prices-header">
-                <span id="device-type-title">ما نوع جهازك؟</span>
-                <button class="close-prices-btn" onclick="document.getElementById('device-type-modal').style.display='none'"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="prices-content" style="display: flex; gap: 15px; padding-top: 25px;">
-               <a href="https://www.instagram.com/p/DWx_KZgCP-b/?igsh=MXdrdWk3dW83em95bA==" style="flex:1; text-align:center; background:#3DDC84; color:white; padding:15px; border-radius:15px; text-decoration:none; font-weight:bold; display:flex; flex-direction:column; align-items:center; gap:8px;" class="ripple">
-                   <i class="fab fa-android" style="font-size:30px;"></i> <span id="device-android">اندرويد</span>
-               </a>
-               <a href="https://www.instagram.com/p/DWyAEmRiN5d/?igsh=NGQ0ZHYzaTBrdWxy" style="flex:1; text-align:center; background:#000000; color:white; padding:15px; border-radius:15px; text-decoration:none; font-weight:bold; display:flex; flex-direction:column; align-items:center; gap:8px;" class="ripple">
-                   <i class="fab fa-apple" style="font-size:30px;"></i> <span id="device-ios">ايفون (iOS)</span>
-               </a>
-            </div>
-        </div>
-    </div>
-
-    <div id="global-lock-screen">
-        <img src="https://cdn-icons-png.flaticon.com/512/2888/2888746.png" alt="صيانة" style="width: 180px; margin-bottom: 25px; cursor: pointer; animation: scaleIn 0.5s ease;" onclick="handleLockScreenSecret()">
-        <h2 id="lock-h2" class="lock-title">التطبيق مغلق للصيانة 🛠️</h2>
-        <p id="lock-p" class="lock-text">نعتذر منكم عيني، دا نسوي شوية تحديثات وتطوير للتطبيق. نرجع نستقبل طلباتكم بأقرب وقت!</p>
-    </div>
-
-    <div id="offline-screen">
-        <h2 id="off-title" class="offline-title">لا يوجد إتصال بالانترنت</h2>
-        <svg style="margin-bottom: 20px; width: 250px; height: 250px;" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <path d="M40 160 L100 60 L160 160 Z" fill="#9CA3AF" opacity="0.8"/>
-            <path d="M100 60 L160 160 L100 160 Z" fill="#6B7280" opacity="0.9"/>
-            <circle cx="100" cy="40" r="10" fill="#374151" />
-            <path d="M100 50 L100 80 M90 60 L110 45" stroke="#374151" stroke-width="4" stroke-linecap="round"/>
-            <path d="M110 30 L120 20 M125 15 L115 10" stroke="#EF4444" stroke-width="4" stroke-linecap="round"/>
-            <path d="M20 160 L180 160" stroke="#D1D5DB" stroke-width="6" stroke-linecap="round"/>
-            <circle cx="40" cy="110" r="15" fill="#E5E7EB" opacity="0.8"/>
-            <circle cx="55" cy="120" r="12" fill="#E5E7EB" opacity="0.8"/>
-            <circle cx="160" cy="90" r="18" fill="#E5E7EB" opacity="0.8"/>
-            <circle cx="145" cy="100" r="14" fill="#E5E7EB" opacity="0.8"/>
-            <path d="M100 15 A25 25 0 0 1 120 5" stroke="#D1D5DB" stroke-width="3" fill="none" stroke-linecap="round"/>
-            <path d="M90 20 L130 -5" stroke="#EF4444" stroke-width="3" fill="none" stroke-linecap="round"/>
-        </svg>
-        <p id="off-text" class="offline-text">للمتابعة، يرجى الاتصال بالإنترنت أو المحاولة مرة أخرى.</p>
-        <button id="off-btn-wifi" class="offline-btn-primary ripple" onclick="openWiFiSettings()">الاتصال عبر ال WiFi</button>
-        <button id="off-btn-data" class="offline-btn-outline ripple" onclick="openDataSettings()">الاتصال عبر انترنت الهاتف</button>
-    </div>
-    <div id="toast-container"></div>
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-    <div class="sidebar" id="appSidebar">
-        <div class="sidebar-close ripple-dark" id="side-close-text" onclick="closeSidebar()"><i class="fas fa-arrow-right"></i> إغلاق</div>
-        <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width:80px; height:80px; background:rgba(37, 99, 235, 0.1); border-radius:24px; display:flex; align-items:center; justify-content:center; margin: 0 auto 15px;">
-                <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
-           </div>
-            <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">البندر</h3>
-            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">2010/5/25🙁</p>
-        </div>
-        <div class="sidebar-item ripple-dark" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
-            <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
-        </div>
-        
-        <div class="sidebar-item ripple-dark" onclick="toggleLanguage(); closeSidebar();" id="sidebar-lang-btn">
-            <i class="fas fa-language" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-lang-text">English Language</span>
-        </div>
-
-        <a id="side-support-link" href="https://wa.me/9647739470354" target="_blank" class="sidebar-item ripple-dark">
-            <i class="fab fa-whatsapp" style="color: #25d366; font-size: 22px; width: 25px;"></i> <span id="side-support-text">مراسلة الدعم الفني</span>
-        </a>
-        <div class="sidebar-item ripple-dark" style="color: var(--danger); margin-top: 5px;" onclick="userLogout(); closeSidebar();">
-            <i class="fas fa-sign-out-alt" style="color: var(--danger); font-size: 20px; width: 25px;"></i> <span id="side-logout-text" style="font-weight: 800;">تسجيل خروج</span>
-        </div>
-    </div>
-    <div class="bottom-nav" id="bottomNavigation">
-        <div class="nav-item active ripple-dark" onclick="showScreen('home-screen'); updateNav(this)">
-            <i class="fas fa-compass"></i><span id="nav-home-text">الرئيسية</span>
-        </div>
-        <div class="nav-item ripple-dark" onclick="showScreen('order-screen'); updateNav(this)" style="position: relative;">
-            <i class="fas fa-shopping-basket"></i><span id="nav-shop-text">مسواكك</span>
-            <div id="local-cart-badge" class="local-order-counter" style="display:none;">0</div>
-        </div>
-        <div class="nav-item ripple-dark" onclick="showScreen('tuk-screen'); updateNav(this)">
-            <i class="fas fa-motorcycle"></i><span id="nav-tuk-text">توصيلة</span>
-        </div>
-        <div class="nav-item ripple-dark" onclick="showScreen('mediator-screen'); updateNav(this)">
-            <i class="fas fa-handshake"></i><span id="nav-med-text">الوسيط</span>
-        </div>
-        <div class="nav-item ripple-dark" id="nav-account-btn" onclick="openJoinScreen(); updateNav(this)">
-            <i id="nav-acc-icon" class="fas fa-user-circle"></i><span id="nav-acc-text">حسابي</span>
-        </div>
-    </div>
-
-    <button class="theme-toggle ripple" onclick="openSidebar()" id="menu-btn"><i class="fas fa-bars"></i></button>
-
-    <div id="welcome-overlay" onclick="skipWelcome()">
-        <i class="fas fa-check-circle" style="font-size: 80px; color: #10B981; margin-bottom: 20px; animation: scaleIn 0.5s ease;"></i>
-        <h1 id="welcome-title" style="margin:0 0 10px; font-weight:800;">تم التفعيل! 🥳</h1>
-        <p id="welcome-msg" style="font-size: 18px; color: var(--text-muted); margin-bottom: 30px;"></p>
-        <div style="background: var(--bg-color); padding: 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
-            <p id="wel-p1" style="margin:0; font-weight:700;">أنت الآن مندوب رسمي</p>
-            <p id="wel-p2" style="margin:5px 0 0; font-size: 14px; color:var(--text-muted);">جاري تجهيز لوحة التحكم...</p>
-        </div>
-    </div>
-
-    <div id="splash-screen">
-      <div id="app-logo-splash"><i class="fas fa-box-open" style="font-size: 65px; color: var(--primary);"></i></div>
-      <div class="splash-welcome-text">
-          <h2 id="splash-title" style="margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 1px;">البندر</h2>
-          <p id="splash-subtitle" style="margin: 8px 0 0; opacity: 0.9; font-size: 16px; font-weight: 500;">أسرع تطبيق للتوصيل والتحصيل في أم قصر</p>
-      </div>
-      <div class="road-realistic"><div class="road-lines"></div></div>
-      <div class="bike-box"><i class="fas fa-motorcycle"></i><div class="exhaust"><div class="smoke"></div><div class="smoke"></div><div class="smoke"></div></div></div>
-    </div>
-    
-    <div id="login-screen" class="screen container">
-        <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width:100px; height:100px; background:rgba(90, 34, 139, 0.1); border-radius:30px; display:flex; align-items:center; justify-content:center; margin: 0 auto 20px; box-shadow: var(--shadow-sm);">
-                <i class="fas fa-user-circle" style="font-size: 50px; color: var(--primary);"></i>
-           </div>
-            <h2 id="login-h2" style="margin: 0; font-weight: 800; font-size: 28px; color: var(--text-main);">أهلاً بيك في البندر</h2>
-            <p id="login-p" style="margin: 8px 0 0; color: var(--text-muted); font-size: 15px; font-weight: 600;">سجل دخولك بخطوتين بسيطة!</p>
-        </div>
-
-        <div class="form-card" id="login-step-1" style="text-align: center; padding: 30px 20px;">
-            <i class="fas fa-signature icon-pulse" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
-            <h3 id="login-s1-h3" style="margin-top: 0;">شنو اسمك الكريم؟</h3>
-            <p id="login-s1-p" style="font-size: 14px; color: var(--text-muted); font-weight: bold; margin-bottom: 25px;">
-                اكتب اسمك حتى نتعرف عليك ونخدمك بأفضل طريقة
-            </p>
-            <div class="form-group" style="text-align: right;">
-               <input type="text" id="loginNameInput" placeholder="اكتب اسمك الثلاثي هنا..." style="text-align: center; font-size: 18px; font-weight: bold;">
-           </div>
-            <button id="login-s1-btn" class="send-btn ripple" onclick="goToLoginStep2()">
-                التالي <i class="fas fa-arrow-left" id="login-s1-icon"></i>
-           </button>
-        </div>
-
-        <div class="form-card" id="login-step-2" style="display: none; text-align: center; padding: 30px 20px;">
-            <i class="fas fa-mobile-alt icon-pulse" style="font-size: 60px; color: var(--primary); margin-bottom: 20px;"></i>
-            <h3 id="login-s2-h3" style="margin-top: 0;">تفعيل الحساب برقمك</h3>
-            <p id="login-s2-p" style="font-size: 14px; color: var(--text-muted); font-weight: bold; margin-bottom: 25px;">
-                اكتب رقمك العراقي (يبدأ بـ 07) حتى يكمل تسجيل الدخول!
-            </p>
-            
-            <div class="form-group" style="text-align: right; margin-bottom: 20px;">
-               <input type="tel" id="loginPhoneInput" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)" style="text-align: center; font-size: 18px; font-weight: bold;">
-               <span id="login-phone-err" class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-           </div>
-
-            <button id="direct-login-btn" class="send-btn ripple" onclick="completeDirectLogin()">
-                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
-           </button>
-            
-            <button id="login-s2-back" class="resign-btn ripple-dark" style="margin-top: 15px; border: none; color: var(--text-muted);" onclick="backToLoginStep1()">
-                <i class="fas fa-arrow-right" id="login-s2-b-icon"></i> رجوع لتعديل الاسم
-           </button>
-        </div>
-    </div>
-    
-    <div id="admin-panel" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="adm-back-icon"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> <span id="adm-title">لوحة التحكم السرية</span></h2>
-        <div class="form-card" style="text-align: center;">
-            <p id="adm-status-desc" style="font-weight: 700; margin-bottom: 20px;">حالة استقبال الطلبات للزبائن</p>
-           
-            <div style="display: flex; gap: 15px; justify-content: center;">
-               <button id="btn-open-app" class="send-btn ripple" style="margin-top: 0; background: #10B981;" onclick="setGlobalAppStatus('online')">
-                   <i class="fas fa-unlock"></i> فتح التطبيق
-               </button>
-               <button id="btn-close-app" class="send-btn ripple" style="margin-top: 0; background: var(--danger);" onclick="setGlobalAppStatus('offline')">
-                   <i class="fas fa-lock"></i> إغلاق التطبيق
-               </button>
-           </div>
-            
-            <p id="adm-note" style="font-size: 12px; color: var(--text-muted); margin-top: 20px;">حدد الحالة: "فتح" لاستقبال الطلبات، أو "إغلاق" لإيقاف التطبيق عند الجميع.</p>
-        </div>
-    </div>
-    
-    <div id="home-screen" class="screen container active-screen">
-      <div class="header-main">
-        <div id="admin-status-badge" class="driver-status-bar" style="background: var(--danger); color: white; display: none;">الخدمة متوقفة حالياً🔴</div>
-        <div id="driver-status-badge" class="driver-status-bar">أنت الآن في وضع العمل النشط 🟢</div>
-        <h1 id="main-title" onclick="handleSecretClick()">البندر</h1>
-        <p id="main-sub">شنو مشتهين اليوم؟</p>
-      </div>
-
-      <div style="padding: 0 5px; position: relative; z-index: 5; margin-top: -30px; margin-bottom: 15px;">
-          <div class="select-card ripple" style="padding: 12px; display: flex; align-items: center; gap: 10px; border: 2px solid var(--danger); background: rgba(239, 68, 68, 0.1);">
-              <i class="fas fa-clock" style="font-size: 24px; color: var(--danger);"></i>
-              <div>
-                 <h4 id="sys-alert-title" style="margin: 0; font-size: 14px; font-weight: 800; color: var(--danger);">تنبيه النظام</h4>
-                 <small id="sys-alert-sub" style="color: var(--text-main); font-weight: 600;">التطبيق يتوقف عن العمل من الساعة 2 ليلاً حتى 8 صباحاً.</small>
-             </div>
-          </div>
-      </div>
-      <div style="position: relative; z-index: 5;">
-          <div class="rest-slider">
-             <div class="rest-card ripple" onclick="openMenu('rken_estkana')">
-                 <img src="Rken.jpg" alt="ركن استكانة">
-                 <h4 id="rest-1-title">ركن استكانة</h4>
-                 <small id="rest-1-sub">مشاوي، شرقي وغربي</small>
-             </div>
-
-             <div class="rest-card ripple" onclick="openMenu('royal_food')">
-                 <img src="Roealfod.jpg" alt="رويال فود">
-                 <h4 id="rest-2-title">رويال فود</h4>
-                 <small id="rest-2-sub">بركر، بيتزا ووجبات</small>
-             </div>
-
-              <div class="rest-card ripple" onclick="openMenu('victoria')">
-                 <img src="fktorea.jpg" alt="مطعم فيكتوريا">
-                 <h4 id="rest-3-title">مطعم فيكتوريا</h4>
-                 <small id="rest-3-sub">بركر وسندويجات</small>
-             </div>
-
-              <div id="klashe-restaurant" class="rest-card ripple" onclick="openMenu('klashe')" style="display: none;">
-                 <img src="klashe.jpg" alt="كلاشي">
-                 <h4 id="rest-4-title">كلاشي</h4>
-                 <small id="rest-4-sub">عصائر ومشروبات</small>
-             </div>
-
-              <div class="rest-card ripple" onclick="openMenu('haleg')">
-                 <img src="Haleg.jpg" alt="مطعم الخليج">
-                 <h4 id="rest-5-title">مطعم الخليج</h4>
-                 <small id="rest-5-sub">أشهى المأكولات</small>
-             </div>
-
-             <div class="rest-card ripple" onclick="openMenu('scozi')">
-                 <img src="scoozi.jpg" alt="سكوزي">
-                 <h4 id="rest-6-title">سكوزي</h4>
-                 <small id="rest-6-sub">أشهى الوجبات</small>
-             </div>
-
-              <div class="rest-card ripple" onclick="openMenu('abo_hmode')">
-                 <img src="Hmode.jpg.jpg" alt="بركر ابو حمودي">
-                 <h4 id="rest-7-title">بركر ابو حمودي</h4>
-                 <small id="rest-7-sub">الطعم الأصلي</small>
-             </div>
-
-              <div class="rest-card ripple" onclick="openMenu('ali_salem')">
-                 <img src="Burger.jpg.jpg" alt="برجر علي سالم">
-                 <h4 id="rest-8-title">برجر علي سالم</h4>
-                 <small id="rest-8-sub">أطيب برجر بأم قصر</small>
-             </div>
-
-              <div class="rest-card" style="opacity: 0.6; cursor: default;">
-                 <div style="width: 100%; height: 90px; border-radius: 15px; background: var(--border-color); display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
-                     <i class="fas fa-utensils" style="font-size: 30px; color: var(--text-muted);"></i>
-                 </div>
-                 <h4 id="rest-9-title">مطعم جديد</h4>
-                 <small id="rest-9-sub">قريباً...</small>
-             </div>
-          </div>
-      </div>
-
-      <div style="padding: 0 5px 15px; position: relative; z-index: 5;">
-          <div class="select-card ripple-dark" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--danger); background: rgba(239, 68, 68, 0.05);" onclick="openPricesModal()">
-              <div style="display: flex; align-items: center; gap: 15px;">
-                 <div style="width: 45px; height: 45px; background: rgba(239, 68, 68, 0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: var(--danger); font-size: 20px;"><i class="fas fa-exclamation-circle"></i></div>
-                  <div>
-                     <h4 id="price-alert-title" style="margin: 0; font-size: 16px; font-weight: 800; color: var(--danger);">أسعار التوصيل (تنبيه)</h4>
-                     <small id="price-alert-sub" style="color: var(--text-muted); font-weight: 600;">تعرف على أسعار كل مناطق أم قصر</small>
-                 </div>
-             </div>
-              <i class="fas fa-chevron-left" style="color: var(--danger); font-size: 14px;"></i>
-          </div>
-      </div>
-
-      <div class="services-grid">
-          <div class="select-card card-full card-cart ripple-dark" onclick="showScreen('order-screen')">
-            <div class="icon-wrapper icon-pulse"><i class="fas fa-shopping-cart"></i></div>
-            <div class="card-text"><h3 id="srv-shop-title">تسوق مسواكك</h3><small id="srv-shop-sub">أطلب أي شي ونوصله الك</small></div>
-            <i class="fas fa-chevron-left arrow-icon"></i>
-          </div>
-          
-          <div class="select-card card-half card-tuk ripple-dark" onclick="showScreen('tuk-screen')">
-            <div class="icon-wrapper icon-pulse"><i class="fas fa-money-bill-wave"></i></div>
-            <h3 id="srv-tuk-title">تكتك توصيلة</h3>
-            <small id="srv-tuk-sub">خدمات تحصيل<br>سريعة وآمنة</small>
-          </div>
-          
-          <div class="select-card card-half card-med ripple-dark" onclick="showScreen('mediator-screen')">
-            <div class="icon-wrapper icon-pulse"><i class="fas fa-handshake"></i></div>
-            <h3 id="srv-med-title">الوسيط</h3>
-            <small id="srv-med-sub">نقل الأغراض<br>بين شخصين</small>
-          </div>
-
-          <div class="select-card card-full ripple" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; margin-bottom: 5px;" onclick="shareApp()">
-            <div class="icon-wrapper" style="background: rgba(255,255,255,0.2); color: white;"><i class="fas fa-gift"></i></div>
-            <div class="card-text">
-                <h3 id="srv-share-title">شارك واربح توصيل مجاني</h3>
-               <small id="srv-share-sub">انسخ رابطك ودزه لأصدقائك 🎁</small>
-           </div>
-          </div>
-          
-          <div id="join-driver-card" class="select-card card-full card-join ripple-dark" onclick="openJoinScreen()">
-            <div class="icon-wrapper"><i class="fas fa-id-card"></i></div>
-            <div class="card-text"><h3 id="srv-join-title">انضم ككابتن</h3><small id="srv-join-sub">سجل معنا وابدأ بتحقيق الدخل</small></div>
-            <i class="fas fa-chevron-left arrow-icon"></i>
-          </div>
-          
-          <div id="driver-plaza-card" class="select-card card-full card-plaza ripple-dark" style="display: none;" onclick="showScreen('plaza-screen')">
-            <div class="icon-wrapper"><i class="fas fa-briefcase"></i></div>
-            <div class="card-text"><h3 id="srv-plaza-title">لوحة الكابتن</h3><small id="srv-plaza-sub">تسليم الطلبات والإحصائيات</small></div>
-            <i class="fas fa-chevron-left arrow-icon"></i>
-          </div>
-          
-          <div id="public-orders-btn" class="select-card card-half ripple-dark" style="display: none; border: 1px solid #F59E0B; background: rgba(245, 158, 11, 0.05);" onclick="showScreen('public-orders-screen')">
-            <div class="icon-wrapper" style="background: rgba(245, 158, 11, 0.1); color: #F59E0B;"><i class="fas fa-list"></i></div>
-            <h3 id="pub-order-title" style="font-size: 15px; color: #F59E0B; margin-top: 5px;">الطلبات العامة</h3>
-          </div>
-          <div id="private-orders-btn" class="select-card card-half ripple-dark" style="display: none; border: 1px solid #10B981; background: rgba(16, 185, 129, 0.05);" onclick="showScreen('private-orders-screen')">
-            <div class="icon-wrapper" style="background: rgba(16, 185, 129, 0.1); color: #10B981;"><i class="fas fa-box-open"></i></div>
-            <h3 id="priv-order-title" style="font-size: 15px; color: #10B981; margin-top: 5px;">الطلبات المحجوزة</h3>
-          </div>
-      </div>
-    </div>
-    <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="rest-back-icon"></i></button>
-        <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> <span id="restaurant-name-header">اسم المطعم</span></h2>
-        <p id="rest-menu-desc" style="color: var(--text-muted); font-size: 14px; font-weight: 600; margin-bottom: 20px;">اختار طلبك وحدد الكمية، وراح نحسبلك المجموع مباشرة.</p>
-        
-        <div id="rest-menu-note" class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
-          ⚠تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور الطلب كامله. يرجى التأكد قبل تثبيت الطلب.
-        </div>
-        
-        <div class="form-card" style="padding: 0; overflow: hidden; background: transparent; border: none; box-shadow: none;" id="menu-items-container">
-        </div>
-        
-        <div class="cart-bar" id="cartBar" style="display: none;">
-            <div>
-               <span id="cart-total-lbl" style="font-size: 13px; color: var(--text-muted); font-weight: bold;">المجموع الكلي للطلب:</span>
-               <span class="cart-bar-total" id="cartTotal">0 د.ع</span>
-           </div>
-            <button id="cart-continue-btn" class="send-btn ripple" style="width: auto; margin: 0; padding: 12px 25px; font-size: 16px; box-shadow: none;" onclick="checkoutRestaurant()">استمرار <i class="fas fa-arrow-left" id="cart-cont-icon"></i></button>
-        </div>
-    </div>
-    
-    <div id="tuk-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="tuk-back-icon"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
-        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> <span id="tuk-loc-notice">ملاحظة: تم تحديد موقعك تلقائياً 📍</span></span>
-        
-        <div id="tuk-warn-note" class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
-            ⚠️تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
-        </div>
-        
-        <div class="form-card" id="tuk-user-card">
-            <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="tuk-p-info">بيانات العميل</span></div>
-            <div class="form-group">
-               <label id="lbl-tuk-name">الاسم الكامل</label>
-               <input type="text" id="tukName" placeholder="اكتب اسمك هنا">
-               <span id="tuk-step1" class="step-number">خطوة رقم (1)</span>
-           </div>
-            <div class="form-group">
-               <label id="lbl-tuk-phone">رقم الموبايل</label>
-               <input type="tel" id="tukPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-                <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-               <span id="tuk-step2" class="step-number">خطوة رقم (2)</span>
-           </div>
-        </div>
-
-        <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-route"></i> <span id="tuk-r-info">تفاصيل العملية</span></div>
-            <div class="form-group">
-               <label style="color:var(--danger);" id="lbl-tuk-drop">موقع التحصيل/التسليم (إجباري)</label>
-               
-               <div class="note" style="padding:12px; font-size:13px; margin-bottom:10px; background:rgba(16, 185, 129, 0.1); border-right-color:#10B981; color:var(--text-main);">
-                   <span id="tuk-map-hint">💡هسه تگدر تحدد مكان النزول مباشرة من الخريطة داخل التطبيق بدون ما تطلع وتنسخ روابط! 🗺️</span>
+            <div class="form-card" id="med-user-card">
+                <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="med-p-info">بيانات المرسل</span></div>
+                <div class="form-group">
+                   <label id="lbl-med-name">الاسم الكامل</label>
+                   <input type="text" id="medName" placeholder="اكتب اسمك">
+                   <span id="med-step1" class="step-number">خطوة رقم (1)</span>
                </div>
-               
-               <button id="tuk-map-btn" type="button" class="location-btn ripple-dark" style="border: 2px dashed var(--primary); background: var(--surface); color: var(--primary);" onclick="openMapModal()">
-                   <i class="fas fa-map-marked-alt"></i> افتح الخريطة وحدد المكان 📍
+                <div class="form-group">
+                   <label id="lbl-med-phone">رقم الموبايل</label>
+                   <input type="tel" id="medPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                   <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                   <span id="med-step2" class="step-number">خطوة رقم (2)</span>
+               </div>
+                <div class="form-group">
+                   <label id="lbl-med-land">أقرب نقطة دالة لمكانك</label>
+                   <input type="text" id="medLandmark" placeholder="لتسهيل وصول المندوب">
+                   <span id="med-step3" class="step-number">خطوة رقم (3)</span>
+               </div>
+            </div>
+
+            <div class="form-card">
+                <div class="form-card-title"><i class="fas fa-box-open"></i> <span id="med-o-info">تفاصيل الطلب</span></div>
+                <div class="form-group">
+                   <label id="lbl-med-order">ما هو الغرض؟ وإلى أين؟</label>
+                   <textarea id="medOrder" rows="4" placeholder="مثال: أريد توصيل مفاتيح من تقاطع الميناء إلى حي المهندسين..."></textarea>
+                    <span id="med-step4" class="step-number">خطوة رقم (4)</span>
+               </div>
+            </div>
+
+            <div id="med-final-warn" class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+                <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
+            </div>
+
+            <button class="send-btn order-btn-logic ripple" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
+        </div>
+        <div id="order-screen" class="screen container">
+            <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="shop-back-icon"></i></button>
+            <h2 class="screen-header-title"><i class="fas fa-shopping-cart" style="color:var(--primary);"></i> <span id="shop-head">تسوق مسواكك</span></h2>
+            <span class="location-notice"><i class="fas fa-map-marker-alt"></i> <span id="shop-loc-notice">ملاحظة: تم تحديد موقعك تلقائياً 📍</span></span>
+            
+            <div id="shop-warn-note" class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
+                ⚠️تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور الطلب كاملة. يرجى التأكد قبل تثبيت الطلب.
+            </div>
+            
+            <div id="loyalty-info" class="loyalty-card">
+                <div class="loyalty-text"><span id="loy-txt">طلبك رقم</span> <span id="current-order-count" style="color:var(--primary); font-size:22px;">0</span> / 10</div>
+                <div class="loyalty-progress"><div id="loyalty-bar" class="loyalty-bar"></div></div>
+                <span class="gift-note" id="loyalty-gift-msg"><i class="fas fa-gift"></i> أوصل للطلب 10 وكروتك مجانية</span>
+            </div>
+
+            <div class="form-card" id="shop-user-card">
+                <div class="form-card-title"><i class="fas fa-address-card"></i> <span id="shop-p-info">بيانات التوصيل</span></div>
+                <div class="form-group">
+                   <label id="lbl-shop-name">الاسم</label>
+                   <input type="text" id="custName" placeholder="اسمك">
+                   <span id="shop-step1" class="step-number">خطوة رقم (1)</span>
+               </div>
+                <div class="form-group">
+                   <label id="lbl-shop-phone">رقم الهاتف</label>
+                   <input type="tel" id="custPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); updateLoyaltyUI(); checkPhoneLive(this)" onblur="syncLoyaltyWithServer()">
+                   <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                    <span id="shop-step2" class="step-number">خطوة رقم (2)</span>
+               </div>
+                <div class="form-group">
+                   <label id="lbl-shop-land">نقطة دالة</label>
+                   <input type="text" id="custLandmark" placeholder="وصف سريع لمكانك">
+                    <span id="shop-step3" class="step-number">خطوة رقم (3)</span>
+               </div>
+            </div>
+
+            <div class="form-card">
+                <div class="form-card-title"><i class="fas fa-list-ul"></i> <span id="shop-o-info">ماذا تريد أن نشتري لك؟</span></div>
+                <div class="form-group">
+                   <textarea id="custOrder" rows="5" placeholder="اكتب طلباتك هنا بالتفصيل (أكل، مسواك، صيدلية)..."></textarea>
+                   <span id="shop-step4" class="step-number">خطوة رقم (4)</span>
+               </div>
+            </div>
+
+            <div id="shop-final-warn" class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
+                <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل شراء المواد. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
+            </div>
+
+            <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
+        </div>
+
+        <div id="join-screen" class="screen container">
+            <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="join-back-icon"></i></button>
+            <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> <span id="join-head">انضم ككابتن</span></h2>
+            
+            <div class="form-card">
+                <div class="form-card-title"><i class="fas fa-user-edit"></i> <span id="join-p-info">بيانات التسجيل</span></div>
+                <div class="form-group">
+                   <label id="lbl-join-name">الاسم الثلاثي</label>
+                   <input type="text" id="driverJoinName" placeholder="اسمك الكامل">
+                   <span id="join-step1" class="step-number">خطوة رقم (1)</span>
+               </div>
+                <div class="form-group">
+                   <label id="lbl-join-phone">رقم الهاتف</label>
+                   <input type="tel" id="driverJoinPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                   <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
+                   <span id="join-step2" class="step-number">خطوة رقم (2)</span>
+               </div>
+                <div class="form-group">
+                   <label id="lbl-join-bike">نوع المركبة</label>
+                    <select id="bikeType">
+                       <option id="opt-bike-def" value="" disabled selected>اختر النوع...</option>
+                       <option id="opt-bike-1" value="ايراني">دراجة ايراني</option>
+                       <option id="opt-bike-2" value="بوكسر">دراجة بوكسر</option>
+                       <option id="opt-bike-3" value="تكتك">تكتك</option>
+                   </select>
+                   <span id="join-step3" class="step-number">خطوة رقم (3)</span>
+               </div>
+            </div>
+            <button class="send-btn ripple" id="joinSendBtn" onclick="submitJoinRequest()">إرسال طلب الانضمام</button>
+        </div>
+
+        <div id="activation-screen" class="screen container">
+            <div class="form-card" style="text-align:center; padding: 40px 20px;">
+                <i class="fas fa-clock" style="font-size:50px; margin-bottom:20px; color:var(--gold);"></i>
+                <h3 id="wait-title" style="margin:0 0 10px;">طلبك قيد المراجعة</h3>
+                <p id="wait-desc" style="color:var(--text-muted); font-size:14px; margin-bottom:20px; font-weight:700;">سوف يصلك الكود في حال تمت الموافقة عليك اذا لم يتم الرد اتصل على هذا الرقم 07739470354</p>
+                <div class="form-group">
+                   <input type="number" id="activationCodeInput" placeholder="أدخل الكود هنا..." style="text-align:center; font-size:20px; letter-spacing:4px; font-weight:bold;">
+                   <span id="act-step1" class="step-number">خطوة رقم (1)</span>
+               </div>
+                <button id="act-btn1" class="send-btn ripple" onclick="verifyActivationCode()">تفعيل الحساب</button>
+                <button id="act-btn2" class="send-btn ripple" style="background: var(--bg-color); color: var(--primary); border: 2px solid var(--primary); margin-top: 15px; box-shadow: none;" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="act-icon-back"></i> العودة للشاشة الرئيسية</button>
+                <button id="act-btn3" class="resign-btn ripple-dark" onclick="cancelJoinRequest()" style="margin-top:15px;">إلغاء الطلب</button>
+            </div>
+        </div>
+        
+        <div id="public-orders-screen" class="screen container">
+            <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="pub-back-icon"></i></button>
+            <h2 class="screen-header-title"><i class="fas fa-list" style="color:#F59E0B;"></i> <span id="pub-head">الطلبات العامة</span></h2>
+            <div class="form-card" id="available-orders-section">
+                <div class="form-card-title"><i class="fas fa-motorcycle" style="color: #F59E0B;"></i> <span id="pub-card-title">حجز الطلبات المتاحة</span></div>
+                <div id="available-orders-container" style="display: flex; flex-direction: column; gap: 10px;">
+                    <p id="pub-empty" style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات متاحة حالياً</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="private-orders-screen" class="screen container">
+            <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="priv-back-icon"></i></button>
+            <h2 class="screen-header-title"><i class="fas fa-box-open" style="color:#10B981;"></i> <span id="priv-head">الطلبات المحجوزة</span></h2>
+            
+            <div class="note" style="background: rgba(16, 185, 129, 0.1); border-right-color: #10B981; color: #065F46; font-size: 14px; font-weight: 800; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
+                <i class="fas fa-bullhorn" style="font-size: 20px; color: #10B981;"></i> 
+                <span id="priv-admin-note" style="display: block; margin-top: 5px;">ملاحظة للكابتن: 500 دينار من أجرة كل طلب تعود لصاحب التطبيق.</span>
+            </div>
+
+            <div class="form-card" id="my-active-orders-section">
+                <div class="form-card-title"><i class="fas fa-box-open" style="color: #10B981;"></i> <span id="priv-card-title">طلباتي الحالية</span></div>
+                <div id="my-active-orders-container" style="display: flex; flex-direction: column; gap: 10px;">
+                    <p id="priv-empty" style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات محجوزة لك حالياً</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="plaza-screen" class="screen container">
+            <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="plaza-back-icon"></i></button>
+            <h2 class="screen-header-title"><i class="fas fa-briefcase" style="color:#8B5CF6;"></i> <span id="plaza-head">لوحة الكابتن</span></h2>
+
+            <div id="plaza-rule-note" class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 14px; font-weight: 800; margin-bottom: 20px;">
+                <i class="fas fa-exclamation-circle" style="font-size: 20px;"></i> 
+                <span style="display: block; margin-top: 5px;">قانون صارم: ممنوع تشتري أي مسواك أو تتحرك قبل ما تتصل بالزبون وتتأكد منه! إذا الزبون ما جاوب، الغي الطلب فوراً. المندوب اللي يخالف ويشتري بدون اتصال يتحمل الخسارة.</span>
+            </div>
+
+            <div class="form-card" style="text-align: center; padding: 15px;">
+                <button id="statusToggleBtn" class="send-btn ripple" style="background: #10B981; margin-top: 0; box-shadow: none;" onclick="toggleDriverStatus()">
+                    <i class="fas fa-check-circle"></i> أنا متاح للعمل
                </button>
-               
-               <input type="hidden" id="tukDropoffLink" value="">
-                <p id="map-success-msg" style="display: none; color: #10B981; font-weight: 800; font-size: 14px; margin-top: 10px; text-align: center;"><i class="fas fa-check-circle"></i> <span id="tuk-map-success">تم تحديد المكان بنجاح!</span></p>
-               <span id="tuk-step3" class="step-number">خطوة رقم (3)</span>
-           </div>
-            <div class="form-group">
-               <label id="lbl-tuk-land">أقرب نقطة دالة (اختياري)</label>
-               <input type="text" id="tukLandmark" placeholder="مدرسة، جامع، أو تقاطع...">
-               <span id="tuk-step4" class="step-number">خطوة رقم (4)</span>
-           </div>
-        </div>
-
-        <div id="tuk-final-warn" class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
-            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
-        </div>
-
-        <button class="send-btn order-btn-logic ripple" id="tukSendBtn" onclick="sendTukOrder()"><i class="fas fa-paper-plane"></i> <span id="tuk-final-btn">طلب تكتك توصيلة</span></button>
-    </div>
-
-    <div id="mediator-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="med-back-icon"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-handshake" style="color:#F97316;"></i> <span id="med-head">خدمة الوسيط</span></h2>
-        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> <span id="med-loc-notice">ملاحظة: تم تحديد موقعك تلقائياً 📍</span></span>
-        
-        <div id="med-warn-note" class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
-            ⚠️ تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور التوصيل كاملة. يرجى التأكد قبل تثبيت الطلب.
-        </div>
-
-        <div class="form-card" style="border-right: 4px solid #F97316;">
-            <div class="form-card-title"><i class="fas fa-info-circle" style="color: #F97316;"></i> <span id="med-prices-title">أسعار خدمة الوسيط 🤝</span></div>
-            <div class="prices-content" style="padding: 0; max-height: 200px; overflow-y: auto;">
-               <div class="price-item"><span id="mloc1" style="flex:1;">الخمسين</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc2" style="flex:1;">المشروع</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc3" style="flex:1;">حي المعلمين</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc4" style="flex:1;">شوارع</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc5" style="flex:1;">هندية جنوبية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc6" style="flex:1;">الهندسة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc7" style="flex:1;">شعبي</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc8" style="flex:1;">دور الظباط</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc9" style="flex:1;">دور سمنت</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc10" style="flex:1;">البهو</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc11" style="flex:1;">صناعة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc12" style="flex:1;">هندية الشمالية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc13" style="flex:1;">ميناء الجنوبي</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc14" style="flex:1;">الارصفة العشرة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc15" style="flex:1;">ميناء 27</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc16" style="flex:1;">الترحيب</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">1,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc17" style="flex:1;">القاعدة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">2,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc18" style="flex:1;">هدامة</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">2,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc19" style="flex:1;">الصمود</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">4,000 د.ع</span></div>
-               <div class="price-item"><span id="mloc20" style="flex:1;">الستباقية</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">7,000 د.ع</span></div>
-               <div class="price-item" style="border-bottom: none;"><span id="mloc21" style="flex:1;">التحليات</span><span class="price-val" style="color:#F97316; background:rgba(249, 115, 22, 0.1);">7,000 د.ع</span></div>
-            </div>
-        </div>
-        
-        <div class="form-card" id="med-user-card">
-            <div class="form-card-title"><i class="fas fa-user-circle"></i> <span id="med-p-info">بيانات المرسل</span></div>
-            <div class="form-group">
-               <label id="lbl-med-name">الاسم الكامل</label>
-               <input type="text" id="medName" placeholder="اكتب اسمك">
-               <span id="med-step1" class="step-number">خطوة رقم (1)</span>
-           </div>
-            <div class="form-group">
-               <label id="lbl-med-phone">رقم الموبايل</label>
-               <input type="tel" id="medPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-               <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-               <span id="med-step2" class="step-number">خطوة رقم (2)</span>
-           </div>
-            <div class="form-group">
-               <label id="lbl-med-land">أقرب نقطة دالة لمكانك</label>
-               <input type="text" id="medLandmark" placeholder="لتسهيل وصول المندوب">
-               <span id="med-step3" class="step-number">خطوة رقم (3)</span>
-           </div>
-        </div>
-
-        <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-box-open"></i> <span id="med-o-info">تفاصيل الطلب</span></div>
-            <div class="form-group">
-               <label id="lbl-med-order">ما هو الغرض؟ وإلى أين؟</label>
-               <textarea id="medOrder" rows="4" placeholder="مثال: أريد توصيل مفاتيح من تقاطع الميناء إلى حي المهندسين..."></textarea>
-                <span id="med-step4" class="step-number">خطوة رقم (4)</span>
-           </div>
-        </div>
-
-        <div id="med-final-warn" class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
-            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل التحرك. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
-        </div>
-
-        <button class="send-btn order-btn-logic ripple" id="medSendBtn" onclick="sendMedFinal()"><i class="fas fa-paper-plane"></i> <span id="med-final-btn">تأكيد طلب الوسيط</span></button>
-    </div>
-
-    <div id="order-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="shop-back-icon"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-shopping-cart" style="color:var(--primary);"></i> <span id="shop-head">تسوق مسواكك</span></h2>
-        <span class="location-notice"><i class="fas fa-map-marker-alt"></i> <span id="shop-loc-notice">ملاحظة: تم تحديد موقعك تلقائياً 📍</span></span>
-        
-        <div id="shop-warn-note" class="note" style="background: #ffe6e6; border: 2px solid red; color: red; font-size: 14px; font-weight: 800; text-align: center; margin-bottom: 15px; padding: 12px; border-radius: 8px; box-shadow: 0 4px 6px rgba(255,0,0,0.1);">
-            ⚠️تنبيه هام: عند طلب الخدمة وإلغائها بعد انطلاق المندوب، يلتزم العميل بدفع أجور الطلب كاملة. يرجى التأكد قبل تثبيت الطلب.
-        </div>
-        
-        <div id="loyalty-info" class="loyalty-card">
-            <div class="loyalty-text"><span id="loy-txt">طلبك رقم</span> <span id="current-order-count" style="color:var(--primary); font-size:22px;">0</span> / 10</div>
-            <div class="loyalty-progress"><div id="loyalty-bar" class="loyalty-bar"></div></div>
-            <span class="gift-note" id="loyalty-gift-msg"><i class="fas fa-gift"></i> أوصل للطلب 10 وكروتك مجانية</span>
-        </div>
-
-        <div class="form-card" id="shop-user-card">
-            <div class="form-card-title"><i class="fas fa-address-card"></i> <span id="shop-p-info">بيانات التوصيل</span></div>
-            <div class="form-group">
-               <label id="lbl-shop-name">الاسم</label>
-               <input type="text" id="custName" placeholder="اسمك">
-               <span id="shop-step1" class="step-number">خطوة رقم (1)</span>
-           </div>
-            <div class="form-group">
-               <label id="lbl-shop-phone">رقم الهاتف</label>
-               <input type="tel" id="custPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); updateLoyaltyUI(); checkPhoneLive(this)" onblur="syncLoyaltyWithServer()">
-               <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-                <span id="shop-step2" class="step-number">خطوة رقم (2)</span>
-           </div>
-            <div class="form-group">
-               <label id="lbl-shop-land">نقطة دالة</label>
-               <input type="text" id="custLandmark" placeholder="وصف سريع لمكانك">
-                <span id="shop-step3" class="step-number">خطوة رقم (3)</span>
-           </div>
-        </div>
-
-        <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-list-ul"></i> <span id="shop-o-info">ماذا تريد أن نشتري لك؟</span></div>
-            <div class="form-group">
-               <textarea id="custOrder" rows="5" placeholder="اكتب طلباتك هنا بالتفصيل (أكل، مسواك، صيدلية)..."></textarea>
-               <span id="shop-step4" class="step-number">خطوة رقم (4)</span>
-           </div>
-        </div>
-
-        <div id="shop-final-warn" class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 13px; font-weight: 800; margin-bottom: 15px;">
-            <i class="fas fa-exclamation-triangle"></i> تنبيه: سيتم الاتصال بك لتأكيد الطلب قبل شراء المواد. في حال عدم الرد سيتم إلغاء الطلب فوراً، والتلاعب يعرض رقمك للحظر النهائي!
-        </div>
-
-        <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
-    </div>
-
-    <div id="join-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="join-back-icon"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> <span id="join-head">انضم ككابتن</span></h2>
-        
-        <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-user-edit"></i> <span id="join-p-info">بيانات التسجيل</span></div>
-            <div class="form-group">
-               <label id="lbl-join-name">الاسم الثلاثي</label>
-               <input type="text" id="driverJoinName" placeholder="اسمك الكامل">
-               <span id="join-step1" class="step-number">خطوة رقم (1)</span>
-           </div>
-            <div class="form-group">
-               <label id="lbl-join-phone">رقم الهاتف</label>
-               <input type="tel" id="driverJoinPhone" placeholder="مثال: 07700000000" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-               <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح (يجب أن يكون 11 رقم ويبدأ بـ 07)</span>
-               <span id="join-step2" class="step-number">خطوة رقم (2)</span>
-           </div>
-            <div class="form-group">
-               <label id="lbl-join-bike">نوع المركبة</label>
-                <select id="bikeType">
-                   <option id="opt-bike-def" value="" disabled selected>اختر النوع...</option>
-                   <option id="opt-bike-1" value="ايراني">دراجة ايراني</option>
-                   <option id="opt-bike-2" value="بوكسر">دراجة بوكسر</option>
-                   <option id="opt-bike-3" value="تكتك">تكتك</option>
-               </select>
-               <span id="join-step3" class="step-number">خطوة رقم (3)</span>
-           </div>
-        </div>
-        <button class="send-btn ripple" id="joinSendBtn" onclick="submitJoinRequest()">إرسال طلب الانضمام</button>
-    </div>
-
-    <div id="activation-screen" class="screen container">
-        <div class="form-card" style="text-align:center; padding: 40px 20px;">
-            <i class="fas fa-clock" style="font-size:50px; margin-bottom:20px; color:var(--gold);"></i>
-            <h3 id="wait-title" style="margin:0 0 10px;">طلبك قيد المراجعة</h3>
-            <p id="wait-desc" style="color:var(--text-muted); font-size:14px; margin-bottom:20px; font-weight:700;">سوف يصلك الكود في حال تمت الموافقة عليك اذا لم يتم الرد اتصل على هذا الرقم 07739470354</p>
-            <div class="form-group">
-               <input type="number" id="activationCodeInput" placeholder="أدخل الكود هنا..." style="text-align:center; font-size:20px; letter-spacing:4px; font-weight:bold;">
-               <span id="act-step1" class="step-number">خطوة رقم (1)</span>
-           </div>
-            <button id="act-btn1" class="send-btn ripple" onclick="verifyActivationCode()">تفعيل الحساب</button>
-            <button id="act-btn2" class="send-btn ripple" style="background: var(--bg-color); color: var(--primary); border: 2px solid var(--primary); margin-top: 15px; box-shadow: none;" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="act-icon-back"></i> العودة للشاشة الرئيسية</button>
-            <button id="act-btn3" class="resign-btn ripple-dark" onclick="cancelJoinRequest()" style="margin-top:15px;">إلغاء الطلب</button>
-        </div>
-    </div>
-    
-    <div id="public-orders-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="pub-back-icon"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-list" style="color:#F59E0B;"></i> <span id="pub-head">الطلبات العامة</span></h2>
-        <div class="form-card" id="available-orders-section">
-            <div class="form-card-title"><i class="fas fa-motorcycle" style="color: #F59E0B;"></i> <span id="pub-card-title">حجز الطلبات المتاحة</span></div>
-            <div id="available-orders-container" style="display: flex; flex-direction: column; gap: 10px;">
-                <p id="pub-empty" style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات متاحة حالياً</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="private-orders-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="priv-back-icon"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-box-open" style="color:#10B981;"></i> <span id="priv-head">الطلبات المحجوزة</span></h2>
-        
-        <div class="note" style="background: rgba(16, 185, 129, 0.1); border-right-color: #10B981; color: #065F46; font-size: 14px; font-weight: 800; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
-            <i class="fas fa-bullhorn" style="font-size: 20px; color: #10B981;"></i> 
-            <span id="priv-admin-note" style="display: block; margin-top: 5px;">ملاحظة للكابتن: 500 دينار من أجرة كل طلب تعود لصاحب التطبيق.</span>
-        </div>
-
-        <div class="form-card" id="my-active-orders-section">
-            <div class="form-card-title"><i class="fas fa-box-open" style="color: #10B981;"></i> <span id="priv-card-title">طلباتي الحالية</span></div>
-            <div id="my-active-orders-container" style="display: flex; flex-direction: column; gap: 10px;">
-                <p id="priv-empty" style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">لا توجد طلبات محجوزة لك حالياً</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="plaza-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="plaza-back-icon"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-briefcase" style="color:#8B5CF6;"></i> <span id="plaza-head">لوحة الكابتن</span></h2>
-
-        <div id="plaza-rule-note" class="note" style="background: rgba(239, 68, 68, 0.1); border-right-color: var(--danger); color: var(--danger); font-size: 14px; font-weight: 800; margin-bottom: 20px;">
-            <i class="fas fa-exclamation-circle" style="font-size: 20px;"></i> 
-            <span style="display: block; margin-top: 5px;">قانون صارم: ممنوع تشتري أي مسواك أو تتحرك قبل ما تتصل بالزبون وتتأكد منه! إذا الزبون ما جاوب، الغي الطلب فوراً. المندوب اللي يخالف ويشتري بدون اتصال يتحمل الخسارة.</span>
-        </div>
-
-        <div class="form-card" style="text-align: center; padding: 15px;">
-            <button id="statusToggleBtn" class="send-btn ripple" style="background: #10B981; margin-top: 0; box-shadow: none;" onclick="toggleDriverStatus()">
-                <i class="fas fa-check-circle"></i> أنا متاح للعمل
-           </button>
-            
-            <button id="soundToggleBtn" class="send-btn ripple" style="background: var(--text-muted); margin-top: 10px; box-shadow: none;" onclick="toggleOrderSound()">
-                <i class="fas fa-bell-slash"></i> جرس الطلبات: معطل
-           </button>
-            
-            <button id="plaza-log-btn" class="send-btn ripple" style="background: var(--bg-color); color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; box-shadow: none;" onclick="showScreen('log-screen')">
-                <i class="fas fa-list-alt"></i> سجل الطلبات (المنجزة والملغية)
-           </button>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-            <div class="form-card" style="background: linear-gradient(135deg, var(--primary) 0%, #818CF8 100%); color:white; border:none; margin: 0; padding: 15px; text-align: center;">
-                <h4 id="plaza-stat-1" style="color:rgba(255,255,255,0.8); margin:0; font-size:14px;">المنجزة ✅</h4>
-                <p id="stat-count" style="font-size: 35px; font-weight:800; color:white; margin:5px 0 0;">0</p>
-                <div style="display:none;"><span id="stat-driver">0</span><span id="stat-admin">0</span></div>
+                
+                <button id="soundToggleBtn" class="send-btn ripple" style="background: var(--text-muted); margin-top: 10px; box-shadow: none;" onclick="toggleOrderSound()">
+                    <i class="fas fa-bell-slash"></i> جرس الطلبات: معطل
+               </button>
+                
+                <button id="plaza-log-btn" class="send-btn ripple" style="background: var(--bg-color); color: var(--primary); border: 2px solid var(--primary); margin-top: 10px; box-shadow: none;" onclick="showScreen('log-screen')">
+                    <i class="fas fa-list-alt"></i> سجل الطلبات (المنجزة والملغية)
+               </button>
             </div>
             
-            <div class="form-card" style="background: linear-gradient(135deg, #EF4444 0%, #FCA5A5 100%); color:white; border:none; margin: 0; padding: 15px; text-align: center;">
-                <h4 id="plaza-stat-2" style="color:rgba(255,255,255,0.8); margin:0; font-size:14px;">الطلبات الملغية 🚫</h4>
-                <p id="stat-canceled-count" style="font-size: 35px; font-weight:800; color:white; margin:5px 0 0;">0</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <div class="form-card" style="background: linear-gradient(135deg, var(--primary) 0%, #818CF8 100%); color:white; border:none; margin: 0; padding: 15px; text-align: center;">
+                    <h4 id="plaza-stat-1" style="color:rgba(255,255,255,0.8); margin:0; font-size:14px;">المنجزة ✅</h4>
+                    <p id="stat-count" style="font-size: 35px; font-weight:800; color:white; margin:5px 0 0;">0</p>
+                    <div style="display:none;"><span id="stat-driver">0</span><span id="stat-admin">0</span></div>
+                </div>
+                
+                <div class="form-card" style="background: linear-gradient(135deg, #EF4444 0%, #FCA5A5 100%); color:white; border:none; margin: 0; padding: 15px; text-align: center;">
+                    <h4 id="plaza-stat-2" style="color:rgba(255,255,255,0.8); margin:0; font-size:14px;">الطلبات الملغية 🚫</h4>
+                    <p id="stat-canceled-count" style="font-size: 35px; font-weight:800; color:white; margin:5px 0 0;">0</p>
+                </div>
             </div>
+
+            <div class="form-card">
+                <div class="form-card-title"><i class="fas fa-qrcode"></i> <span id="plaza-verify-title">تأكيد تسليم/تحصيل جديد</span></div>
+                <div class="form-group">
+                   <label id="lbl-plaza-phone">رقم هاتف الزبون</label>
+                   <input type="tel" id="driverVerifyPhoneInput" placeholder="مثال: 07700000000" style="text-align:center;" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
+                   <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
+                   <span id="plaza-step1" class="step-number">خطوة رقم (1)</span>
+               </div>
+                <div class="form-group">
+                   <label id="lbl-plaza-code">كود التأكيد (من الزبون)</label>
+                   <input type="number" id="driverVerifyInput" placeholder="مثال: 1234" style="text-align:center; font-size:22px; letter-spacing:4px; font-weight:bold;">
+                   <span id="plaza-step2" class="step-number">خطوة رقم (2)</span>
+               </div>
+                <button id="plaza-verify-btn" class="send-btn ripple" style="background: #10B981; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); margin-top:5px;" onclick="processVerifyCode()"><i class="fas fa-check-circle"></i> تأكيد العملية</button>
+            </div>
+
+            <div class="leaderboard-card">
+                <div class="form-card-title" style="justify-content:center;"><i class="fas fa-trophy"></i> <span id="plaza-league-title">دوري الأبطال</span></div>
+                <div id="leaderboard-list">
+                    <p id="plaza-league-load" style="text-align: center; color: var(--text-muted);">جاري تحميل الترتيب...</p>
+               </div>
+                <small id="plaza-league-sub" style="display: block; text-align: center; margin-top: 15px; color: var(--text-muted); font-weight:600;">المنافسة مستمرة🏆</small>
+            </div>
+
+            <p id="driver-display-name" style="text-align: center; font-weight: 700; color: var(--text-muted); margin-top:30px;"></p>
+            <button id="plaza-logout-btn" class="resign-btn ripple-dark" onclick="resignDriver()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج / استقالة</button>
         </div>
 
-        <div class="form-card">
-            <div class="form-card-title"><i class="fas fa-qrcode"></i> <span id="plaza-verify-title">تأكيد تسليم/تحصيل جديد</span></div>
-            <div class="form-group">
-               <label id="lbl-plaza-phone">رقم هاتف الزبون</label>
-               <input type="tel" id="driverVerifyPhoneInput" placeholder="مثال: 07700000000" style="text-align:center;" dir="ltr" maxlength="11" oninput="this.value = this.value.replace(/[^0-9]/g, ''); checkPhoneLive(this)">
-               <span class="phone-note phone-error" style="display:none; color:var(--danger); margin-top:5px; font-size:12px; font-weight:bold;">⚠️ الرقم غير صحيح</span>
-               <span id="plaza-step1" class="step-number">خطوة رقم (1)</span>
-           </div>
-            <div class="form-group">
-               <label id="lbl-plaza-code">كود التأكيد (من الزبون)</label>
-               <input type="number" id="driverVerifyInput" placeholder="مثال: 1234" style="text-align:center; font-size:22px; letter-spacing:4px; font-weight:bold;">
-               <span id="plaza-step2" class="step-number">خطوة رقم (2)</span>
-           </div>
-            <button id="plaza-verify-btn" class="send-btn ripple" style="background: #10B981; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3); margin-top:5px;" onclick="processVerifyCode()"><i class="fas fa-check-circle"></i> تأكيد العملية</button>
+        <div id="log-screen" class="screen container">
+            <button class="back-btn ripple-dark" onclick="showScreen('plaza-screen')"><i class="fas fa-arrow-right" id="log-back-icon"></i></button>
+            <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> <span id="log-head">سجل الكابتن</span></h2>
+            
+            <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                <button id="tab-completed" class="send-btn ripple" style="margin: 0; background: var(--primary); box-shadow: none; font-size: 14px; border-radius: 12px;" onclick="switchLogTab('completed')">المنجزة ✅</button>
+                <button id="tab-canceled" class="send-btn ripple" style="margin: 0; background: var(--surface); color: var(--text-main); border: 1px solid var(--border-color); box-shadow: none; font-size: 14px; border-radius: 12px;" onclick="switchLogTab('canceled')">الملغية 🚫</button>
+            </div>
+
+            <div id="driver-log-container"></div>
         </div>
-
-        <div class="leaderboard-card">
-            <div class="form-card-title" style="justify-content:center;"><i class="fas fa-trophy"></i> <span id="plaza-league-title">دوري الأبطال</span></div>
-            <div id="leaderboard-list">
-                <p id="plaza-league-load" style="text-align: center; color: var(--text-muted);">جاري تحميل الترتيب...</p>
-           </div>
-            <small id="plaza-league-sub" style="display: block; text-align: center; margin-top: 15px; color: var(--text-muted); font-weight:600;">المنافسة مستمرة🏆</small>
-        </div>
-
-        <p id="driver-display-name" style="text-align: center; font-weight: 700; color: var(--text-muted); margin-top:30px;"></p>
-        <button id="plaza-logout-btn" class="resign-btn ripple-dark" onclick="resignDriver()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج / استقالة</button>
-    </div>
-
-    <div id="log-screen" class="screen container">
-        <button class="back-btn ripple-dark" onclick="showScreen('plaza-screen')"><i class="fas fa-arrow-right" id="log-back-icon"></i></button>
-        <h2 class="screen-header-title"><i class="fas fa-clipboard-list" style="color:var(--primary);"></i> <span id="log-head">سجل الكابتن</span></h2>
-        
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <button id="tab-completed" class="send-btn ripple" style="margin: 0; background: var(--primary); box-shadow: none; font-size: 14px; border-radius: 12px;" onclick="switchLogTab('completed')">المنجزة ✅</button>
-            <button id="tab-canceled" class="send-btn ripple" style="margin: 0; background: var(--surface); color: var(--text-main); border: 1px solid var(--border-color); box-shadow: none; font-size: 14px; border-radius: 12px;" onclick="switchLogTab('canceled')">الملغية 🚫</button>
-        </div>
-
-        <div id="driver-log-container"></div>
-    </div>
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser"; 
@@ -1531,7 +1233,7 @@
       function initAutoLocation() {
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
-                 (position) => { userCoords = `https://www.google.com/maps?q=${position.coords.latitude},0{position.coords.longitude}`; checkAppAccess(position.coords.latitude, position.coords.longitude); },
+                 (position) => { userCoords = `https://www.google.com/maps?q=$${position.coords.latitude},${position.coords.longitude}`; checkAppAccess(position.coords.latitude, position.coords.longitude); },
                  (error) => { console.warn("GPS Denied"); }, { enableHighAccuracy: true }
               );
           }
@@ -1634,217 +1336,7 @@
              localStorage.clear(); window.location.replace(window.location.href.split('?')[0]);
           }
       }
-        async function checkNewOrdersForSound() {
-         if(!isSoundEnabled || !navigator.onLine) return;
-          try {
-              const resp = await fetch(`${GS_URL}?action=checkNewOrders&t=${new Date().getTime()}`);
-              const currentCount = parseInt(await resp.text());
-             if(!isNaN(currentCount)) {
-                 if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
-                     newOrderAudio.play().catch(e=>{});
-                      showToast(currentLang === 'en' ? "🔔 New order available!" : "🔔طلب جديد نزل بالساحة!");
-                     if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                  }
-                 lastOrderCount = currentCount;
-              }
-          } catch(e) {}
-      }
 
-      function startOrderPolling() {
-         if(orderPollInterval) clearInterval(orderPollInterval);
-         checkNewOrdersForSound(); 
-         orderPollInterval = setInterval(checkNewOrdersForSound, 10000); 
-      }
-
-      function initAutoLocation() {
-          if (navigator.geolocation) {
-             navigator.geolocation.getCurrentPosition(
-                 (position) => {
-                     userCoords = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
-                     checkAppAccess(position.coords.latitude, position.coords.longitude);
-                  },
-                 (error) => { console.warn("GPS Denied on load"); },
-                  { enableHighAccuracy: true }
-              );
-          }
-      }
-
-      function handleSecretClick() {
-         secretCounter++;
-          if (secretCounter === 5) {
-             secretCounter = 0;
-              let pass = prompt(currentLang === 'en' ? "Enter Secret Code:" : "أدخل الرمز السري:");
-              if (pass === "2006") {
-                 localStorage.setItem('isAdmin', 'true'); 
-                 
-                 let adminCard = document.querySelector('#admin-panel .form-card');
-                 if (adminCard && !document.getElementById('btn-unblock-order')) {
-                     let unblockHtml = `
-                     <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                         <p style="font-weight: 700; margin-bottom: 10px; color: var(--primary);">${currentLang === 'en' ? 'Captain Privileges' : 'صلاحيات الكابتن'}</p>
-                         <button id="btn-unblock-order" class="send-btn ripple" style="background: #3B82F6; margin-top: 0; box-shadow: none;" onclick="unlockSecondOrder()">
-                             <i class="fas fa-unlock-alt"></i> ${currentLang === 'en' ? 'Unblock Second Order' : 'فك حظر الطلب الثاني'}
-                         </button>
-                     </div>`;
-                     adminCard.insertAdjacentHTML('beforeend', unblockHtml);
-                 }
-
-                 showScreen('admin-panel');
-                 checkGlobalStatusFromServer(); 
-              } else if (pass !== null) {
-                 showToast(currentLang === 'en' ? "Wrong Code ❌" : "الرمز خطأ ❌");
-              }
-          }
-      }
-
-      function unlockSecondOrder() {
-          localStorage.setItem('allow_second_order', 'true');
-          showToast(currentLang === 'en' ? "Unblocked successfully! You can book a second order now. 🔓" : "تم فك الحظر بنجاح! تكدر هسه تحجز طلب ثاني. 🔓");
-      }
-
-      function handleLockScreenSecret() {
-         lockSecretCounter++;
-          if (lockSecretCounter === 5) {
-             lockSecretCounter = 0;
-              let pass = prompt(currentLang === 'en' ? "Enter Secret Code:" : "أدخل الرمز السري:");
-              if (pass === "2006") {
-                 localStorage.setItem('isAdmin', 'true'); 
-                 
-                 let adminCard = document.querySelector('#admin-panel .form-card');
-                 if (adminCard && !document.getElementById('btn-unblock-order')) {
-                     let unblockHtml = `
-                     <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                         <p style="font-weight: 700; margin-bottom: 10px; color: var(--primary);">${currentLang === 'en' ? 'Captain Privileges' : 'صلاحيات الكابتن'}</p>
-                         <button id="btn-unblock-order" class="send-btn ripple" style="background: #3B82F6; margin-top: 0; box-shadow: none;" onclick="unlockSecondOrder()">
-                             <i class="fas fa-unlock-alt"></i> ${currentLang === 'en' ? 'Unblock Second Order' : 'فك حظر الطلب الثاني'}
-                         </button>
-                     </div>`;
-                     adminCard.insertAdjacentHTML('beforeend', unblockHtml);
-                 }
-
-                 document.getElementById('global-lock-screen').style.display = 'none';
-                 showScreen('admin-panel');
-              } else if (pass !== null) {
-                  showToast(currentLang === 'en' ? "Wrong Code ❌" : "الرمز خطأ ❌");
-              }
-          }
-      }
-      
-      async function setGlobalAppStatus(newStatus) {
-          const btnOpen = document.getElementById('btn-open-app');
-          const btnClose = document.getElementById('btn-close-app');
-          if(newStatus === 'online') { btnOpen.innerHTML = '<span class="baly-spinner"></span>'; } 
-          else { btnClose.innerHTML = '<span class="baly-spinner"></span>'; }
-          btnOpen.disabled = true; btnClose.disabled = true;
-          
-          try {
-              if(typeof db !== 'undefined') {
-                  await db.ref('settings/app_status').set(newStatus);
-                  showToast(newStatus === "online" ? (currentLang === 'en' ? "App opened for all ✅" : "تم فتح التطبيق للجميع ✅") : (currentLang === 'en' ? "App closed 🔴" : "تم إغلاق التطبيق 🔴"));
-              }
-          } catch(e) {
-              showToast(currentLang === 'en' ? "Connection Error ❌" : "حدث خطأ في الاتصال ❌");
-          } finally { 
-              btnOpen.innerHTML = currentLang === 'en' ? '<i class="fas fa-unlock"></i> Open App' : '<i class="fas fa-unlock"></i> فتح التطبيق';
-              btnClose.innerHTML = currentLang === 'en' ? '<i class="fas fa-lock"></i> Close App' : '<i class="fas fa-lock"></i> إغلاق التطبيق';
-              btnOpen.disabled = false; btnClose.disabled = false;
-          }
-      }
-
-      function listenToGlobalStatus() {
-          if(typeof db === 'undefined') return;
-          
-          db.ref('settings/app_status').on('value', (snapshot) => {
-              if (checkTimeLock()) {
-                  applyGlobalStatus();
-                  hideSplash();
-                  return; 
-              }
-
-              const status = snapshot.val() || 'online'; 
-              const lockScreen = document.getElementById('global-lock-screen');
-              const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
-              
-              if (status === "offline") {
-                 appIsActive = false;
-                 if(lockScreen && !isAdmin) lockScreen.style.display = 'flex'; 
-                 else if(lockScreen && isAdmin) lockScreen.style.display = 'none';
-              } else {
-                 appIsActive = true;
-                 if(lockScreen) lockScreen.style.display = 'none'; 
-              }
-              applyGlobalStatus();
-              hideSplash();
-          });
-      }
-
-      function hideSplash() {
-          const splash = document.getElementById('splash-screen');
-          if(splash && splash.style.display !== 'none') { 
-              splash.style.opacity = '0'; 
-              setTimeout(() => splash.style.display = 'none', 500); 
-          }
-      }
-
-      async function checkGlobalStatusFromServer() {
-          try {
-              if (checkTimeLock()) {
-                  applyGlobalStatus();
-                  return; 
-              }
-
-              const resp = await fetch(`${GS_URL}?action=getAppStatus&t=${new Date().getTime()}`);
-              const status = await resp.text();
-              const lockScreen = document.getElementById('global-lock-screen');
-              const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
-              if (status === "offline") {
-                 appIsActive = false;
-                 if(lockScreen && !isAdmin) lockScreen.style.display = 'flex'; 
-                  else if(lockScreen && isAdmin) lockScreen.style.display = 'none';
-              } else {
-                 appIsActive = true;
-                 if(lockScreen) lockScreen.style.display = 'none'; 
-              }
-              applyGlobalStatus();
-          } catch(e) {
-          } finally {
-              const splash = document.getElementById('splash-screen');
-             if(splash && splash.style.display !== 'none') { 
-                 splash.style.opacity = '0'; 
-                 setTimeout(() => splash.style.display = 'none', 500); 
-              }
-          }
-      }
-
-      function applyGlobalStatus() {
-          const badge = document.getElementById('admin-status-badge');
-          const orderButtons = document.querySelectorAll('.order-btn-logic');
-          const isAdmin = localStorage.getItem('isAdmin') === 'true';
-          if (!appIsActive) {
-             badge.style.display = 'block';
-             badge.innerText = currentLang === 'en' ? 'Service is currently unavailable 🔴' : 'الخدمة متوقفة حالياً🔴';
-              if (!isAdmin) {
-                 orderButtons.forEach(btn => {
-                     btn.disabled = true;
-                     btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-lock"></i> Closed Now' : '<i class="fas fa-lock"></i> مغلق حالياً';
-                  });
-              } else { orderButtons.forEach(btn => btn.disabled = false); }
-          } else {
-             badge.style.display = 'none';
-             document.getElementById('tukSendBtn').innerHTML = currentLang === 'en' ? '<i class="fas fa-paper-plane"></i> Request TukTuk' : '<i class="fas fa-paper-plane"></i> طلب تكتك توصيلة';
-             document.getElementById('medSendBtn').innerHTML = currentLang === 'en' ? '<i class="fas fa-paper-plane"></i> Confirm Mediator Order' : '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
-             document.getElementById('sendBtn').innerHTML = currentLang === 'en' ? '<i class="fas fa-paper-plane"></i> Send Order Now' : '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
-             orderButtons.forEach(btn => btn.disabled = false);
-          }
-      }
-
-      function userLogout() {
-          if (confirm(currentLang === 'en' ? "Are you sure you want to logout?" : "هل أنت متأكد من تسجيل الخروج من التطبيق؟")) {
-             localStorage.clear();
-             window.location.replace(window.location.href.split('?')[0]);
-          }
-      }
-      
       async function syncLoyaltyWithServer() {
           const phoneInput = document.getElementById('custPhone');
           const phone = (phoneInput && phoneInput.value.trim() !== "") ? phoneInput.value.trim() : localStorage.getItem('saved_customer_phone');
@@ -1908,6 +1400,7 @@
          document.getElementById('login-step-2').style.display = 'none';
          document.getElementById('login-step-1').style.display = 'block';
       }
+
       function completeDirectLogin() {
           const userName = document.getElementById('loginNameInput').value.trim();
           const userPhone = document.getElementById('loginPhoneInput').value.trim();
@@ -1945,8 +1438,7 @@
               document.getElementById('loginPhoneInput').value = '';
           }, 800);
       }
-
-      async function sendToDiscord(msg, orderId) {
+        async function sendToDiscord(msg, orderId) {
           try {
               let response = await fetch(DISCORD_PUBLIC_WEBHOOK + "?wait=true", {
                   method: "POST",
@@ -2052,6 +1544,11 @@
               const cancelMsg = `🚫 **طلب ملغي**\nالكابتن: ${dName}\nرقم الزبون: ${phone}\nرقم الطلب: ${orderId}\nسبب الإلغاء: ${reason}`;
               sendToPrivateDiscord(cancelMsg);
 
+              // إرسال إشعار للزبون بإلغاء الطلب
+              try {
+                  await fetch(`${GS_URL}?action=sendNotification&phone=${phone}&msg=${encodeURIComponent("الطلب انلغه. السبب: " + reason)}`);
+              } catch(e) {}
+
               showToast(currentLang === 'en' ? "Order canceled and removed 🚫" : "تم إلغاء الطلب وحذفه من قائمتك 🚫");
               closeCancelModal();
               
@@ -2112,6 +1609,14 @@
                   </div>
               `).join('');
           }
+      }
+
+      // دالة زر (كملت مسواك)
+      async function finishShopping(orderId, phone) {
+          showToast(currentLang === 'en' ? "Customer notified that shopping is done ✅" : "تم إرسال إشعار للزبون بأن المسواك كمل ✅");
+          try {
+              await fetch(`${GS_URL}?action=sendNotification&phone=${phone}&msg=${encodeURIComponent("طلبك كمل باقي بس يجيك")}`);
+          } catch(e) { console.log(e); }
       }
 
       function listenToOrders() {
@@ -2192,9 +1697,13 @@
                               <p style="margin: 0 0 8px; font-weight: 800; color: var(--primary);">📦 ${currentLang === 'en' ? 'Order Details:' : 'تفاصيل الطلب:'}</p>
                               <p style="margin: 0 0 5px; font-size: 14px; font-weight: 700; color: var(--text-main);">🔵 ${currentLang === 'en' ? 'Type:' : 'نوع الطلب:'} ${order.type || 'مسواك'}</p>
                               <p style="margin: 0 0 8px; font-size: 14px; font-weight: 700; line-height: 1.5; color: var(--text-main);">📝 ${currentLang === 'en' ? 'Items:' : 'الطلب:'}<br><span style="font-weight: 600; color: var(--text-muted);">${displayItems}</span></p>
-                              <p style="margin: 0 0 10px; font-size: 14px; font-weight: 700; color: var(--text-main);">🔢 ${currentLang === 'en' ? 'Seq:' : 'تسلسل العميل:'} <span style="color: #F59E0B;">${order.loyaltyMsg || '-'}</span></p>
+                              <p style="margin: 0 0 10px; font-size: 14px; font-weight: 700; color: var(--text-main);">🔢 ${currentLang === 'en' ? 'Seq:' : 'تسلسل العميل (الولاء):'} <span style="color: #F59E0B;">${order.loyaltyMsg || '-'}</span></p>
                               
                               ${locationButtonsHTML}
+
+                              <button class="send-btn ripple" style="background: #10B981; color: white; padding: 10px; margin-top: 10px; box-shadow: none; border-radius: 12px;" onclick="finishShopping('${key}', '${order.phone}')">
+                                  <i class="fas fa-check-double"></i> ${currentLang === 'en' ? 'Shopping Done' : 'كملت مسواك'}
+                              </button>
 
                               <a href="tel:${order.phone}" class="send-btn ripple" style="background: #3B82F6; color: white; text-decoration: none; padding: 10px; display: block; text-align: center; margin-top: 10px;"><i class="fas fa-phone-alt"></i> ${currentLang === 'en' ? 'Call Customer' : 'اتصال بالزبون'}</a>
                               
@@ -2236,8 +1745,12 @@
           }
           
           const privateMsg = `✅ تم حجز الطلب بنجاح\n\n🔑 كود التأكيد: ${orderId}\n\n📦 التفاصيل:\n🔵 طلب ${type}\n👤الزبون: ${customerName}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${items}\n🔢 تسلسل طلب العميل: ${loyaltyMsg}\n📍الموقع: ${location}`;
-          
           sendToPrivateDiscord(privateMsg);
+
+          // إرسال إشعار للزبون بأن الطلب انحجز
+          try {
+              await fetch(`${GS_URL}?action=sendNotification&phone=${phone}&msg=${encodeURIComponent("الطلب انحجز باقي يروح للسوك")}`);
+          } catch(e) {}
           
           showToast(currentLang === 'en' ? "Order Claimed! Check My Orders." : "تم حجز الطلب بنجاح! راجع الطلبات المحجوزة.");
       }
@@ -2604,6 +2117,11 @@
                   });
               }
 
+              // إرسال إشعار بوصول طلب جديد للمندوبين
+              try {
+                  await fetch(`${GS_URL}?action=notifyDrivers&msg=${encodeURIComponent("تم وصول طلب جديد")}`);
+              } catch(e) {}
+
               const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: تحصيل/تسليم - ${dropLink}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}\nموقع الزبون: ${userCoords}`;
               await sendToDiscord(msg, vc); 
              
@@ -2653,6 +2171,11 @@
                       location: userCoords
                   });
               }
+
+              // إرسال إشعار بوصول طلب جديد للمندوبين
+              try {
+                  await fetch(`${GS_URL}?action=notifyDrivers&msg=${encodeURIComponent("تم وصول طلب جديد")}`);
+              } catch(e) {}
 
              const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${order}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}\nموقع الزبون: ${userCoords}`;
              await sendToDiscord(msg, vc); 
@@ -2728,6 +2251,12 @@
                       timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords
                   });
               }
+
+              // إرسال إشعار بوصول طلب جديد للمندوبين
+              try {
+                  await fetch(`${GS_URL}?action=notifyDrivers&msg=${encodeURIComponent("تم وصول طلب جديد")}`);
+              } catch(e) {}
+
               const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${msgContent}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}${restOrderNumbers}\nموقع الزبون: ${userCoords}`;
               await sendToDiscord(msg, vc);
              document.getElementById('success-order-modal').style.display = 'flex';
@@ -2903,454 +2432,13 @@
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
       function confirmMapLocation() {
           const center = appMap.getCenter();
-          const googleMapsLink = `https://www.google.com/maps?q=${center.lat},${center.lng}`;
+          const googleMapsLink = `https://www.google.com/maps?q=$${center.lat},${center.lng}`;
          document.getElementById('tukDropoffLink').value = googleMapsLink;
          document.getElementById('map-success-msg').style.display = 'block';
          closeMapModal();
       }
       function openPricesModal() { document.getElementById('prices-modal').style.display = 'flex'; }
       function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
-      
-      // ==========================================
-      // قائمة المطاعم والأكلات (مترجمة بالكامل)
-      // ==========================================
-      const menus = {
-          'rken_estkana': {
-              name: t('ركن استكانة', 'Ruken Estkana'),
-              items: [
-                  { id: 'rk1', name: t('كيلو كباب لحم', '1 Kg Meat Kebab'), price: 24000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('16 شيش كباب، خبز، سلطة، طرشي، وشطة', '16 Kebab skewers, bread, salad, pickles, and hot sauce') },
-                  { id: 'rk2', name: t('نفر كباب لحم', 'Meat Kebab Portion'), price: 6000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('4 شيش دبل، 3 خبزات، سلطة، طرشي، وشطة', '4 double skewers, 3 breads, salad, pickles, and hot sauce') },
-                  { id: 'rk3', name: t('نص نفر كباب لحم', 'Half Meat Kebab Portion'), price: 3000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('2 شيش، 2 خبزة، سلطة، طرشي، وشطة', '2 skewers, 2 breads, salad, pickles, and hot sauce') },
-                  { id: 'rk4', name: t('كيلو تكة لحم', '1 Kg Meat Tikka'), price: 32000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('خبز، سلطة، طرشي، وشطة', 'Bread, salad, pickles, and hot sauce') },
-                  { id: 'rk5', name: t('نفر تكة لحم', 'Meat Tikka Portion'), price: 8000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('4 شيش، خبز، سلطة، طرشي، وشطة', '4 skewers, bread, salad, pickles, and hot sauce') },
-                  { id: 'rk6', name: t('كيلو معلاق', '1 Kg Liver'), price: 24000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('خبز، سلطة، طرشي، وشطة', 'Bread, salad, pickles, and hot sauce') },
-                  { id: 'rk7', name: t('نفر معلاق', 'Liver Portion'), price: 6000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('4 شيش، خبز، سلطة، طرشي، وشطة', '4 skewers, bread, salad, pickles, and hot sauce') },
-                  { id: 'rk8', name: t('كيلو تكة دجاج (طاووق)', '1 Kg Chicken Tikka (Tawook)'), price: 16000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('خبز، سلطة، طرشي، وشطة', 'Bread, salad, pickles, and hot sauce') },
-                  { id: 'rk9', name: t('نفر تكة دجاج (طاووق)', 'Chicken Tikka Portion'), price: 4000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('4 شيش، خبز، سلطة، طرشي، وشطة', '4 skewers, bread, salad, pickles, and hot sauce') },
-                  { id: 'rk10', name: t('كيلو كباب دجاج', '1 Kg Chicken Kebab'), price: 16000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('خبز، سلطة، طرشي، وشطة', 'Bread, salad, pickles, and hot sauce') },
-                  { id: 'rk11', name: t('نفر كباب دجاج', 'Chicken Kebab Portion'), price: 4000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('4 شيش، خبز، سلطة، طرشي، وشطة', '4 skewers, bread, salad, pickles, and hot sauce') },
-                  { id: 'rk12', name: t('كيلو جوانح مشوية', '1 Kg Grilled Wings'), price: 12000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('خبز، سلطة، طرشي، وشطة', 'Bread, salad, pickles, and hot sauce') },
-                  { id: 'rk13', name: t('نفر جوانح مشوية', 'Grilled Wings Portion'), price: 3000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('خبز، سلطة، طرشي، وشطة', 'Bread, salad, pickles, and hot sauce') },
-                  { id: 'rk14', name: t('لفة كباب لحم', 'Meat Kebab Wrap'), price: 2000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('كباب، خضروات، وصمون حجري أو خبز', 'Kebab, vegetables, and stone bread or regular bread') },
-                  { id: 'rk15', name: t('لفة تكة لحم', 'Meat Tikka Wrap'), price: 2000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('تكة لحم، خضروات، وصمون حجري', 'Meat tikka, vegetables, and stone bread') },
-                  { id: 'rk16', name: t('لفة تكة دجاج', 'Chicken Tikka Wrap'), price: 1500, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('تكة دجاج، خضروات، وصمون حجري', 'Chicken tikka, vegetables, and stone bread') },
-                  { id: 'rk17', name: t('لفة كباب دجاج', 'Chicken Kebab Wrap'), price: 1500, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('كباب دجاج، خضروات، وصمون حجري', 'Chicken kebab, vegetables, and stone bread') },
-                  { id: 'rk18', name: t('لفة معلاق', 'Liver Wrap'), price: 1500, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('معلاق مشوي، خضروات، وصمون حجري', 'Grilled liver, vegetables, and stone bread') },
-
-                  { id: 'rk19', name: t('بيتزا شاورما لحم (صغير)', 'Meat Shawarma Pizza (Small)'), price: 7000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk20', name: t('بيتزا شاورما لحم (وسط)', 'Meat Shawarma Pizza (Medium)'), price: 10000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk21', name: t('بيتزا شاورما لحم (كبير)', 'Meat Shawarma Pizza (Large)'), price: 14000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk22', name: t('بيتزا شاورما لحم (عائلي)', 'Meat Shawarma Pizza (Family)'), price: 18000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk23', name: t('بيتزا فوريو (صغير)', 'For You Pizza (Small)'), price: 7000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk24', name: t('بيتزا فوريو (وسط)', 'For You Pizza (Medium)'), price: 10000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk25', name: t('بيتزا فوريو (كبير)', 'For You Pizza (Large)'), price: 14000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk26', name: t('بيتزا فوريو (عائلي)', 'For You Pizza (Family)'), price: 18000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk27', name: t('بيتزا مكس جبن (صغير)', 'Mixed Cheese Pizza (Small)'), price: 7000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk28', name: t('بيتزا مكس جبن (وسط)', 'Mixed Cheese Pizza (Medium)'), price: 10000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk29', name: t('بيتزا مكس جبن (كبير)', 'Mixed Cheese Pizza (Large)'), price: 14000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk30', name: t('بيتزا مكس جبن (عائلي)', 'Mixed Cheese Pizza (Family)'), price: 18000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk31', name: t('بيتزا شاورما دجاج (صغير)', 'Chicken Shawarma Pizza (Small)'), price: 6000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk32', name: t('بيتزا شاورما دجاج (وسط)', 'Chicken Shawarma Pizza (Medium)'), price: 9000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk33', name: t('بيتزا شاورما دجاج (كبير)', 'Chicken Shawarma Pizza (Large)'), price: 12000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk34', name: t('بيتزا شاورما دجاج (عائلي)', 'Chicken Shawarma Pizza (Family)'), price: 14000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk35', name: t('بيتزا مارغريتا (صغير)', 'Margherita Pizza (Small)'), price: 6000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk36', name: t('بيتزا مارغريتا (وسط)', 'Margherita Pizza (Medium)'), price: 9000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk37', name: t('بيتزا مارغريتا (كبير)', 'Margherita Pizza (Large)'), price: 12000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk38', name: t('بيتزا مارغريتا (عائلي)', 'Margherita Pizza (Family)'), price: 14000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk39', name: t('بيتزا بابروني (صغير)', 'Pepperoni Pizza (Small)'), price: 7000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk40', name: t('بيتزا بابروني (وسط)', 'Pepperoni Pizza (Medium)'), price: 10000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk41', name: t('بيتزا بابروني (كبير)', 'Pepperoni Pizza (Large)'), price: 12000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk42', name: t('بيتزا بابروني (عائلي)', 'Pepperoni Pizza (Family)'), price: 15000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk43', name: t('بيتزا مشكل (صغير)', 'Mixed Pizza (Small)'), price: 7000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk44', name: t('بيتزا مشكل (وسط)', 'Mixed Pizza (Medium)'), price: 10000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk45', name: t('بيتزا مشكل (كبير)', 'Mixed Pizza (Large)'), price: 12000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk46', name: t('بيتزا مشكل (عائلي)', 'Mixed Pizza (Family)'), price: 15000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk47', name: t('بيتزا يونانية (صغير)', 'Greek Pizza (Small)'), price: 7000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk48', name: t('بيتزا يونانية (وسط)', 'Greek Pizza (Medium)'), price: 10000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk49', name: t('بيتزا يونانية (كبير)', 'Greek Pizza (Large)'), price: 12000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk50', name: t('بيتزا يونانية (عائلي)', 'Greek Pizza (Family)'), price: 15000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk51', name: t('بيتزا خضروات (صغير)', 'Veggie Pizza (Small)'), price: 5000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk52', name: t('بيتزا خضروات (وسط)', 'Veggie Pizza (Medium)'), price: 7000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk53', name: t('بيتزا خضروات (كبير)', 'Veggie Pizza (Large)'), price: 9000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-                  { id: 'rk54', name: t('بيتزا خضروات (عائلي)', 'Veggie Pizza (Family)'), price: 12000, category: t('🍕 قسم البيتزا', '🍕 Pizza Section') },
-
-                  { id: 'rk55', name: t('برجر استكانة (عادي)', 'Estkana Burger (Regular)'), price: 4000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk56', name: t('برجر استكانة (مع جبن)', 'Estkana Burger (Cheese)'), price: 5000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk57', name: t('برجر استكانة (دبل)', 'Estkana Burger (Double)'), price: 7000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk58', name: t('برجر سماش (عادي)', 'Smash Burger (Regular)'), price: 4000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk59', name: t('برجر سماش (مع جبن)', 'Smash Burger (Cheese)'), price: 5000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk60', name: t('برجر سماش (دبل)', 'Smash Burger (Double)'), price: 7000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk61', name: t('برجر لحم (عادي)', 'Meat Burger (Regular)'), price: 3000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk62', name: t('برجر لحم (مع جبن)', 'Meat Burger (Cheese)'), price: 4000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk63', name: t('برجر لحم (دبل)', 'Meat Burger (Double)'), price: 5000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk64', name: t('برجر تكساس (عادي)', 'Texas Burger (Regular)'), price: 3000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk65', name: t('برجر تكساس (مع جبن)', 'Texas Burger (Cheese)'), price: 4000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk66', name: t('برجر تكساس (دبل)', 'Texas Burger (Double)'), price: 5000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk67', name: t('برجر مشرووم (عادي)', 'Mushroom Burger (Regular)'), price: 3000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk68', name: t('برجر مشرووم (مع جبن)', 'Mushroom Burger (Cheese)'), price: 4000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk69', name: t('برجر مشرووم (دبل)', 'Mushroom Burger (Double)'), price: 5000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk70', name: t('برجر BBQ (عادي)', 'BBQ Burger (Regular)'), price: 3000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk71', name: t('برجر BBQ (مع جبن)', 'BBQ Burger (Cheese)'), price: 4000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk72', name: t('برجر BBQ (دبل)', 'BBQ Burger (Double)'), price: 5000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk73', name: t('برجر دجاج (عادي)', 'Chicken Burger (Regular)'), price: 2500, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk74', name: t('برجر دجاج (مع جبن)', 'Chicken Burger (Cheese)'), price: 3000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk75', name: t('برجر دجاج (دبل)', 'Chicken Burger (Double)'), price: 4000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk76', name: t('برجر سكالب (عادي)', 'Escalope Burger (Regular)'), price: 2500, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk77', name: t('برجر سكالب (مع جبن)', 'Escalope Burger (Cheese)'), price: 3000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk78', name: t('برجر سكالب (دبل)', 'Escalope Burger (Double)'), price: 4000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk79', name: t('برجر فوريو سبيشل (عادي)', 'For You Special Burger (Regular)'), price: 7000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-                  { id: 'rk80', name: t('برجر فوريو سبيشل (دبل)', 'For You Special Burger (Double)'), price: 10000, category: t('🍔 قسم البرجر', '🍔 Burger Section') },
-
-                  { id: 'rk81', name: t('صاج شاورما لحم (صغير)', 'Meat Shawarma Saj (Small)'), price: 3000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk82', name: t('صاج شاورما لحم (كبير)', 'Meat Shawarma Saj (Large)'), price: 5000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk83', name: t('صاج شاورما لحم (وجبة)', 'Meat Shawarma Saj (Meal)'), price: 6000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk84', name: t('صاج دجاج (صغير)', 'Chicken Saj (Small)'), price: 2500, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk85', name: t('صاج دجاج (كبير)', 'Chicken Saj (Large)'), price: 3000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk86', name: t('صاج دجاج (وجبة)', 'Chicken Saj (Meal)'), price: 5000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk87', name: t('صاج كرسبي (صغير)', 'Crispy Saj (Small)'), price: 2500, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk88', name: t('صاج كرسبي (كبير)', 'Crispy Saj (Large)'), price: 3000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk89', name: t('صاج كرسبي (وجبة)', 'Crispy Saj (Meal)'), price: 5000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk90', name: t('صاج مسخن (صغير)', 'Musakhan Saj (Small)'), price: 2500, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk91', name: t('صاج مسخن (كبير)', 'Musakhan Saj (Large)'), price: 3000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk92', name: t('صاج مسخن (وجبة)', 'Musakhan Saj (Meal)'), price: 5000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk93', name: t('صاج فلافل (صغير)', 'Falafel Saj (Small)'), price: 1500, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk94', name: t('صاج فلافل (كبير)', 'Falafel Saj (Large)'), price: 2000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk95', name: t('صاج فلافل (وجبة)', 'Falafel Saj (Meal)'), price: 4000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk96', name: t('صاج تركي لحم', 'Turkish Meat Saj'), price: 7000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk97', name: t('صاج تركي دجاج', 'Turkish Chicken Saj'), price: 6000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk98', name: t('صاج إيطالي لحم', 'Italian Meat Saj'), price: 7000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-                  { id: 'rk99', name: t('صاج إيطالي دجاج', 'Italian Chicken Saj'), price: 6000, category: t('🌯 قسم الصاج واللفات', '🌯 Saj & Wraps Section') },
-
-                  { id: 'rk100', name: t('طبق فنكر الشيف (سبيشل)', 'Chef\'s Fries Plate (Special)'), price: 7000, category: t('🍟 المقبلات والبطاطا', '🍟 Appetizers & Fries') },
-                  { id: 'rk101', name: t('فرايز جكن هلابينو', 'Jalapeno Chicken Fries'), price: 6000, category: t('🍟 المقبلات والبطاطا', '🍟 Appetizers & Fries') },
-                  { id: 'rk102', name: t('فرايز شاورما', 'Shawarma Fries'), price: 6000, category: t('🍟 المقبلات والبطاطا', '🍟 Appetizers & Fries') },
-                  { id: 'rk103', name: t('جكن سيزر سلاد (سلطة)', 'Chicken Caesar Salad'), price: 5000, category: t('🍟 المقبلات والبطاطا', '🍟 Appetizers & Fries') },
-                  { id: 'rk104', name: t('فنكر جيز خضار', 'Veggie Cheese Fries'), price: 4000, category: t('🍟 المقبلات والبطاطا', '🍟 Appetizers & Fries') },
-                  { id: 'rk105', name: t('أورديف مقبلات مشكلة (صغير)', 'Mixed Appetizers (Small)'), price: 3000, category: t('🍟 المقبلات والبطاطا', '🍟 Appetizers & Fries') },
-                  { id: 'rk106', name: t('أورديف مقبلات مشكلة (كبير)', 'Mixed Appetizers (Large)'), price: 5000, category: t('🍟 المقبلات والبطاطا', '🍟 Appetizers & Fries') },
-                  { id: 'rk107', name: t('جاينت برجر العملاق (لحم)', 'Giant Meat Burger'), price: 12000, category: t('🍱 وجبات الريزو والعملاقة', '🍱 Rizo & Giant Meals') },
-                  { id: 'rk108', name: t('جاينت برجر العملاق (دجاج)', 'Giant Chicken Burger'), price: 10000, category: t('🍱 وجبات الريزو والعملاقة', '🍱 Rizo & Giant Meals') },
-                  { id: 'rk109', name: t('انشيلادا مكسيكي', 'Mexican Enchilada'), price: 8000, category: t('🍱 وجبات الريزو والعملاقة', '🍱 Rizo & Giant Meals') },
-                  { id: 'rk110', name: t('ماك اند جيز', 'Mac and Cheese'), price: 8000, category: t('🍱 وجبات الريزو والعملاقة', '🍱 Rizo & Giant Meals') },
-                  { id: 'rk111', name: t('لغم برجر (لحم)', 'Mine Meat Burger'), price: 6000, category: t('🍱 وجبات الريزو والعملاقة', '🍱 Rizo & Giant Meals') },
-                  { id: 'rk112', name: t('لغم برجر (دجاج)', 'Mine Chicken Burger'), price: 5000, category: t('🍱 وجبات الريزو والعملاقة', '🍱 Rizo & Giant Meals') },
-                  { id: 'rk113', name: t('ريزو عادي', 'Regular Rizo'), price: 5000, category: t('🍱 وجبات الريزو والعملاقة', '🍱 Rizo & Giant Meals') },
-                  { id: 'rk114', name: t('ريزو BBQ', 'BBQ Rizo'), price: 5000, category: t('🍱 وجبات الريزو والعملاقة', '🍱 Rizo & Giant Meals') },
-                  { id: 'rk115', name: t('ريزو مكس', 'Mixed Rizo'), price: 5000, category: t('🍱 وجبات الريزو والعملاقة', '🍱 Rizo & Giant Meals') },
-
-                  { id: 'rk116', name: t('لبن', 'Laban (Yogurt Drink)'), price: 500, category: t('🥤 المشروبات الباردة', '🥤 Cold Drinks') },
-                  { id: 'rk117', name: t('بيبسي', 'Pepsi'), price: 500, category: t('🥤 المشروبات الباردة', '🥤 Cold Drinks') },
-                  { id: 'rk118', name: t('سفن', '7up'), price: 500, category: t('🥤 المشروبات الباردة', '🥤 Cold Drinks') },
-                  { id: 'rk119', name: t('فانتا', 'Fanta'), price: 500, category: t('🥤 المشروبات الباردة', '🥤 Cold Drinks') },
-                  { id: 'rk120', name: t('كوكا', 'Coca Cola'), price: 500, category: t('🥤 المشروبات الباردة', '🥤 Cold Drinks') },
-                  { id: 'rk121', name: t('ميرندا', 'Miranda'), price: 500, category: t('🥤 المشروبات الباردة', '🥤 Cold Drinks') },
-                  { id: 'rk122', name: t('شاني', 'Shani'), price: 500, category: t('🥤 المشروبات الباردة', '🥤 Cold Drinks') },
-
-                  { id: 'rk123', name: t('صينية كيلو لحم مندي', '1 Kg Mandi Meat Tray'), price: 45000, category: t('🍖 أطباق اللحوم الشرقية', '🍖 Oriental Meat Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk124', name: t('صينية كيلو لحم برياني', '1 Kg Biryani Meat Tray'), price: 45000, category: t('🍖 أطباق اللحوم الشرقية', '🍖 Oriental Meat Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk125', name: t('نص لحم (500 غرام)', 'Half Meat (500g)'), price: 24000, category: t('🍖 أطباق اللحوم الشرقية', '🍖 Oriental Meat Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk126', name: t('نفر برياني لحم كامل', 'Full Meat Biryani Portion'), price: 15000, category: t('🍖 أطباق اللحوم الشرقية', '🍖 Oriental Meat Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk127', name: t('ربع لحم (250 غرام)', 'Quarter Meat (250g)'), price: 12000, category: t('🍖 أطباق اللحوم الشرقية', '🍖 Oriental Meat Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk128', name: t('تشريب لحم', 'Meat Tashreeb'), price: 6000, category: t('🍖 أطباق اللحوم الشرقية', '🍖 Oriental Meat Dishes'), desc: t('سلطة، طرشي، شطة، وخبزة', 'Salad, pickles, hot sauce, and bread') },
-                  { id: 'rk129', name: t('دليمية لحم', 'Meat Dulaimiya'), price: 5000, category: t('🍖 أطباق اللحوم الشرقية', '🍖 Oriental Meat Dishes'), desc: t('مرق، سلطة، طرشي، وشطة', 'Stew, salad, pickles, and hot sauce') },
-                  { id: 'rk130', name: t('صينية دجاجة كاملة مندي', 'Full Chicken Mandi Tray'), price: 20000, category: t('🍗 أطباق الدجاج الشرقية', '🍗 Oriental Chicken Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk131', name: t('صينية دجاجة كاملة برياني', 'Full Chicken Biryani Tray'), price: 20000, category: t('🍗 أطباق الدجاج الشرقية', '🍗 Oriental Chicken Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk132', name: t('نفر برياني دجاج كامل', 'Full Chicken Biryani Portion'), price: 10000, category: t('🍗 أطباق الدجاج الشرقية', '🍗 Oriental Chicken Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk133', name: t('نص دجاجة مندي', 'Half Chicken Mandi'), price: 10000, category: t('🍗 أطباق الدجاج الشرقية', '🍗 Oriental Chicken Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk134', name: t('نص دجاجة برياني', 'Half Chicken Biryani'), price: 10000, category: t('🍗 أطباق الدجاج الشرقية', '🍗 Oriental Chicken Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk135', name: t('ربع دجاجة مندي', 'Quarter Chicken Mandi'), price: 5000, category: t('🍗 أطباق الدجاج الشرقية', '🍗 Oriental Chicken Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk136', name: t('ربع دجاجة برياني', 'Quarter Chicken Biryani'), price: 5000, category: t('🍗 أطباق الدجاج الشرقية', '🍗 Oriental Chicken Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk137', name: t('تشريب دجاج', 'Chicken Tashreeb'), price: 5000, category: t('🍗 أطباق الدجاج الشرقية', '🍗 Oriental Chicken Dishes'), desc: t('سلطة، طرشي، شطة، وخبزة', 'Salad, pickles, hot sauce, and bread') },
-                  { id: 'rk138', name: t('دليمية دجاج', 'Chicken Dulaimiya'), price: 4000, category: t('🍗 أطباق الدجاج الشرقية', '🍗 Oriental Chicken Dishes'), desc: t('مرق، سلطة، طرشي، وشطة', 'Stew, salad, pickles, and hot sauce') },
-                  { id: 'rk139', name: t('نص مندي مشكل (لحم + دجاج)', 'Half Mixed Mandi (Meat + Chicken)'), price: 17000, category: t('🍱 الوجبات المشكلة', '🍱 Mixed Meals'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk140', name: t('ربع مندي مشكل (لحم + دجاج)', 'Quarter Mixed Mandi (Meat + Chicken)'), price: 10000, category: t('🍱 الوجبات المشكلة', '🍱 Mixed Meals'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk141', name: t('صينية كيلو سمك نويبي متبل', '1 Kg Marinated Nuwaibi Fish Tray'), price: 25000, category: t('🐟 أطباق الأسماك', '🐟 Fish Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk142', name: t('نص نفر سمك نويبي متبل', 'Half Portion Marinated Nuwaibi Fish'), price: 15000, category: t('🐟 أطباق الأسماك', '🐟 Fish Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') },
-                  { id: 'rk143', name: t('نفر سمك نويبي متبل', 'Marinated Nuwaibi Fish Portion'), price: 8000, category: t('🐟 أطباق الأسماك', '🐟 Fish Dishes'), desc: t('تمن، حشو، مرق، سلطة، طرشي، شطة، وخبزة', 'Rice, stuffing, stew, salad, pickles, hot sauce, and bread') }
-              ]
-          },
-          'royal_food': {
-              name: t('رويال فود', 'Royal Food'),
-              items: [
-                  { id: 'rf1', name: t('بركر كلاسيك', 'Classic Burger'), price: 2500, category: t('بركر اللحم', 'Meat Burger') },
-                  { id: 'rf2', name: t('بركر بالجبن', 'Cheese Burger'), price: 3000, category: t('بركر اللحم', 'Meat Burger') },
-                  { id: 'rf3', name: t('بركر دبل', 'Double Burger'), price: 5000, category: t('بركر اللحم', 'Meat Burger') },
-                  { id: 'rf4', name: t('بركر كلاسيك', 'Classic Burger'), price: 2000, category: t('بركر دجاج', 'Chicken Burger') },
-                  { id: 'rf5', name: t('بركر بالجبن', 'Cheese Burger'), price: 2500, category: t('بركر دجاج', 'Chicken Burger') },
-                  { id: 'rf6', name: t('بركر دبل', 'Double Burger'), price: 4000, category: t('بركر دجاج', 'Chicken Burger') },
-                  { id: 'rf7', name: t('بركر كلاسيك', 'Classic Burger'), price: 2500, category: t('بركر سكالوب', 'Escalope Burger') },
-                  { id: 'rf8', name: t('بركر بالجبن', 'Cheese Burger'), price: 3000, category: t('بركر سكالوب', 'Escalope Burger') },
-                  { id: 'rf9', name: t('بركر دبل', 'Double Burger'), price: 4000, category: t('بركر سكالوب', 'Escalope Burger') },
-                  { id: 'rf10', name: t('بركر ستيك رويال', 'Royal Steak Burger'), price: 5000, category: t('بركر سبشل', 'Special Burger') },
-                  { id: 'rf11', name: t('بركر هيمي', 'Himi Burger'), price: 6000, category: t('بركر سبشل', 'Special Burger') },
-                  { id: 'rf12', name: t('لغم بركر لحم', 'Mine Meat Burger'), price: 7000, category: t('بركر سبشل', 'Special Burger') },
-                  { id: 'rf13', name: t('لغم بركر دجاج', 'Mine Chicken Burger'), price: 5000, category: t('بركر سبشل', 'Special Burger') },
-                  { id: 'rf14', name: t('ستيك دجاج دايت', 'Diet Chicken Steak'), price: 6000, category: t('بركر سبشل', 'Special Burger') },
-                  { id: 'rf15', name: t('انشيلادا', 'Enchilada'), price: 5000, category: t('بركر سبشل', 'Special Burger') },
-                  { id: 'rf16', name: t('صغير', 'Small'), price: 8000, category: t('جاينت بركر لحم', 'Giant Meat Burger') },
-                  { id: 'rf17', name: t('وسط', 'Medium'), price: 10000, category: t('جاينت بركر لحم', 'Giant Meat Burger') },
-                  { id: 'rf18', name: t('كبير', 'Large'), price: 15000, category: t('جاينت بركر لحم', 'Giant Meat Burger') },
-                  { id: 'rf19', name: t('صغير', 'Small'), price: 6000, category: t('جاينت بركر دجاج', 'Giant Chicken Burger') },
-                  { id: 'rf20', name: t('وسط', 'Medium'), price: 8000, category: t('جاينت بركر دجاج', 'Giant Chicken Burger') },
-                  { id: 'rf21', name: t('كبير', 'Large'), price: 12000, category: t('جاينت بركر دجاج', 'Giant Chicken Burger') },
-                  { id: 'rf22', name: t('نفر شاورما لحم', 'Meat Shawarma Portion'), price: 7000, category: t('شاورما لحم', 'Meat Shawarma') },
-                  { id: 'rf23', name: t('ربع كيلو شاورما لحم', 'Quarter Kg Meat Shawarma'), price: 10000, category: t('شاورما لحم', 'Meat Shawarma') },
-                  { id: 'rf24', name: t('نص كيلو شاورما لحم', 'Half Kg Meat Shawarma'), price: 20000, category: t('شاورما لحم', 'Meat Shawarma') },
-                  { id: 'rf25', name: t('كيلو شاورما لحم', '1 Kg Meat Shawarma'), price: 40000, category: t('شاورما لحم', 'Meat Shawarma') },
-                  { id: 'rf26', name: t('نفر شاورما دجاج', 'Chicken Shawarma Portion'), price: 6000, category: t('شاورما دجاج', 'Chicken Shawarma') },
-                  { id: 'rf27', name: t('ربع كيلو شاورما دجاج', 'Quarter Kg Chicken Shawarma'), price: 9000, category: t('شاورما دجاج', 'Chicken Shawarma') },
-                  { id: 'rf28', name: t('نص كيلو شاورما دجاج', 'Half Kg Chicken Shawarma'), price: 18000, category: t('شاورما دجاج', 'Chicken Shawarma') },
-                  { id: 'rf29', name: t('كيلو شاورما دجاج', '1 Kg Chicken Shawarma'), price: 35000, category: t('شاورما دجاج', 'Chicken Shawarma') },
-                  { id: 'rf30', name: t('صاج لحم صغير', 'Small Meat Saj'), price: 3000, category: t('الصاجات (سنجل)', 'Saj (Single)') },
-                  { id: 'rf31', name: t('صاج لحم كبير', 'Large Meat Saj'), price: 4000, category: t('الصاجات (سنجل)', 'Saj (Single)') },
-                  { id: 'rf32', name: t('صاج دجاج صغير', 'Small Chicken Saj'), price: 2500, category: t('الصاجات (سنجل)', 'Saj (Single)') },
-                  { id: 'rf33', name: t('صاج دجاج كبير', 'Large Chicken Saj'), price: 3500, category: t('الصاجات (سنجل)', 'Saj (Single)') },
-                  { id: 'rf34', name: t('صاج فلافل صغير', 'Small Falafel Saj'), price: 1500, category: t('الصاجات (سنجل)', 'Saj (Single)') },
-                  { id: 'rf35', name: t('صاج فلافل كبير', 'Large Falafel Saj'), price: 2000, category: t('الصاجات (سنجل)', 'Saj (Single)') },
-                  { id: 'rf36', name: t('صاج كرسبي صغير', 'Small Crispy Saj'), price: 2500, category: t('الصاجات (سنجل)', 'Saj (Single)') },
-                  { id: 'rf37', name: t('صاج كرسبي كبير', 'Large Crispy Saj'), price: 3000, category: t('الصاجات (سنجل)', 'Saj (Single)') },
-                  { id: 'rf38', name: t('صاج ايطالي لحم', 'Italian Meat Saj'), price: 6000, category: t('الصاجات (سنجل)', 'Saj (Single)') },
-                  { id: 'rf39', name: t('صاج ايطالي دجاج', 'Italian Chicken Saj'), price: 5000, category: t('الصاجات (سنجل)', 'Saj (Single)') },
-                  { id: 'rf40', name: t('وجبة صاج لحم', 'Meat Saj Meal'), price: 7000, category: t('وجبات الصاج', 'Saj Meals') },
-                  { id: 'rf41', name: t('وجبة صاج دجاج', 'Chicken Saj Meal'), price: 6000, category: t('وجبات الصاج', 'Saj Meals') },
-                  { id: 'rf42', name: t('وجبة صاج فلافل', 'Falafel Saj Meal'), price: 4000, category: t('وجبات الصاج', 'Saj Meals') },
-                  { id: 'rf43', name: t('وجبة صاج كرسبي', 'Crispy Saj Meal'), price: 5000, category: t('وجبات الصاج', 'Saj Meals') },
-                  { id: 'rf44', name: t('سندويش لحم', 'Meat Sandwich'), price: 2000, category: t('سندويش', 'Sandwich') },
-                  { id: 'rf45', name: t('سندويش دجاج', 'Chicken Sandwich'), price: 2000, category: t('سندويش', 'Sandwich') },
-                  { id: 'rf46', name: t('فاهيتا دجاج', 'Chicken Fajita'), price: 3000, category: t('سندويش', 'Sandwich') },
-                  { id: 'rf47', name: t('كرسبي 3 قطع', 'Crispy 3 Pcs'), price: 4000, category: t('كرسبي', 'Crispy') },
-                  { id: 'rf48', name: t('كرسبي 5 قطع', 'Crispy 5 Pcs'), price: 6000, category: t('كرسبي', 'Crispy') },
-                  { id: 'rf49', name: t('ريزو عادي', 'Regular Rizo'), price: 5000, category: t('ريزو', 'Rizo') },
-                  { id: 'rf50', name: t('ريزو BBQ', 'BBQ Rizo'), price: 5000, category: t('ريزو', 'Rizo') },
-                  { id: 'rf51', name: t('ريزو مكس', 'Mixed Rizo'), price: 5000, category: t('ريزو', 'Rizo') },
-                  { id: 'rf52', name: t('ريزو هلابينو', 'Jalapeno Rizo'), price: 6000, category: t('ريزو', 'Rizo') },
-                  { id: 'rf53', name: t('دجاج', 'Chicken'), price: 5000, category: t('بيتزا (الحجم الصغير)', 'Pizza (Small)') },
-                  { id: 'rf54', name: t('لحم', 'Meat'), price: 7000, category: t('بيتزا (الحجم الصغير)', 'Pizza (Small)') },
-                  { id: 'rf55', name: t('ببروني', 'Pepperoni'), price: 7000, category: t('بيتزا (الحجم الصغير)', 'Pizza (Small)') },
-                  { id: 'rf56', name: t('مشكل', 'Mixed'), price: 7000, category: t('بيتزا (الحجم الصغير)', 'Pizza (Small)') },
-                  { id: 'rf57', name: t('لحم رانش', 'Ranch Meat'), price: 8000, category: t('بيتزا (الحجم الصغير)', 'Pizza (Small)') },
-                  { id: 'rf58', name: t('دجاج رانش', 'Ranch Chicken'), price: 6000, category: t('بيتزا (الحجم الصغير)', 'Pizza (Small)') },
-                  { id: 'rf59', name: t('جبن', 'Cheese'), price: 6000, category: t('بيتزا (الحجم الصغير)', 'Pizza (Small)') },
-                  { id: 'rf60', name: t('خضار', 'Veggie'), price: 5000, category: t('بيتزا (الحجم الصغير)', 'Pizza (Small)') },
-                  { id: 'rf61', name: t('دجاج', 'Chicken'), price: 8000, category: t('بيتزا (الحجم الوسط)', 'Pizza (Medium)') },
-                  { id: 'rf62', name: t('لحم', 'Meat'), price: 9000, category: t('بيتزا (الحجم الوسط)', 'Pizza (Medium)') },
-                  { id: 'rf63', name: t('ببروني', 'Pepperoni'), price: 10000, category: t('بيتزا (الحجم الوسط)', 'Pizza (Medium)') },
-                  { id: 'rf64', name: t('مشكل', 'Mixed'), price: 9000, category: t('بيتزا (الحجم الوسط)', 'Pizza (Medium)') },
-                  { id: 'rf65', name: t('لحم رانش', 'Ranch Meat'), price: 10000, category: t('بيتزا (الحجم الوسط)', 'Pizza (Medium)') },
-                  { id: 'rf66', name: t('دجاج رانش', 'Ranch Chicken'), price: 9000, category: t('بيتزا (الحجم الوسط)', 'Pizza (Medium)') },
-                  { id: 'rf67', name: t('جبن', 'Cheese'), price: 9000, category: t('بيتزا (الحجم الوسط)', 'Pizza (Medium)') },
-                  { id: 'rf68', name: t('خضار', 'Veggie'), price: 7000, category: t('بيتزا (الحجم الوسط)', 'Pizza (Medium)') },
-                  { id: 'rf69', name: t('دجاج', 'Chicken'), price: 10000, category: t('بيتزا (الحجم الكبير)', 'Pizza (Large)') },
-                  { id: 'rf70', name: t('لحم', 'Meat'), price: 13000, category: t('بيتزا (الحجم الكبير)', 'Pizza (Large)') },
-                  { id: 'rf71', name: t('ببروني', 'Pepperoni'), price: 13000, category: t('بيتزا (الحجم الكبير)', 'Pizza (Large)') },
-                  { id: 'rf72', name: t('مشكل', 'Mixed'), price: 13000, category: t('بيتزا (الحجم الكبير)', 'Pizza (Large)') },
-                  { id: 'rf73', name: t('لحم رانش', 'Ranch Meat'), price: 13000, category: t('بيتزا (الحجم الكبير)', 'Pizza (Large)') },
-                  { id: 'rf74', name: t('دجاج رانش', 'Ranch Chicken'), price: 12000, category: t('بيتزا (الحجم الكبير)', 'Pizza (Large)') },
-                  { id: 'rf75', name: t('جبن', 'Cheese'), price: 12000, category: t('بيتزا (الحجم الكبير)', 'Pizza (Large)') },
-                  { id: 'rf76', name: t('خضار', 'Veggie'), price: 10000, category: t('بيتزا (الحجم الكبير)', 'Pizza (Large)') },
-                  { id: 'rf77', name: t('علبة فنكر', 'Fries Box'), price: 1000, category: t('المقبلات والجانبيات', 'Appetizers & Sides') },
-                  { id: 'rf78', name: t('طبق فنكر', 'Fries Plate'), price: 2000, category: t('المقبلات والجانبيات', 'Appetizers & Sides') },
-                  { id: 'rf79', name: t('جيز فنكر', 'Cheese Fries'), price: 3000, category: t('المقبلات والجانبيات', 'Appetizers & Sides') },
-                  { id: 'rf80', name: t('فرايز چكن هلابينو', 'Jalapeno Chicken Fries'), price: 6000, category: t('المقبلات والجانبيات', 'Appetizers & Sides') },
-                  { id: 'rf81', name: t('مقبلات صغير', 'Small Appetizers'), price: 3000, category: t('المقبلات والجانبيات', 'Appetizers & Sides') },
-                  { id: 'rf82', name: t('مقبلات كبير', 'Large Appetizers'), price: 5000, category: t('المقبلات والجانبيات', 'Appetizers & Sides') },
-                  { id: 'rf83', name: t('سلطة سيزر', 'Caesar Salad'), price: 5000, category: t('المقبلات والجانبيات', 'Appetizers & Sides') },
-                  { id: 'rf84', name: t('حمص باللحم', 'Hummus with Meat'), price: 4000, category: t('المقبلات والجانبيات', 'Appetizers & Sides') },
-                  { id: 'rf85', name: t('حمص دجاج', 'Hummus with Chicken'), price: 3000, category: t('المقبلات والجانبيات', 'Appetizers & Sides') },
-                  { id: 'rf86', name: t('بيبسي', 'Pepsi'), price: 500, category: t('المشروبات والصوصات', 'Drinks & Sauces') },
-                  { id: 'rf87', name: t('ديو', 'Mountain Dew'), price: 500, category: t('المشروبات والصوصات', 'Drinks & Sauces') },
-                  { id: 'rf88', name: t('بيبسي دايت', 'Diet Pepsi'), price: 500, category: t('المشروبات والصوصات', 'Drinks & Sauces') },
-                  { id: 'rf89', name: t('صوص عادي', 'Regular Sauce'), price: 500, category: t('المشروبات والصوصات', 'Drinks & Sauces') },
-                  { id: 'rf90', name: t('صوص ثومية', 'Garlic Sauce'), price: 250, category: t('المشروبات والصوصات', 'Drinks & Sauces') },
-                  { id: 'rf91', name: t('صوص BBQ', 'BBQ Sauce'), price: 500, category: t('المشروبات والصوصات', 'Drinks & Sauces') }
-              ]
-          },
-          'victoria': {
-              name: t('مطعم فيكتوريا', 'Victoria'),
-              items: [
-                  { id: 'v1', name: t('برجر كلاسيك', 'Classic Burger'), price: 2500, category: t('قسم البرجر', 'Burger Section'), desc: t('قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو', 'Zinger piece + Cocktail sauce + Lettuce + Tomato + Pickles + Avocado sauce') },
-                  { id: 'v2', name: t('برجر جبن', 'Cheese Burger'), price: 3000, category: t('قسم البرجر', 'Burger Section'), desc: t('قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو + صوص الجبن', 'Zinger piece + Cocktail sauce + Lettuce + Tomato + Pickles + Avocado & Cheese sauce') },
-                  { id: 'v3', name: t('برجر مشروم', 'Mushroom Burger'), price: 3500, category: t('قسم البرجر', 'Burger Section'), desc: t('كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل', '2 Crispy pieces + Cocktail sauce + Lettuce + Tomato + Pickles') },
-                  { id: 'v4', name: t('برجر دبل', 'Double Burger'), price: 5000, category: t('قسم البرجر', 'Burger Section'), desc: t('كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز', '2 Crispy pieces + Cocktail sauce + Lettuce + Tomato + Pickles + Cheese sauce') },
-                  { id: 'v5', name: t('برجر فيكتوريا', 'Victoria Burger'), price: 6000, category: t('قسم البرجر', 'Burger Section'), desc: t('تندر مقرمش 2 قطعة + صوص مدخن + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز', '2 Crispy Tenders + Smoked sauce + Cocktail sauce + Lettuce + Tomato + Pickles + Cheese sauce') },
-                  { id: 'v6', name: t('برجر دجاج', 'Chicken Burger'), price: 2500, category: t('قسم البرجر', 'Burger Section'), desc: '' },
-                  { id: 'v7', name: t('برجر دجاج دبل', 'Double Chicken Burger'), price: 4000, category: t('قسم البرجر', 'Burger Section'), desc: '' },
-                  { id: 'v8', name: t('سندويش زنجر', 'Zinger Sandwich'), price: 2500, category: t('قسم السندويجات', 'Sandwiches Section'), desc: t('قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو', 'Zinger piece + Cocktail sauce + Lettuce + Tomato + Pickles + Avocado sauce') },
-                  { id: 'v9', name: t('سندويش زنجر جيز', 'Zinger Cheese Sandwich'), price: 3000, category: t('قسم السندويجات', 'Sandwiches Section'), desc: t('قطعة زنجر + صوص كوكتيل + خس + طماطه + مخلل + صوص افكادو + صوص الجبن', 'Zinger piece + Cocktail sauce + Lettuce + Tomato + Pickles + Avocado & Cheese sauce') },
-                  { id: 'v10', name: t('سندويش كرسبي', 'Crispy Sandwich'), price: 2500, category: t('قسم السندويجات', 'Sandwiches Section'), desc: t('كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل', '2 Crispy pieces + Cocktail sauce + Lettuce + Tomato + Pickles') },
-                  { id: 'v11', name: t('سندويش كرسبي جيز', 'Crispy Cheese Sandwich'), price: 3000, category: t('قسم السندويجات', 'Sandwiches Section'), desc: t('كرسبي 2 قطعة + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز', '2 Crispy pieces + Cocktail sauce + Lettuce + Tomato + Pickles + Cheese sauce') },
-                  { id: 'v12', name: t('تويستر راب', 'Twister Wrap'), price: 3500, category: t('قسم السندويجات', 'Sandwiches Section'), desc: t('تندر مقرمش 2 قطعة + صوص مدخن + صوص كوكتيل + خس + طماطه + مخلل + صوص جيز', '2 Crispy Tenders + Smoked sauce + Cocktail sauce + Lettuce + Tomato + Pickles + Cheese sauce') },
-                  { id: 'v13', name: t('سندويش فاهيته', 'Fajita Sandwich'), price: 3500, category: t('قسم السندويجات', 'Sandwiches Section'), desc: t('قطع الدجاج + خضار مشوي + جبن موزريلا + صوص افوكادو', 'Chicken pieces + Grilled vegetables + Mozzarella cheese + Avocado sauce') },
-                  { id: 'v14', name: t('سندويش فلادلفيه', 'Philadelphia Sandwich'), price: 4000, category: t('قسم السندويجات', 'Sandwiches Section'), desc: t('قطع حبل الظهر + خضار مشوي + جبن موزريلا + صوص مدخن', 'Meat slices + Grilled vegetables + Mozzarella cheese + Smoked sauce') },
-                  { id: 'v15', name: t('سندويش سكالوب', 'Escalope Sandwich'), price: 3500, category: t('قسم السندويجات', 'Sandwiches Section'), desc: t('قطع سكالوب + صوص افوكادو + مخلل + كولسلو', 'Escalope pieces + Avocado sauce + Pickles + Coleslaw') },
-                  { id: 'v16', name: t('سندويش الشيف', 'Chef Sandwich'), price: 4000, category: t('قسم السندويجات', 'Sandwiches Section'), desc: t('قطع التندر مقرمش + صوص الطبخ + مخلل + كولسلو', 'Crispy Tender pieces + Cooking sauce + Pickles + Coleslaw') },
-                  { id: 'v17', name: t('مقبلات حجم صغير', 'Small Appetizers'), price: 2000, category: t('قسم المقبلات', 'Appetizers Section'), desc: t('رمانية - حمص بطحينة - كولسلو - جاجيك - فتة دجاج - فتة بتنجان - اناناس - فراوله - بيتنجانية - مسبحة - جزر', 'Pomegranate - Hummus - Coleslaw - Jajeek - Chicken Fatteh - Eggplant Fatteh - Pineapple - Strawberry - Eggplant - Musabaha - Carrots') },
-                  { id: 'v18', name: t('مقبلات حجم كبير', 'Large Appetizers'), price: 4000, category: t('قسم المقبلات', 'Appetizers Section'), desc: t('رمانية - حمص بطحينة - كولسلو - جاجيك - فتة دجاج - فتة بتنجان - اناناس - فراوله - بيتنجانية - مسبحة - جزر', 'Pomegranate - Hummus - Coleslaw - Jajeek - Chicken Fatteh - Eggplant Fatteh - Pineapple - Strawberry - Eggplant - Musabaha - Carrots') },
-                  { id: 'v19', name: t('كنتاكي 3 قطع', 'KFC 3 Pieces'), price: 6000, category: t('قسم الكنتاكي والكرسبي', 'KFC & Crispy Section'), desc: t('صمون 3 قطع + ثوميه + كولسلو + بيبسي', '3 Breads + Garlic sauce + Coleslaw + Pepsi') },
-                  { id: 'v20', name: t('كنتاكي 5 قطع', 'KFC 5 Pieces'), price: 10000, category: t('قسم الكنتاكي والكرسبي', 'KFC & Crispy Section'), desc: t('صمون 5 قطع + ثوميه + كولسلو + بيبسي', '5 Breads + Garlic sauce + Coleslaw + Pepsi') },
-                  { id: 'v21', name: t('كنتاكي 10 قطع', 'KFC 10 Pieces'), price: 18000, category: t('قسم الكنتاكي والكرسبي', 'KFC & Crispy Section'), desc: t('صمون 10 قطع + ثوميه + كولسلو + بيبسي', '10 Breads + Garlic sauce + Coleslaw + Pepsi') },
-                  { id: 'v22', name: t('كرسبي 5 قطع', 'Crispy 5 Pieces'), price: 6000, category: t('قسم الكنتاكي والكرسبي', 'KFC & Crispy Section'), desc: t('صمون 5 قطع + ثوميه + كولسلو + بيبسي', '5 Breads + Garlic sauce + Coleslaw + Pepsi') },
-                  { id: 'v23', name: t('كرسبي 10 قطع', 'Crispy 10 Pieces'), price: 12000, category: t('قسم الكنتاكي والكرسبي', 'KFC & Crispy Section'), desc: t('صمون 10 قطع + ثوميه + كولسلو + بيبسي', '10 Breads + Garlic sauce + Coleslaw + Pepsi') },
-                  { id: 'v24', name: t('كنتاكي سبايسي 3 قطع', 'Spicy KFC 3 Pcs'), price: 6500, category: t('قسم السبايسي', 'Spicy Section'), desc: t('صمون 3 قطع + ثوميه + كولسلو + بيبسي', '3 Breads + Garlic sauce + Coleslaw + Pepsi') },
-                  { id: 'v25', name: t('كنتاكي سبايسي 5 قطع', 'Spicy KFC 5 Pcs'), price: 10500, category: t('قسم السبايسي', 'Spicy Section'), desc: t('صمون 5 قطع + ثوميه + كولسلو + بيبسي', '5 Breads + Garlic sauce + Coleslaw + Pepsi') },
-                  { id: 'v26', name: t('كنتاكي سبايسي 10 قطع', 'Spicy KFC 10 Pcs'), price: 18500, category: t('قسم السبايسي', 'Spicy Section'), desc: t('صمون 10 قطع + ثوميه + كولسلو + بيبسي', '10 Breads + Garlic sauce + Coleslaw + Pepsi') },
-                  { id: 'v27', name: t('كرسبي سبايسي 5 قطع', 'Spicy Crispy 5 Pcs'), price: 6500, category: t('قسم السبايسي', 'Spicy Section'), desc: t('صمون 5 قطع + ثوميه + صوص كوكتيل', '5 Breads + Garlic sauce + Cocktail sauce') },
-                  { id: 'v28', name: t('كرسبي سبايسي 10 قطع', 'Spicy Crispy 10 Pcs'), price: 10500, category: t('قسم السبايسي', 'Spicy Section'), desc: t('صمون 10 قطع + ثوميه + صوص كوكتيل', '10 Breads + Garlic sauce + Cocktail sauce') },
-                  { id: 'v29', name: t('بيتزا لحم صغير', 'Small Meat Pizza'), price: 6000, category: t('قسم البيتزا', 'Pizza Section'), desc: '' },
-                  { id: 'v30', name: t('بيتزا لحم وسط', 'Medium Meat Pizza'), price: 8000, category: t('قسم البيتزا', 'Pizza Section'), desc: '' },
-                  { id: 'v31', name: t('بيتزا لحم كبير', 'Large Meat Pizza'), price: 14000, category: t('قسم البيتزا', 'Pizza Section'), desc: '' },
-                  { id: 'v32', name: t('بيتزا دجاج صغير', 'Small Chicken Pizza'), price: 5000, category: t('قسم البيتزا', 'Pizza Section'), desc: '' },
-                  { id: 'v33', name: t('بيتزا دجاج وسط', 'Medium Chicken Pizza'), price: 7000, category: t('قسم البيتزا', 'Pizza Section'), desc: '' },
-                  { id: 'v34', name: t('بيتزا دجاج كبير', 'Large Chicken Pizza'), price: 13000, category: t('قسم البيتزا', 'Pizza Section'), desc: '' },
-                  { id: 'v35', name: t('بيتزا خضار صغير', 'Small Veggie Pizza'), price: 5000, category: t('قسم البيتزا', 'Pizza Section'), desc: '' },
-                  { id: 'v36', name: t('بيتزا خضار وسط', 'Medium Veggie Pizza'), price: 7000, category: t('قسم البيتزا', 'Pizza Section'), desc: '' },
-                  { id: 'v37', name: t('بيتزا خضار كبير', 'Large Veggie Pizza'), price: 12000, category: t('قسم البيتزا', 'Pizza Section'), desc: '' },
-                  { id: 'v38', name: t('بيتزا مرغريتا صغير', 'Small Margherita Pizza'), price: 5000, category: t('قسم البيتزا', 'Pizza Section'), desc: '' },
-                  { id: 'v39', name: t('بيتزا مرغريتا وسط', 'Medium Margherita Pizza'), price: 7000, category: t('قسم البيتزا', 'Pizza Section'), desc: '' },
-                  { id: 'v40', name: t('بيتزا مرغريتا كبير', 'Large Margherita Pizza'), price: 10000, category: t('قسم البيتزا', 'Pizza Section'), desc: '' },
-                  { id: 'v41', name: t('بيتزا الشيف وسط', 'Medium Chef Pizza'), price: 10000, category: t('قسم البيتزا', 'Pizza Section'), desc: '' },
-                  { id: 'v42', name: t('بيتزا الشيف كبير', 'Large Chef Pizza'), price: 15000, category: t('قسم البيتزا', 'Pizza Section'), desc: '' },
-                  { id: 'v43', name: t('صاج إيطالي لحم', 'Italian Meat Saj'), price: 6000, category: t('الصاج الإيطالي', 'Italian Saj'), desc: '' },
-                  { id: 'v44', name: t('صاج إيطالي دجاج', 'Italian Chicken Saj'), price: 5000, category: t('الصاج الإيطالي', 'Italian Saj'), desc: '' },
-                  { id: 'v45', name: t('ريزو كلاسيك', 'Classic Rizo'), price: 4500, category: t('قسم الريزو', 'Rizo Section'), desc: t('قطع دجاج + صوص كوكتيل', 'Chicken pieces + Cocktail sauce') },
-                  { id: 'v46', name: t('ريزو مدخن', 'Smoked Rizo'), price: 5000, category: t('قسم الريزو', 'Rizo Section'), desc: t('قطع دجاج + صوص مدخن', 'Chicken pieces + Smoked sauce') },
-                  { id: 'v47', name: t('ريزو باربيكيو', 'BBQ Rizo'), price: 5000, category: t('قسم الريزو', 'Rizo Section'), desc: t('قطع دجاج + صوص الباربيكيو', 'Chicken pieces + BBQ sauce') },
-                  { id: 'v48', name: t('ريزو فيكتوريا', 'Victoria Rizo'), price: 6000, category: t('قسم الريزو', 'Rizo Section'), desc: t('قطع دجاج + شاورمه لحم + شاورمه دجاج + صوص ميكس', 'Chicken pieces + Meat shawarma + Chicken shawarma + Mix sauce') },
-                  { id: 'v49', name: t('ريزو شاورمه دجاج', 'Chicken Shawarma Rizo'), price: 5000, category: t('قسم الريزو', 'Rizo Section'), desc: t('شاورمه دجاج + صوص كوكتيل', 'Chicken shawarma + Cocktail sauce') },
-                  { id: 'v50', name: t('ريزو شاورمه لحم', 'Meat Shawarma Rizo'), price: 5500, category: t('قسم الريزو', 'Rizo Section'), desc: t('شاورمه لحم + صوص مدخن', 'Meat shawarma + Smoked sauce') },
-                  { id: 'v51', name: t('ريزو ميكس', 'Mixed Rizo'), price: 5000, category: t('قسم الريزو', 'Rizo Section'), desc: '' },
-                  { id: 'v52', name: t('صاج لحم صغير', 'Small Meat Saj'), price: 3000, category: t('قسم الصاج', 'Saj Section'), desc: '' },
-                  { id: 'v53', name: t('صاج لحم كبير', 'Large Meat Saj'), price: 4000, category: t('قسم الصاج', 'Saj Section'), desc: '' },
-                  { id: 'v54', name: t('صاج دجاج صغير', 'Small Chicken Saj'), price: 2000, category: t('قسم الصاج', 'Saj Section'), desc: '' },
-                  { id: 'v55', name: t('صاج دجاج كبير', 'Large Chicken Saj'), price: 3000, category: t('قسم الصاج', 'Saj Section'), desc: '' },
-                  { id: 'v56', name: t('صاج فلافل صغير', 'Small Falafel Saj'), price: 1500, category: t('قسم الصاج', 'Saj Section'), desc: '' },
-                  { id: 'v57', name: t('صاج فلافل كبير', 'Large Falafel Saj'), price: 2000, category: t('قسم الصاج', 'Saj Section'), desc: '' },
-                  { id: 'v58', name: t('فنكر صغير', 'Small Fries'), price: 1000, category: t('قسم الفنكر والمقبلات الساخنة', 'Fries & Hot Appetizers Section'), desc: '' },
-                  { id: 'v59', name: t('فنكر صوص كبير', 'Large Fries with Sauce'), price: 2000, category: t('قسم الفنكر والمقبلات الساخنة', 'Fries & Hot Appetizers Section'), desc: '' },
-                  { id: 'v60', name: t('فنكر بالجبن', 'Cheese Fries'), price: 2500, category: t('قسم الفنكر والمقبلات الساخنة', 'Fries & Hot Appetizers Section'), desc: '' },
-                  { id: 'v61', name: t('حلقات بصل', 'Onion Rings'), price: 3000, category: t('قسم الفنكر والمقبلات الساخنة', 'Fries & Hot Appetizers Section'), desc: '' },
-                  { id: 'v62', name: t('فرايز دجاج مقرمش', 'Crispy Chicken Fries'), price: 4000, category: t('قسم الفنكر والمقبلات الساخنة', 'Fries & Hot Appetizers Section'), desc: '' }
-              ]
-          },
-          'klashe': {
-              name: t('كلاشي', 'Klashe'),
-              items: [
-                  { id: 'k1', name: t('عصير برتقال', 'Orange Juice'), price: 1000, category: t('قسم العصائر', 'Juices Section'), desc: '' },
-                  { id: 'k2', name: t('عصير ليمون', 'Lemon Juice'), price: 1000, category: t('قسم العصائر', 'Juices Section'), desc: '' },
-                  { id: 'k3', name: t('عصير بطيخ بالحليب', 'Melon Milk Juice'), price: 1000, category: t('قسم العصائر', 'Juices Section'), desc: '' },
-                  { id: 'k4', name: t('عصير موز بالكاكاو', 'Banana Cocoa Juice'), price: 1000, category: t('قسم العصائر', 'Juices Section'), desc: '' },
-                  { id: 'k5', name: t('عصير تين', 'Fig Juice'), price: 1000, category: t('قسم العصائر', 'Juices Section'), desc: '' },
-                  { id: 'k6', name: t('عصير خوخ', 'Peach Juice'), price: 1000, category: t('قسم العصائر', 'Juices Section'), desc: '' },
-                  { id: 'k7', name: t('عصير كوكتيل', 'Cocktail Juice'), price: 1000, category: t('قسم العصائر', 'Juices Section'), desc: '' },
-                  { id: 'k8', name: t('عصير فراولة', 'Strawberry Juice'), price: 1000, category: t('قسم العصائر', 'Juices Section'), desc: '' },
-                  { id: 'k9', name: t('عصير ككرزات حليب', 'Nuts Milk Juice'), price: 1500, category: t('قسم العصائر', 'Juices Section'), desc: '' },
-                  { id: 'k10', name: t('سكنجبيل', 'Sekanjabin Mojito'), price: 1000, category: t('قسم الموهيتو', 'Mojito Section'), desc: '' },
-                  { id: 'k11', name: t('موهيتو فراولة', 'Strawberry Mojito'), price: 1500, category: t('قسم الموهيتو', 'Mojito Section'), desc: '' },
-                  { id: 'k12', name: t('موهيتو علج بوبي', 'Bubble Gum Mojito'), price: 1500, category: t('قسم الموهيتو', 'Mojito Section'), desc: '' },
-                  { id: 'k13', name: t('موهيتو بلو بيري', 'Blueberry Mojito'), price: 1500, category: t('قسم الموهيتو', 'Mojito Section'), desc: '' },
-                  { id: 'k14', name: t('موهيتو روز بيري', 'Raspberry Mojito'), price: 1500, category: t('قسم الموهيتو', 'Mojito Section'), desc: '' },
-                  { id: 'k15', name: t('موهيتو ليمون', 'Lemon Mojito'), price: 1500, category: t('قسم الموهيتو', 'Mojito Section'), desc: '' },
-                  { id: 'k16', name: t('موهيتو رمان', 'Pomegranate Mojito'), price: 1500, category: t('قسم الموهيتو', 'Mojito Section'), desc: '' },
-                  { id: 'k17', name: t('موهيتو مانجو', 'Mango Mojito'), price: 1500, category: t('قسم الموهيتو', 'Mojito Section'), desc: '' },
-                  { id: 'k18', name: t('سموذي مانجو', 'Mango Smoothie'), price: 3000, category: t('قسم السموذي', 'Smoothie Section'), desc: '' },
-                  { id: 'k19', name: t('سموذي فراولة', 'Strawberry Smoothie'), price: 3000, category: t('قسم السموذي', 'Smoothie Section'), desc: '' },
-                  { id: 'k20', name: t('سموذي توت ازرق', 'Blueberry Smoothie'), price: 3000, category: t('قسم السموذي', 'Smoothie Section'), desc: '' },
-                  { id: 'k21', name: t('ايس لاتيه', 'Iced Latte'), price: 2000, category: t('قسم القهوة الباردة', 'Cold Coffee Section'), desc: '' },
-                  { id: 'k22', name: t('ايس أمريكانو', 'Iced Americano'), price: 2000, category: t('قسم القهوة الباردة', 'Cold Coffee Section'), desc: '' },
-                  { id: 'k23', name: t('ايس اسبانيش', 'Iced Spanish'), price: 2000, category: t('قسم القهوة الباردة', 'Cold Coffee Section'), desc: '' },
-                  { id: 'k24', name: t('ايس اسبانيش بلو', 'Iced Spanish Blue'), price: 2000, category: t('قسم القهوة الباردة', 'Cold Coffee Section'), desc: '' },
-                  { id: 'k25', name: t('ايس روز لاتيه', 'Iced Rose Latte'), price: 2000, category: t('قسم القهوة الباردة', 'Cold Coffee Section'), desc: '' },
-                  { id: 'k26', name: t('شاي مهيل', 'Cardamom Tea'), price: 500, category: t('قسم المشروبات الساخنة', 'Hot Drinks Section'), desc: '' },
-                  { id: 'k27', name: t('شاي كرك', 'Karak Tea'), price: 1000, category: t('قسم المشروبات الساخنة', 'Hot Drinks Section'), desc: '' },
-                  { id: 'k28', name: t('شاي توت', 'Berry Tea'), price: 1000, category: t('قسم المشروبات الساخنة', 'Hot Drinks Section'), desc: '' },
-                  { id: 'k29', name: t('شاي ليمون', 'Lemon Tea'), price: 1000, category: t('قسم المشروبات الساخنة', 'Hot Drinks Section'), desc: '' },
-                  { id: 'k30', name: t('شاي رمان', 'Pomegranate Tea'), price: 1000, category: t('قسم المشروبات الساخنة', 'Hot Drinks Section'), desc: '' },
-                  { id: 'k31', name: t('قهوة تركية ساده', 'Plain Turkish Coffee'), price: 1000, category: t('قسم القهوة', 'Coffee Section'), desc: '' },
-                  { id: 'k32', name: t('قهوة وسط', 'Medium Coffee'), price: 1000, category: t('قسم القهوة', 'Coffee Section'), desc: '' },
-                  { id: 'k33', name: t('قهوة جكليتية', 'Chocolate Coffee'), price: 1000, category: t('قسم القهوة', 'Coffee Section'), desc: '' },
-                  { id: 'k34', name: t('قهوة عثمانية', 'Ottoman Coffee'), price: 2000, category: t('قسم القهوة', 'Coffee Section'), desc: '' },
-                  { id: 'k35', name: t('قهوة أسبريسو', 'Espresso'), price: 2000, category: t('قسم القهوة', 'Coffee Section'), desc: '' },
-                  { id: 'k36', name: t('حليب فقط', 'Milk Only'), price: 1000, category: t('قسم القهوة', 'Coffee Section'), desc: '' },
-                  { id: 'k37', name: t('مشروب الكاكاو', 'Cocoa Drink'), price: 1000, category: t('قسم القهوة', 'Coffee Section'), desc: '' },
-                  { id: 'k38', name: t('كابتشينو', 'Cappuccino'), price: 1000, category: t('قسم القهوة', 'Coffee Section'), desc: '' },
-                  { id: 'k39', name: t('كابتشينو مكسرات', 'Nut Cappuccino'), price: 1000, category: t('قسم القهوة', 'Coffee Section'), desc: '' }
-              ]
-          },
-          'haleg': {
-              name: t('مطعم الخليج', 'Al Khaleej'),
-              items: [
-                  { id: 'hal1', name: t('ربع دجاجة', 'Quarter Chicken'), price: 5000, category: t('قسم الدجاج', 'Chicken Section'), desc: t('ذبح فرش مع نصف كيلو تمن مع شطة وطرشي ومرق', 'Fresh with half kg rice, hot sauce, pickles and stew') },
-                  { id: 'hal2', name: t('نصف دجاجة', 'Half Chicken'), price: 10000, category: t('قسم الدجاج', 'Chicken Section'), desc: t('ذبح فرش مع كيلو تمن مع شطة وطرشي ومرق', 'Fresh with 1 kg rice, hot sauce, pickles and stew') },
-                  { id: 'hal3', name: 'دجاجة كاملة (1)', price: 20000, category: t('قسم الدجاج', 'Chicken Section'), desc: t('ذبح فرش مع كيلوين تمن مع شطة وطرشي و 2 كاسة مرق', 'Fresh with 2 kg rice, hot sauce, pickles and 2 bowls of stew') },
-                  { id: 'hal4', name: 'دجاجة كاملة (2)', price: 25000, category: t('قسم الدجاج', 'Chicken Section'), desc: t('ذبح فرش مع ثلاثة كيلو تمن مع شطة وطرشي و 2 كاسة مرق', 'Fresh with 3 kg rice, hot sauce, pickles and 2 bowls of stew') },
-                  
-                  { id: 'hal5', name: t('ربع لحم عجل', 'Quarter Veal Meat'), price: 12000, category: t('أنواع اللحم', 'Meat Types'), desc: t('150 غرام مع نصف كيلو تمن وشطة وطرشي وكاسة مرق', '150g with half kg rice, hot sauce, pickles and stew bowl') },
-                  { id: 'hal6', name: t('نصف لحم عجل', 'Half Veal Meat'), price: 18000, category: t('أنواع اللحم', 'Meat Types'), desc: t('300 غرام مع كيلو تمن وشطة وطرشي وكاسة مرق', '300g with 1 kg rice, hot sauce, pickles and stew bowl') },
-                  { id: 'hal7', name: t('لحم عجل كامل', 'Whole Veal Meat'), price: 35000, category: t('أنواع اللحم', 'Meat Types'), desc: t('600 غرام مع كيلوين تمن وشطة وطرشي و 2 كاسة مرق', '600g with 2 kg rice, hot sauce, pickles and 2 stew bowls') },
-                  { id: 'hal8', name: t('ربع لحم غنم', 'Quarter Lamb Meat'), price: 12000, category: t('أنواع اللحم', 'Meat Types'), desc: t('150 غرام مع نصف كيلو تمن وشطة وطرشي وكاسة مرق', '150g with half kg rice, hot sauce, pickles and stew bowl') },
-                  { id: 'hal9', name: t('نصف لحم غنم', 'Half Lamb Meat'), price: 18000, category: t('أنواع اللحم', 'Meat Types'), desc: t('300 غرام مع كيلو تمن وشطة وطرشي وكاسة مرق', '300g with 1 kg rice, hot sauce, pickles and stew bowl') },
-                  { id: 'hal10', name: t('غنم كامل', 'Whole Lamb Meat'), price: 35000, category: t('أنواع اللحم', 'Meat Types'), desc: t('600 غرام مع كيلوين تمن وشطة وطرشي و 2 كاسة مرق', '600g with 2 kg rice, hot sauce, pickles and 2 stew bowls') },
-                  
-                  { id: 'hal11', name: t('مطبق سمك (نصف كيلو)', 'Half Kg Fish Mutabbaq'), price: 10000, category: t('السمك', 'Fish'), desc: t('نصف كيلو سمك مع كيلو تمن', 'Half Kg fish with 1 Kg rice') },
-                  { id: 'hal12', name: t('مطبق سمك (كيلو)', '1 Kg Fish Mutabbaq'), price: 20000, category: t('السمك', 'Fish'), desc: t('كيلو سمك بحري مع كيلوين تمن', '1 Kg sea fish with 2 Kg rice') },
-                  
-                  { id: 'hal13', name: t('نصف كيلو دولمة', 'Half Kg Dolma'), price: 6000, category: t('الدولمة', 'Dolma'), desc: '' },
-                  { id: 'hal14', name: t('كيلو دولمة', '1 Kg Dolma'), price: 12000, category: t('الدولمة', 'Dolma'), desc: '' },
-                  
-                  { id: 'hal15', name: t('ربع برياني', 'Quarter Biryani'), price: 5000, category: t('البرياني ', 'Biryani'), desc: '' },
-                  { id: 'hal16', name: t('كيلو برياني', '1 Kg Biryani'), price: 10000, category: t('البرياني ', 'Biryani'), desc: '' },
-                  { id: 'hal17', name: t('كيلوين برياني', '2 Kg Biryani'), price: 20000, category: t('البرياني ', 'Biryani'), desc: '' },
-                  
-                  { id: 'hal18', name: t('نفر تمن ومرق مع الملحقات', 'Rice & Stew Portion with Sides'), price: 3500, category: t('التمن والمرق', 'Rice & Stew'), desc: '' },
-                  { id: 'hal19', name: t('كاسة مرق', 'Stew Bowl'), price: 1000, category: t('التمن والمرق', 'Rice & Stew'), desc: '' }
-              ]
-          },
-          'scozi': {
-              name: t('مطعم سكوزي', 'Scoozi'),
-              items: [
-                  { id: 'sc1', name: t('وجبة كرسبي', 'Crispy Meal'), price: 6000, category: t('الوجبات والريزو', 'Meals & Rizo'), desc: '' },
-                  { id: 'sc2', name: t('نص وجبة كرسبي', 'Half Crispy Meal'), price: 4000, category: t('الوجبات والريزو', 'Meals & Rizo'), desc: '' },
-                  { id: 'sc3', name: t('وجبة فاهيتا', 'Fajita Meal'), price: 6000, category: t('الوجبات والريزو', 'Meals & Rizo'), desc: '' },
-                  { id: 'sc4', name: t('وجبة فيله سمك', 'Fish Fillet Meal'), price: 7000, category: t('الوجبات والريزو', 'Meals & Rizo'), desc: '' },
-                  { id: 'sc5', name: t('ريزو', 'Rizo'), price: 6000, category: t('الوجبات والريزو', 'Meals & Rizo'), desc: '' },
-                  { id: 'sc6', name: t('ريزو روبيان', 'Shrimp Rizo'), price: 7000, category: t('الوجبات والريزو', 'Meals & Rizo'), desc: '' },
-                  { id: 'sc7', name: t('ريزو سمك', 'Fish Rizo'), price: 7000, category: t('الوجبات والريزو', 'Meals & Rizo'), desc: '' },
-                  
-                  { id: 'sc8', name: t('بيتزا وسط', 'Medium Pizza'), price: 5000, category: t('البيتزا', 'Pizza'), desc: '' },
-                  { id: 'sc9', name: t('بيتزا كبير', 'Large Pizza'), price: 10000, category: t('البيتزا', 'Pizza'), desc: '' },
-                  
-                  { id: 'sc10', name: t('لفة سكالوب', 'Escalope Wrap'), price: 2500, category: t('اللفات (الساندويش)', 'Wraps (Sandwiches)'), desc: '' },
-                  { id: 'sc11', name: t('لفة همبركر', 'Hamburger Wrap'), price: 2000, category: t('اللفات (الساندويش)', 'Wraps (Sandwiches)'), desc: '' },
-                  { id: 'sc12', name: t('لفة فاهيته', 'Fajita Wrap'), price: 2000, category: t('اللفات (الساندويش)', 'Wraps (Sandwiches)'), desc: '' },
-                  { id: 'sc13', name: t('لفة صاج دجاج', 'Chicken Saj Wrap'), price: 2000, category: t('اللفات (الساندويش)', 'Wraps (Sandwiches)'), desc: '' },
-                  
-                  { id: 'sc14', name: t('شيش طاووق', 'Shish Tawook'), price: 6000, category: t('المشويات والاستيك', 'Grills & Steaks'), desc: '' },
-                  { id: 'sc15', name: t('ستيك دجاج دايت', 'Diet Chicken Steak'), price: 6000, category: t('المشويات والاستيك', 'Grills & Steaks'), desc: '' },
-                  { id: 'sc16', name: t('ستيك دجاج', 'Chicken Steak'), price: 6000, category: t('المشويات والاستيك', 'Grills & Steaks'), desc: '' },
-                  
-                  { id: 'sc17', name: t('ماعون مقبلات صغير', 'Small Appetizers Plate'), price: 3000, category: t('المقبلات', 'Appetizers'), desc: '' },
-                  { id: 'sc18', name: t('ماعون مقبلات كبير', 'Large Appetizers Plate'), price: 5000, category: t('المقبلات', 'Appetizers'), desc: '' }
-              ]
-          },
-          'abo_hmode': {
-              name: t('مطعم بركر ابو حمودي', 'Abo Hamoody Burger'),
-              items: [
-                  { id: 'h1', name: t('بركر كلاسيك', 'Classic Burger'), price: 1000 }, { id: 'h2', name: t('بركر جبن', 'Cheese Burger'), price: 1250 }, { id: 'h3', name: t('بركر مكسيكي', 'Mexican Burger'), price: 1500 },
-                  { id: 'h4', name: t('بركر كرانشي', 'Crunchy Burger'), price: 3000 }, { id: 'h5', name: t('بركر دبل لحم دبل جبن', 'Double Meat Double Cheese Burger'), price: 2500 }, { id: 'h6', name: t('ريزو كلاسيك', 'Classic Rizo'), price: 3000 },
-                  { id: 'h7', name: t('ريزو ابو حمودي', 'Abo Hamoody Rizo'), price: 5000 }, { id: 'h8', name: t('اجنحه فحم نص', 'Half Charcoal Wings'), price: 8000 }, { id: 'h9', name: t('تكه دجاج نص', 'Half Chicken Tikka'), price: 8000 },
-                  { id: 'h10', name: t('فروج ابو حمودي', 'Abo Hamoody Farrouj'), price: 8000 }, { id: 'h11', name: t('عصير كلاص', 'Glass of Juice'), price: 1000 }, { id: 'h12', name: t('عصير بطل', 'Bottle of Juice'), price: 1500 },
-                  { id: 'h13', name: t('لبن بطل صغير', 'Small Laban Bottle'), price: 750 }, { id: 'h14', name: t('لبن بطل جبير', 'Large Laban Bottle'), price: 2000 }, { id: 'h15', name: t('ببسي', 'Pepsi'), price: 500 },
-                  { id: 'h16', name: t('ديو', 'Dew'), price: 500 }, { id: 'h17', name: t('سبرايت', 'Sprite'), price: 500 }, { id: 'h18', name: t('كولا', 'Cola'), price: 500 }
-              ]
-          },
-          'ali_salem': {
-              name: t('مطعم برجر علي سالم', 'Ali Salem Burger'),
-              items: [
-                  { id: 'm1', name: t('برجر', 'Burger'), price: 1000 }, { id: 'm2', name: t('برجر جبن', 'Cheese Burger'), price: 1500 }, { id: 'm3', name: t('ريزو دجاج', 'Chicken Rizo'), price: 3000 },
-                  { id: 'm4', name: t('لبن بطل صغير', 'Small Laban Bottle'), price: 750 }, { id: 'm5', name: t('لبن بطل كبير', 'Large Laban Bottle'), price: 2000 }, { id: 'm6', name: t('بيبسي', 'Pepsi'), price: 500 }, { id: 'm7', name: t('ديو', 'Dew'), price: 500 }
-              ]
-          }
-      };
     </script>
 </body>
 </html>
