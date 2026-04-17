@@ -185,7 +185,6 @@
       
       .card-public-orders .icon-wrapper { background: rgba(245, 158, 11, 0.1); color: #F59E0B; }
       .card-private-orders .icon-wrapper { background: rgba(16, 185, 129, 0.1); color: #10B981; }
-
       .form-card { background: var(--surface); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); animation: scaleIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards; }
       .form-card-title { font-size: 16px; font-weight: 800; color: var(--primary); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
       .form-card-title i { font-size: 18px; color: var(--gold); }
@@ -1139,6 +1138,7 @@
 
         <div id="driver-log-container"></div>
     </div>
+    
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "@uumqaser"; 
@@ -1329,7 +1329,6 @@
               'rest-9-title': 'New Restaurant', 'rest-9-sub': 'Coming Soon...'
           }
       };
-
       function toggleLanguage() {
           currentLang = currentLang === 'ar' ? 'en' : 'ar';
           localStorage.setItem('app_lang', currentLang);
@@ -1346,7 +1345,6 @@
                   if (el) el.innerHTML = text;
               }
               
-              // الأزرار الخاصة والخريطة
               const loginBtn = document.getElementById('direct-login-btn');
               if(loginBtn) loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
               const s1Btn = document.getElementById('login-s1-btn');
@@ -1366,7 +1364,6 @@
               const cartBtn = document.getElementById('cart-continue-btn');
               if(cartBtn) cartBtn.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
               
-              // زر "افتح الخريطة وحدد المكان"
               const tukMapBtn = document.getElementById('tuk-map-btn');
               if (tukMapBtn) tukMapBtn.innerHTML = '<i class="fas fa-map-marked-alt"></i> Open Map & Pin Location 📍';
 
@@ -1508,6 +1505,7 @@
           }
       }
       
+      // 🚀 دالة الفحص مع الإشعارات الخارجية (Push Notifications) 🚀
       async function checkNewOrdersForSound() {
          if(!isSoundEnabled || !navigator.onLine) return;
           try {
@@ -1515,8 +1513,19 @@
               const currentCount = parseInt(await resp.text());
              if(!isNaN(currentCount)) {
                  if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
-                     newOrderAudio.play().catch(e=>{}); showToast(t("🔔طلب جديد نزل بالساحة!", "🔔 New order available!"));
+                     newOrderAudio.play().catch(e=>{}); 
+                     const msg = currentLang === 'en' ? "🔔 New order available!" : "🔔طلب جديد نزل بالساحة!";
+                     showToast(msg);
                      if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                     
+                     // إظهار إشعار حقيقي خارج المتصفح
+                     if ("Notification" in window && Notification.permission === "granted") {
+                         new Notification(currentLang === 'en' ? "New Order! 📦" : "طلب جديد بالبندر 📦", {
+                             body: currentLang === 'en' ? "A new order is available. Open the app to claim it!" : "نزل طلب جديد بالساحة، ادخل للتطبيق بسرعة واحجزه!",
+                             icon: "android-chrome-192x192.png",
+                             requireInteraction: true
+                         });
+                     }
                   }
                  lastOrderCount = currentCount;
               }
@@ -1531,15 +1540,10 @@
       function initAutoLocation() {
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
-                 (position) => { userCoords = `https://www.google.com/maps?q=${position.coords.latitude},0{position.coords.longitude}`; checkAppAccess(position.coords.latitude, position.coords.longitude); },
+                 (position) => { userCoords = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`; checkAppAccess(position.coords.latitude, position.coords.longitude); },
                  (error) => { console.warn("GPS Denied"); }, { enableHighAccuracy: true }
               );
           }
-      }
-
-      function unlockSecondOrder() {
-          localStorage.setItem('allow_second_order', 'true');
-          showToast(t("تم فك الحظر بنجاح! تكدر هسه تحجز طلب ثاني. 🔓", "Unblocked successfully! You can book a second order now. 🔓"));
       }
 
       function handleSecretClick() {
@@ -1556,6 +1560,11 @@
                  showScreen('admin-panel'); checkGlobalStatusFromServer(); 
               } else if (pass !== null) showToast(t("الرمز خطأ ❌", "Wrong Code ❌"));
           }
+      }
+
+      function unlockSecondOrder() {
+          localStorage.setItem('allow_second_order', 'true');
+          showToast(t("تم فك الحظر بنجاح! تكدر هسه تحجز طلب ثاني. 🔓", "Unblocked successfully! You can book a second order now. 🔓"));
       }
 
       function handleLockScreenSecret() {
@@ -1634,217 +1643,7 @@
              localStorage.clear(); window.location.replace(window.location.href.split('?')[0]);
           }
       }
-        async function checkNewOrdersForSound() {
-         if(!isSoundEnabled || !navigator.onLine) return;
-          try {
-              const resp = await fetch(`${GS_URL}?action=checkNewOrders&t=${new Date().getTime()}`);
-              const currentCount = parseInt(await resp.text());
-             if(!isNaN(currentCount)) {
-                 if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
-                     newOrderAudio.play().catch(e=>{});
-                      showToast(currentLang === 'en' ? "🔔 New order available!" : "🔔طلب جديد نزل بالساحة!");
-                     if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
-                  }
-                 lastOrderCount = currentCount;
-              }
-          } catch(e) {}
-      }
 
-      function startOrderPolling() {
-         if(orderPollInterval) clearInterval(orderPollInterval);
-         checkNewOrdersForSound(); 
-         orderPollInterval = setInterval(checkNewOrdersForSound, 10000); 
-      }
-
-      function initAutoLocation() {
-          if (navigator.geolocation) {
-             navigator.geolocation.getCurrentPosition(
-                 (position) => {
-                     userCoords = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`;
-                     checkAppAccess(position.coords.latitude, position.coords.longitude);
-                  },
-                 (error) => { console.warn("GPS Denied on load"); },
-                  { enableHighAccuracy: true }
-              );
-          }
-      }
-
-      function handleSecretClick() {
-         secretCounter++;
-          if (secretCounter === 5) {
-             secretCounter = 0;
-              let pass = prompt(currentLang === 'en' ? "Enter Secret Code:" : "أدخل الرمز السري:");
-              if (pass === "2006") {
-                 localStorage.setItem('isAdmin', 'true'); 
-                 
-                 let adminCard = document.querySelector('#admin-panel .form-card');
-                 if (adminCard && !document.getElementById('btn-unblock-order')) {
-                     let unblockHtml = `
-                     <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                         <p style="font-weight: 700; margin-bottom: 10px; color: var(--primary);">${currentLang === 'en' ? 'Captain Privileges' : 'صلاحيات الكابتن'}</p>
-                         <button id="btn-unblock-order" class="send-btn ripple" style="background: #3B82F6; margin-top: 0; box-shadow: none;" onclick="unlockSecondOrder()">
-                             <i class="fas fa-unlock-alt"></i> ${currentLang === 'en' ? 'Unblock Second Order' : 'فك حظر الطلب الثاني'}
-                         </button>
-                     </div>`;
-                     adminCard.insertAdjacentHTML('beforeend', unblockHtml);
-                 }
-
-                 showScreen('admin-panel');
-                 checkGlobalStatusFromServer(); 
-              } else if (pass !== null) {
-                 showToast(currentLang === 'en' ? "Wrong Code ❌" : "الرمز خطأ ❌");
-              }
-          }
-      }
-
-      function unlockSecondOrder() {
-          localStorage.setItem('allow_second_order', 'true');
-          showToast(currentLang === 'en' ? "Unblocked successfully! You can book a second order now. 🔓" : "تم فك الحظر بنجاح! تكدر هسه تحجز طلب ثاني. 🔓");
-      }
-
-      function handleLockScreenSecret() {
-         lockSecretCounter++;
-          if (lockSecretCounter === 5) {
-             lockSecretCounter = 0;
-              let pass = prompt(currentLang === 'en' ? "Enter Secret Code:" : "أدخل الرمز السري:");
-              if (pass === "2006") {
-                 localStorage.setItem('isAdmin', 'true'); 
-                 
-                 let adminCard = document.querySelector('#admin-panel .form-card');
-                 if (adminCard && !document.getElementById('btn-unblock-order')) {
-                     let unblockHtml = `
-                     <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                         <p style="font-weight: 700; margin-bottom: 10px; color: var(--primary);">${currentLang === 'en' ? 'Captain Privileges' : 'صلاحيات الكابتن'}</p>
-                         <button id="btn-unblock-order" class="send-btn ripple" style="background: #3B82F6; margin-top: 0; box-shadow: none;" onclick="unlockSecondOrder()">
-                             <i class="fas fa-unlock-alt"></i> ${currentLang === 'en' ? 'Unblock Second Order' : 'فك حظر الطلب الثاني'}
-                         </button>
-                     </div>`;
-                     adminCard.insertAdjacentHTML('beforeend', unblockHtml);
-                 }
-
-                 document.getElementById('global-lock-screen').style.display = 'none';
-                 showScreen('admin-panel');
-              } else if (pass !== null) {
-                  showToast(currentLang === 'en' ? "Wrong Code ❌" : "الرمز خطأ ❌");
-              }
-          }
-      }
-      
-      async function setGlobalAppStatus(newStatus) {
-          const btnOpen = document.getElementById('btn-open-app');
-          const btnClose = document.getElementById('btn-close-app');
-          if(newStatus === 'online') { btnOpen.innerHTML = '<span class="baly-spinner"></span>'; } 
-          else { btnClose.innerHTML = '<span class="baly-spinner"></span>'; }
-          btnOpen.disabled = true; btnClose.disabled = true;
-          
-          try {
-              if(typeof db !== 'undefined') {
-                  await db.ref('settings/app_status').set(newStatus);
-                  showToast(newStatus === "online" ? (currentLang === 'en' ? "App opened for all ✅" : "تم فتح التطبيق للجميع ✅") : (currentLang === 'en' ? "App closed 🔴" : "تم إغلاق التطبيق 🔴"));
-              }
-          } catch(e) {
-              showToast(currentLang === 'en' ? "Connection Error ❌" : "حدث خطأ في الاتصال ❌");
-          } finally { 
-              btnOpen.innerHTML = currentLang === 'en' ? '<i class="fas fa-unlock"></i> Open App' : '<i class="fas fa-unlock"></i> فتح التطبيق';
-              btnClose.innerHTML = currentLang === 'en' ? '<i class="fas fa-lock"></i> Close App' : '<i class="fas fa-lock"></i> إغلاق التطبيق';
-              btnOpen.disabled = false; btnClose.disabled = false;
-          }
-      }
-
-      function listenToGlobalStatus() {
-          if(typeof db === 'undefined') return;
-          
-          db.ref('settings/app_status').on('value', (snapshot) => {
-              if (checkTimeLock()) {
-                  applyGlobalStatus();
-                  hideSplash();
-                  return; 
-              }
-
-              const status = snapshot.val() || 'online'; 
-              const lockScreen = document.getElementById('global-lock-screen');
-              const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
-              
-              if (status === "offline") {
-                 appIsActive = false;
-                 if(lockScreen && !isAdmin) lockScreen.style.display = 'flex'; 
-                 else if(lockScreen && isAdmin) lockScreen.style.display = 'none';
-              } else {
-                 appIsActive = true;
-                 if(lockScreen) lockScreen.style.display = 'none'; 
-              }
-              applyGlobalStatus();
-              hideSplash();
-          });
-      }
-
-      function hideSplash() {
-          const splash = document.getElementById('splash-screen');
-          if(splash && splash.style.display !== 'none') { 
-              splash.style.opacity = '0'; 
-              setTimeout(() => splash.style.display = 'none', 500); 
-          }
-      }
-
-      async function checkGlobalStatusFromServer() {
-          try {
-              if (checkTimeLock()) {
-                  applyGlobalStatus();
-                  return; 
-              }
-
-              const resp = await fetch(`${GS_URL}?action=getAppStatus&t=${new Date().getTime()}`);
-              const status = await resp.text();
-              const lockScreen = document.getElementById('global-lock-screen');
-              const isAdmin = localStorage.getItem('isAdmin') === 'true'; 
-              if (status === "offline") {
-                 appIsActive = false;
-                 if(lockScreen && !isAdmin) lockScreen.style.display = 'flex'; 
-                  else if(lockScreen && isAdmin) lockScreen.style.display = 'none';
-              } else {
-                 appIsActive = true;
-                 if(lockScreen) lockScreen.style.display = 'none'; 
-              }
-              applyGlobalStatus();
-          } catch(e) {
-          } finally {
-              const splash = document.getElementById('splash-screen');
-             if(splash && splash.style.display !== 'none') { 
-                 splash.style.opacity = '0'; 
-                 setTimeout(() => splash.style.display = 'none', 500); 
-              }
-          }
-      }
-
-      function applyGlobalStatus() {
-          const badge = document.getElementById('admin-status-badge');
-          const orderButtons = document.querySelectorAll('.order-btn-logic');
-          const isAdmin = localStorage.getItem('isAdmin') === 'true';
-          if (!appIsActive) {
-             badge.style.display = 'block';
-             badge.innerText = currentLang === 'en' ? 'Service is currently unavailable 🔴' : 'الخدمة متوقفة حالياً🔴';
-              if (!isAdmin) {
-                 orderButtons.forEach(btn => {
-                     btn.disabled = true;
-                     btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-lock"></i> Closed Now' : '<i class="fas fa-lock"></i> مغلق حالياً';
-                  });
-              } else { orderButtons.forEach(btn => btn.disabled = false); }
-          } else {
-             badge.style.display = 'none';
-             document.getElementById('tukSendBtn').innerHTML = currentLang === 'en' ? '<i class="fas fa-paper-plane"></i> Request TukTuk' : '<i class="fas fa-paper-plane"></i> طلب تكتك توصيلة';
-             document.getElementById('medSendBtn').innerHTML = currentLang === 'en' ? '<i class="fas fa-paper-plane"></i> Confirm Mediator Order' : '<i class="fas fa-paper-plane"></i> تأكيد طلب الوسيط';
-             document.getElementById('sendBtn').innerHTML = currentLang === 'en' ? '<i class="fas fa-paper-plane"></i> Send Order Now' : '<i class="fas fa-paper-plane"></i> أرسل الطلب الآن';
-             orderButtons.forEach(btn => btn.disabled = false);
-          }
-      }
-
-      function userLogout() {
-          if (confirm(currentLang === 'en' ? "Are you sure you want to logout?" : "هل أنت متأكد من تسجيل الخروج من التطبيق؟")) {
-             localStorage.clear();
-             window.location.replace(window.location.href.split('?')[0]);
-          }
-      }
-      
       async function syncLoyaltyWithServer() {
           const phoneInput = document.getElementById('custPhone');
           const phone = (phoneInput && phoneInput.value.trim() !== "") ? phoneInput.value.trim() : localStorage.getItem('saved_customer_phone');
@@ -2560,7 +2359,6 @@
           if(id === 'order-screen') updateLoyaltyUI();
           if (typeof closeSidebar === 'function') closeSidebar();
       }
-
       async function sendTukOrder() {
           if (!navigator.onLine) return showToast(currentLang === 'en' ? "No Internet ❌" : "لا يوجد إنترنت ❌");
           const name = document.getElementById('tukName').value.trim(); const phone = document.getElementById('tukPhone').value.trim();
@@ -2878,15 +2676,28 @@
           }
       }
 
+      // 🔔 دالة المندوب المعدلة لطلب صلاحية الإشعارات 🔔
       function initDriverStatus() {
           let current = localStorage.getItem('driver_status') || 'available';
           const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
           if(current === 'busy') { if(btn) { btn.style.background = 'var(--danger)'; btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-minus-circle"></i> I am Busy Now' : '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً'; } if(badge) { badge.innerText = currentLang === 'en' ? 'You are busy 🔴' : 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; } } 
           else { if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-check-circle"></i> I am Available' : '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; } if(badge) { badge.innerText = currentLang === 'en' ? 'You are active now 🟢' : 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; } }
+          
           const soundBtn = document.getElementById('soundToggleBtn');
-         if(isSoundEnabled) {
-             if(soundBtn) { soundBtn.innerHTML = currentLang === 'en' ? '<i class="fas fa-bell"></i> Order Bell: ON' : '<i class="fas fa-bell"></i> جرس الطلبات: مفعل'; soundBtn.style.background = '#F59E0B'; soundBtn.style.color = 'white'; }
-             startOrderPolling();
+          if(isSoundEnabled) {
+              if(soundBtn) { soundBtn.innerHTML = currentLang === 'en' ? '<i class="fas fa-bell"></i> Order Bell: ON' : '<i class="fas fa-bell"></i> جرس الطلبات: مفعل'; soundBtn.style.background = '#F59E0B'; soundBtn.style.color = 'white'; }
+              startOrderPolling();
+          }
+
+          // 🔔 طلب صلاحية الإشعارات الحقيقية من المندوب
+          if ("Notification" in window) {
+              if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                  Notification.requestPermission().then(permission => {
+                      if (permission === "granted") {
+                          showToast(currentLang === 'en' ? "Notifications Enabled! 🔔" : "تم تفعيل الإشعارات بنجاح! 🔔");
+                      }
+                  });
+              }
           }
       }
       
