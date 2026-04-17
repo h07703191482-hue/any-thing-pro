@@ -530,7 +530,7 @@
                 <i class="fas fa-box-open" style="font-size: 35px; color: var(--primary);"></i>
            </div>
             <h3 id="side-name" style="margin: 0; font-weight: 800; color: var(--text-main);">البندر</h3>
-            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">1.0 الاصدار</p>
+            <p id="side-ver" style="margin: 5px 0 0; font-size: 13px; color: var(--text-muted);">1.5 الاصدار</p>
         </div>
         <div class="sidebar-item ripple-dark" onclick="toggleTheme(); closeSidebar();" id="sidebar-theme-btn">
             <i class="fas fa-moon" style="color: var(--primary); font-size: 20px; width: 25px;"></i> <span id="side-dark-text">تفعيل الوضع الليلي</span>
@@ -3161,6 +3161,129 @@
                   { id: 'm4', name: t('لبن بطل صغير', 'Small Laban Bottle'), price: 750 }, { id: 'm5', name: t('لبن بطل كبير', 'Large Laban Bottle'), price: 2000 }, { id: 'm6', name: t('بيبسي', 'Pepsi'), price: 500 }, { id: 'm7', name: t('ديو', 'Dew'), price: 500 }
               ]
           }
+      };
+        // =================================================================
+      // 🚨 دوال الـ JavaScript الخاصة بالإنذار الجماعي (Firebase Sync) 🚨
+      // =================================================================
+
+      // 1. الاستماع لحالة الإنذار من السيرفر (تشتغل عند كل المندوبين)
+      function listenToGlobalAlarm() {
+          if(typeof db === 'undefined') return;
+          db.ref('settings/global_alarm').on('value', (snapshot) => {
+              const isAlarmActive = snapshot.val();
+              const alarmModal = document.getElementById('persistent-alarm-modal');
+              const alarmAudio = document.getElementById('persistent-alarm-audio');
+              
+              if (isAlarmActive === true) {
+                  // تشغيل الإنذار للكل (فقط للمندوب المفعل الجرس ومسجل دخول)
+                  if (isSoundEnabled && localStorage.getItem('isVerifiedDriver') === 'true') {
+                      if(alarmModal) alarmModal.style.display = 'flex';
+                      if(alarmAudio) {
+                          alarmAudio.currentTime = 0;
+                          alarmAudio.loop = true;
+                          alarmAudio.play().catch(e => console.log("Audio blocked."));
+                      }
+                      if ("vibrate" in navigator) navigator.vibrate([500, 200, 500, 200, 500]);
+                  }
+              } else {
+                  // إيقاف الإنذار فوراً عند الكل
+                  if(alarmModal) alarmModal.style.display = 'none';
+                  if(alarmAudio) {
+                      alarmAudio.pause();
+                      alarmAudio.currentTime = 0;
+                  }
+                  if ("vibrate" in navigator) navigator.vibrate(0);
+              }
+          });
+      }
+
+      // 2. دالة تشغيل الإنذار (ترفع القيمة للفايربيس وتخلي الكل يرن)
+      function triggerNewOrderAlarm() {
+          if(typeof db !== 'undefined') {
+              db.ref('settings/global_alarm').set(true);
+          }
+          
+          if ("Notification" in window && Notification.permission === "granted") {
+              const notification = new Notification(t("طلب جديد! 🚨", "New Order! 🚨"), {
+                  body: t("نزل طلب جديد بالساحة، ادخل بسرعة واحجزه!", "A new order is available, claim it now!"),
+                  icon: "android-chrome-192x192.png",
+                  requireInteraction: true // يخلي الإشعار ما يختفي لحد ما المندوب يدوس عليه
+              });
+              notification.onclick = function() { window.focus(); this.close(); };
+          }
+      }
+
+      // 3. دالة إيقاف الإنذار (تطفي الإنذار عند الكل من خلال الفايربيس)
+      function stopPersistentAlarm() {
+          if(typeof db !== 'undefined') {
+              db.ref('settings/global_alarm').set(false); 
+          }
+      }
+
+      // 4. استبدال دالة الفحص الذكية حتى تستخدم الإنذار الجماعي
+      window.checkNewOrdersForSound = async function() {
+          if(!isSoundEnabled || !navigator.onLine) return;
+          if(localStorage.getItem('isVerifiedDriver') !== 'true') return;
+
+          try {
+              const resp = await fetch(`${GS_URL}?action=checkNewOrders&t=${new Date().getTime()}`);
+              const currentCount = parseInt(await resp.text());
+              
+              if(!isNaN(currentCount)) {
+                  if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
+                      triggerNewOrderAlarm(); // تشغيل الإنذار للكل
+                  }
+                  lastOrderCount = currentCount;
+              }
+          } catch(e) {
+              console.log("Error checking for new orders");
+          }
+      };
+
+      // 5. استبدال دالة حجز الطلب (claimOrder) حتى تطفي الإنذار من ينحجز الطلب
+      window.claimOrder = async function(orderId, customerName, discordMsgId, phone, location, items, land, loyaltyMsg, restOrderNumbers, price, type) {
+          let limit = localStorage.getItem('allow_second_order') === 'true' ? 2 : 1;
+          
+          if (driverActiveOrders >= limit) {
+              document.getElementById('code-entry-modal').style.display = 'flex';
+              return; 
+          }
+
+          // 🚨 إيقاف الإنذار المستمر عند الكل بمجرد حجز الطلب 🚨
+          stopPersistentAlarm();
+
+          const driverName = localStorage.getItem('driver_name') || (currentLang === 'en' ? 'Unknown Captain' : 'كابتن غير معروف');
+          const driverPhone = localStorage.getItem('driver_phone') || '';
+          
+          if(typeof db !== 'undefined') {
+              db.ref('orders/' + orderId).update({ 
+                  status: 'claimed', 
+                  driver: driverName,
+                  driverPhone: driverPhone
+              });
+          }
+          
+          if(discordMsgId) {
+              const newPublicMsg = `🔴 **تم حجز الطلب**\nباسم المندوب: ${driverName}`;
+              editDiscordMessage(discordMsgId, newPublicMsg);
+          }
+          
+          const privateMsg = `✅ تم حجز الطلب بنجاح\n\n🔑 كود التأكيد: ${orderId}\n\n📦 التفاصيل:\n🔵 طلب ${type}\n👤الزبون: ${customerName}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${items}\n🔢 تسلسل طلب العميل: ${loyaltyMsg}\n📍الموقع: ${location}`;
+          
+          sendToPrivateDiscord(privateMsg);
+          
+          showToast(currentLang === 'en' ? "Order Claimed! Check My Orders." : "تم حجز الطلب بنجاح! راجع الطلبات المحجوزة.");
+      };
+
+      // 6. إضافة سطر مراقبة الإنذار لدالة المندوب
+      const originalInitDriverStatus = window.initDriverStatus;
+      window.initDriverStatus = function() {
+          // استدعاء الكود القديم
+          if (typeof originalInitDriverStatus === 'function') {
+              originalInitDriverStatus();
+          }
+          // تشغيل مراقبة الإنذار الجماعي
+          listenToGlobalAlarm();
       };
     </script>
 </body>
