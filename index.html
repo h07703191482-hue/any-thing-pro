@@ -2643,9 +2643,17 @@
       // 🚨 دوال الـ JavaScript الخاصة بالإنذار الجماعي وإدارة الطلبات 🚨
       // =================================================================
 
+      let globalOrderCount = 0; // متغير لمزامنة رقم الطلب عند كل المندوبين لمنع التكرار
+
       // 1. الاستماع لحالة الإنذار من السيرفر
       function listenToGlobalAlarm() {
           if(typeof db === 'undefined') return;
+
+          // مراقبة رقم آخر طلب تم إطلاق الإنذار له حتى ما يتكرر
+          db.ref('settings/global_order_count').on('value', (snap) => {
+              globalOrderCount = snap.val() || 0;
+          });
+
           db.ref('settings/global_alarm').on('value', (snapshot) => {
               const isAlarmActive = snapshot.val();
               const alarmModal = document.getElementById('persistent-alarm-modal');
@@ -2707,7 +2715,7 @@
           }
       }
 
-      // 4. الفحص الذكي للطلبات الجديدة
+      // 4. الفحص الذكي للطلبات الجديدة (تم تعديله لمنع الإزعاج المتكرر)
       async function checkNewOrdersForSound() {
           if(!isSoundEnabled || !navigator.onLine) return;
           if(localStorage.getItem('isVerifiedDriver') !== 'true') return;
@@ -2717,13 +2725,25 @@
               const currentCount = parseInt(await resp.text());
               
               if(!isNaN(currentCount)) {
-                  if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
-                      triggerNewOrderAlarm();
+                  if (lastOrderCount === -1) {
+                      lastOrderCount = currentCount; // تهيئة أولية عند فتح التطبيق
+                  } else {
+                      // إذا اكو طلب جديد، وهذا الطلب مامشتغل عليه إنذار قبل (يعني أكبر من العداد العالمي)
+                      if (currentCount > lastOrderCount && currentCount > globalOrderCount) {
+                          // نحدث العداد العالمي فوراً حتى باقي التليفونات متكرر الإنذار
+                          if(typeof db !== 'undefined') db.ref('settings/global_order_count').set(currentCount);
+                          triggerNewOrderAlarm();
+                      } 
+                      // في حال تم تصفير الشيت (الرقم قل)
+                      else if (currentCount < lastOrderCount) {
+                          if(typeof db !== 'undefined') db.ref('settings/global_order_count').set(currentCount);
+                      }
+                      lastOrderCount = currentCount;
                   }
-                  lastOrderCount = currentCount;
               }
           } catch(e) {}
       }
+
 
       function startOrderPolling() {
           if(orderPollInterval) clearInterval(orderPollInterval);
