@@ -2417,7 +2417,6 @@
               if(!hasMyOrders) myOrdersContainer.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">${currentLang === 'en' ? 'No active orders for you currently' : 'لا توجد طلبات محجوزة لك حالياً'}</p>`;
           });
       }
-
       async function fetchDynamicMenus() {
           try {
               const resp = await fetch(`${GS_URL}?action=getDynamicMenus`);
@@ -3106,6 +3105,23 @@
 
       // 3. دالة إيقاف الإنذار 
       function stopPersistentAlarm() {
+          // 1. إيقاف الصوت محلياً فوراً (كتم الصوت بجهاز المندوب اللي حجز بدون انتظار النت)
+          const alarmAudio = document.getElementById('persistent-alarm-audio');
+          if (alarmAudio) {
+              alarmAudio.pause();
+              alarmAudio.currentTime = 0;
+          }
+          
+          // 2. إخفاء الشاشة الحمراء محلياً فوراً
+          const alarmModal = document.getElementById('persistent-alarm-modal');
+          if (alarmModal) {
+              alarmModal.style.display = 'none';
+          }
+          
+          // 3. إيقاف الاهتزاز فوراً
+          if ("vibrate" in navigator) navigator.vibrate(0);
+
+          // 4. إرسال الإيعاز للفايربيس حتى يطفي الإنذار عند باقي المندوبين
           if(typeof db !== 'undefined') {
               db.ref('settings/global_alarm').set(false); 
           }
@@ -3144,7 +3160,7 @@
               return; 
           }
 
-          // بمجرد أن يضغط المندوب "حجز"، يتم إيقاف الإنذار عند كل المندوبين
+          // بمجرد أن يضغط المندوب "حجز"، يتم إيقاف الإنذار عند المندوب محلياً فوراً، وعند الباقين عن طريق الفايربيس
           stopPersistentAlarm();
 
           const driverName = localStorage.getItem('driver_name') || (currentLang === 'en' ? 'Unknown Captain' : 'كابتن غير معروف');
