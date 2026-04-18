@@ -3136,6 +3136,7 @@
           }
       });
 
+            // الفحص الأولي عند تحميل الصفحة
       window.onload = function() {
           checkStatus(); 
           initAutoLocation(); 
@@ -3146,7 +3147,21 @@
           setInterval(() => {
               if (checkTimeLock()) applyGlobalStatus();
           }, 60000);
+
+          // إخفاء إجباري بعد التحميل
+          setTimeout(() => {
+              hideSplash();
+          }, 1500);
       };
+
+      // إخفاء إجباري وفوري للشاشة الترحيبية حتى لو النت ضعيف (أمان إضافي)
+      setTimeout(() => {
+          const splash = document.getElementById('splash-screen');
+          if (splash && splash.style.display !== 'none') {
+              splash.style.opacity = '0';
+              setTimeout(() => splash.style.display = 'none', 500);
+          }
+      }, 3000);
 
     </script>
 </body>
