@@ -355,8 +355,9 @@
         <i class="fas fa-bell icon-pulse" style="font-size: 100px; color: white; margin-bottom: 20px; text-shadow: 0 10px 20px rgba(0,0,0,0.5);"></i>
         <h1 style="color: white; font-weight: 900; font-size: 35px; margin: 0 0 10px; text-shadow: 0 4px 10px rgba(0,0,0,0.3);">🚨 طلب جديد بالساحة! 🚨</h1>
         <p style="color: white; font-size: 18px; font-weight: 700; max-width: 300px; margin-bottom: 30px;">أكو طلب جديد نزل هسه، ادخل للطلبات بسرعة واحجزه قبل لا يروح عليك!</p>
-        <button class="ripple" style="background: white; color: var(--danger); border: none; padding: 15px 40px; font-size: 20px; font-weight: 900; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.3);" onclick="document.getElementById('persistent-alarm-modal').style.display='none';">حسناً، إخفاء التنبيه</button>
+        <button class="ripple" style="background: white; color: var(--danger); border: none; padding: 15px 40px; font-size: 20px; font-weight: 900; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.3);" onclick="stopLocalAlarm()">حسناً، إخفاء التنبيه</button>
     </div>
+
     <div id="out-of-zone-popup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--danger); z-index: 9999999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px;">
         <div class="out-zone-card" style="background: white; border: none; border-radius: 24px; max-width: 400px; width: 95%; padding: 35px 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
             <i class="fas fa-map-marker-slash" style="font-size: 80px; color: var(--danger); margin-bottom: 20px; animation: bouncePin 1s infinite alternate;"></i>
@@ -369,6 +370,7 @@
             </p>
         </div>
     </div>
+
     <div id="code-entry-modal">
         <div class="code-entry-container">
             <div class="code-entry-header">
@@ -638,7 +640,6 @@
            </button>
         </div>
     </div>
-    
     <div id="admin-panel" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="adm-back-icon"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> <span id="adm-title">لوحة التحكم السرية</span></h2>
@@ -676,7 +677,7 @@
           </div>
       </div>
       
-            <div style="position: relative; z-index: 5;">
+      <div style="position: relative; z-index: 5;">
           <div class="rest-slider">
              <div class="rest-card ripple" onclick="openMenu('rken_estkana')">
                  <img src="Rken.jpg" alt="ركن استكانة">
@@ -811,6 +812,7 @@
           </div>
       </div>
     </div>
+    
     <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="rest-back-icon"></i></button>
         <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> <span id="restaurant-name-header">اسم المطعم</span></h2>
@@ -831,7 +833,6 @@
             <button id="cart-continue-btn" class="send-btn ripple" style="width: auto; margin: 0; padding: 12px 25px; font-size: 16px; box-shadow: none;" onclick="checkoutRestaurant()">استمرار <i class="fas fa-arrow-left" id="cart-cont-icon"></i></button>
         </div>
     </div>
-    
     <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="tuk-back-icon"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
@@ -1920,12 +1921,12 @@
           if (isSoundEnabled) {
              btn.innerHTML = t('<i class="fas fa-bell"></i> جرس الطلبات: مفعل', '<i class="fas fa-bell"></i> Order Bell: ON');
               btn.style.background = '#F59E0B'; btn.style.color = 'white';
-             newOrderAudio.play().catch(e => {}); startOrderPolling();
+             newOrderAudio.play().catch(e => {}); 
              showToast(t("🔔 تم تفعيل جرس تنبيه الطلبات!", "🔔 Order alert sound enabled!"));
           } else {
               btn.innerHTML = t('<i class="fas fa-bell-slash"></i> جرس الطلبات: معطل', '<i class="fas fa-bell-slash"></i> Order Bell: OFF');
              btn.style.background = 'var(--text-muted)'; btn.style.color = 'white';
-             clearInterval(orderPollInterval); showToast(t("تم إيقاف الجرس 🔕", "Sound disabled 🔕"));
+             showToast(t("تم إيقاف الجرس 🔕", "Sound disabled 🔕"));
           }
       }
 
@@ -2147,14 +2148,13 @@
           }, 800);
       }
       
-      // دالة إرسال الطلب إلى قناة التلكرام - التعديل هنا على التوجيه الخاص بـ uumqaser
       async function sendToTelegramChannel(msg) {
           try {
               const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
               await fetch(url, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) // خليتها تروح لـ ADMIN_CHAT_ID
+                  body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
               });
           } catch(e) { console.log(e); }
       }
@@ -2747,7 +2747,7 @@
           
           saveCustomerData(name, phone);
           
-          // تأخير ثانيتين مثل ما طلبت وبعدها تطلع رسالة النجاح والطلب ينرسل بالخلفية
+          // تأخير ثانيتين وبعدها تطلع رسالة النجاح والطلب ينرسل بالخلفية
           setTimeout(() => {
               document.getElementById('success-order-modal').style.display = 'flex';
               document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = "";
@@ -3068,118 +3068,72 @@
       }
       function updateLoyaltyUI() { updateLocalLoyaltyUI(); } updateLocalLoyaltyUI();
 
-      function toggleDriverStatus() {
-          const btn = document.getElementById('statusToggleBtn'); const badge = document.getElementById('driver-status-badge');
-          let current = localStorage.getItem('driver_status') || 'available';
-          if(current === 'available') {
-             localStorage.setItem('driver_status', 'busy'); btn.style.background = 'var(--danger)'; btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-minus-circle"></i> I am Busy Now' : '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً';
-             if(badge) { badge.innerText = currentLang === 'en' ? 'You are busy 🔴' : 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; }
-          } else {
-             localStorage.setItem('driver_status', 'available'); btn.style.background = 'var(--secondary)'; btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-check-circle"></i> I am Available' : '<i class="fas fa-check-circle"></i> أنا متاح للعمل';
-             if(badge) { badge.innerText = currentLang === 'en' ? 'You are active now 🟢' : 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; }
-          }
-      }
-
-      let appMap = null;
-      function openMapModal() {
-         document.getElementById('map-modal').style.display = 'flex';
-          if (!appMap) {
-              const umQasrBounds = L.latLngBounds(L.latLng(30.0100, 47.8800), L.latLng(30.0800, 47.9600));
-              appMap = L.map('map-view', { attributionControl: false, maxBounds: umQasrBounds, maxBoundsViscosity: 1.0, minZoom: 13 }).setView([30.0396, 47.9298], 15);
-             L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(appMap);
-          }
-         setTimeout(() => { appMap.invalidateSize(); }, 300);
-      }
-      function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
-      function confirmMapLocation() {
-          const center = appMap.getCenter();
-          const googleMapsLink = `https://www.google.com/maps?q=${center.lat},${center.lng}`;
-         document.getElementById('tukDropoffLink').value = googleMapsLink;
-         document.getElementById('map-success-msg').style.display = 'block';
-         closeMapModal();
-      }
-      function openPricesModal() { document.getElementById('prices-modal').style.display = 'flex'; }
-      function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
-
       // =================================================================
-      // 🚨 دوال الـ JavaScript الخاصة بالإنذار الجماعي (Firebase Sync) 🚨
+      // 🚨 دوال الـ JavaScript الخاصة بالإنذار اللحظي الذكي (Firebase) 🚨
       // =================================================================
 
-      // 1. الاستماع لحالة الإنذار من السيرفر
-      function listenToGlobalAlarm() {
-          if(typeof db === 'undefined') return;
-          db.ref('settings/global_alarm').on('value', (snapshot) => {
-              const isAlarmActive = snapshot.val();
-              const alarmModal = document.getElementById('persistent-alarm-modal');
-              const alarmAudio = document.getElementById('persistent-alarm-audio');
-              
-              if (isAlarmActive === true) {
-                  if (isSoundEnabled && localStorage.getItem('isVerifiedDriver') === 'true') {
-                      if(alarmModal) alarmModal.style.display = 'flex';
-                      if(alarmAudio) {
-                          alarmAudio.currentTime = 0;
-                          alarmAudio.play().catch(e => console.log("Audio blocked."));
-                      }
-                      if ("vibrate" in navigator) navigator.vibrate([500, 200, 500, 200, 500]);
-                  }
-              } else {
-                  if(alarmModal) alarmModal.style.display = 'none';
-                  if(alarmAudio) {
-                      alarmAudio.pause();
-                      alarmAudio.currentTime = 0;
-                  }
-                  if ("vibrate" in navigator) navigator.vibrate(0);
+      let isInitialLoad = true; // لتجاهل الطلبات القديمة عند فتح التطبيق
+
+      // 1. الاستماع للطلبات الجديدة في نفس اللحظة
+      function listenToNewOrdersRealtime() {
+          if(typeof db === 'undefined' || localStorage.getItem('isVerifiedDriver') !== 'true') return;
+
+          db.ref('orders').on('child_added', (snapshot) => {
+              if (isInitialLoad) return; // لا تشغل الجرس للطلبات اللي موجودة مسبقاً
+
+              const order = snapshot.val();
+              // تشغيل الإنذار فقط إذا كان الطلب جديد (ينتظر المندوب)
+              if (order && (order.status === 'pending_driver' || order.status === 'pending_restaurant')) {
+                  triggerLocalAlarm();
               }
           });
+
+          // بعد 3 ثواني نعتبر التطبيق حمل الطلبات القديمة، ونبدأ نستقبل التنبيهات الجديدة
+          setTimeout(() => { isInitialLoad = false; }, 3000);
       }
 
-      // 2. دالة تشغيل الإنذار 
-      function triggerNewOrderAlarm() {
-          if(typeof db !== 'undefined') {
-              db.ref('settings/global_alarm').set(true);
+      // 2. دالة تشغيل الإنذار (محلياً بجهاز المندوب المتاح)
+      function triggerLocalAlarm() {
+          // التأكد أن الكابتن متاح للعمل، ومفعل الصوت
+          if(localStorage.getItem('driver_status') === 'busy') return; 
+          if(!isSoundEnabled) return;
+
+          const alarmModal = document.getElementById('persistent-alarm-modal');
+          const alarmAudio = document.getElementById('persistent-alarm-audio');
+
+          if(alarmModal) alarmModal.style.display = 'flex';
+          
+          if(alarmAudio) {
+              alarmAudio.currentTime = 0;
+              alarmAudio.play().catch(e => console.log("المتصفح يحتاج تفاعل"));
           }
+
+          if ("vibrate" in navigator) navigator.vibrate([500, 200, 500, 200, 500]);
+
           if ("Notification" in window && Notification.permission === "granted") {
-              const notification = new Notification(t("طلب جديد! 🚨", "New Order! 🚨"), {
+              const notification = new Notification(t("طلب جديد بالبندر! 🚨", "New Order! 🚨"), {
                   body: t("نزل طلب جديد بالساحة، ادخل بسرعة واحجزه!", "A new order is available, claim it now!"),
                   icon: "android-chrome-192x192.png",
-                  requireInteraction: true 
+                  requireInteraction: true
               });
               notification.onclick = function() { window.focus(); this.close(); };
           }
       }
 
-      // 3. دالة إيقاف الإنذار 
-      function stopPersistentAlarm() {
-          if(typeof db !== 'undefined') {
-              db.ref('settings/global_alarm').set(false); 
+      // 3. دالة إيقاف الإنذار من شاشة المندوب
+      function stopLocalAlarm() {
+          const alarmModal = document.getElementById('persistent-alarm-modal');
+          const alarmAudio = document.getElementById('persistent-alarm-audio');
+          
+          if(alarmModal) alarmModal.style.display = 'none';
+          if(alarmAudio) {
+              alarmAudio.pause();
+              alarmAudio.currentTime = 0;
           }
+          if ("vibrate" in navigator) navigator.vibrate(0);
       }
 
-      // 4. الفحص الذكي للطلبات الجديدة
-      async function checkNewOrdersForSound() {
-          if(!isSoundEnabled || !navigator.onLine) return;
-          if(localStorage.getItem('isVerifiedDriver') !== 'true') return;
-
-          try {
-              const resp = await fetch(`${GS_URL}?action=checkNewOrders&t=${new Date().getTime()}`);
-              const currentCount = parseInt(await resp.text());
-              
-              if(!isNaN(currentCount)) {
-                  if(lastOrderCount !== -1 && currentCount > lastOrderCount) {
-                      triggerNewOrderAlarm();
-                  }
-                  lastOrderCount = currentCount;
-              }
-          } catch(e) {}
-      }
-
-      function startOrderPolling() {
-          if(orderPollInterval) clearInterval(orderPollInterval);
-          checkNewOrdersForSound(); 
-          orderPollInterval = setInterval(checkNewOrdersForSound, 10000); 
-      }
-
-      // 5. دالة الحجز بعد التعديل (لإيقاف الإنذار)
+      // 4. دالة الحجز (إيقاف الإنذار محلياً بعد الحجز)
       async function claimOrder(orderId, customerName, discordMsgId, phone, location, items, land, loyaltyMsg, restOrderNumbers, price, type) {
           let limit = localStorage.getItem('allow_second_order') === 'true' ? 2 : 1;
           
@@ -3188,8 +3142,8 @@
               return; 
           }
 
-          // بمجرد أن يضغط المندوب "حجز"، يتم إيقاف الإنذار عند كل المندوبين
-          stopPersistentAlarm();
+          // إيقاف الإنذار بمجرد الضغط على الحجز
+          stopLocalAlarm();
 
           const driverName = localStorage.getItem('driver_name') || (currentLang === 'en' ? 'Unknown Captain' : 'كابتن غير معروف');
           const driverPhone = localStorage.getItem('driver_phone') || '';
@@ -3213,7 +3167,7 @@
           showToast(currentLang === 'en' ? "Order Claimed! Check My Orders." : "تم حجز الطلب بنجاح! راجع الطلبات المحجوزة.");
       }
 
-      // 6. إضافة صلاحيات الإشعارات والمراقبة للمندوب
+      // 5. تهيئة لوحة المندوب عند الدخول
       function initDriverStatus() {
           let current = localStorage.getItem('driver_status') || 'available';
           const btn = document.getElementById('statusToggleBtn'); 
@@ -3245,7 +3199,6 @@
                   soundBtn.innerHTML = currentLang === 'en' ? '<i class="fas fa-bell"></i> Order Bell: ON' : '<i class="fas fa-bell"></i> جرس الطلبات: مفعل'; 
                   soundBtn.style.background = '#F59E0B'; soundBtn.style.color = 'white'; 
               }
-              startOrderPolling();
           }
 
           if ("Notification" in window) {
@@ -3257,7 +3210,9 @@
                   });
               }
           }
-          listenToGlobalAlarm();
+
+          // تفعيل الاستماع للطلبات اللحظية بدل التحديث الموقوت القديم
+          listenToNewOrdersRealtime();
       }
 
       window.addEventListener('offline', checkConnection);
