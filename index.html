@@ -481,6 +481,7 @@
             <button id="cancel-back-btn" class="resign-btn ripple-dark" style="margin-top: 10px; border-color: var(--text-muted); color: var(--text-muted);" onclick="closeCancelModal()">تراجع</button>
         </div>
     </div>
+
     <div id="device-type-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100006; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;">
         <div class="prices-container">
             <div class="prices-header">
@@ -1160,12 +1161,29 @@
     </div>
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
+      const PUBLIC_CHANNEL = "@uumqaser"; 
       const ADMIN_CHAT_ID = "7479342799"; 
       const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
 
       const DISCORD_PUBLIC_WEBHOOK = "https://discord.com/api/webhooks/1491324693871857684/i9PXJalQMx79I_Ev5i10jeS8TgKEe_Q_bdqhuhOC57LNiCw-kFFdJstxeuquI9abklp9";
       const DISCORD_PRIVATE_WEBHOOK = "https://discord.com/api/webhooks/1491325381209362483/JmSQslp2XaCCPYOE3MbX3ODMr7NQIt0za7KCF_O_VTTmiemGCe7lI_fp_5wKquE-6wVz";
       
+      const ALI_SALEM_BOT_TOKEN = "8735092732:AAE9lBE3i6AJRkKe3LLlAAodFXuAv7VXpys";
+      const ABO_HMODE_BOT_TOKEN = "8695832371:AAHosUvA37U9U1qhiZJlbDKxJPZFgDHbJAk"; 
+      const VICTORIA_BOT_TOKEN = "8769449664:AAErwMuaA893BKDvbKcOk4sFgFPXUIxlnmc"; 
+      const KLASHE_BOT_TOKEN = "8719779552:AAE5MMDa12ats3qocRoZoy_DMCS9RU8IQvQ"; 
+      const HALEG_BOT_TOKEN = "8607099366:AAEK-D1553k9Mz94fcZJ9KiPUxZqusQSMqs";
+      const SCOZI_BOT_TOKEN = "8129985022:AAHlKRiRSH4Jop8J58iFQOjl2NcAZnLdkRo";
+      const ROYAL_FOOD_BOT_TOKEN = "8620504304:AAEuUp97cjQmyaHCYSUC4eygNBXhsL4ZmXo";
+
+      const ALI_SALEM_CHAT_ID = "-1003722556479";
+      const ABO_HMODE_CHAT_ID = "-1003704352460";
+      const VICTORIA_CHAT_ID = "-1003760108006"; 
+      const KLASHE_CHAT_ID = "-1003727059406"; 
+      const HALEG_CHAT_ID = "-1003719488878";
+      const SCOZI_CHAT_ID = "-1003315608193";
+      const ROYAL_FOOD_CHAT_ID = "-1003798976901";
+
       let currentLang = localStorage.getItem('app_lang') || 'ar';
       
       function t(arText, enText) {
@@ -1325,6 +1343,116 @@
               'rest-9-title': 'New Restaurant', 'rest-9-sub': 'Coming Soon...'
           }
       };
+      
+      function toggleLanguage() {
+          currentLang = currentLang === 'ar' ? 'en' : 'ar';
+          localStorage.setItem('app_lang', currentLang);
+          location.reload(); 
+      }
+
+      function applyLanguage() {
+          document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+          document.documentElement.lang = currentLang;
+          
+          if (currentLang === 'en') {
+              for (const [id, text] of Object.entries(translations.en)) {
+                  const el = document.getElementById(id);
+                  if (el) el.innerHTML = text;
+              }
+              
+              const loginBtn = document.getElementById('direct-login-btn');
+              if(loginBtn) loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+              const s1Btn = document.getElementById('login-s1-btn');
+              if(s1Btn) s1Btn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+              const joinBtn = document.getElementById('joinSendBtn');
+              if(joinBtn) joinBtn.innerHTML = 'Submit Join Request';
+              const actBtn1 = document.getElementById('act-btn1');
+              if(actBtn1) actBtn1.innerHTML = 'Activate Account';
+              const mapBtn = document.getElementById('map-modal-btn');
+              if(mapBtn) mapBtn.innerHTML = 'Confirm Location <i class="fas fa-check"></i>';
+              const cancelBtn = document.getElementById('cancel-confirm-btn');
+              if(cancelBtn) cancelBtn.innerHTML = 'Confirm Cancel <i class="fas fa-check"></i>';
+              const offBtnW = document.getElementById('off-btn-wifi');
+              if(offBtnW) offBtnW.innerHTML = 'Connect via WiFi';
+              const offBtnD = document.getElementById('off-btn-data');
+              if(offBtnD) offBtnD.innerHTML = 'Connect via Mobile Data';
+              const cartBtn = document.getElementById('cart-continue-btn');
+              if(cartBtn) cartBtn.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
+              
+              const tukMapBtn = document.getElementById('tuk-map-btn');
+              if (tukMapBtn) tukMapBtn.innerHTML = '<i class="fas fa-map-marked-alt"></i> Open Map & Pin Location 📍';
+
+              const pMap = {
+                  'loginNameInput': 'Enter your full name...',
+                  'loginPhoneInput': 'Example: 07700000000',
+                  'tukName': 'Enter your name here',
+                  'tukPhone': 'Example: 07700000000',
+                  'tukLandmark': 'School, Mosque, or intersection...',
+                  'medName': 'Enter your name',
+                  'medPhone': 'Example: 07700000000',
+                  'medLandmark': 'To help the captain find you',
+                  'medOrder': 'Example: I want to transfer keys...',
+                  'custName': 'Your name',
+                  'custPhone': 'Example: 07700000000',
+                  'custLandmark': 'Quick description of your location',
+                  'custOrder': 'Write your order details here (food, groceries)...',
+                  'driverJoinName': 'Your full name',
+                  'driverJoinPhone': 'Example: 07700000000',
+                  'driverVerifyPhoneInput': 'Example: 07700000000',
+                  'driverVerifyInput': 'Example: 1234',
+                  'activationCodeInput': 'Enter code here...',
+                  'forcedVerifyInput': 'Enter code here'
+              };
+              for (const [id, ph] of Object.entries(pMap)) {
+                  const el = document.getElementById(id);
+                  if (el) el.placeholder = ph;
+              }
+              
+              document.querySelectorAll('.phone-error').forEach(el => el.innerHTML = '⚠️ Invalid number (must be 11 digits starting with 07)');
+              document.querySelectorAll('.step-number').forEach((el, index) => el.innerHTML = `Step (${index + 1})`);
+          }
+      }
+      
+      applyLanguage();
+
+      let userCoords = ""; 
+      let driverActiveOrders = 0; 
+      let forcedVerifyCustomerPhone = ""; 
+      let currentLogTab = 'completed'; 
+
+      const CURRENT_VERSION = "2.0.30"; 
+      if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
+          localStorage.setItem('app_version', CURRENT_VERSION);
+      }
+
+      const umQasrPolygon = [{ lat: 30.0800, lng: 47.9600 }, { lat: 30.0800, lng: 47.8800 }, { lat: 30.0100, lng: 47.8800 }, { lat: 30.0100, lng: 47.9600 }];
+      function isUserInUmQasr(userLat, userLng, polygon) {
+          let isInside = false;
+          for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+              const xi = polygon[i].lat, yi = polygon[i].lng;
+              const xj = polygon[j].lat, yj = polygon[j].lng;
+              const intersect = ((yi > userLng) != (yj > userLng)) && (userLat < (xj - xi) * (userLng - yi) / (yj - yi) + xi);
+              if (intersect) isInside = !isInside;
+          }
+          return isInside;
+      }
+      
+      function checkAppAccess(lat, lng) {
+          if(localStorage.getItem('isAdmin') === 'true') return; 
+          if (!isUserInUmQasr(lat, lng, umQasrPolygon)) document.getElementById('out-of-zone-popup').style.display = 'flex';
+      }
+      async function trackLiveVisit() { try { fetch(`${GS_URL}?action=trackVisit&t=${new Date().getTime()}`); } catch(e) {} }
+
+      let secretCounter = 0, lockSecretCounter = 0, appIsActive = true, lastOrderCount = -1, orderPollInterval = null;
+      let isSoundEnabled = localStorage.getItem('sound_enabled') === 'true';
+      const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+
+      window.addEventListener('load', () => {
+          setTimeout(() => {
+              const splash = document.getElementById('splash-screen');
+              if (splash && splash.style.display !== 'none') { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 500); }
+          }, 3000); 
+      });
 
       const menus = {
           'rken_estkana': {
@@ -1747,6 +1875,7 @@
               ]
           }
       };
+
       // ==========================================
       // دوال النظام والجافاسكربت الأساسية
       // ==========================================
@@ -1832,7 +1961,7 @@
       function initAutoLocation() {
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
-                 (position) => { userCoords = `https://www.google.com/maps?q=$${position.coords.latitude},${position.coords.longitude}`; checkAppAccess(position.coords.latitude, position.coords.longitude); },
+                 (position) => { userCoords = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`; checkAppAccess(position.coords.latitude, position.coords.longitude); },
                  (error) => { console.warn("GPS Denied"); }, { enableHighAccuracy: true }
               );
           }
@@ -2009,7 +2138,6 @@
          document.getElementById('login-step-2').style.display = 'none';
          document.getElementById('login-step-1').style.display = 'block';
       }
-      
       function completeDirectLogin() {
           const userName = document.getElementById('loginNameInput').value.trim();
           const userPhone = document.getElementById('loginPhoneInput').value.trim();
@@ -2029,10 +2157,10 @@
               if (navigator.onLine) {
                  const msg = `👤 تسجيل دخول جديد (مباشر)\nالاسم: ${userName}\nالرقم: ${userPhone}`;
                  try {
-                     fetch(`https://discord.com/api/webhooks/1491325381209362483/JmSQslp2XaCCPYOE3MbX3ODMr7NQIt0za7KCF_O_VTTmiemGCe7lI_fp_5wKquE-6wVz`, {
+                     await fetch(`https://discord.com/api/webhooks/1491325381209362483/JmSQslp2XaCCPYOE3MbX3ODMr7NQIt0za7KCF_O_VTTmiemGCe7lI_fp_5wKquE-6wVz`, {
                          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: msg })
-                     }).catch(e=>{});
-                     fetch(`${GS_URL}?action=incrementAuthUsers`).catch(e=>{});
+                     });
+                     await fetch(`${GS_URL}?action=incrementAuthUsers`);
                  } catch(e) {}
               }
 
@@ -2047,16 +2175,15 @@
               document.getElementById('loginPhoneInput').value = '';
           }, 800);
       }
-      
-      // دالة إرسال الطلب إلى القناة الرئيسية الموحدة
-      function sendToTelegramChannel(msg) {
+      // دالة إرسال الطلب إلى قناة التلكرام
+      async function sendToTelegramChannel(msg) {
           try {
               const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-              fetch(url, {
+              await fetch(url, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg })
-              }).catch(e => console.log(e));
+                  body: JSON.stringify({ chat_id: PUBLIC_CHANNEL, text: msg })
+              });
           } catch(e) { console.log(e); }
       }
 
@@ -2076,23 +2203,23 @@
           } catch(e) { console.log(e); }
       }
 
-      function editDiscordMessage(msgId, newMsg) {
+      async function editDiscordMessage(msgId, newMsg) {
           try {
-              fetch(DISCORD_PUBLIC_WEBHOOK + "/messages/" + msgId, {
+              await fetch(DISCORD_PUBLIC_WEBHOOK + "/messages/" + msgId, {
                   method: "PATCH",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ content: newMsg })
-              }).catch(e=>{});
+              });
           } catch(e) {}
       }
 
-      function sendToPrivateDiscord(msg) {
+      async function sendToPrivateDiscord(msg) {
           try {
-              fetch(DISCORD_PRIVATE_WEBHOOK, {
+              await fetch(DISCORD_PRIVATE_WEBHOOK, {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ content: msg })
-              }).catch(e=>{});
+              });
           } catch(e) {}
       }
 
@@ -2563,35 +2690,33 @@
           else showScreen('join-screen');
       }
 
-      function submitJoinRequest() {
+      async function submitJoinRequest() {
           const name = document.getElementById('driverJoinName').value.trim();
           const phone = document.getElementById('driverJoinPhone').value.trim();
           const bike = document.getElementById('bikeType').value;
           if(!name || !validateIraqiPhone(phone) || !bike) return showToast(currentLang === 'en' ? "Complete the form correctly 📝" : "أكمل البيانات بشكل صحيح 📝");
           const btn = document.getElementById('joinSendBtn');
           const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
-          
-          setTimeout(() => {
+          try {
              localStorage.setItem('temp_name', name); localStorage.setItem('temp_phone', phone);
               const randomCode = Math.floor(100000 + Math.random() * 900000);
              localStorage.setItem('temp_activation', randomCode); localStorage.setItem('pending_join', 'true');
              
               const msg = `📥 طلب انضمام جديد (كابتن)\n👤الاسم: ${name}\n📞الهاتف: ${phone}\n🏍️المركبة: ${bike}\n🔑الكود: ${randomCode}`;
-              sendToPrivateDiscord(msg);
+              await sendToPrivateDiscord(msg);
              
              showScreen('activation-screen');
-             btn.innerHTML = originalText; btn.disabled = false;
-          }, 600);
+          } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
-      function verifyActivationCode() {
+      async function verifyActivationCode() {
           const input = document.getElementById('activationCodeInput').value.trim();
           if(input === localStorage.getItem('temp_activation')) {
               const dName = localStorage.getItem('temp_name'); const dPhone = localStorage.getItem('temp_phone');
              localStorage.setItem('isVerifiedDriver', 'true'); localStorage.setItem('driver_name', dName); localStorage.setItem('driver_phone', dPhone); localStorage.removeItem('pending_join');
               try {
                  const msg = `✅ تم تفعيل كابتن جديد بنجاح:\n👤 الاسم: ${dName}\n📞 الهاتف: ${dPhone}`;
-                 fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) }).catch(e=>{});
+                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) });
               } catch(e) {}
              document.getElementById('welcome-overlay').style.display = 'flex';
              confetti({ particleCount: 200, spread: 90, origin: { y: 0.5 } });
@@ -2601,7 +2726,7 @@
 
       function cancelJoinRequest() { if(confirm(currentLang === 'en' ? "Confirm cancel?" : "تأكيد الإلغاء؟")) { localStorage.clear(); location.reload(); } }
       
-      function resignDriver() { 
+      async function resignDriver() { 
           if (confirm(currentLang === 'en' ? "Are you sure you want to resign/logout?" : "هل أنت متأكد من تسجيل الخروج والاستقالة؟")) { 
               const dName = localStorage.getItem('driver_name') || "غير معروف";
               const dPhone = localStorage.getItem('driver_phone') || "غير معروف";
@@ -2609,9 +2734,9 @@
               if(btn) btn.innerHTML = '<span class="baly-spinner" style="border-top-color:var(--danger);"></span> ' + (currentLang === 'en' ? 'Logging out...' : 'جاري الخروج...');
               try {
                  const msg = `❌ استقالة / تسجيل خروج كابتن:\n👤 الاسم: ${dName}\n📞 الهاتف: ${dPhone}`;
-                 fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) }).catch(e=>{});
+                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ chat_id: ADMIN_CHAT_ID, text: msg }) });
               } catch(e) {}
-             setTimeout(()=> { localStorage.clear(); location.reload(); }, 600);
+             localStorage.clear(); location.reload(); 
           } 
       }
 
@@ -2630,8 +2755,7 @@
           if (typeof closeSidebar === 'function') closeSidebar();
       }
 
-      // التعديل: إرسال تكتك بالخلفية وبسرعة
-      function sendTukOrder() {
+      async function sendTukOrder() {
           if (!navigator.onLine) return showToast(currentLang === 'en' ? "No Internet ❌" : "لا يوجد إنترنت ❌");
           const name = document.getElementById('tukName').value.trim(); const phone = document.getElementById('tukPhone').value.trim();
           const land = document.getElementById('tukLandmark').value.trim(); const dropLink = document.getElementById('tukDropoffLink').value.trim(); 
@@ -2640,50 +2764,50 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=${pos.coords.latitude},{pos.coords.longitude}`; sendTukOrder(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               } else { showToast(currentLang === 'en' ? "GPS Not Supported ❌" : "جهازك لا يدعم تحديد الموقع ❌"); }
               return;
           }
           const btn = document.getElementById('tukSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
-          
-          setTimeout(() => {
+          try {
+              saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`);
+             localStorage.removeItem('referred_by'); 
+
+              const type = currentLang === 'en' ? 'TukTuk Ride' : 'توصيلة';
+              const loyaltyMsg = '-';
+              const restOrderNumbers = '-';
+
+              if(typeof db !== 'undefined') {
+                  db.ref('orders/' + vc).set({
+                      id: vc,
+                      customer: name,
+                      phone: phone,
+                      items: `تحصيل/تسليم: ${dropLink}`,
+                      land: land,
+                      type: type,
+                      loyaltyMsg: loyaltyMsg,
+                      restOrderNumbers: restOrderNumbers,
+                      price: "حسب المسافة",
+                      restaurant: "تكتك توصيلة",
+                      status: 'pending_driver',
+                      timestamp: firebase.database.ServerValue.TIMESTAMP,
+                      location: userCoords
+                  });
+              }
+
+              const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: تحصيل/تسليم - ${dropLink}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}\nموقع الزبون: ${userCoords}`;
+              await sendToDiscord(msg, vc); 
+              await sendToTelegramChannel(msg);
+             
              document.getElementById('success-order-modal').style.display = 'flex';
-             document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; 
-             btn.innerHTML = originalText; btn.disabled = false;
-             loadSavedCustomerData();
-          }, 600);
-
-          (async () => {
-              try {
-                  saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
-                  fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&isTuk=true&referrer=${referrer}`).catch(e=>{});
-                 localStorage.removeItem('referred_by'); 
-
-                  const type = currentLang === 'en' ? 'TukTuk Ride' : 'توصيلة';
-                  const loyaltyMsg = '-';
-                  const restOrderNumbers = '-';
-
-                  if(typeof db !== 'undefined') {
-                      db.ref('orders/' + vc).set({
-                          id: vc, customer: name, phone: phone, items: `تحصيل/تسليم: ${dropLink}`,
-                          land: land, type: type, loyaltyMsg: loyaltyMsg, restOrderNumbers: restOrderNumbers,
-                          price: "حسب المسافة", restaurant: "تكتك توصيلة", status: 'pending_driver',
-                          timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords
-                      });
-                  }
-
-                  const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: تحصيل/تسليم - ${dropLink}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}\nموقع الزبون: ${userCoords}`;
-                  sendToDiscord(msg, vc).catch(e=>{}); 
-                  sendToTelegramChannel(msg);
-                 syncLoyaltyWithServer();
-              } catch (e) {}
-          })();
+             document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+          } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
-      // التعديل: إرسال الوسيط بالخلفية وبسرعة
-      function sendMedFinal() {
+      async function sendMedFinal() {
           if (!navigator.onLine) return showToast(currentLang === 'en' ? "No Internet ❌" : "لا يوجد إنترنت ❌");
           const name = document.getElementById('medName').value.trim(); const phone = document.getElementById('medPhone').value.trim(); const order = document.getElementById('medOrder').value.trim();
           const land = document.getElementById('medLandmark').value.trim();
@@ -2692,48 +2816,49 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=${pos.coords.latitude},{pos.coords.longitude}`; sendMedFinal(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
               return;
           }
           const btn = document.getElementById('medSendBtn'); const originalText = btn.innerHTML; btn.innerHTML = '<span class="baly-spinner"></span>'; btn.disabled = true;
-          
-          setTimeout(() => {
+          try {
+             saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`); localStorage.removeItem('referred_by');
+
+              const type = currentLang === 'en' ? 'Mediator' : 'وسيط';
+              const loyaltyMsg = '-';
+              const restOrderNumbers = '-';
+
+              if(typeof db !== 'undefined') {
+                  db.ref('orders/' + vc).set({
+                      id: vc,
+                      customer: name,
+                      phone: phone,
+                      items: order,
+                      land: land,
+                      type: type,
+                      loyaltyMsg: loyaltyMsg,
+                      restOrderNumbers: restOrderNumbers,
+                      price: "بدون أجور توصيل", 
+                      restaurant: "خدمة الوسيط",
+                      status: 'pending_driver',
+                      timestamp: firebase.database.ServerValue.TIMESTAMP,
+                      location: userCoords
+                  });
+              }
+
+             const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${order}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}\nموقع الزبون: ${userCoords}`;
+             await sendToDiscord(msg, vc); 
+             await sendToTelegramChannel(msg);
+             
              document.getElementById('success-order-modal').style.display = 'flex';
-             document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; 
-             btn.innerHTML = originalText; btn.disabled = false;
-             loadSavedCustomerData();
-          }, 600);
-
-          (async () => {
-              try {
-                 saveCustomerData(name, phone); const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
-                  fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`).catch(e=>{}); localStorage.removeItem('referred_by');
-
-                  const type = currentLang === 'en' ? 'Mediator' : 'وسيط';
-                  const loyaltyMsg = '-';
-                  const restOrderNumbers = '-';
-
-                  if(typeof db !== 'undefined') {
-                      db.ref('orders/' + vc).set({
-                          id: vc, customer: name, phone: phone, items: order, land: land, type: type,
-                          loyaltyMsg: loyaltyMsg, restOrderNumbers: restOrderNumbers, price: "بدون أجور توصيل", 
-                          restaurant: "خدمة الوسيط", status: 'pending_driver', timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords
-                      });
-                  }
-
-                 const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${order}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}\nموقع الزبون: ${userCoords}`;
-                 sendToDiscord(msg, vc).catch(e=>{}); 
-                 sendToTelegramChannel(msg);
-                 syncLoyaltyWithServer();
-              } catch (e) {} 
-          })();
+             document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = ""; syncLoyaltyWithServer(); loadSavedCustomerData();
+          } catch (e) {} finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
 
-      // التعديل: إرسال المسواك بالخلفية وبسرعة وإلغاء البوتات المتعددة
-      function sendFinal() {
+      async function sendFinal() {
           if (!navigator.onLine) return showToast(currentLang === 'en' ? "No Internet ❌" : "لا يوجد إنترنت ❌");
           const name = document.getElementById('custName').value.trim(); 
           const phone = document.getElementById('custPhone').value.trim();
@@ -2744,7 +2869,7 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -2752,60 +2877,61 @@
           }
           const btn = document.getElementById('sendBtn'); 
           const originalText = btn.innerHTML; 
-          btn.innerHTML = '<span class="baly-spinner"></span>'; 
+         btn.innerHTML = '<span class="baly-spinner"></span>'; 
           btn.disabled = true;
-
-          setTimeout(() => {
+          try {
+             saveCustomerData(name, phone); 
+              const vc = generateSecureVC(); 
+              let referrer = localStorage.getItem('referred_by') || "";
+              await fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`);
+             localStorage.removeItem('referred_by');
+              let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0); 
+             tempLoyalty++; 
+             localStorage.setItem('my_loyalty_orders', tempLoyalty);
+             updateLocalLoyaltyUI();
+              let loyaltyMsg = (tempLoyalty % 10) === 0 ? "🎁 هذا الطلب مجاني (الطلب العاشر)" : `الطلب رقم ${tempLoyalty % 10} من أصل 10`;
+              let msgContent = order;
+              let restOrderNumbers = "";
+              const restOrders = [
+                  { key: "مطعم برجر علي سالم", token: ALI_SALEM_BOT_TOKEN, id: ALI_SALEM_CHAT_ID },
+                  { key: "مطعم بركر ابو حمودي", token: ABO_HMODE_BOT_TOKEN, id: ABO_HMODE_CHAT_ID },
+                  { key: "مطعم فيكتوريا", token: VICTORIA_BOT_TOKEN, id: VICTORIA_CHAT_ID },
+                  { key: "كلاشي", token: KLASHE_BOT_TOKEN, id: KLASHE_CHAT_ID },
+                  { key: "مطعم الخليج", token: HALEG_BOT_TOKEN, id: HALEG_CHAT_ID },
+                  { key: "مطعم سكوزي", token: SCOZI_BOT_TOKEN, id: SCOZI_CHAT_ID },
+                  { key: "ركن استكانة", token: ROYAL_FOOD_BOT_TOKEN, id: ROYAL_FOOD_CHAT_ID }
+              ];
+              let targetRestaurant = "توصيل عام";
+              for (let rest of restOrders) {
+                  if (order.includes(rest.key)) {
+                      targetRestaurant = rest.key;
+                      let currentRestCount = parseInt(localStorage.getItem('order_counter_' + rest.key) || "0") + 1;
+                      localStorage.setItem('order_counter_' + rest.key, currentRestCount);
+                      restOrderNumbers += `\n🔢 رقم طلب (${rest.key}): #${currentRestCount}`;
+                      const restMsg = `🍔 طلب جديد لـ ${rest.key}!\n🔢 رقم الطلب: #${currentRestCount}\n\n👤 الزبون: ${name}\n📞 الهاتف: ${phone}\n\n📝 التفاصيل:\n${msgContent}\n\n⚠️ يرجى التجهيز، المندوب سيصل قريباً.`;
+                      fetch(`https://api.telegram.org/bot${rest.token}/sendMessage`, { 
+                          method: "POST", headers: { "Content-Type": "application/json" }, 
+                          body: JSON.stringify({ chat_id: rest.id, text: restMsg }) 
+                      }).catch(e => {});
+                  }
+              }
+              const type = currentLang === 'en' ? 'Groceries/Food' : 'مسواك';
+              if(typeof db !== 'undefined') {
+                  db.ref('orders/' + vc).set({
+                      id: vc, customer: name, phone: phone, items: msgContent, land: land, type: type,
+                      loyaltyMsg: loyaltyMsg, restOrderNumbers: restOrderNumbers, price: "حسب الفاتورة",
+                      restaurant: targetRestaurant, status: targetRestaurant !== "توصيل عام" ? 'pending_restaurant' : 'pending_driver',
+                      timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords
+                  });
+              }
+              const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${msgContent}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}${restOrderNumbers}\nموقع الزبون: ${userCoords}`;
+              await sendToDiscord(msg, vc);
+              await sendToTelegramChannel(msg); 
              document.getElementById('success-order-modal').style.display = 'flex';
              document.getElementById('custOrder').value = ""; 
              document.getElementById('custLandmark').value = ""; 
-             btn.innerHTML = originalText; 
-             btn.disabled = false;
              loadSavedCustomerData();
-          }, 600);
-
-          (async () => {
-              try {
-                 saveCustomerData(name, phone); 
-                  const vc = generateSecureVC(); 
-                  let referrer = localStorage.getItem('referred_by') || "";
-                  fetch(`${GS_URL}?action=saveOrderCode&phone=${phone}&code=${vc}&referrer=${referrer}`).catch(e=>{});
-                 localStorage.removeItem('referred_by');
-                  let tempLoyalty = parseInt(localStorage.getItem('my_loyalty_orders') || 0); 
-                 tempLoyalty++; 
-                 localStorage.setItem('my_loyalty_orders', tempLoyalty);
-                 updateLocalLoyaltyUI();
-                  let loyaltyMsg = (tempLoyalty % 10) === 0 ? "🎁 هذا الطلب مجاني (الطلب العاشر)" : `الطلب رقم ${tempLoyalty % 10} من أصل 10`;
-                  let msgContent = order;
-                  let restOrderNumbers = "";
-                  
-                  const restNames = ["مطعم برجر علي سالم", "مطعم بركر ابو حمودي", "مطعم فيكتوريا", "كلاشي", "مطعم الخليج", "مطعم سكوزي", "ركن استكانة", "رويال فود", "مطعم رضا للأسماك", "مطعم محمد محسن"];
-                  let targetRestaurant = "توصيل عام";
-                  for (let rName of restNames) {
-                      if (order.includes(rName)) {
-                          targetRestaurant = rName;
-                          let currentRestCount = parseInt(localStorage.getItem('order_counter_' + rName) || "0") + 1;
-                          localStorage.setItem('order_counter_' + rName, currentRestCount);
-                          restOrderNumbers += `\n🔢 رقم طلب (${rName}): #${currentRestCount}`;
-                          break;
-                      }
-                  }
-                  
-                  const type = currentLang === 'en' ? 'Groceries/Food' : 'مسواك';
-                  if(typeof db !== 'undefined') {
-                      db.ref('orders/' + vc).set({
-                          id: vc, customer: name, phone: phone, items: msgContent, land: land, type: type,
-                          loyaltyMsg: loyaltyMsg, restOrderNumbers: restOrderNumbers, price: "حسب الفاتورة",
-                          restaurant: targetRestaurant, status: targetRestaurant !== "توصيل عام" ? 'pending_restaurant' : 'pending_driver',
-                          timestamp: firebase.database.ServerValue.TIMESTAMP, location: userCoords
-                      });
-                  }
-                  const msg = `طلب جديد متاح للحجز\nاسم الزبون: ${name}\nرقم الزبون: ${phone}\nطلب الزبون: ${msgContent}\nاقرب نقطه داله: ${land}\nتسلسل الطلب: ${loyaltyMsg}\nرقم الطلب: ${vc}${restOrderNumbers}\nموقع الزبون: ${userCoords}`;
-                  sendToDiscord(msg, vc).catch(e=>{});
-                  sendToTelegramChannel(msg);
-                  
-              } catch (e) { console.error(e); } 
-          })();
+          } catch (e) { showToast(currentLang === 'en' ? "Error sending order ❌" : "حدث خطأ أثناء الإرسال ❌"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
       }
       
       async function processVerifyCode() {
@@ -2834,7 +2960,7 @@
                   localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
                   updateStatsUI();
                   let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
-                  fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`).catch(e=>{});
+                  fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
                   syncLoyaltyWithServer(); 
                   showToast(currentLang === 'en' ? `Process confirmed successfully! Great job 👏` : `تم تأكيد العملية بنجاح! عاشت ايدك 👏`); refreshLeaderboard();
                   document.getElementById('driverVerifyInput').value = ""; document.getElementById('driverVerifyPhoneInput').value = "";
@@ -2866,7 +2992,7 @@
               }
 
               if (targetOrder) {
-                  fetch(`${GS_URL}?action=verifyOrder&phone=${targetOrder.phone}&code=${code}`).catch(e=>{});
+                  await fetch(`${GS_URL}?action=verifyOrder&phone=${targetOrder.phone}&code=${code}`);
                   db.ref('orders/' + code).update({ status: 'completed' });
 
                   try { const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); cashAudio.play(); confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } }); } catch(e) {}
@@ -2877,7 +3003,7 @@
                   localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
                   updateStatsUI();
                   let adminCut = parseInt(localStorage.getItem('d_count')) * 500;
-                  fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`).catch(e=>{});
+                  fetch(`${GS_URL}?action=updateStats&name=${encodeURIComponent(localStorage.getItem('driver_name'))}&phone=${localStorage.getItem('driver_phone')}&inCount=${localStorage.getItem('d_count')}&leagueCount=${localStorage.getItem('league_count')}&inDriver=0&inAdmin=${adminCut}`);
                   
                   showToast(currentLang === 'en' ? `Order delivery confirmed! You can book a new one now 👏` : `تم تأكيد تسليم الطلب بنجاح! تكدر تحجز طلب جديد هسه 👏`); 
                   refreshLeaderboard();
@@ -2960,7 +3086,7 @@
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
       function confirmMapLocation() {
           const center = appMap.getCenter();
-          const googleMapsLink = `https://www.google.com/maps?q=$${center.lat},${center.lng}`;
+          const googleMapsLink = `https://www.google.com/maps?q=${center.lat},${center.lng}`;
          document.getElementById('tukDropoffLink').value = googleMapsLink;
          document.getElementById('map-success-msg').style.display = 'block';
          closeMapModal();
@@ -2992,8 +3118,8 @@
               } else {
                   if(alarmModal) alarmModal.style.display = 'none';
                   if(alarmAudio) {
-                          alarmAudio.pause();
-                          alarmAudio.currentTime = 0;
+                      alarmAudio.pause();
+                      alarmAudio.currentTime = 0;
                   }
                   if ("vibrate" in navigator) navigator.vibrate(0);
               }
@@ -3047,7 +3173,7 @@
       }
 
       // 5. دالة الحجز بعد التعديل (لإيقاف الإنذار)
-      function claimOrder(orderId, customerName, discordMsgId, phone, location, items, land, loyaltyMsg, restOrderNumbers, price, type) {
+      async function claimOrder(orderId, customerName, discordMsgId, phone, location, items, land, loyaltyMsg, restOrderNumbers, price, type) {
           let limit = localStorage.getItem('allow_second_order') === 'true' ? 2 : 1;
           
           if (driverActiveOrders >= limit) {
@@ -3136,7 +3262,6 @@
           }
       });
 
-            // الفحص الأولي عند تحميل الصفحة
       window.onload = function() {
           checkStatus(); 
           initAutoLocation(); 
@@ -3147,22 +3272,8 @@
           setInterval(() => {
               if (checkTimeLock()) applyGlobalStatus();
           }, 60000);
-
-          // إخفاء إجباري بعد التحميل
-          setTimeout(() => {
-              hideSplash();
-          }, 1500);
       };
-
-      // إخفاء إجباري وفوري للشاشة الترحيبية حتى لو النت ضعيف (أمان إضافي)
-      setTimeout(() => {
-          const splash = document.getElementById('splash-screen');
-          if (splash && splash.style.display !== 'none') {
-              splash.style.opacity = '0';
-              setTimeout(() => splash.style.display = 'none', 500);
-          }
-      }, 3000);
 
     </script>
 </body>
-</html>
+        </html>
