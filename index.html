@@ -1933,7 +1933,7 @@
       function initAutoLocation() {
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
-                 (position) => { userCoords = `https://www.google.com/maps?q=${position.coords.latitude},${position.coords.longitude}`; checkAppAccess(position.coords.latitude, position.coords.longitude); },
+                 (position) => { userCoords = `https://www.google.com/maps?q=$${position.coords.latitude},${position.coords.longitude}`; checkAppAccess(position.coords.latitude, position.coords.longitude); },
                  (error) => { console.warn("GPS Denied"); }, { enableHighAccuracy: true }
               );
           }
@@ -2737,7 +2737,7 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=${pos.coords.latitude},{pos.coords.longitude}`; sendTukOrder(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               } else { showToast(currentLang === 'en' ? "GPS Not Supported ❌" : "جهازك لا يدعم تحديد الموقع ❌"); }
@@ -2747,13 +2747,11 @@
           
           saveCustomerData(name, phone);
           
-          // تأخير ثانيتين وبعدها تطلع رسالة النجاح والطلب ينرسل بالخلفية
           setTimeout(() => {
               document.getElementById('success-order-modal').style.display = 'flex';
               document.getElementById('tukDropoffLink').value = ""; document.getElementById('tukLandmark').value = "";
               btn.innerHTML = originalText; btn.disabled = false;
               
-              // الرفع الفعلي للبيانات يتم بالخلفية بدون تأخير المستخدم
               (async function backgroundUpload() {
                   try {
                       const vc = generateSecureVC(); let referrer = localStorage.getItem('referred_by') || "";
@@ -2801,7 +2799,7 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=${pos.coords.latitude},{pos.coords.longitude}`; sendMedFinal(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -2811,7 +2809,6 @@
           
           saveCustomerData(name, phone);
           
-          // تأخير ثانيتين وإظهار شاشة النجاح
           setTimeout(() => {
               document.getElementById('success-order-modal').style.display = 'flex';
               document.getElementById('medOrder').value = ""; document.getElementById('medLandmark').value = "";
@@ -2865,7 +2862,7 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
+                     (pos) => { userCoords = `https://www.google.com/maps?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -2878,7 +2875,6 @@
           
           saveCustomerData(name, phone);
           
-          // تأخير ثانيتين وإظهار شاشة النجاح
           setTimeout(() => {
               document.getElementById('success-order-modal').style.display = 'flex';
               document.getElementById('custOrder').value = ""; 
@@ -3067,6 +3063,30 @@
           else { if(giftMsg) { giftMsg.innerHTML = currentLang === 'en' ? "<i class='fas fa-gift'></i> Reach 10 orders for a free delivery" : "<i class='fas fa-gift'></i>أوصل للطلب 10 وكروتك مجانية"; giftMsg.style.color = "var(--primary)"; } if(progressBar) progressBar.style.background = "var(--gold)"; }
       }
       function updateLoyaltyUI() { updateLocalLoyaltyUI(); } updateLocalLoyaltyUI();
+
+      // ==========================================
+      // دوال الخريطة والأسعار (المفقودة)
+      // ==========================================
+      let appMap = null;
+      function openMapModal() {
+         document.getElementById('map-modal').style.display = 'flex';
+          if (!appMap) {
+              const umQasrBounds = L.latLngBounds(L.latLng(30.0100, 47.8800), L.latLng(30.0800, 47.9600));
+              appMap = L.map('map-view', { attributionControl: false, maxBounds: umQasrBounds, maxBoundsViscosity: 1.0, minZoom: 13 }).setView([30.0396, 47.9298], 15);
+             L.tileLayer('https://mt1.google.com/vt/lyrs=m&hl=ar&x={x}&y={y}&z={z}', { maxZoom: 20 }).addTo(appMap);
+          }
+         setTimeout(() => { appMap.invalidateSize(); }, 300);
+      }
+      function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
+      function confirmMapLocation() {
+          const center = appMap.getCenter();
+          const googleMapsLink = `https://www.google.com/maps?q=$${center.lat},${center.lng}`;
+         document.getElementById('tukDropoffLink').value = googleMapsLink;
+         document.getElementById('map-success-msg').style.display = 'block';
+         closeMapModal();
+      }
+      function openPricesModal() { document.getElementById('prices-modal').style.display = 'flex'; }
+      function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
 
       // =================================================================
       // 🚨 دوال الـ JavaScript الخاصة بالإنذار اللحظي الذكي (Firebase) 🚨
