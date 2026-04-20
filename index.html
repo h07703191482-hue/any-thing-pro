@@ -36,7 +36,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -56,7 +55,6 @@
           firebase.initializeApp(firebaseConfig);
       }
       const db = firebase.database();
-      const messaging = firebase.messaging(); // تهيئة مكتبة الإشعارات
     </script>
 
     <style>
@@ -69,6 +67,7 @@
       .map-footer { padding: 15px; text-align: center; background: var(--surface); }
       @keyframes bouncePin { from { transform: translate(-50%, -100%); } to { transform: translate(-50%, -110%); } }
 
+      /* Styles for code entry modal */
       #code-entry-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100005; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(5px); padding: 20px;}
       .code-entry-container { width: 100%; max-width: 400px; background: var(--danger); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-floating); display: flex; flex-direction: column; animation: scaleIn 0.3s ease-out;}
       .code-entry-header { padding: 18px; background: var(--danger); color: white; text-align: center; font-weight: 800; font-size: 18px; display: flex; justify-content: space-between; align-items: center; }
@@ -750,6 +749,7 @@
           </div>
       </div>
 
+
       <div style="padding: 0 5px 15px; position: relative; z-index: 5;">
           <div class="select-card ripple-dark" style="padding: 16px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--danger); background: rgba(239, 68, 68, 0.05);" onclick="openPricesModal()">
               <div style="display: flex; align-items: center; gap: 15px;">
@@ -812,7 +812,6 @@
           </div>
       </div>
     </div>
-    
     <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="rest-back-icon"></i></button>
         <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> <span id="restaurant-name-header">اسم المطعم</span></h2>
@@ -983,6 +982,7 @@
 
         <button class="send-btn order-btn-logic ripple" id="sendBtn" onclick="sendFinal()"><i class="fas fa-paper-plane"></i> <span id="shop-final-btn">أرسل الطلب الآن</span></button>
     </div>
+
     <div id="join-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="join-back-icon"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-id-card" style="color:#10B981;"></i> <span id="join-head">انضم ككابتن</span></h2>
@@ -1132,330 +1132,6 @@
 
         <div id="driver-log-container"></div>
     </div>
-    <script>
-      const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
-      const PUBLIC_CHANNEL = "7479342799"; 
-      const ADMIN_CHAT_ID = "7479342799"; 
-      const GS_URL = "https://script.google.com/macros/s/AKfycbxkTDFl3XFV3Md0BRjD0GYRaIlngDigP9B4K5nTkoD8dIqGudFJiE7__kGpLC1FODip/exec";
-
-      const DISCORD_PUBLIC_WEBHOOK = "https://discord.com/api/webhooks/1491324693871857684/i9PXJalQMx79I_Ev5i10jeS8TgKEe_Q_bdqhuhOC57LNiCw-kFFdJstxeuquI9abklp9";
-      const DISCORD_PRIVATE_WEBHOOK = "https://discord.com/api/webhooks/1491325381209362483/JmSQslp2XaCCPYOE3MbX3ODMr7NQIt0za7KCF_O_VTTmiemGCe7lI_fp_5wKquE-6wVz";
-      
-      const ALI_SALEM_BOT_TOKEN = "8735092732:AAE9lBE3i6AJRkKe3LLlAAodFXuAv7VXpys";
-      const ABO_HMODE_BOT_TOKEN = "8695832371:AAHosUvA37U9U1qhiZJlbDKxJPZFgDHbJAk"; 
-      const VICTORIA_BOT_TOKEN = "8769449664:AAErwMuaA893BKDvbKcOk4sFgFPXUIxlnmc"; 
-      const KLASHE_BOT_TOKEN = "8719779552:AAE5MMDa12ats3qocRoZoy_DMCS9RU8IQvQ"; 
-      const HALEG_BOT_TOKEN = "8607099366:AAEK-D1553k9Mz94fcZJ9KiPUxZqusQSMqs";
-      const SCOZI_BOT_TOKEN = "8129985022:AAHlKRiRSH4Jop8J58iFQOjl2NcAZnLdkRo";
-      const ROYAL_FOOD_BOT_TOKEN = "8620504304:AAEuUp97cjQmyaHCYSUC4eygNBXhsL4ZmXo";
-
-      const ALI_SALEM_CHAT_ID = "-1003722556479";
-      const ABO_HMODE_CHAT_ID = "-1003704352460";
-      const VICTORIA_CHAT_ID = "-1003760108006"; 
-      const KLASHE_CHAT_ID = "-1003727059406"; 
-      const HALEG_CHAT_ID = "-1003719488878";
-      const SCOZI_CHAT_ID = "-1003315608193";
-      const ROYAL_FOOD_CHAT_ID = "-1003798976901";
-
-      let currentLang = localStorage.getItem('app_lang') || 'ar';
-      
-      function t(arText, enText) {
-          return currentLang === 'en' ? enText : arText;
-      }
-
-      const translations = {
-          en: {
-              'side-lang-text': 'التبديل للعربية',
-              'side-dark-text': 'Toggle Dark Mode',
-              'side-support-text': 'Contact Support',
-              'side-logout-text': 'Logout',
-              'side-name': 'Al-Bandar',
-              'nav-home-text': 'Home',
-              'nav-shop-text': 'Groceries',
-              'nav-tuk-text': 'TukTuk',
-              'nav-med-text': 'Mediator',
-              'nav-acc-text': 'Account',
-              'main-title': 'Al-Bandar',
-              'main-sub': 'What are you craving today?',
-              'sys-alert-title': 'System Alert',
-              'sys-alert-sub': 'App is offline from 2 AM to 8 AM.',
-              'price-alert-title': 'Delivery Prices (Notice)',
-              'price-alert-sub': 'Check prices for all Um Qasr areas',
-              'srv-shop-title': 'Grocery Shopping',
-              'srv-shop-sub': 'Order anything, we deliver',
-              'srv-tuk-title': 'TukTuk Ride',
-              'srv-tuk-sub': 'Fast & safe pickups',
-              'srv-med-title': 'Mediator',
-              'srv-med-sub': 'Transfer items between people',
-              'srv-share-title': 'Share & Win Free Delivery',
-              'srv-share-sub': 'Send your link to friends 🎁',
-              'srv-join-title': 'Join as Captain',
-              'srv-join-sub': 'Register and start earning',
-              'srv-plaza-title': 'Captain Dashboard',
-              'srv-plaza-sub': 'Orders & Statistics',
-              'pub-order-title': 'Public Orders',
-              'priv-order-title': 'Reserved Orders',
-              
-              'loc1': 'Al-Khamsin', 'mloc1': 'Al-Khamsin',
-              'loc2': 'Al-Mashrou', 'mloc2': 'Al-Mashrou',
-              'loc3': 'Teachers Qtr', 'mloc3': 'Teachers Qtr',
-              'loc4': 'Streets', 'mloc4': 'Streets',
-              'loc5': 'South Hindiya', 'mloc5': 'South Hindiya',
-              'loc6': 'Engineering', 'mloc6': 'Engineering',
-              'loc7': 'Shaabi', 'mloc7': 'Shaabi',
-              'loc8': 'Officers Houses', 'mloc8': 'Officers Houses',
-              'loc9': 'Cement Houses', 'mloc9': 'Cement Houses',
-              'loc10': 'Al-Baho', 'mloc10': 'Al-Baho',
-              'loc11': 'Industrial', 'mloc11': 'Industrial',
-              'loc12': 'North Hindiya', 'mloc12': 'North Hindiya',
-              'loc13': 'Al-Qaida', 'mloc13': 'Al-Qaida',
-              'loc14': 'Hadama', 'mloc14': 'Hadama',
-              'loc15': 'South Port', 'mloc15': 'South Port',
-              'loc16': 'The 10 Piers', 'mloc16': 'The 10 Piers',
-              'loc17': 'Port 27', 'mloc17': 'Port 27',
-              'loc18': 'Al-Tarheeb', 'mloc18': 'Al-Tarheeb',
-              'loc19': 'Somoud', 'mloc19': 'Somoud',
-              'loc20': 'Istibaqiya', 'mloc20': 'Istibaqiya',
-              'loc21': 'Tahliyat', 'mloc21': 'Tahliyat',
-
-              'rest-menu-note': '⚠️ Warning: If the order is canceled after the captain departs, you must pay the full fee. Please confirm before ordering.',
-              'tuk-warn-note': '⚠️ Warning: If the ride is canceled after the captain departs, you must pay the full fee.',
-              'med-warn-note': '⚠️ Warning: If the service is canceled after the captain departs, you must pay the full fee.',
-              'shop-warn-note': '⚠️ Warning: If the order is canceled after the captain departs, you must pay the full fee.',
-              'tuk-final-warn': '⚠️ Alert: You will be called to confirm. If no answer, order is canceled and your number blocked!',
-              'med-final-warn': '⚠️ Alert: You will be called to confirm. If no answer, order is canceled and your number blocked!',
-              'shop-final-warn': '⚠️ Alert: You will be called to confirm. If no answer, order is canceled and your number blocked!',
-              'plaza-rule-note': '🚫 Strict Rule: Do not buy items without calling the customer first! If no answer, cancel immediately.',
-              'priv-admin-note': '📣 Captain Note: 500 IQD from each order fee goes to the app owner.',
-              
-              'login-h2': 'Welcome to Al-Bandar',
-              'login-p': 'Login in two simple steps!',
-              'login-s1-h3': 'What is your name?',
-              'login-s1-p': 'Enter your name so we can serve you better',
-              'login-s2-h3': 'Verify with your number',
-              'login-s2-p': 'Enter your Iraqi number (starts with 07)',
-              'tuk-head': 'TukTuk Ride',
-              'tuk-loc-notice': 'Note: Your location is detected automatically 📍',
-              'tuk-p-info': 'Customer Details',
-              'lbl-tuk-name': 'Full Name',
-              'lbl-tuk-phone': 'Phone Number',
-              'tuk-r-info': 'Ride Details',
-              'lbl-tuk-drop': 'Drop-off Location (Required)',
-              'tuk-map-hint': '💡 You can pick the location directly from the map now! 🗺️',
-              'tuk-map-success': 'Location picked successfully!',
-              'lbl-tuk-land': 'Nearest Landmark (Optional)',
-              'tuk-final-btn': 'Request TukTuk',
-              'med-head': 'Mediator Service',
-              'med-loc-notice': 'Note: Your location is detected automatically 📍',
-              'med-prices-title': 'Mediator Service Prices 🤝',
-              'med-p-info': 'Sender Details',
-              'lbl-med-name': 'Full Name',
-              'lbl-med-phone': 'Phone Number',
-              'lbl-med-land': 'Nearest Landmark',
-              'med-o-info': 'Order Details',
-              'lbl-med-order': 'What is the item? And where to?',
-              'med-final-btn': 'Confirm Mediator Order',
-              'shop-head': 'Grocery Shopping',
-              'shop-loc-notice': 'Note: Your location is detected automatically 📍',
-              'loy-txt': 'Your Order No.',
-              'shop-p-info': 'Delivery Details',
-              'lbl-shop-name': 'Name',
-              'lbl-shop-phone': 'Phone Number',
-              'lbl-shop-land': 'Landmark',
-              'shop-o-info': 'What do you need us to buy?',
-              'shop-final-btn': 'Send Order Now',
-              'join-head': 'Join as Captain',
-              'join-p-info': 'Registration Details',
-              'lbl-join-name': 'Full Name',
-              'lbl-join-phone': 'Phone Number',
-              'lbl-join-bike': 'Vehicle Type',
-              'opt-bike-def': 'Select type...',
-              'opt-bike-1': 'Iranian Bike',
-              'opt-bike-2': 'Boxer Bike',
-              'opt-bike-3': 'TukTuk',
-              'plaza-head': 'Captain Dashboard',
-              'plaza-stat-1': 'Completed ✅',
-              'plaza-stat-2': 'Canceled 🚫',
-              'plaza-verify-title': 'Confirm New Delivery',
-              'lbl-plaza-phone': 'Customer Phone',
-              'lbl-plaza-code': 'Confirmation Code',
-              'plaza-league-title': 'Champions League',
-              'plaza-league-sub': 'The competition is ongoing 🏆',
-              'log-head': 'Captain Log',
-              'tab-completed': 'Completed ✅',
-              'tab-canceled': 'Canceled 🚫',
-              'pub-head': 'Public Orders',
-              'pub-card-title': 'Available Orders',
-              'priv-head': 'Reserved Orders',
-              'priv-card-title': 'My Active Orders',
-              'out-zone-title': 'Outside Um Qasr Boundaries!',
-              'out-zone-desc1': 'This app works <span style="color: var(--danger);">ONLY</span> inside Um Qasr.',
-              'out-zone-desc2': 'The app is stopped because your current location is out of coverage.',
-              'map-modal-title': 'Select Drop-off 📍',
-              'map-modal-desc': 'Move the map to place the pin on the exact location',
-              'prices-modal-title': 'Delivery Prices 🛵',
-              'success-title': 'Order Sent Successfully!',
-              'success-desc1': 'Please wait until we contact you.',
-              'success-desc2': '⚠️ Do not send another order by mistake to avoid duplication!',
-              'cancel-title': 'Reason for Cancellation',
-              'cancel-label': 'Choose a reason:',
-              'device-type-title': 'What is your device?',
-              'device-android': 'Android',
-              'device-ios': 'iPhone (iOS)',
-              'off-title': 'No Internet Connection',
-              'off-text': 'Please connect to the internet to continue.',
-              'rest-1-title': 'Ruken Estkana', 'rest-1-sub': 'Grills, Oriental & Western',
-              'rest-2-title': 'Royal Food', 'rest-2-sub': 'Burger, Pizza & Meals',
-              'rest-mohsen-title': 'Mohsen Restaurant', 'rest-mohsen-sub': 'Pizza, Saj, and Burger',
-              'rest-3-title': 'Victoria', 'rest-3-sub': 'Burger & Sandwiches',
-              'rest-4-title': 'Klashe', 'rest-4-sub': 'Juices & Drinks',
-              'rest-5-title': 'Al Khaleej', 'rest-5-sub': 'Delicious Food',
-              'rest-6-title': 'Scoozi', 'rest-6-sub': 'Tasty Meals',
-              'rest-7-title': 'Abo Hamoody', 'rest-7-sub': 'Original Taste',
-              'rest-8-title': 'Ali Salem', 'rest-8-sub': 'Best Burger in Um Qasr',
-              'rest-9-title': 'New Restaurant', 'rest-9-sub': 'Coming Soon...'
-          }
-      };
-      
-      function toggleLanguage() {
-          currentLang = currentLang === 'ar' ? 'en' : 'ar';
-          localStorage.setItem('app_lang', currentLang);
-          location.reload(); 
-      }
-
-      function applyLanguage() {
-          document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-          document.documentElement.lang = currentLang;
-          
-          if (currentLang === 'en') {
-              for (const [id, text] of Object.entries(translations.en)) {
-                  const el = document.getElementById(id);
-                  if (el) el.innerHTML = text;
-              }
-              
-              const loginBtn = document.getElementById('direct-login-btn');
-              if(loginBtn) loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
-              const s1Btn = document.getElementById('login-s1-btn');
-              if(s1Btn) s1Btn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
-              const joinBtn = document.getElementById('joinSendBtn');
-              if(joinBtn) joinBtn.innerHTML = 'Submit Join Request';
-              const actBtn1 = document.getElementById('act-btn1');
-              if(actBtn1) actBtn1.innerHTML = 'Activate Account';
-              const mapBtn = document.getElementById('map-modal-btn');
-              if(mapBtn) mapBtn.innerHTML = 'Confirm Location <i class="fas fa-check"></i>';
-              const cancelBtn = document.getElementById('cancel-confirm-btn');
-              if(cancelBtn) cancelBtn.innerHTML = 'Confirm Cancel <i class="fas fa-check"></i>';
-              const offBtnW = document.getElementById('off-btn-wifi');
-              if(offBtnW) offBtnW.innerHTML = 'Connect via WiFi';
-              const offBtnD = document.getElementById('off-btn-data');
-              if(offBtnD) offBtnD.innerHTML = 'Connect via Mobile Data';
-              const cartBtn = document.getElementById('cart-continue-btn');
-              if(cartBtn) cartBtn.innerHTML = 'Continue <i class="fas fa-arrow-right"></i>';
-              
-              const tukMapBtn = document.getElementById('tuk-map-btn');
-              if (tukMapBtn) tukMapBtn.innerHTML = '<i class="fas fa-map-marked-alt"></i> Open Map & Pin Location 📍';
-
-              const pMap = {
-                  'loginNameInput': 'Enter your full name...',
-                  'loginPhoneInput': 'Example: 07700000000',
-                  'tukName': 'Enter your name here',
-                  'tukPhone': 'Example: 07700000000',
-                  'tukLandmark': 'School, Mosque, or intersection...',
-                  'medName': 'Enter your name',
-                  'medPhone': 'Example: 07700000000',
-                  'medLandmark': 'To help the captain find you',
-                  'medOrder': 'Example: I want to transfer keys...',
-                  'custName': 'Your name',
-                  'custPhone': 'Example: 07700000000',
-                  'custLandmark': 'Quick description of your location',
-                  'custOrder': 'Write your order details here (food, groceries)...',
-                  'driverJoinName': 'Your full name',
-                  'driverJoinPhone': 'Example: 07700000000',
-                  'driverVerifyPhoneInput': 'Example: 07700000000',
-                  'driverVerifyInput': 'Example: 1234',
-                  'activationCodeInput': 'Enter code here...',
-                  'forcedVerifyInput': 'Enter code here'
-              };
-              for (const [id, ph] of Object.entries(pMap)) {
-                  const el = document.getElementById(id);
-                  if (el) el.placeholder = ph;
-              }
-              
-              document.querySelectorAll('.phone-error').forEach(el => el.innerHTML = '⚠️ Invalid number (must be 11 digits starting with 07)');
-              document.querySelectorAll('.step-number').forEach((el, index) => el.innerHTML = `Step (${index + 1})`);
-          }
-      }
-      
-      applyLanguage();
-
-      let userCoords = ""; 
-      let driverActiveOrders = 0; 
-      let forcedVerifyCustomerPhone = ""; 
-      let currentLogTab = 'completed'; 
-
-      const CURRENT_VERSION = "2.0.30"; 
-      if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
-          localStorage.setItem('app_version', CURRENT_VERSION);
-      }
-
-      const umQasrPolygon = [
-          { lat: 30.0800, lng: 47.9600 }, 
-          { lat: 30.0800, lng: 47.8800 }, 
-          { lat: 30.0100, lng: 47.8800 }, 
-          { lat: 30.0100, lng: 47.9600 }
-      ];
-
-      function isUserInUmQasr(userLat, userLng, polygon) {
-          let isInside = false;
-          for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-              const xi = polygon[i].lat, yi = polygon[i].lng;
-              const xj = polygon[j].lat, yj = polygon[j].lng;
-              const intersect = ((yi > userLng) != (yj > userLng)) && (userLat < (xj - xi) * (userLng - yi) / (yj - yi) + xi);
-              if (intersect) isInside = !isInside;
-          }
-          return isInside;
-      }
-      
-      function checkAppAccess(lat, lng) {
-          if(localStorage.getItem('isAdmin') === 'true') return; 
-          if (!isUserInUmQasr(lat, lng, umQasrPolygon)) {
-              document.getElementById('out-of-zone-popup').style.display = 'flex';
-          }
-      }
-      
-      async function trackLiveVisit() { try { fetch(`${GS_URL}?action=trackVisit&t=${new Date().getTime()}`); } catch(e) {} }
-
-      let secretCounter = 0, lockSecretCounter = 0, appIsActive = true, lastOrderCount = -1, orderPollInterval = null;
-      let isSoundEnabled = localStorage.getItem('sound_enabled') === 'true';
-      const newOrderAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-
-      window.addEventListener('load', () => {
-          setTimeout(() => {
-              const splash = document.getElementById('splash-screen');
-              if (splash && splash.style.display !== 'none') { splash.style.opacity = '0'; setTimeout(() => splash.style.display = 'none', 500); }
-          }, 3000); 
-      });
-
-      const menus = {
-          'rken_estkana': {
-              name: t('ركن استكانة', 'Ruken Estkana'),
-              items: [
-                  { id: 'rk1', name: t('كيلو كباب لحم', '1 Kg Meat Kebab'), price: 24000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('16 شيش كباب، خبز، سلطة، طرشي، وشطة', '16 Kebab skewers, bread, salad, pickles, and hot sauce') },
-                  { id: 'rk2', name: t('نفر كباب لحم', 'Meat Kebab Portion'), price: 6000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('4 شيش دبل، 3 خبزات، سلطة، طرشي، وشطة', '4 double skewers, 3 breads, salad, pickles, and hot sauce') },
-                  { id: 'rk3', name: t('نص نفر كباب لحم', 'Half Meat Kebab Portion'), price: 3000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('2 شيش، 2 خبزة، سلطة، طرشي، وشطة', '2 skewers, 2 breads, salad, pickles, and hot sauce') },
-                  { id: 'rk4', name: t('كيلو تكة لحم', '1 Kg Meat Tikka'), price: 32000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('خبز، سلطة، طرشي، وشطة', 'Bread, salad, pickles, and hot sauce') },
-                  { id: 'rk5', name: t('نفر تكة لحم', 'Meat Tikka Portion'), price: 8000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('4 شيش، خبز، سلطة، طرشي، وشطة', '4 skewers, bread, salad, pickles, and hot sauce') },
-                  { id: 'rk6', name: t('كيلو معلاق', '1 Kg Liver'), price: 24000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('خبز، سلطة، طرشي، وشطة', 'Bread, salad, pickles, and hot sauce') },
-                  { id: 'rk7', name: t('نفر معلاق', 'Liver Portion'), price: 6000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('4 شيش، خبز، سلطة، طرشي، وشطة', '4 skewers, bread, salad, pickles, and hot sauce') },
-                  { id: 'rk8', name: t('كيلو تكة دجاج (طاووق)', '1 Kg Chicken Tikka (Tawook)'), price: 16000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('خبز، سلطة، طرشي، وشطة', 'Bread, salad, pickles, and hot sauce') },
-                  { id: 'rk9', name: t('نفر تكة دجاج (طاووق)', 'Chicken Tikka Portion'), price: 4000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('4 شيش، خبز، سلطة، طرشي، وشطة', '4 skewers, bread, salad, pickles, and hot sauce') },
-                  { id: 'rk10', name: t('كيلو كباب دجاج', '1 Kg Chicken Kebab'), price: 16000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('خبز، سلطة، طرشي، وشطة', 'Bread, salad, pickles, and hot sauce') },
-                  { id: 'rk11', name: t('نفر كباب دجاج', 'Chicken Kebab Portion'), price: 4000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('4 شيش، خبز، سلطة، طرشي، وشطة', '4 skewers, bread, salad, pickles, and hot sauce') },
-                  { id: 'rk12', name: t('كيلو جوانح مشوية', '1 Kg Grilled Wings'), price: 12000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('خبز، سلطة، طرشي، وشطة', 'Bread, salad, pickles, and hot sauce') },
-                  { id: 'rk13', name: t('نفر جوانح مشوية', 'Grilled Wings Portion'), price: 3000, category: t('🥩 قسم أكلات المشاوي', '🥩 Grills Section'), desc: t('خبز، سلطة، طرشي، وشطة', 'Bread, salad, pickles, and hot sauce') }
-              ]
-          }
-      };
     <script>
       const BOT_TOKEN = "8640123901:AAFfl57lPpounm1y-SM-KmQadiT2fnqjFOM";
       const PUBLIC_CHANNEL = "7479342799"; 
@@ -2182,46 +1858,6 @@
               ]
           }
       };
-
-      // ==========================================
-      // دوال إشعارات الدفع (Push Notifications) والخلفية
-      // ==========================================
-      
-      // 1. تسجيل الـ Service Worker
-      if ('serviceWorker' in navigator) {
-          window.addEventListener('load', function() {
-              navigator.serviceWorker.register('/firebase-messaging-sw.js')
-              .then((registration) => {
-                  console.log('تم تسجيل Service Worker بنجاح:', registration.scope);
-              }).catch((err) => {
-                  console.log('فشل تسجيل Service Worker:', err);
-              });
-          });
-      }
-
-      // 2. طلب إذن الإشعارات من المندوب وحفظ الـ Token
-      async function requestNotificationPermission() {
-          if (!('Notification' in window)) return;
-          try {
-              const permission = await Notification.requestPermission();
-              if (permission === 'granted') {
-                  console.log('تم السماح بالإشعارات');
-                  // ملاحظة: ضع مفتاح VAPID الخاص بك هنا من إعدادات فايربيز
-                  const currentToken = await messaging.getToken({ vapidKey: 'ضع_مفتاح_VAPID_الخاص_بك_هنا' });
-                  if (currentToken) {
-                      const phone = localStorage.getItem('driver_phone');
-                      if (phone && typeof db !== 'undefined') {
-                          db.ref('driver_tokens/' + phone).set(currentToken);
-                      }
-                  }
-              } else {
-                  console.log('لم يتم السماح بالإشعارات');
-              }
-          } catch (err) {
-              console.log('حدث خطأ أثناء جلب التوكن: ', err);
-          }
-      }
-
       // ==========================================
       // دوال النظام والجافاسكربت الأساسية
       // ==========================================
@@ -2240,6 +1876,7 @@
           // تم إلغاء العرض الأسبوعي
       }
 
+      // 🔴 الدالة الخاصة بقفل التطبيق من 2 بالليل إلى 8 الصبح
       function checkTimeLock() {
           const hour = new Date().getHours();
           const lockScreen = document.getElementById('global-lock-screen'), lockTitle = document.getElementById('lock-h2'), lockDesc = document.getElementById('lock-p');
@@ -2287,6 +1924,7 @@
              navigator.geolocation.getCurrentPosition(
                  (position) => { 
                      userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`; 
+                     // 🔴 فحص هل المستخدم داخل أم قصر أو لا
                      checkAppAccess(position.coords.latitude, position.coords.longitude); 
                  },
                  (error) => { console.warn("GPS Denied"); }, { enableHighAccuracy: true }
@@ -2323,6 +1961,7 @@
                   }
               }
           }
+          
           showToast(t("تم فك الحظر وإنهاء الطلبات المعلقة بنجاح! 🔓", "Unblocked and pending orders completed! 🔓"));
       }
 
@@ -2464,6 +2103,7 @@
          document.getElementById('login-step-2').style.display = 'none';
          document.getElementById('login-step-1').style.display = 'block';
       }
+      
       function completeDirectLogin() {
           const userName = document.getElementById('loginNameInput').value.trim();
           const userPhone = document.getElementById('loginPhoneInput').value.trim();
@@ -2681,63 +2321,6 @@
           }
       }
 
-      // ==========================================
-      // دالة مراقبة الطلبات وإيقاف المنبه (مهمة جداً)
-      // ==========================================
-      let isInitialLoad = true; 
-
-      function listenToNewOrdersRealtime() {
-          if(typeof db === 'undefined' || localStorage.getItem('isVerifiedDriver') !== 'true') return;
-
-          db.ref('orders').on('child_added', (snapshot) => {
-              if (isInitialLoad) return; 
-              const order = snapshot.val();
-              if (order && (order.status === 'pending_driver' || order.status === 'pending_restaurant')) {
-                  triggerLocalAlarm();
-              }
-          });
-
-          setTimeout(() => { isInitialLoad = false; }, 3000);
-      }
-
-      function triggerLocalAlarm() {
-          if(localStorage.getItem('driver_status') === 'busy') return; 
-          if(!isSoundEnabled) return;
-
-          const alarmModal = document.getElementById('persistent-alarm-modal');
-          const alarmAudio = document.getElementById('persistent-alarm-audio');
-
-          if(alarmModal) alarmModal.style.display = 'flex';
-          
-          if(alarmAudio) {
-              alarmAudio.currentTime = 0;
-              alarmAudio.play().catch(e => console.log("المتصفح يحتاج تفاعل"));
-          }
-
-          if ("vibrate" in navigator) navigator.vibrate([500, 200, 500, 200, 500]);
-
-          if ("Notification" in window && Notification.permission === "granted") {
-              const notification = new Notification(t("طلب جديد بالبندر! 🚨", "New Order! 🚨"), {
-                  body: t("نزل طلب جديد بالساحة، ادخل بسرعة واحجزه!", "A new order is available, claim it now!"),
-                  icon: "android-chrome-192x192.png",
-                  requireInteraction: true
-              });
-              notification.onclick = function() { window.focus(); this.close(); };
-          }
-      }
-
-      function stopLocalAlarm() {
-          const alarmModal = document.getElementById('persistent-alarm-modal');
-          const alarmAudio = document.getElementById('persistent-alarm-audio');
-          
-          if(alarmModal) alarmModal.style.display = 'none';
-          if(alarmAudio) {
-              alarmAudio.pause();
-              alarmAudio.currentTime = 0;
-          }
-          if ("vibrate" in navigator) navigator.vibrate(0);
-      }
-
       function listenToOrders() {
           if(typeof db === 'undefined' || localStorage.getItem('isVerifiedDriver') !== 'true') return;
           const availableContainer = document.getElementById('available-orders-container');
@@ -2830,10 +2413,10 @@
                   }
               }
               
-              // 🔴🔴 هنا التعديل المهم لإيقاف المنبه عند الجميع في حال قائمة الطلبات فارغة
+              // التعديل: إيقاف التنبيه في حال كانت قائمة الطلبات المتاحة فارغة (تم حجزها أو حذفها)
               if(!hasAvailable) {
                   availableContainer.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">${currentLang === 'en' ? 'No available orders currently' : 'لا توجد طلبات متاحة حالياً'}</p>`;
-                  stopLocalAlarm();
+                  stopLocalAlarm(); // <--- هذا هو السطر الذي يحل المشكلة لجميع المندوبين
               }
 
               if(!hasMyOrders) myOrdersContainer.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">${currentLang === 'en' ? 'No active orders for you currently' : 'لا توجد طلبات محجوزة لك حالياً'}</p>`;
@@ -3498,6 +3081,61 @@
       function openPricesModal() { document.getElementById('prices-modal').style.display = 'flex'; }
       function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
 
+      let isInitialLoad = true; 
+
+      function listenToNewOrdersRealtime() {
+          if(typeof db === 'undefined' || localStorage.getItem('isVerifiedDriver') !== 'true') return;
+
+          db.ref('orders').on('child_added', (snapshot) => {
+              if (isInitialLoad) return; 
+
+              const order = snapshot.val();
+              if (order && (order.status === 'pending_driver' || order.status === 'pending_restaurant')) {
+                  triggerLocalAlarm();
+              }
+          });
+
+          setTimeout(() => { isInitialLoad = false; }, 3000);
+      }
+
+      function triggerLocalAlarm() {
+          if(localStorage.getItem('driver_status') === 'busy') return; 
+          if(!isSoundEnabled) return;
+
+          const alarmModal = document.getElementById('persistent-alarm-modal');
+          const alarmAudio = document.getElementById('persistent-alarm-audio');
+
+          if(alarmModal) alarmModal.style.display = 'flex';
+          
+          if(alarmAudio) {
+              alarmAudio.currentTime = 0;
+              alarmAudio.play().catch(e => console.log("المتصفح يحتاج تفاعل"));
+          }
+
+          if ("vibrate" in navigator) navigator.vibrate([500, 200, 500, 200, 500]);
+
+          if ("Notification" in window && Notification.permission === "granted") {
+              const notification = new Notification(t("طلب جديد بالبندر! 🚨", "New Order! 🚨"), {
+                  body: t("نزل طلب جديد بالساحة، ادخل بسرعة واحجزه!", "A new order is available, claim it now!"),
+                  icon: "android-chrome-192x192.png",
+                  requireInteraction: true
+              });
+              notification.onclick = function() { window.focus(); this.close(); };
+          }
+      }
+
+      function stopLocalAlarm() {
+          const alarmModal = document.getElementById('persistent-alarm-modal');
+          const alarmAudio = document.getElementById('persistent-alarm-audio');
+          
+          if(alarmModal) alarmModal.style.display = 'none';
+          if(alarmAudio) {
+              alarmAudio.pause();
+              alarmAudio.currentTime = 0;
+          }
+          if ("vibrate" in navigator) navigator.vibrate(0);
+      }
+
       async function claimOrder(orderId, customerName, discordMsgId, phone, location, items, land, loyaltyMsg, restOrderNumbers, price, type) {
           let limit = localStorage.getItem('allow_second_order') === 'true' ? 2 : 1;
           
@@ -3508,14 +3146,24 @@
 
           stopLocalAlarm();
 
-          const driverName = localStorage.getItem('driver_name') || 'كابتن غير معروف';
+          const driverName = localStorage.getItem('driver_name') || (currentLang === 'en' ? 'Unknown Captain' : 'كابتن غير معروف');
           const driverPhone = localStorage.getItem('driver_phone') || '';
           
           if(typeof db !== 'undefined') {
-              db.ref('orders/' + orderId).update({ status: 'claimed', driver: driverName, driverPhone: driverPhone });
+              db.ref('orders/' + orderId).update({ 
+                  status: 'claimed', 
+                  driver: driverName,
+                  driverPhone: driverPhone
+              });
           }
           
-          const privateMsg = `✅ تم حجز الطلب بنجاح\n\n🔑 كود التأكيد: ${orderId}\n\n📦 التفاصيل:\n🔵 طلب ${type}\n👤الزبون: ${customerName}\n📞الهاتف: ${phone}`;
+          if(discordMsgId) {
+              const newPublicMsg = `🔴 **تم حجز الطلب**\nباسم المندوب: ${driverName}`;
+              editDiscordMessage(discordMsgId, newPublicMsg);
+          }
+          
+          const privateMsg = `✅ تم حجز الطلب بنجاح\n\n🔑 كود التأكيد: ${orderId}\n\n📦 التفاصيل:\n🔵 طلب ${type}\n👤الزبون: ${customerName}\n📞الهاتف: ${phone}\n📌الدالة: ${land}\n📝الطلب: ${items}\n🔢 تسلسل طلب العميل: ${loyaltyMsg}\n📍الموقع: ${location}`;
+          
           sendToPrivateDiscord(privateMsg);
           showToast(currentLang === 'en' ? "Order Claimed! Check My Orders." : "تم حجز الطلب بنجاح! راجع الطلبات المحجوزة.");
       }
@@ -3526,23 +3174,44 @@
           const badge = document.getElementById('driver-status-badge');
           
           if(current === 'busy') { 
-              if(btn) { btn.style.background = 'var(--danger)'; btn.innerHTML = '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً'; } 
-              if(badge) { badge.innerText = 'أنت الآن مشغول 🔴'; badge.style.background = 'var(--danger)'; badge.style.color = 'white'; } 
+              if(btn) { 
+                  btn.style.background = 'var(--danger)'; 
+                  btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-minus-circle"></i> I am Busy Now' : '<i class="fas fa-minus-circle"></i> أنا مشغول حالياً'; 
+              } 
+              if(badge) { 
+                  badge.innerText = currentLang === 'en' ? 'You are busy 🔴' : 'أنت الآن مشغول 🔴'; 
+                  badge.style.background = 'var(--danger)'; badge.style.color = 'white'; 
+              } 
           } else { 
-              if(btn) { btn.style.background = 'var(--secondary)'; btn.innerHTML = '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; } 
-              if(badge) { badge.innerText = 'أنت الآن في وضع التحصيل النشط 🟢'; badge.style.background = 'var(--gold)'; badge.style.color = '#000'; } 
+              if(btn) { 
+                  btn.style.background = 'var(--secondary)'; 
+                  btn.innerHTML = currentLang === 'en' ? '<i class="fas fa-check-circle"></i> I am Available' : '<i class="fas fa-check-circle"></i> أنا متاح للعمل'; 
+              } 
+              if(badge) { 
+                  badge.innerText = currentLang === 'en' ? 'You are active now 🟢' : 'أنت الآن في وضع التحصيل النشط 🟢'; 
+                  badge.style.background = 'var(--gold)'; badge.style.color = '#000'; 
+              } 
           }
           
-          // طلب صلاحية الإشعارات بمجرد تسجيل الدخول ككابتن
-          requestNotificationPermission();
-          listenToNewOrdersRealtime();
-      }
+          const soundBtn = document.getElementById('soundToggleBtn');
+          if(isSoundEnabled) {
+              if(soundBtn) { 
+                  soundBtn.innerHTML = currentLang === 'en' ? '<i class="fas fa-bell"></i> Order Bell: ON' : '<i class="fas fa-bell"></i> جرس الطلبات: مفعل'; 
+                  soundBtn.style.background = '#F59E0B'; soundBtn.style.color = 'white'; 
+              }
+          }
 
-      function toggleDriverStatus() {
-          let current = localStorage.getItem('driver_status') || 'available';
-          let newStatus = current === 'available' ? 'busy' : 'available';
-          localStorage.setItem('driver_status', newStatus);
-          initDriverStatus();
+          if ("Notification" in window) {
+              if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+                  Notification.requestPermission().then(permission => {
+                      if (permission === "granted") {
+                          showToast(currentLang === 'en' ? "Notifications Enabled! 🔔" : "تم تفعيل الإشعارات بنجاح! 🔔");
+                      }
+                  });
+              }
+          }
+
+          listenToNewOrdersRealtime();
       }
 
       window.addEventListener('offline', checkConnection);
@@ -3557,6 +3226,7 @@
       window.onload = function() {
           checkStatus(); 
           initAutoLocation(); 
+          applyDeliveryDiscount();
           if(localStorage.getItem('isVerifiedDriver') === 'true') {
               initDriverStatus(); 
           }
@@ -3564,6 +3234,7 @@
               if (checkTimeLock()) applyGlobalStatus();
           }, 60000);
       };
+
     </script>
 </body>
 </html>
