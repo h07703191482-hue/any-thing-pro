@@ -831,6 +831,7 @@
             <button id="cart-continue-btn" class="send-btn ripple" style="width: auto; margin: 0; padding: 12px 25px; font-size: 16px; box-shadow: none;" onclick="checkoutRestaurant()">استمرار <i class="fas fa-arrow-left" id="cart-cont-icon"></i></button>
         </div>
     </div>
+    
     <div id="tuk-screen" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="tuk-back-icon"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-money-bill-wave" style="color:var(--gold);"></i> <span id="tuk-head">تكتك توصيلة</span></h2>
@@ -1116,7 +1117,7 @@
         </div>
 
         <p id="driver-display-name" style="text-align: center; font-weight: 700; color: var(--text-muted); margin-top:30px;"></p>
-        <button id="plaza-logout-btn" class="resign-btn ripple-dark" onclick="resignDriver()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج / استقالة</button>
+        <button id="plaza-logout-btn" class="resign-btn ripple-dark" onclick="resignDriver()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج / الاستقالة</button>
     </div>
 
     <div id="log-screen" class="screen container">
@@ -1396,7 +1397,14 @@
           localStorage.setItem('app_version', CURRENT_VERSION);
       }
 
-      const umQasrPolygon = [{ lat: 30.0800, lng: 47.9600 }, { lat: 30.0800, lng: 47.8800 }, { lat: 30.0100, lng: 47.8800 }, { lat: 30.0100, lng: 47.9600 }];
+      // دوال تحديد منطقة أم قصر
+      const umQasrPolygon = [
+          { lat: 30.0800, lng: 47.9600 }, 
+          { lat: 30.0800, lng: 47.8800 }, 
+          { lat: 30.0100, lng: 47.8800 }, 
+          { lat: 30.0100, lng: 47.9600 }
+      ];
+
       function isUserInUmQasr(userLat, userLng, polygon) {
           let isInside = false;
           for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -1410,8 +1418,11 @@
       
       function checkAppAccess(lat, lng) {
           if(localStorage.getItem('isAdmin') === 'true') return; 
-          if (!isUserInUmQasr(lat, lng, umQasrPolygon)) document.getElementById('out-of-zone-popup').style.display = 'flex';
+          if (!isUserInUmQasr(lat, lng, umQasrPolygon)) {
+              document.getElementById('out-of-zone-popup').style.display = 'flex';
+          }
       }
+      
       async function trackLiveVisit() { try { fetch(`${GS_URL}?action=trackVisit&t=${new Date().getTime()}`); } catch(e) {} }
 
       let secretCounter = 0, lockSecretCounter = 0, appIsActive = true, lastOrderCount = -1, orderPollInterval = null;
@@ -1850,7 +1861,6 @@
       // دوال النظام والجافاسكربت الأساسية
       // ==========================================
 
-      // دوال فتح وإغلاق القائمة الجانبية
       function openSidebar() {
           document.getElementById('appSidebar').classList.add('open');
           document.getElementById('sidebarOverlay').classList.add('show');
@@ -1862,10 +1872,10 @@
       }
 
       function applyDeliveryDiscount() {
-          // تم إلغاء العرض الأسبوعي بناءً على طلبك
-          // الأسعار ستبقى كما هي في الـ HTML بدون أي تغيير
+          // تم إلغاء العرض الأسبوعي
       }
 
+      // 🔴 الدالة الخاصة بقفل التطبيق من 2 بالليل إلى 8 الصبح
       function checkTimeLock() {
           const hour = new Date().getHours();
           const lockScreen = document.getElementById('global-lock-screen'), lockTitle = document.getElementById('lock-h2'), lockDesc = document.getElementById('lock-p');
@@ -1884,6 +1894,7 @@
           }
           return false; 
       }
+
       function checkPhoneLive(input) {
           let errorSpan = input.parentNode.querySelector('.phone-error');
           if (!errorSpan) return;
@@ -1910,7 +1921,11 @@
       function initAutoLocation() {
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
-                 (position) => { userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`; checkAppAccess(position.coords.latitude, position.coords.longitude); },
+                 (position) => { 
+                     userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`; 
+                     // 🔴 فحص هل المستخدم داخل أم قصر أو لا
+                     checkAppAccess(position.coords.latitude, position.coords.longitude); 
+                 },
                  (error) => { console.warn("GPS Denied"); }, { enableHighAccuracy: true }
               );
           }
@@ -2704,7 +2719,6 @@
           if (typeof closeSidebar === 'function') closeSidebar();
       }
 
-      // --- تعديل تسريع طلب تكتك توصيلة ---
       async function sendTukOrder() {
           if (!navigator.onLine) return showToast(currentLang === 'en' ? "No Internet ❌" : "لا يوجد إنترنت ❌");
           const name = document.getElementById('tukName').value.trim(); const phone = document.getElementById('tukPhone').value.trim();
@@ -2766,7 +2780,6 @@
           }, 2000);
       }
 
-      // --- تعديل تسريع خدمة الوسيط ---
       async function sendMedFinal() {
           if (!navigator.onLine) return showToast(currentLang === 'en' ? "No Internet ❌" : "لا يوجد إنترنت ❌");
           const name = document.getElementById('medName').value.trim(); const phone = document.getElementById('medPhone').value.trim(); const order = document.getElementById('medOrder').value.trim();
@@ -2827,7 +2840,6 @@
           }, 2000);
       }
 
-      // --- تعديل تسريع طلب مسواك ---
       async function sendFinal() {
           if (!navigator.onLine) return showToast(currentLang === 'en' ? "No Internet ❌" : "لا يوجد إنترنت ❌");
           const name = document.getElementById('custName').value.trim(); 
@@ -3041,9 +3053,6 @@
       }
       function updateLoyaltyUI() { updateLocalLoyaltyUI(); } updateLocalLoyaltyUI();
 
-      // ==========================================
-      // دوال الخريطة والأسعار (المفقودة)
-      // ==========================================
       let appMap = null;
       function openMapModal() {
          document.getElementById('map-modal').style.display = 'flex';
@@ -3065,33 +3074,24 @@
       function openPricesModal() { document.getElementById('prices-modal').style.display = 'flex'; }
       function closePricesModal() { document.getElementById('prices-modal').style.display = 'none'; }
 
-      // =================================================================
-      // 🚨 دوال الـ JavaScript الخاصة بالإنذار اللحظي الذكي (Firebase) 🚨
-      // =================================================================
+      let isInitialLoad = true; 
 
-      let isInitialLoad = true; // لتجاهل الطلبات القديمة عند فتح التطبيق
-
-      // 1. الاستماع للطلبات الجديدة في نفس اللحظة
       function listenToNewOrdersRealtime() {
           if(typeof db === 'undefined' || localStorage.getItem('isVerifiedDriver') !== 'true') return;
 
           db.ref('orders').on('child_added', (snapshot) => {
-              if (isInitialLoad) return; // لا تشغل الجرس للطلبات اللي موجودة مسبقاً
+              if (isInitialLoad) return; 
 
               const order = snapshot.val();
-              // تشغيل الإنذار فقط إذا كان الطلب جديد (ينتظر المندوب)
               if (order && (order.status === 'pending_driver' || order.status === 'pending_restaurant')) {
                   triggerLocalAlarm();
               }
           });
 
-          // بعد 3 ثواني نعتبر التطبيق حمل الطلبات القديمة، ونبدأ نستقبل التنبيهات الجديدة
           setTimeout(() => { isInitialLoad = false; }, 3000);
       }
 
-      // 2. دالة تشغيل الإنذار (محلياً بجهاز المندوب المتاح)
       function triggerLocalAlarm() {
-          // التأكد أن الكابتن متاح للعمل، ومفعل الصوت
           if(localStorage.getItem('driver_status') === 'busy') return; 
           if(!isSoundEnabled) return;
 
@@ -3117,7 +3117,6 @@
           }
       }
 
-      // 3. دالة إيقاف الإنذار من شاشة المندوب
       function stopLocalAlarm() {
           const alarmModal = document.getElementById('persistent-alarm-modal');
           const alarmAudio = document.getElementById('persistent-alarm-audio');
@@ -3130,7 +3129,6 @@
           if ("vibrate" in navigator) navigator.vibrate(0);
       }
 
-      // 4. دالة الحجز (إيقاف الإنذار محلياً بعد الحجز)
       async function claimOrder(orderId, customerName, discordMsgId, phone, location, items, land, loyaltyMsg, restOrderNumbers, price, type) {
           let limit = localStorage.getItem('allow_second_order') === 'true' ? 2 : 1;
           
@@ -3139,7 +3137,6 @@
               return; 
           }
 
-          // إيقاف الإنذار بمجرد الضغط على الحجز
           stopLocalAlarm();
 
           const driverName = localStorage.getItem('driver_name') || (currentLang === 'en' ? 'Unknown Captain' : 'كابتن غير معروف');
@@ -3164,7 +3161,6 @@
           showToast(currentLang === 'en' ? "Order Claimed! Check My Orders." : "تم حجز الطلب بنجاح! راجع الطلبات المحجوزة.");
       }
 
-      // 5. تهيئة لوحة المندوب عند الدخول
       function initDriverStatus() {
           let current = localStorage.getItem('driver_status') || 'available';
           const btn = document.getElementById('statusToggleBtn'); 
@@ -3208,7 +3204,6 @@
               }
           }
 
-          // تفعيل الاستماع للطلبات اللحظية بدل التحديث الموقوت القديم
           listenToNewOrdersRealtime();
       }
 
