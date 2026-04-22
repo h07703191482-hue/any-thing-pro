@@ -411,28 +411,32 @@
                 <span id="prices-modal-title">أسعار التوصيل 🛵</span>
                 <button class="close-prices-btn" onclick="closePricesModal()"><i class="fas fa-times"></i></button>
             </div>
-            <div class="prices-content">
-               <div class="price-item"><span id="loc1" style="flex:1;">الخمسين</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span id="loc2" style="flex:1;">المشروع</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span id="loc3" style="flex:1;">حي المعلمين</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span id="loc4" style="flex:1;">شوارع</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span id="loc5" style="flex:1;">هندية جنوبية</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span id="loc6" style="flex:1;">الهندسة</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span id="loc7" style="flex:1;">شعبي</span><span class="price-val">1,500 د.ع</span></div>
-               <div class="price-item"><span id="loc8" style="flex:1;">دور الظباط</span><span class="price-val">2,000 د.ع</span></div>
-               <div class="price-item"><span id="loc9" style="flex:1;">دور سمنت</span><span class="price-val">2,000 د.ع</span></div>
-               <div class="price-item"><span id="loc10" style="flex:1;">البهو</span><span class="price-val">2,000 د.ع</span></div>
-               <div class="price-item"><span id="loc11" style="flex:1;">صناعة</span><span class="price-val">2,000 د.ع</span></div>
-               <div class="price-item"><span id="loc12" style="flex:1;">هندية الشمالية</span><span class="price-val">2,000 د.ع</span></div>
-               <div class="price-item"><span id="loc13" style="flex:1;">القاعدة</span><span class="price-val">3,000 د.ع</span></div>
-               <div class="price-item"><span id="loc14" style="flex:1;">هدامة</span><span class="price-val">3,000 د.ع</span></div>
-               <div class="price-item"><span id="loc15" style="flex:1;">ميناء الجنوبي</span><span class="price-val">4,000 د.ع</span></div>
-               <div class="price-item"><span id="loc16" style="flex:1;">الارصفة العشرة</span><span class="price-val">4,000 د.ع</span></div>
-               <div class="price-item"><span id="loc17" style="flex:1;">ميناء 27</span><span class="price-val">5,000 د.ع</span></div>
-               <div class="price-item"><span id="loc18" style="flex:1;">الترحيب</span><span class="price-val">5,000 د.ع</span></div>
-               <div class="price-item"><span id="loc19" style="flex:1;">الصمود</span><span class="price-val">7,000 د.ع</span></div>
-               <div class="price-item"><span id="loc20" style="flex:1;">الستباقية</span><span class="price-val">7,000 د.ع</span></div>
-               <div class="price-item" style="border-bottom: none;"><span id="loc21" style="flex:1;">التحليات</span><span class="price-val">7,000 د.ع</span></div>
+            <div class="prices-content" id="prices-content-box">
+               <div class="price-item"><span id="loc1" style="flex:1;">الخمسين</span><span class="price-val discountable-price">1,000 د.ع</span></div>
+               <div class="price-item"><span id="loc2" style="flex:1;">المشروع</span><span class="price-val discountable-price">1,000 د.ع</span></div>
+               <div class="price-item"><span id="loc3" style="flex:1;">حي المعلمين</span><span class="price-val discountable-price">1,000 د.ع</span></div>
+               <div class="price-item"><span id="loc4" style="flex:1;">شوارع</span><span class="price-val discountable-price">1,000 د.ع</span></div>
+               <div class="price-item"><span id="loc5" style="flex:1;">هندية جنوبية</span><span class="price-val discountable-price">1,000 د.ع</span></div>
+               <div class="price-item"><span id="loc6" style="flex:1;">الهندسة</span><span class="price-val discountable-price">1,000 د.ع</span></div>
+               <div class="price-item"><span id="loc7" style="flex:1;">شعبي</span><span class="price-val discountable-price">1,000 د.ع</span></div>
+               <div class="price-item"><span id="loc8" style="flex:1;">دور الظباط</span><span class="price-val discountable-price" data-original="1,000">1,000 د.ع</span></div>
+               <div class="price-item"><span id="loc9" style="flex:1;">دور سمنت</span><span class="price-val discountable-price" data-original="1,000">1,000 د.ع</span></div>
+               <div class="price-item"><span id="loc10" style="flex:1;">البهو</span><span class="price-val discountable-price" data-original="1,000">1,000 د.ع</span></div>
+               <div class="price-item"><span id="loc11" style="flex:1;">صناعة</span><span class="price-val discountable-price" data-original="1,000">1,000 د.ع</span></div>
+               <div class="price-item"><span id="loc12" style="flex:1;">هندية الشمالية</span><span class="price-val discountable-price" data-original="1,000">1,000 د.ع</span></div>
+               
+               <div class="price-item"><span id="loc13" style="flex:1;">القاعدة</span><span class="price-val discountable-price" data-original="2,000">2,000 د.ع</span></div>
+               <div class="price-item"><span id="loc14" style="flex:1;">هدامة</span><span class="price-val discountable-price" data-original="2,000">2,000 د.ع</span></div>
+               <div class="price-item"><span id="loc_new1" style="flex:1;">المجمع الكويتي</span><span class="price-val discountable-price" data-original="2,000">2,000 د.ع</span></div>
+               
+               <div class="price-item"><span id="loc15" style="flex:1;">ميناء الجنوبي</span><span class="price-val discountable-price" data-original="4,000">4,000 د.ع</span></div>
+               <div class="price-item"><span id="loc16" style="flex:1;">الارصفة العشرة</span><span class="price-val discountable-price" data-original="4,000">4,000 د.ع</span></div>
+               <div class="price-item"><span id="loc17" style="flex:1;">ميناء 27</span><span class="price-val discountable-price" data-original="4,000">4,000 د.ع</span></div>
+               <div class="price-item"><span id="loc18" style="flex:1;">الترحيب</span><span class="price-val discountable-price" data-original="4,000">4,000 د.ع</span></div>
+               <div class="price-item"><span id="loc19" style="flex:1;">الصمود</span><span class="price-val discountable-price" data-original="4,000">4,000 د.ع</span></div>
+               
+               <div class="price-item"><span id="loc20" style="flex:1;">الستباقية</span><span class="price-val discountable-price" data-original="7,000">7,000 د.ع</span></div>
+               <div class="price-item" style="border-bottom: none;"><span id="loc21" style="flex:1;">التحليات</span><span class="price-val discountable-price" data-original="7,000">7,000 د.ع</span></div>
             </div>
         </div>
     </div>
@@ -676,7 +680,6 @@
              </div>
           </div>
       </div>
-      
       <div style="position: relative; z-index: 5;">
           <div class="rest-slider">
              <div class="rest-card ripple" onclick="openMenu('rken_estkana')">
@@ -812,6 +815,7 @@
           </div>
       </div>
     </div>
+    
     <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="rest-back-icon"></i></button>
         <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> <span id="restaurant-name-header">اسم المطعم</span></h2>
@@ -1210,6 +1214,7 @@
               'loc12': 'North Hindiya', 'mloc12': 'North Hindiya',
               'loc13': 'Al-Qaida', 'mloc13': 'Al-Qaida',
               'loc14': 'Hadama', 'mloc14': 'Hadama',
+              'loc_new1': 'Kuwaiti Complex', 'mloc_new1': 'Kuwaiti Complex',
               'loc15': 'South Port', 'mloc15': 'South Port',
               'loc16': 'The 10 Piers', 'mloc16': 'The 10 Piers',
               'loc17': 'Port 27', 'mloc17': 'Port 27',
@@ -1393,7 +1398,7 @@
       let forcedVerifyCustomerPhone = ""; 
       let currentLogTab = 'completed'; 
 
-      const CURRENT_VERSION = "2.0.30"; 
+      const CURRENT_VERSION = "2.0.31"; 
       if(localStorage.getItem('app_version') !== CURRENT_VERSION) {
           localStorage.setItem('app_version', CURRENT_VERSION);
       }
@@ -1859,7 +1864,7 @@
           }
       };
       // ==========================================
-      // دوال النظام والجافاسكربت الأساسية
+      // دوال النظام والجافاسكربت الأساسية والخصم الأسبوعي
       // ==========================================
 
       function openSidebar() {
@@ -1872,8 +1877,33 @@
           document.getElementById('sidebarOverlay').classList.remove('show');
       }
 
+      // 🔴 دالة الخصم الأسبوعي (500 دينار) لكل المناطق
+      // الخصم مبرمج ينتهي يوم 29 نيسان 2026
       function applyDeliveryDiscount() {
-          // تم إلغاء العرض الأسبوعي
+          const expiryDate = new Date('2026-04-29T23:59:59');
+          const now = new Date();
+          
+          if (now <= expiryDate) {
+              const priceElements = document.querySelectorAll('.price-val');
+              priceElements.forEach(el => {
+                  // استخراج الرقم فقط
+                  let originalText = el.innerText.replace(/[^0-9]/g, '');
+                  let originalPrice = parseInt(originalText);
+                  
+                  // تطبيق خصم 500 دينار إذا السعر أكبر من أو يساوي 500
+                  if (!isNaN(originalPrice) && originalPrice >= 500 && !el.hasAttribute('data-discounted')) {
+                      let newPrice = originalPrice - 500;
+                      el.innerHTML = `<s style="color: var(--text-muted); font-size: 11px; margin-left: 5px;">${originalPrice.toLocaleString()}</s> <span style="color: #10B981; font-weight: 900;">${newPrice.toLocaleString()} د.ع</span>`;
+                      el.setAttribute('data-discounted', 'true');
+                  }
+              });
+
+              // تغيير إشعار الأسعار بالشاشة الرئيسية
+              const priceAlertTitle = document.getElementById('price-alert-title');
+              const priceAlertSub = document.getElementById('price-alert-sub');
+              if(priceAlertTitle) priceAlertTitle.innerHTML = 'عرض أسبوعي 🔥 (خصم 500 دينار)';
+              if(priceAlertSub) priceAlertSub.innerHTML = 'الخصم ينتهي يوم 29 نيسان 2026 وترجع الأسعار طبيعية';
+          }
       }
 
       // 🔴 الدالة الخاصة بقفل التطبيق من 2 بالليل إلى 8 الصبح
@@ -2413,10 +2443,9 @@
                   }
               }
               
-              // التعديل: إيقاف التنبيه في حال كانت قائمة الطلبات المتاحة فارغة (تم حجزها أو حذفها)
               if(!hasAvailable) {
                   availableContainer.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">${currentLang === 'en' ? 'No available orders currently' : 'لا توجد طلبات متاحة حالياً'}</p>`;
-                  stopLocalAlarm(); // <--- هذا هو السطر الذي يحل المشكلة لجميع المندوبين
+                  stopLocalAlarm();
               }
 
               if(!hasMyOrders) myOrdersContainer.innerHTML = `<p style="text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600;">${currentLang === 'en' ? 'No active orders for you currently' : 'لا توجد طلبات محجوزة لك حالياً'}</p>`;
@@ -2953,7 +2982,7 @@
                   
                   try { const cashAudio = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3'); cashAudio.play(); confetti({ particleCount: 300, spread: 100, origin: { y: 0.5 } }); } catch(e) {}
                   let logs = JSON.parse(localStorage.getItem('driver_logs') || '[]');
-                  logs.unshift({ date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }), phone: custPhone, price: "2,000 د.ع" });
+                  logs.unshift({ date: new Date().toLocaleString('en-US', { hour12: true, year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }), phone: custPhone, price: "تم التسليم" });
                   localStorage.setItem('driver_logs', JSON.stringify(logs));
                   localStorage.setItem('d_count', parseInt(localStorage.getItem('d_count') || 0) + 1);
                   localStorage.setItem('league_count', parseInt(localStorage.getItem('league_count') || 0) + 1);
@@ -3226,7 +3255,7 @@
       window.onload = function() {
           checkStatus(); 
           initAutoLocation(); 
-          applyDeliveryDiscount();
+          applyDeliveryDiscount(); // استدعاء الخصم الأسبوعي
           if(localStorage.getItem('isVerifiedDriver') === 'true') {
               initDriverStatus(); 
           }
