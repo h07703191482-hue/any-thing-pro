@@ -648,6 +648,7 @@
     <div id="admin-panel" class="screen container">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="adm-back-icon"></i></button>
         <h2 class="screen-header-title"><i class="fas fa-user-shield" style="color:var(--primary);"></i> <span id="adm-title">لوحة التحكم السرية</span></h2>
+        
         <div class="form-card" style="text-align: center;">
             <p id="adm-status-desc" style="font-weight: 700; margin-bottom: 20px;">حالة استقبال الطلبات للزبائن</p>
            
@@ -816,7 +817,6 @@
           </div>
       </div>
     </div>
-    
     <div id="restaurant-menu-screen" class="screen container" style="padding-bottom: 100px;">
         <button class="back-btn ripple-dark" onclick="showScreen('home-screen')"><i class="fas fa-arrow-right" id="rest-back-icon"></i></button>
         <h2 class="screen-header-title" style="margin-bottom: 5px;"><i class="fas fa-hamburger" style="color:var(--primary);"></i> <span id="restaurant-name-header">اسم المطعم</span></h2>
@@ -1925,7 +1925,7 @@
           if (navigator.geolocation) {
              navigator.geolocation.getCurrentPosition(
                  (position) => { 
-                     userCoords = `https://maps.google.com/?q=${position.coords.latitude},${position.coords.longitude}`; 
+                     userCoords = `https://maps.google.com/?q=$${position.coords.latitude},${position.coords.longitude}`; 
                      // 🔴 فحص هل المستخدم داخل أم قصر أو لا
                      checkAppAccess(position.coords.latitude, position.coords.longitude); 
                  },
@@ -1983,6 +1983,7 @@
           }
       }
       
+      // 🟢 هذه الدالة الخاصة بتغيير حالة التطبيق على الفايربيس (إغلاق / فتح للجميع)
       async function setGlobalAppStatus(newStatus) {
           const btnOpen = document.getElementById('btn-open-app'), btnClose = document.getElementById('btn-close-app');
           if(newStatus === 'online') btnOpen.innerHTML = '<span class="baly-spinner"></span>'; else btnClose.innerHTML = '<span class="baly-spinner"></span>';
@@ -1999,6 +2000,7 @@
           }
       }
 
+      // 🟢 هذه الدالة تستمع للتغييرات باللحظة (Real-time) وتغلق التطبيق عند الزبائن فوراً
       function listenToGlobalStatus() {
           if(typeof db === 'undefined') return;
           db.ref('settings/app_status').on('value', (snapshot) => {
@@ -2736,7 +2738,7 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
+                     (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendTukOrder(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               } else { showToast(currentLang === 'en' ? "GPS Not Supported ❌" : "جهازك لا يدعم تحديد الموقع ❌"); }
@@ -2797,7 +2799,7 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
+                     (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendMedFinal(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -2859,7 +2861,7 @@
              showToast(currentLang === 'en' ? "Locating you...📍" : "جاري تحديد موقعك الحالي للطلب...📍");
              if(navigator.geolocation) {
                  navigator.geolocation.getCurrentPosition(
-                     (pos) => { userCoords = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
+                     (pos) => { userCoords = `https://maps.google.com/?q=$${pos.coords.latitude},${pos.coords.longitude}`; sendFinal(); },
                      (err) => { showToast(currentLang === 'en' ? "Please enable GPS ❌" : "يرجى تفعيل الـ GPS والسماح للموقع لإرسال الطلب ❌"); }, { enableHighAccuracy: true }
                   );
               }
@@ -3074,7 +3076,7 @@
       function closeMapModal() { document.getElementById('map-modal').style.display = 'none'; }
       function confirmMapLocation() {
           const center = appMap.getCenter();
-          const googleMapsLink = `https://maps.google.com/?q=${center.lat},${center.lng}`;
+          const googleMapsLink = `https://maps.google.com/?q=$${center.lat},${center.lng}`;
          document.getElementById('tukDropoffLink').value = googleMapsLink;
          document.getElementById('map-success-msg').style.display = 'block';
          closeMapModal();
