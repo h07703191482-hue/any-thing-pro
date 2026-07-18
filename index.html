@@ -165,10 +165,11 @@
 
     <!-- صفحة السجل -->
     <div id="history-screen" class="page-screen">
+        <!-- زر حذف السجل أعلى يسار الشاشة -->
+        <button class="btn" style="position: absolute; top: 20px; left: 20px; font-size: 1rem; padding: 10px 20px; background-color: #dc3545; color: white;" onclick="clearHistory()">حذف السجل</button>
+
         <div class="order-container">
             <h2>السجل</h2>
-            <!-- زر حذف السجل -->
-            <button class="submit-btn" style="background-color: #dc3545; margin-top: 0; margin-bottom: 20px;" onclick="clearHistory()">حذف السجل</button>
             <div id="history-list"></div>
         </div>
     </div>
@@ -288,12 +289,12 @@
             renderOrders('receive-list', true, orders);
         }
 
-        // دالة حذف السجل الجديدة
+        // دالة مسح السجل الجديدة
         function clearHistory() {
             let pass = prompt("الرجاء إدخال الرمز السري لحذف السجل:");
             if (pass === "2006") {
-                historyOrders = [];
-                db.ref('historyOrders').set(historyOrders);
+                historyOrders = []; // تصفير المصفوفة
+                db.ref('historyOrders').set(historyOrders); // تحديث في Firebase
                 alert("تم حذف السجل بنجاح!");
             } else if (pass !== null) {
                 alert("الرمز السري غير صحيح!");
