@@ -217,11 +217,12 @@
 
     <!-- صفحة السجل -->
     <div id="history-screen" class="page-screen">
-        <!-- زر حذف السجل أعلى يسار الشاشة -->
-        <button class="btn" style="position: absolute; top: 20px; left: 20px; font-size: 1rem; padding: 10px 20px; background-color: #dc3545; color: white;" onclick="clearHistory()">حذف السجل</button>
-
         <div class="order-container">
             <h2>السجل</h2>
+            
+            <!-- زر حذف السجل يظهر الآن بوضوح فوق قائمة سجلات الطلبات -->
+            <button class="btn" style="width: 100%; margin-bottom: 20px; font-size: 1rem; padding: 10px 20px; background-color: #dc3545; color: white;" onclick="clearHistory()">حذف السجل</button>
+            
             <div id="history-list"></div>
         </div>
     </div>
@@ -341,7 +342,7 @@
             renderOrders('receive-list', true, orders);
         }
 
-        // دالة مسح السجل الجديدة
+        // دالة مسح السجل الجديدة مبرمجة على الرمز 2006
         function clearHistory() {
             let pass = prompt("الرجاء إدخال الرمز السري لحذف السجل:");
             if (pass === "2006") {
