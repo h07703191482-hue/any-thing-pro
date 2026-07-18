@@ -167,6 +167,8 @@
     <div id="history-screen" class="page-screen">
         <div class="order-container">
             <h2>السجل</h2>
+            <!-- زر حذف السجل -->
+            <button class="submit-btn" style="background-color: #dc3545; margin-top: 0; margin-bottom: 20px;" onclick="clearHistory()">حذف السجل</button>
             <div id="history-list"></div>
         </div>
     </div>
@@ -284,6 +286,18 @@
             db.ref('historyOrders').set(historyOrders); 
             
             renderOrders('receive-list', true, orders);
+        }
+
+        // دالة حذف السجل الجديدة
+        function clearHistory() {
+            let pass = prompt("الرجاء إدخال الرمز السري لحذف السجل:");
+            if (pass === "2006") {
+                historyOrders = [];
+                db.ref('historyOrders').set(historyOrders);
+                alert("تم حذف السجل بنجاح!");
+            } else if (pass !== null) {
+                alert("الرمز السري غير صحيح!");
+            }
         }
     </script>
 </body>
