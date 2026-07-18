@@ -64,13 +64,13 @@
 
         /* زر الرجوع */
         .back-btn-main {
-            position: absolute;
+            position: fixed; /* تم تعديله ليكون ثابتاً فوق كل شيء */
             top: 20px;
             right: 20px;
             padding: 10px 20px;
             background-color: #dc3545;
             color: white;
-            border: 1px solid rgba(255,255,255,0.3); /* لمسة جمالية */
+            border: 1px solid rgba(255,255,255,0.3); 
             border-radius: 8px;
             cursor: pointer;
             font-size: 1.2rem;
@@ -84,8 +84,8 @@
         /* حركة كلمة الترحيب */
         .welcome-text {
             font-size: 5rem;
-            color: #ffcc00; /* تغيير للون الذهبي ليتناسب مع الفخامة */
-            text-shadow: 0 0 20px rgba(255, 204, 0, 0.6); /* توهج للكلمة */
+            color: #ffcc00; 
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.6); 
             font-weight: bold;
             opacity: 0;
             animation: appearGrowShrink 3s ease-in-out forwards;
@@ -100,14 +100,25 @@
 
         /* الشاشات */
         #main-screen { display: none; gap: 30px; }
-        .page-screen { display: none; width: 100%; height: 100%; justify-content: center; align-items: center; overflow-y: auto; flex-direction: column; }
+        
+        /* === حل المشكلة: إزالة التوسيط العمودي للسماح بظهور الطلبات الأولى بشكل صحيح === */
+        .page-screen { 
+            display: none; 
+            width: 100%; 
+            height: 100%; 
+            justify-content: flex-start; /* تم تغييره من center لمنع قص الشاشة من الأعلى */
+            align-items: center; 
+            overflow-y: auto; 
+            flex-direction: column; 
+            padding-bottom: 50px; /* مسافة إضافية في الأسفل */
+        }
 
         .btn {
             padding: 15px 50px;
             font-size: 2rem;
             font-weight: bold;
             color: #fff;
-            border: 1px solid rgba(255,255,255,0.2); /* إطار خفيف */
+            border: 1px solid rgba(255,255,255,0.2); 
             border-radius: 12px;
             cursor: pointer;
             box-shadow: 0 8px 20px rgba(0,0,0,0.3);
@@ -120,17 +131,15 @@
 
         /* تنسيق صفحة الإرسال والطلبات */
         .order-container {
-            /* إضافة تأثير الزجاج الشفاف المودرن (Glassmorphism) */
             background: rgba(255, 255, 255, 0.85) !important;
             backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.5);
-            
             width: 90%;
             max-width: 500px;
             padding: 30px;
-            border-radius: 15px; /* زيادة الانحناء قليلاً */
+            border-radius: 15px; 
             box-shadow: 0 15px 35px rgba(0,0,0,0.3) !important;
-            margin-top: 80px;
+            margin-top: 90px; /* مسافة من الأعلى لكي لا يغطي زر الرجوع على المحتوى */
         }
         h2 { text-align: center; color: #333; margin-bottom: 30px; border-bottom: 2px solid #28a745; padding-bottom: 10px; }
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #ddd; }
