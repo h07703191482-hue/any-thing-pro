@@ -155,6 +155,9 @@
         .order-item-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.9); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .receive-btn { background-color: #28a745; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.2s;}
         .receive-btn:hover { transform: scale(1.02); }
+        /* زر الإلغاء الجديد */
+        .cancel-btn { background-color: #dc3545; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.2s;}
+        .cancel-btn:hover { transform: scale(1.02); }
     </style>
 </head>
 <body>
@@ -329,7 +332,13 @@
             list.innerHTML = listArray.length === 0 ? '<p style="text-align:center">لا توجد طلبات.</p>' : '';
             
             listArray.forEach((o, index) => {
-                let receiveHtml = isReceive ? `<button class="receive-btn" onclick="receiveOrder(${index})">استلم</button>` : '';
+                // إضافة زر الإلغاء بجانب زر الاستلام وتوزيعهم بشكل متساوٍ
+                let receiveHtml = isReceive ? `
+                    <div style="display: flex; gap: 10px;">
+                        <button class="receive-btn" onclick="receiveOrder(${index})">استلم</button>
+                        <button class="cancel-btn" onclick="cancelOrder(${index})">إلغاء</button>
+                    </div>
+                ` : '';
                 list.innerHTML += `
                     <div class="order-item-card">
                         <strong>طلب رقم ${index + 1}</strong><br>
@@ -351,7 +360,15 @@
             renderOrders('receive-list', true, orders);
         }
 
-        // دالة مسح السجل الجديدة مبرمجة على الرمز 2006
+        // دالة إلغاء الطلب الجديدة
+        function cancelOrder(index) {
+            orders.splice(index, 1); // حذف الطلب تماماً من قائمة الطلبات
+            db.ref('orders').set(orders); // تحديث القائمة في قاعدة البيانات
+            // لا نضيف الطلب لمصفوفة historyOrders لذلك لن يتم تسجيله
+            renderOrders('receive-list', true, orders);
+        }
+
+        // دالة مسح السجل المبرمجة على الرمز 2006
         function clearHistory() {
             let pass = prompt("الرجاء إدخال الرمز السري لحذف السجل:");
             if (pass === "2006") {
