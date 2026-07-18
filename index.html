@@ -348,7 +348,14 @@
             renderOrders('receive-list', true, orders);
         }
 
-        
+        function clearHistory() {
+            let pass = prompt("الرجاء إدخال الرمز السري لحذف السجل:");
+            if (pass === "2006") {
+                historyOrders = []; 
+                db.ref('historyOrders').set(historyOrders); 
+                alert("تم حذف السجل بنجاح!");
+            } else if (pass !== null) {
+                alert("الرمز السري غير صحيح!");
             }
         }
     </script>
