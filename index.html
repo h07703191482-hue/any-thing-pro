@@ -5,23 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام الكاشير</title>
     
-    <!-- إضافة مكتبات Firebase (متوافقة مع كودك المباشر) -->
+    <!-- إضافة مكتبات Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
 
     <style>
-        /* إعدادات الصفحة الأساسية */
+        /* إعدادات الصفحة الأساسية - خلفية فخمة متحركة */
         body {
             margin: 0;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(45deg, #a8edea 0%, #fed6e3 100%); 
-            font-family: Arial, sans-serif;
+            background: linear-gradient(-45deg, #141E30, #243B55, #2c3e50, #000000);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
-            transition: background 0.5s ease;
             position: relative;
+            color: #fff;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ديكورات الخلفية (كرات مضيئة عائمة) */
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: float 10s infinite ease-in-out alternate;
+        }
+        .shape1 { width: 350px; height: 350px; background: #ff416c; top: -5%; left: -5%; animation-delay: 0s; }
+        .shape2 { width: 450px; height: 450px; background: #00b4db; bottom: -10%; right: -5%; animation-delay: 2s; }
+        .shape3 { width: 300px; height: 300px; background: #fdfc47; top: 40%; left: 50%; transform: translate(-50%, -50%); animation-delay: 4s; opacity: 0.3; }
+
+        @keyframes float { 
+            0% { transform: translateY(0) scale(1); } 
+            100% { transform: translateY(-30px) scale(1.1); } 
         }
 
         /* زر الرجوع */
@@ -29,24 +55,27 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            padding: 10px 20px;
-            background-color: #dc3545;
+            padding: 10px 25px;
+            background: rgba(220, 53, 69, 0.8);
+            backdrop-filter: blur(5px);
             color: white;
-            border: none;
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 8px;
             cursor: pointer;
             font-size: 1.2rem;
             font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             display: none;
             z-index: 1000;
+            transition: all 0.3s ease;
         }
-        .back-btn-main:hover { background-color: #c82333; }
+        .back-btn-main:hover { background: rgba(220, 53, 69, 1); transform: translateY(-2px); }
 
         /* حركة كلمة الترحيب */
         .welcome-text {
             font-size: 5rem;
-            color: #ff0000;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255,255,255,0.5), 0 0 40px #ff416c;
             font-weight: bold;
             opacity: 0;
             animation: appearGrowShrink 3s ease-in-out forwards;
@@ -60,50 +89,83 @@
         }
 
         /* الشاشات */
-        #main-screen { display: none; gap: 30px; }
-        .page-screen { display: none; width: 100%; height: 100%; justify-content: center; align-items: center; overflow-y: auto; flex-direction: column; }
+        #main-screen { display: none; gap: 40px; z-index: 10; }
+        .page-screen { display: none; width: 100%; height: 100%; justify-content: center; align-items: center; overflow-y: auto; flex-direction: column; z-index: 10; padding-top: 50px;}
 
+        /* الأزرار الرئيسية */
         .btn {
-            padding: 15px 50px;
-            font-size: 2rem;
+            padding: 20px 60px;
+            font-size: 2.2rem;
             font-weight: bold;
             color: #fff;
-            border: none;
-            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.2s, background-color 0.2s;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
-        .btn.send { background-color: #28a745; }
-        .btn.receive { background-color: #007bff; }
-        .btn.orders { background-color: #ffc107; color: #000; }
-        .btn:hover { transform: scale(1.05); }
+        .btn.send { background: linear-gradient(135deg, rgba(40, 167, 69, 0.8), rgba(33, 136, 56, 0.8)); }
+        .btn.receive { background: linear-gradient(135deg, rgba(0, 123, 255, 0.8), rgba(0, 86, 179, 0.8)); }
+        .btn.orders { background: linear-gradient(135deg, rgba(255, 193, 7, 0.8), rgba(224, 168, 0, 0.8)); color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .btn:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 15px 35px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.6); }
 
-        /* تنسيق صفحة الإرسال والطلبات */
+        /* تنسيق صفحة الإرسال والطلبات (تأثير الزجاج - Glassmorphism) */
         .order-container {
-            background-color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             width: 90%;
-            max-width: 500px;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            margin-top: 80px;
+            max-width: 550px;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-top: 40px;
+            margin-bottom: 40px;
         }
-        h2 { text-align: center; color: #333; margin-bottom: 30px; border-bottom: 2px solid #28a745; padding-bottom: 10px; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; }
-        .item-name { font-size: 1.3rem; font-weight: bold; color: #444; }
-        .quantity-box { display: flex; align-items: center; gap: 10px; }
-        .qty-btn { background-color: #007bff; color: white; border: none; border-radius: 6px; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; }
-        .qty-btn.minus { background-color: #dc3545; }
-        .quantity-box input { width: 50px; height: 40px; font-size: 1.3rem; text-align: center; border: 1px solid #ccc; border-radius: 6px; pointer-events: none; }
-        .submit-btn { width: 100%; background-color: #28a745; color: #fff; border: none; padding: 15px; font-size: 1.3rem; font-weight: bold; border-radius: 8px; margin-top: 25px; cursor: pointer; }
+        h2 { text-align: center; color: #fff; margin-bottom: 30px; border-bottom: 2px solid #00b4db; padding-bottom: 15px; letter-spacing: 1px; font-size: 2rem;}
+        
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .item-row:last-of-type { border-bottom: none; }
+        .item-name { font-size: 1.4rem; font-weight: bold; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
+        
+        .quantity-box { display: flex; align-items: center; gap: 15px; }
+        .qty-btn { background: rgba(0, 123, 255, 0.8); color: white; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; width: 45px; height: 45px; font-size: 1.8rem; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .qty-btn:hover { transform: scale(1.1); }
+        .qty-btn.minus { background: rgba(220, 53, 69, 0.8); }
+        
+        .quantity-box input { width: 60px; height: 45px; font-size: 1.5rem; text-align: center; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; background: rgba(0,0,0,0.2); color: white; pointer-events: none; }
+        
+        textarea {
+            width: 100%; height: 90px; margin-top: 20px; border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.2); color: #fff;
+            padding: 15px; font-size: 1.1rem; box-sizing: border-box;
+            backdrop-filter: blur(5px); transition: 0.3s;
+        }
+        textarea::placeholder { color: rgba(255,255,255,0.6); }
+        textarea:focus { outline: none; border-color: #00b4db; background: rgba(0, 0, 0, 0.4); }
+
+        .submit-btn { width: 100%; background: linear-gradient(135deg, #28a745, #218838); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 18px; font-size: 1.5rem; font-weight: bold; border-radius: 12px; margin-top: 30px; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .submit-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
         
         /* تنسيق قائمة الطلبات */
-        .order-item-card { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 8px; background: #f9f9f9; }
-        .receive-btn { background-color: #28a745; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; }
+        .order-item-card { border: 1px solid rgba(255,255,255,0.2); padding: 20px; margin-bottom: 15px; border-radius: 12px; background: rgba(0,0,0,0.3); box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.3s; }
+        .order-item-card:hover { transform: scale(1.02); background: rgba(0,0,0,0.4); }
+        .order-item-card strong { font-size: 1.3rem; color: #00b4db; }
+        .receive-btn { background: linear-gradient(135deg, #28a745, #218838); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 15px; font-weight: bold; font-size: 1.2rem; transition: 0.3s; }
+        .receive-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
     </style>
 </head>
 <body>
+
+    <!-- الديكورات الخلفية -->
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+    <div class="bg-shape shape3"></div>
 
     <!-- زر الرجوع -->
     <button id="back-btn-main" class="back-btn-main" onclick="goBack()">رجوع</button>
@@ -121,7 +183,7 @@
     <div id="send-screen" class="page-screen">
         <div class="order-container">
             <h2>إرسال طلب جديد</h2>
-            <button class="btn orders" style="width: 100%; margin-bottom: 20px; font-size: 1rem;" onclick="showPage('orders-screen')">عرض الطلبات المسجلة</button>
+            <button class="btn orders" style="width: 100%; margin-bottom: 25px; font-size: 1.2rem; padding: 15px;" onclick="showPage('orders-screen')">عرض الطلبات المسجلة</button>
             
             <div class="item-row">
                 <div class="item-name">طبق عادي</div>
@@ -139,7 +201,7 @@
                     <button class="qty-btn minus" onclick="decreaseQty('qty2')">-</button>
                 </div>
             </div>
-            <textarea id="notes" style="width:100%; height:80px; margin-top:20px; border-radius:8px; border: 1px solid #ccc;" placeholder="ملاحظات الطلب..."></textarea>
+            <textarea id="notes" placeholder="ملاحظات الطلب..."></textarea>
             <button class="submit-btn" onclick="saveOrder()">إرسال الطلب</button>
         </div>
     </div>
@@ -155,7 +217,7 @@
     <!-- صفحة الاستلام -->
     <div id="receive-screen" class="page-screen">
         <!-- زر السجل -->
-        <button class="btn orders" style="position: absolute; top: 20px; left: 20px; font-size: 1rem; padding: 10px 20px;" onclick="showPage('history-screen')">السجل</button>
+        <button class="btn orders" style="position: absolute; top: 20px; left: 20px; font-size: 1.1rem; padding: 10px 25px;" onclick="showPage('history-screen')">السجل</button>
         
         <div class="order-container">
             <h2>قائمة الاستلام</h2>
@@ -166,7 +228,7 @@
     <!-- صفحة السجل -->
     <div id="history-screen" class="page-screen">
         <!-- زر حذف السجل أعلى يسار الشاشة -->
-        <button class="btn" style="position: absolute; top: 20px; left: 20px; font-size: 1rem; padding: 10px 20px; background-color: #dc3545; color: white;" onclick="clearHistory()">حذف السجل</button>
+        <button class="btn" style="position: absolute; top: 20px; left: 20px; font-size: 1.1rem; padding: 10px 25px; background: rgba(220, 53, 69, 0.8); color: white; border-color: rgba(255,255,255,0.3);" onclick="clearHistory()">حذف السجل</button>
 
         <div class="order-container">
             <h2>السجل</h2>
@@ -190,10 +252,10 @@
         const db = firebase.database();
 
         let orders = [];
-        let historyOrders = []; // مصفوفة للسجل
+        let historyOrders = []; 
         let pageHistory = ['main-screen'];
 
-        // مزامنة الطلبات اللحظية من Firebase
+        // مزامنة الطلبات
         db.ref('orders').on('value', (snapshot) => {
             orders = snapshot.val() || [];
             let currentPage = pageHistory[pageHistory.length - 1];
@@ -201,7 +263,7 @@
             if(currentPage === 'receive-screen') renderOrders('receive-list', true, orders);
         });
 
-        // مزامنة السجل اللحظي من Firebase
+        // مزامنة السجل
         db.ref('historyOrders').on('value', (snapshot) => {
             historyOrders = snapshot.val() || [];
             let currentPage = pageHistory[pageHistory.length - 1];
@@ -211,7 +273,7 @@
         setTimeout(function() {
             document.getElementById('welcome-text').style.display = 'none';
             document.getElementById('main-screen').style.display = 'flex';
-        }, 3000); // 3 ثوانٍ
+        }, 3000); 
 
         function showPage(pageId) {
             document.querySelectorAll('.page-screen, #main-screen').forEach(s => s.style.display = 'none');
@@ -219,7 +281,6 @@
             
             pageHistory.push(pageId);
             document.getElementById('back-btn-main').style.display = 'block';
-            document.body.style.background = '#ffffff';
 
             if(pageId === 'orders-screen') renderOrders('orders-list', false, orders);
             if(pageId === 'receive-screen') renderOrders('receive-list', true, orders);
@@ -235,7 +296,6 @@
                 
                 if (prevPage === 'main-screen') {
                     document.getElementById('back-btn-main').style.display = 'none';
-                    document.body.style.background = 'linear-gradient(45deg, #a8edea 0%, #fed6e3 100%)';
                 }
             }
         }
@@ -254,7 +314,7 @@
             if(q1 == 0 && q2 == 0) { alert("يرجى اختيار طبق واحد على الأقل"); return; }
 
             orders.push({q1, q2, notes});
-            db.ref('orders').set(orders); // حفظ الطلب في Firebase
+            db.ref('orders').set(orders);
 
             alert("تم تسجيل الطلب!");
             document.getElementById('qty1').value = 0;
@@ -264,40 +324,31 @@
 
         function renderOrders(elementId, isReceive, listArray) {
             let list = document.getElementById(elementId);
-            list.innerHTML = listArray.length === 0 ? '<p style="text-align:center">لا توجد طلبات.</p>' : '';
+            list.innerHTML = listArray.length === 0 ? '<p style="text-align:center; color:rgba(255,255,255,0.7); font-size:1.2rem;">لا توجد طلبات.</p>' : '';
             
             listArray.forEach((o, index) => {
                 let receiveHtml = isReceive ? `<button class="receive-btn" onclick="receiveOrder(${index})">استلم</button>` : '';
                 list.innerHTML += `
                     <div class="order-item-card">
-                        <strong>طلب رقم ${index + 1}</strong><br>
+                        <strong>طلب رقم ${index + 1}</strong><br><br>
                         طبق عادي: ${o.q1} | طبق فنكر: ${o.q2}<br>
-                        <em>الملاحظات: ${o.notes || 'لا توجد'}</em>
+                        <em style="color: #ddd; display:block; margin-top:8px;">الملاحظات: ${o.notes || 'لا توجد'}</em>
                         ${receiveHtml}
                     </div>`;
             });
         }
 
         function receiveOrder(index) {
-            let completedOrder = orders.splice(index, 1)[0]; // نقل الطلب
+            let completedOrder = orders.splice(index, 1)[0]; 
             historyOrders.push(completedOrder);
             
-            // تحديث القوائم في Firebase
             db.ref('orders').set(orders); 
             db.ref('historyOrders').set(historyOrders); 
             
             renderOrders('receive-list', true, orders);
         }
 
-        // دالة مسح السجل الجديدة
-        function clearHistory() {
-            let pass = prompt("الرجاء إدخال الرمز السري لحذف السجل:");
-            if (pass === "2006") {
-                historyOrders = []; // تصفير المصفوفة
-                db.ref('historyOrders').set(historyOrders); // تحديث في Firebase
-                alert("تم حذف السجل بنجاح!");
-            } else if (pass !== null) {
-                alert("الرمز السري غير صحيح!");
+        
             }
         }
     </script>
