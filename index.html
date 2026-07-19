@@ -347,10 +347,12 @@
             return `منذ ${hours} ساعة${mins > 0 ? ` و ${mins} دقيقة` : ''}`;
         }
 
-        function renderOrders(elementId, isReceive, listArray) {
+        function renderOrders(elementId, isReceive, listArray, isHistory = false) {
             let list = document.getElementById(elementId);
             list.innerHTML = listArray.length === 0 ? '<p style="text-align:center">لا توجد طلبات.</p>' : '';
             
+            let totalAllOrders = 0; // متغير لحساب المجموع الكلي
+
             listArray.forEach((o, index) => {
                 let bgColor = cardColors[index % cardColors.length]; // تحديد لون بناءً على ترتيب الطلب
                 let timeText = timeSince(o.timestamp); // حساب الوقت
@@ -361,6 +363,30 @@
                         <button class="cancel-btn" onclick="cancelOrder(${index})">إلغاء</button>
                     </div>
                 ` : '';
+
+                // ---------- قسم حساب الأسعار (يظهر فقط في السجل) ----------
+                let priceHtml = '';
+                if (isHistory) {
+                    let q1Count = parseInt(o.q1) || 0;
+                    let q2Count = parseInt(o.q2) || 0;
+                    let notesText = o.notes || '';
+                    
+                    let q1Price = 2000;
+                    // إذا الملاحظات بيها كلمة "دبل" نحسب الطبق بـ 4000
+                    if (notesText.includes('دبل')) {
+                        q1Price = 4000;
+                    }
+                    
+                    let orderTotalPrice = (q1Count * q1Price) + (q2Count * 1000);
+                    totalAllOrders += orderTotalPrice;
+                    
+                    priceHtml = `
+                        <div style="margin-top: 15px; padding-top: 10px; border-top: 2px dashed #ccc; font-size: 1.3rem; font-weight: bold; color: #198754;">
+                            سعر الطلب: ${orderTotalPrice.toLocaleString()} دينار
+                        </div>
+                    `;
+                }
+                // --------------------------------------------------------
 
                 list.innerHTML += `
                     <div class="order-item-card" style="background-color: ${bgColor};">
@@ -374,16 +400,27 @@
                             طبق فنكر: <span class="qty-highlight">${o.q2}</span>
                         </div>
                         <em style="color: #444;">الملاحظات: ${o.notes || 'لا توجد'}</em>
+                        ${priceHtml}
                         ${receiveHtml}
                     </div>`;
             });
+
+            // عرض المجموع الكلي أسفل القائمة في السجل
+            if (isHistory && listArray.length > 0) {
+                list.innerHTML += `
+                    <div style="background-color: #198754; color: white; padding: 15px; border-radius: 12px; text-align: center; font-size: 1.5rem; font-weight: bold; margin-top: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                        المجموع الكلي للطلبات: ${totalAllOrders.toLocaleString()} دينار
+                    </div>
+                `;
+            }
         }
 
         function updateVisibleLists() {
             let currentPage = pageHistory[pageHistory.length - 1];
-            if(currentPage === 'orders-screen') renderOrders('orders-list', false, orders);
-            if(currentPage === 'receive-screen') renderOrders('receive-list', true, orders);
-            if(currentPage === 'history-screen') renderOrders('history-list', false, historyOrders);
+            // مررنا isHistory = false للشاشات العادية، و isHistory = true لشاشة السجل
+            if(currentPage === 'orders-screen') renderOrders('orders-list', false, orders, false);
+            if(currentPage === 'receive-screen') renderOrders('receive-list', true, orders, false);
+            if(currentPage === 'history-screen') renderOrders('history-list', false, historyOrders, true);
         }
 
         // تحديث الوقت المكتوب على الطلبات كل دقيقة تلقائياً
