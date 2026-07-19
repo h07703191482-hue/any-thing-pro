@@ -369,15 +369,8 @@
                 if (isHistory) {
                     let q1Count = parseInt(o.q1) || 0;
                     let q2Count = parseInt(o.q2) || 0;
-                    let notesText = o.notes || '';
                     
-                    let q1Price = 2000;
-                    // إذا الملاحظات بيها كلمة "دبل" نحسب الطبق بـ 4000
-                    if (notesText.includes('دبل')) {
-                        q1Price = 4000;
-                    }
-                    
-                    let orderTotalPrice = (q1Count * q1Price) + (q2Count * 1000);
+                    let orderTotalPrice = (q1Count * 2000) + (q2Count * 1000);
                     totalAllOrders += orderTotalPrice;
                     
                     priceHtml = `
