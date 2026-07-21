@@ -5,9 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام الكاشير</title>
     
-    <!-- إضافة مكتبات Firebase -->
+    <!-- إضافة مكتبات Firebase الأساسية والداتابيز والإشعارات -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <script src="https://www.تفضل هذا هو **الكود الكامل والنهائي** (HTML + CSS + JavaScript) مدمجاً فيه التعديل الأخير. 
+
+لقد أضفت لك زراً صغيراً في الشاشة الرئيسية باسم **"تفعيل هذا الجهاز ككاشير"** لتسهيل العملية عليك بدون الحاجة لأي تعقيد.
+
+انسخ هذا الكود بالكامل واستبدله في ملفك على `GitHub`:
+
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الكاشير - البندر</title>
+    
+    <!-- إضافة مكتبات Firebase الأساسية والداتابيز والإشعارات -->
+    <script src="[https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js](https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js)"></script>
+    <script src="[https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js](https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js)"></script>
+    <script src="[https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js](https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js)"></script>
 
     <style>
         /* === ديكورات الخلفية الفخمة === */
@@ -15,6 +32,15 @@
             background: linear-gradient(135deg, #141e30 0%, #243b55 100%) !important;
             background-size: 200% 200% !important;
             animation: gradientMove 10s ease infinite !important;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            transition: background 0.5s ease;
+            position: relative;
         }
 
         @keyframes gradientMove {
@@ -44,19 +70,6 @@
         @keyframes floatShape {
             0% { transform: translateY(0) scale(1); }
             100% { transform: translateY(-40px) scale(1.1); }
-        }
-        /* ==================================== */
-
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-            transition: background 0.5s ease;
-            position: relative;
         }
 
         .back-btn-main {
@@ -93,8 +106,10 @@
             100% { transform: scale(0); opacity: 0; }
         }
 
-        #main-screen { display: none; gap: 30px; }
+        #main-screen { display: none; gap: 20px; flex-direction: column; align-items: center; }
         
+        .main-buttons-container { display: flex; gap: 30px; margin-bottom: 20px; }
+
         .page-screen { 
             display: none; 
             width: 100%; 
@@ -120,6 +135,7 @@
         .btn.send { background-color: #28a745; }
         .btn.receive { background-color: #007bff; }
         .btn.orders { background-color: #ffc107; color: #000; }
+        .btn.cashier-setup { background-color: #6c757d; font-size: 1.2rem; padding: 10px 30px; }
         .btn:hover { transform: scale(1.05); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
 
         /* تأثير الوميض لزر الاستلام عند وصول طلب جديد */
@@ -130,6 +146,14 @@
         }
         .pulse-active {
             animation: pulseAlert 0.8s infinite !important;
+        }
+
+        /* تأثير التلاشي عند الاستلام أو الإلغاء */
+        .fade-out-anim {
+            opacity: 0 !important;
+            transform: scale(0.8) !important;
+            transition: all 0.4s ease-out !important;
+            pointer-events: none;
         }
 
         .order-container {
@@ -194,8 +218,8 @@
 </head>
 <body>
 
-    <!-- عنصر الصوت للتنبيه (رابط صوت جرس قصير جاهز) -->
-    <audio id="alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+    <!-- عنصر الصوت -->
+    <audio id="alert-sound" src="[https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3](https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3)" preload="auto"></audio>
 
     <div class="bg-decorations">
         <div class="shape shape-1"></div>
@@ -208,9 +232,12 @@
     <div id="welcome-text" class="welcome-text">العافية</div>
 
     <div id="main-screen">
-        <button class="btn send" onclick="showPage('send-screen')">إرسال</button>
-        <!-- زر الاستلام الذي سيومض عند وجود طلبات جديدة -->
-        <button class="btn receive" id="main-receive-btn" onclick="showPage('receive-screen')">استلام</button>
+        <div class="main-buttons-container">
+            <button class="btn send" onclick="showPage('send-screen')">إرسال</button>
+            <button class="btn receive" id="main-receive-btn" onclick="showPage('receive-screen')">استلام</button>
+        </div>
+        <!-- زر تفعيل الكاشير لتشغيل الصوت على هذا الجهاز فقط -->
+        <button class="btn cashier-setup" onclick="activateAsCashierDevice()">تفعيل هذا الجهاز ككاشير 🔒</button>
     </div>
 
     <div id="send-screen" class="page-screen">
@@ -267,7 +294,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyBXW3gL4PszJjmgmVVOjkuEqe-WkWHyO60",
             authDomain: "al-bandar-f02f6.firebaseapp.com",
-            databaseURL: "https://al-bandar-f02f6-default-rtdb.firebaseio.com",
+            databaseURL: "[https://al-bandar-f02f6-default-rtdb.firebaseio.com](https://al-bandar-f02f6-default-rtdb.firebaseio.com)",
             projectId: "al-bandar-f02f6",
             storageBucket: "al-bandar-f02f6.firebasestorage.app",
             messagingSenderId: "799678549296",
@@ -276,22 +303,82 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        const messaging = firebase.messaging();
 
         let orders = [];
         let historyOrders = []; 
         let pageHistory = ['main-screen'];
-        let previousOrdersCount = -1; // متغير لتخزين العدد القديم ومقارنته
+        let previousOrdersCount = -1;
+
+        let playCount = 0;
+        const maxPlays = 3;
+        let soundElement = document.getElementById('alert-sound');
 
         const cardColors = ['#f8d7da', '#d1ecf1', '#d4edda', '#fff3cd', '#e8daef', '#ffebd7'];
 
-        // مراقبة الطلبات في فايربيس
+        // دالة لتفعيل هذا الجهاز فقط كـ "كاشير رئيسي"
+        function activateAsCashierDevice() {
+            let pass = prompt("أدخل الرمز السري لتفعيل هذا الجهاز ككاشير:");
+            if (pass === "2006") {
+                localStorage.setItem('isCashierDevice', 'true');
+                alert("تم تفعيل هذا الجهاز بنجاح! الإشعارات والصوت ستعمل هنا فقط.");
+                requestNotificationPermission();
+            } else if (pass !== null) {
+                alert("الرمز السري غير صحيح!");
+            }
+        }
+
+        // أداء تكرار الصوت 3 مرات
+        if (soundElement) {
+            soundElement.addEventListener('ended', function() {
+                playCount++;
+                if (playCount < maxPlays) {
+                    soundElement.currentTime = 0;
+                    soundElement.play().catch(e => console.log(e));
+                }
+            });
+        }
+
+        // إرسال التوكن لفايربيس فقط إذا كان هذا الجهاز هو جهاز الكاشير
+        function requestNotificationPermission() {
+            if (localStorage.getItem('isCashierDevice') !== 'true') return;
+
+            Notification.requestPermission().then((permission) => {
+                if (permission === 'granted') {
+                    messaging.getToken({ vapidKey: 'BPohHHQQN16Y1ols63bqkBjaanF1NIVlZqsZNrAoIBWlA565Jt6JH9-JrauNibeH_k89lvz06pTXp-nye4ZlXdw' }).then((currentToken) => {
+                        if (currentToken) {
+                            console.log('التوكن الخاص بهذا الجهاز:', currentToken);
+                            db.ref('adminTokens/' + currentToken).set(true);
+                        }
+                    }).catch((err) => console.log('خطأ في جلب التوكن:', err));
+                }
+            });
+        }
+
+        document.body.addEventListener('click', () => {
+            if (localStorage.getItem('isCashierDevice') === 'true' && Notification.permission !== 'granted') {
+                requestNotificationPermission();
+            }
+        }, { once: true });
+
+        messaging.onMessage((payload) => {
+            console.log('إشعار مستلم والتطبيق مفتوح:', payload);
+        });
+
+        // مراقبة الداتابيز
         db.ref('orders').on('value', (snapshot) => {
             let newOrders = snapshot.val() || [];
             
-            // التحقق إذا تم إضافة طلب جديد (العدد زاد عن السابق)
-            if (previousOrdersCount !== -1 && newOrders.length > previousOrdersCount) {
-                playAlertSound();      // تشغيل الصوت
-                triggerPulseEffect();  // تفعيل الوميض المرئي
+            if (previousOrdersCount !== -1) {
+                if (newOrders.length > previousOrdersCount) {
+                    // تشغيل الصوت والوميض فقط إذا كان هذا الجهاز مفعلاً ككاشير
+                    if (localStorage.getItem('isCashierDevice') === 'true') {
+                        playAlertSound();      
+                        triggerPulseEffect();  
+                    }
+                } else if (newOrders.length < previousOrdersCount || newOrders.length === 0) {
+                    stopAlert(); 
+                }
             }
             
             previousOrdersCount = newOrders.length;
@@ -309,27 +396,30 @@
             document.getElementById('main-screen').style.display = 'flex';
         }, 3000); 
 
-        // دالة تشغيل التنبيه الصوتي
         function playAlertSound() {
-            let sound = document.getElementById('alert-sound');
-            if (sound) {
-                sound.currentTime = 0; // إعادة الصوت من البداية ليعمل فوراً إذا تكرر
-                sound.play().catch(error => {
-                    console.log("المتصفح منع التشغيل التلقائي حتى يتم التفاعل مع الصفحة أولاً", error);
-                });
+            if (soundElement) {
+                playCount = 0; 
+                soundElement.currentTime = 0;
+                soundElement.play().catch(error => console.log(error));
             }
         }
 
-        // دالة تفعيل الوميض المرئي على زر الاستلام
+        function stopAlert() {
+            let receiveBtn = document.getElementById('main-receive-btn');
+            if (soundElement) {
+                playCount = maxPlays; 
+                soundElement.pause();
+                soundElement.currentTime = 0;
+            }
+            if (receiveBtn) {
+                receiveBtn.classList.remove('pulse-active');
+            }
+        }
+
         function triggerPulseEffect() {
             let receiveBtn = document.getElementById('main-receive-btn');
             if (receiveBtn) {
                 receiveBtn.classList.add('pulse-active');
-                
-                // إيقاف الوميض تلقائياً بعد 15 ثانية (أو عند فتح شاشة الاستلام)
-                setTimeout(() => {
-                    receiveBtn.classList.remove('pulse-active');
-                }, 15000);
             }
         }
 
@@ -341,10 +431,8 @@
             document.getElementById('back-btn-main').style.display = 'block';
             document.body.style.background = '#ffffff';
 
-            // إذا دخل الكاشير إلى شاشة الاستلام، نلغي الوميض لأنه انتبه للطلبات
             if (pageId === 'receive-screen') {
-                let receiveBtn = document.getElementById('main-receive-btn');
-                if (receiveBtn) receiveBtn.classList.remove('pulse-active');
+                stopAlert(); 
             }
 
             updateVisibleLists();
@@ -430,7 +518,7 @@
                 }
 
                 list.innerHTML += `
-                    <div class="order-item-card" style="background-color: ${bgColor};">
+                    <div id="${elementId}-card-${index}" class="order-item-card" style="background-color: ${bgColor};">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                             <strong style="font-size: 1.2rem;">طلب رقم ${index + 1}</strong>
                             ${timeText ? `<span class="time-badge">⏱️ ${timeText}</span>` : ''}
@@ -467,6 +555,17 @@
         }, 60000);
 
         function receiveOrder(index) {
+            let card = document.getElementById(`receive-list-card-${index}`);
+            if (card) {
+                card.classList.add('fade-out-anim');
+                setTimeout(() => { processReceive(index); }, 400);
+            } else {
+                processReceive(index);
+            }
+        }
+
+        function processReceive(index) {
+            stopAlert();
             let completedOrder = orders.splice(index, 1)[0]; 
             historyOrders.push(completedOrder);
             
@@ -477,6 +576,17 @@
         }
 
         function cancelOrder(index) {
+            let card = document.getElementById(`receive-list-card-${index}`);
+            if (card) {
+                card.classList.add('fade-out-anim');
+                setTimeout(() => { processCancel(index); }, 400);
+            } else {
+                processCancel(index);
+            }
+        }
+
+        function processCancel(index) {
+            stopAlert();
             orders.splice(index, 1); 
             db.ref('orders').set(orders); 
             updateVisibleLists();
