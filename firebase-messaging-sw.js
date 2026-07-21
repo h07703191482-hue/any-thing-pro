@@ -1,9 +1,10 @@
-importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
 
 firebase.initializeApp({
     apiKey: "AIzaSyBXW3gL4PszJjmgmVVOjkuEqe-WkWHyO60",
     authDomain: "al-bandar-f02f6.firebaseapp.com",
+    databaseURL: "https://al-bandar-f02f6-default-rtdb.firebaseio.com",
     projectId: "al-bandar-f02f6",
     storageBucket: "al-bandar-f02f6.firebasestorage.app",
     messagingSenderId: "799678549296",
@@ -12,17 +13,12 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// هذه الدالة تعمل عندما يوصل إشعار والتطبيق مغلق تماماً
-messaging.onBackgroundMessage((payload) => {
-    console.log('وصل إشعار في الخلفية:', payload);
-    const notificationTitle = payload.notification.title;
-    const notificationOptions = {
-        body: payload.notification.body,
-        icon: 'android-chrome-192x192.png', // أيقونة تطبيق البندر
-        vibrate: [200, 100, 200],
-        tag: 'new-order', // لمنع تكرار الإشعارات
-        data: { url: '/index.html' } 
-    };
+messaging.onBackgroundMessage(function(payload) {
+  const notificationTitle = payload.notification.title || 'طلب جديد في البندر!';
+  const notificationOptions = {
+    body: payload.notification.body || 'يوجد طلب جديد بانتظار الاستلام.',
+    icon: 'https://cdn-icons-png.flaticon.com/512/3500/3500833.png' 
+  };
 
-    self.registration.showNotification(notificationTitle, notificationOptions);
+  self.registration.showNotification(notificationTitle, notificationOptions);
 });
