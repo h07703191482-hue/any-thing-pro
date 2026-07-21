@@ -132,6 +132,14 @@
             animation: pulseAlert 0.8s infinite !important;
         }
 
+        /* تأثير التلاشي السلس للكروت */
+        .fade-out-anim {
+            opacity: 0 !important;
+            transform: scale(0.8) !important;
+            transition: all 0.4s ease-out !important;
+            pointer-events: none;
+        }
+
         .order-container {
             background: rgba(255, 255, 255, 0.85) !important;
             backdrop-filter: blur(15px);
@@ -161,6 +169,7 @@
             border-radius: 12px; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
             color: #222;
+            transition: all 0.3s ease; /* لدعم حركة التلاشي */
         }
         
         .qty-highlight {
@@ -194,7 +203,7 @@
 </head>
 <body>
 
-    <!-- عنصر الصوت للتنبيه (رابط صوت جرس قصير جاهز) -->
+    <!-- ملف الصوت للتنبيه -->
     <audio id="alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
     <div class="bg-decorations">
@@ -209,7 +218,7 @@
 
     <div id="main-screen">
         <button class="btn send" onclick="showPage('send-screen')">إرسال</button>
-        <!-- زر الاستلام الذي سيومض عند وجود طلبات جديدة -->
+        <!-- زر الاستلام -->
         <button class="btn receive" id="main-receive-btn" onclick="showPage('receive-screen')">استلام</button>
     </div>
 
@@ -280,18 +289,17 @@
         let orders = [];
         let historyOrders = []; 
         let pageHistory = ['main-screen'];
-        let previousOrdersCount = -1; // متغير لتخزين العدد القديم ومقارنته
+        let previousOrdersCount = -1; 
 
         const cardColors = ['#f8d7da', '#d1ecf1', '#d4edda', '#fff3cd', '#e8daef', '#ffebd7'];
 
-        // مراقبة الطلبات في فايربيس
+        // مراقبة الطلبات للتحقق من وصول طلب جديد لتشغيل الصوت والوميض
         db.ref('orders').on('value', (snapshot) => {
             let newOrders = snapshot.val() || [];
             
-            // التحقق إذا تم إضافة طلب جديد (العدد زاد عن السابق)
             if (previousOrdersCount !== -1 && newOrders.length > previousOrdersCount) {
-                playAlertSound();      // تشغيل الصوت
-                triggerPulseEffect();  // تفعيل الوميض المرئي
+                playAlertSound();     
+                triggerPulseEffect(); 
             }
             
             previousOrdersCount = newOrders.length;
@@ -309,24 +317,22 @@
             document.getElementById('main-screen').style.display = 'flex';
         }, 3000); 
 
-        // دالة تشغيل التنبيه الصوتي
+        // تشغيل الصوت
         function playAlertSound() {
             let sound = document.getElementById('alert-sound');
             if (sound) {
-                sound.currentTime = 0; // إعادة الصوت من البداية ليعمل فوراً إذا تكرر
+                sound.currentTime = 0;
                 sound.play().catch(error => {
-                    console.log("المتصفح منع التشغيل التلقائي حتى يتم التفاعل مع الصفحة أولاً", error);
+                    console.log("المتصفح يمنع الصوت التلقائي حتى تتفاعل مع الصفحة", error);
                 });
             }
         }
 
-        // دالة تفعيل الوميض المرئي على زر الاستلام
+        // تشغيل الوميض
         function triggerPulseEffect() {
             let receiveBtn = document.getElementById('main-receive-btn');
             if (receiveBtn) {
                 receiveBtn.classList.add('pulse-active');
-                
-                // إيقاف الوميض تلقائياً بعد 15 ثانية (أو عند فتح شاشة الاستلام)
                 setTimeout(() => {
                     receiveBtn.classList.remove('pulse-active');
                 }, 15000);
@@ -341,7 +347,6 @@
             document.getElementById('back-btn-main').style.display = 'block';
             document.body.style.background = '#ffffff';
 
-            // إذا دخل الكاشير إلى شاشة الاستلام، نلغي الوميض لأنه انتبه للطلبات
             if (pageId === 'receive-screen') {
                 let receiveBtn = document.getElementById('main-receive-btn');
                 if (receiveBtn) receiveBtn.classList.remove('pulse-active');
@@ -429,8 +434,9 @@
                     `;
                 }
 
+                // تم إضافة ID خاص بكل كارت لتسهيل حركة التلاشي
                 list.innerHTML += `
-                    <div class="order-item-card" style="background-color: ${bgColor};">
+                    <div id="${elementId}-card-${index}" class="order-item-card" style="background-color: ${bgColor};">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                             <strong style="font-size: 1.2rem;">طلب رقم ${index + 1}</strong>
                             ${timeText ? `<span class="time-badge">⏱️ ${timeText}</span>` : ''}
@@ -466,7 +472,20 @@
             updateVisibleLists();
         }, 60000);
 
+        // تعديل دالة الاستلام لإضافة التلاشي
         function receiveOrder(index) {
+            let card = document.getElementById(`receive-list-card-${index}`);
+            if (card) {
+                card.classList.add('fade-out-anim'); // تفعيل التلاشي
+                setTimeout(() => {
+                    processReceive(index);
+                }, 400); // الانتظار 400 مللي ثانية
+            } else {
+                processReceive(index);
+            }
+        }
+
+        function processReceive(index) {
             let completedOrder = orders.splice(index, 1)[0]; 
             historyOrders.push(completedOrder);
             
@@ -476,7 +495,20 @@
             updateVisibleLists();
         }
 
+        // تعديل دالة الإلغاء لإضافة التلاشي
         function cancelOrder(index) {
+            let card = document.getElementById(`receive-list-card-${index}`);
+            if (card) {
+                card.classList.add('fade-out-anim'); // تفعيل التلاشي
+                setTimeout(() => {
+                    processCancel(index);
+                }, 400); 
+            } else {
+                processCancel(index);
+            }
+        }
+
+        function processCancel(index) {
             orders.splice(index, 1); 
             db.ref('orders').set(orders); 
             updateVisibleLists();
@@ -495,4 +527,3 @@
     </script>
 </body>
 </html>
-
